@@ -157,8 +157,8 @@ last_reviewed: 2026-04-23
 #### 4.1.7 CTA セクション [**MVP**]
 
 - ページ下部に「お探しの答えは見つかりましたか？」セクション。
-- リンク: 「お問い合わせ（不具合報告・ご質問）」→ `bug-report.html`、「よくある質問を見る」→ `faq.html`。
-- `bug-report.html` は不具合・一般問い合わせ兼用で、問い合わせ種別選択を必須。
+- リンク: 「お問い合わせ（不具合報告・ご質問）」→ `contact.html`、「よくある質問を見る」→ `faq.html`。
+- `contact.html` は不具合・一般問い合わせ兼用で、問い合わせ種別選択を必須。`bug-report.html` は互換URLとして `/contact/` へ転送する。
 - 「回答には通常 〇 営業日いただいております」文言を表示（日数 TBD）。受付時間・SLA・緊急連絡は運用側定義（TBD）。
 
 #### 4.1.8 多言語対応 [**Should**]
@@ -236,7 +236,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 - 次アクション導線:
   - 代替検索語リスト（人気キーワードチップ。未設定なら非表示）+ 「キーワードを変えて再入力してください」のヒント。
   - FAQ リンク（`faq.html`）。
-  - 問い合わせリンク（`bug-report.html`）。
+  - 問い合わせリンク（`contact.html`）。
 
 #### 4.2.3 カテゴリ内の絞り込み・ソート [**MVP**]
 
@@ -284,7 +284,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 **画面分岐**:
 - 投票済み（期限内）はボタンを表示せず「ご協力ありがとうございました。」のみ。
-- **「いいえ」投票後**: 「投票は記録されません。問い合わせはこちら（記事 ID（例: HELP-0123）を記載ください）」と `bug-report.html` / `faq.html` への誘導。`bug-report.html?articleId=<id>` 自動引き渡しは Phase 2（§9）。現行は「はい/いいえ」同一メッセージ（L209-L216）。Phase 1 で分岐実装。
+- **「いいえ」投票後**: 「投票は記録されません。問い合わせはこちら（記事 ID（例: HELP-0123）を記載ください）」と `contact.html` / `faq.html` への誘導。`contact.html?articleId=<id>` 自動引き渡しは Phase 2（§9）。現行は「はい/いいえ」同一メッセージ（L209-L216）。Phase 1 で分岐実装。
 - 投票取消 UI は Phase 2（§9）。
 - **複数タブ**: `storage` イベント購読による他タブ投票反映は現行未実装。Phase 1 で実装。
 - **容量超**: 現行は `catch (_e) { /* no-op */ }`（L43-L45）。仕様: `QuotaExceededError` 発生時はコンソール警告 + 投票ボタン非表示 + 「フィードバックを保存できませんでした。」表示。Phase 1 で実装。
@@ -363,7 +363,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 - 読み込み失敗時は「コンテンツの読み込みに失敗しました。」を表示。
 - エラー UI 要件:
-  - リトライボタン、問い合わせ導線（`bug-report.html`）リンク。
+  - リトライボタン、問い合わせ導線（`contact.html`）リンク。
   - エラー ID 表示 + コピーボタン（多言語 MVP）。コピー成功時はトースト通知（**必須**）。
   - Clipboard API 失敗時は `<input readonly>` にエラー ID を入れて `select()` で自動選択表示（**必須**）。
 - **エラー ID 書式**: `YYYYMMDD-HHMMSS-XXXX`（UTC、XXXX は大文字英数字 4 桁乱数）。`Date.now()` の UTC 文字列化 + `Math.random().toString(36).toUpperCase()` 上位 4 桁。衝突は照合用途のため許容。UUIDv4 化は Phase 2。
@@ -497,11 +497,11 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 ## 8. Support 配下サイトの共通アセット運用ルール
 
-> **TL;DR**: 本章は `support.speed-ad.com` / `stg.support.speed-ad.com` 配下（`/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`）の共通アセット運用ルール。**§4 のダッシュボード配下ヘルプセンターとは別スコープ**（`SPDAD2026-73` 由来）。URL正本は `21_support_site_separation_spec.md` とする。
+> **TL;DR**: 本章は `support.speed-ad.com` / `stg.support.speed-ad.com` 配下（`/help/`, `/help-content/`, `/faq/`, `/contact/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`）の共通アセット運用ルール。**§4 のダッシュボード配下ヘルプセンターとは別スコープ**（`SPDAD2026-73` 由来）。URL正本は `21_support_site_separation_spec.md` とする。
 
 ### 8.1 対象 URL / 配置 / 参照
 
-- 対象 URL: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/news/<slug>/`, `/news.json`, `/customer-voices/`, `/customer-voices/<slug>/`, `/terms/`, `/privacy/`, `/privacy/member-registration/`, `/tokushoho/`。URL正本は `21_support_site_separation_spec.md` とする。
+- 対象 URL: `/help/`, `/help-content/`, `/faq/`, `/contact/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/news/<slug>/`, `/news.json`, `/customer-voices/`, `/customer-voices/<slug>/`, `/terms/`, `/privacy/`, `/privacy/member-registration/`, `/tokushoho/`。URL正本は `21_support_site_separation_spec.md` とする。
 - `/tutorial/` はサブドメイン配下の独立ページとして扱う。`help_articles.json` のカテゴリ `tutorial` は、独立ページから接続する詳細記事群として維持する。
 - ページ本体は各配下、共通 `header.html` / `footer.html` は `/common/` 配下、共通 `css` / `js` / `img` は `/assets/` 配下に集約。機能専用リソースは `/assets/img/faq/` のように用途別で分ける。
 - HTML からの参照はルート相対で統一（例: `/assets/css/common.20260414.css`）。`../assets/...` のような相対参照は不採用。
@@ -511,6 +511,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
   faq/index.html
   help/index.html
   help-content/index.html
+  contact/index.html
   bug-report/index.html
   tutorial/index.html
   plans/index.html
@@ -540,7 +541,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 - 本番・検証はドメイン分離のため、Cookie と localStorage は自動分離。
 - **CSP [Should]**: `default-src 'self'` を基本、外部リソースは明示許可。**理由**: 万一 XSS 混入時も外部ドメインへのリソース取得・外部送信を防ぐため。
 - **HSTS [Should]**: `max-age=31536000; includeSubDomains`。**理由**: HTTPS への強制接続で中間者攻撃を防ぐため。
-- **`<meta>` robots [Nice]**: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/customer-voices/`, `/terms/`, `/privacy/`, `/tokushoho/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
+- **`<meta>` robots [Nice]**: `/help/`, `/help-content/`, `/faq/`, `/contact/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/customer-voices/`, `/terms/`, `/privacy/`, `/tokushoho/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
 - 第三者委託（CDN 等）運用は本要件書の対象外。
 
 ### 8.4 非採用方針
@@ -576,4 +577,4 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 | エラー ID UUIDv4 化 | 現行書式から UUIDv4 へ（§5.3） | 低 |
 | 空検索語時の 0 件フロー統一 | `renderNotFound()` から `renderSearchResults([])` に統一（§4.2.1） | 低 |
 | おすすめ記事: 同一カテゴリ優先 | 同一カテゴリ記事を優先抽出（§4.2.6） | 低 |
-| 「いいえ」投票後 articleId 自動引き渡し | `bug-report.html?articleId=<id>` 自動引き渡し（§4.2.5） | 低 |
+| 「いいえ」投票後 articleId 自動引き渡し | `contact.html?articleId=<id>` 自動引き渡し（§4.2.5）。`bug-report.html` は互換URLとして維持 | 低 |

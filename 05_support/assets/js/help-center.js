@@ -10,15 +10,16 @@ function loc(value) {
     return resolveLocalizedValue(value, lang, 'ja');
 }
 
-// カテゴリごとの表示メタ (アイコン / アクセントカラー)
+// カテゴリごとの表示メタ (アイコン)。アクセントはネイビー1色に統一 (design handoff)
+const HC_ACCENT = '#2c5d97';
 const CATEGORY_META = {
-    'getting-started':  { icon: 'flag',           accent: '#5B7DFF' },
-    'account':          { icon: 'account_circle', accent: '#8B6DB8' },
-    'how-to-use':       { icon: 'build',          accent: '#3BAA8E' },
-    'plans-billing':    { icon: 'receipt_long',   accent: '#D4A642' },
-    'troubleshooting':  { icon: 'support_agent',  accent: '#C85646' },
-    'tutorial':         { icon: 'school',         accent: '#2EACB9' },
-    'misc':             { icon: 'more_horiz',     accent: '#7A7A7A' },
+    'getting-started':  { icon: 'rocket_launch',   accent: HC_ACCENT },
+    'account':          { icon: 'manage_accounts', accent: HC_ACCENT },
+    'how-to-use':       { icon: 'tune',            accent: HC_ACCENT },
+    'plans-billing':    { icon: 'receipt_long',    accent: HC_ACCENT },
+    'troubleshooting':  { icon: 'troubleshoot',    accent: HC_ACCENT },
+    'tutorial':         { icon: 'play_circle',     accent: HC_ACCENT },
+    'misc':             { icon: 'lightbulb',       accent: HC_ACCENT },
 };
 
 // カテゴリの表示順 (固定)
@@ -38,8 +39,9 @@ const FAQ_CARD = {
     name: 'よくある質問',
     description: 'サービス全般に関するご質問',
     href: `${BASE}/faq/`,
-    icon: 'help_outline',
-    accent: '#D68A3A',
+    icon: 'quiz',
+    accent: HC_ACCENT,
+    lead: '料金・機能・契約まわりのよくいただくご質問をまとめています。',
     previewArticles: [],
     articleCount: null,
 };
@@ -328,11 +330,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </li>
             `).join('');
 
+            const isFaq = card.id === 'faq';
             const countLabel = card.articleCount != null ? `${card.articleCount}件の記事` : '';
-            const moreLabel = card.id === 'faq' ? 'FAQ を見る' : (countLabel || 'すべて見る');
+            const moreLabel = isFaq ? 'FAQ を見る' : (countLabel || 'すべて見る');
+            // FAQ カードは質問リンクではなく説明文 1 行 (design handoff)
+            const bodyHtml = isFaq
+                ? (card.lead ? `<p class="hc-cat-card__lead">${escapeHtml(card.lead)}</p>` : '')
+                : (previewHtml ? `<ul class="hc-cat-card__articles">${previewHtml}</ul>` : '');
 
             return `
-                <a href="${escapeHtml(card.href)}" class="hc-cat-card" style="--hc-accent: ${escapeHtml(card.accent)};" aria-label="${escapeHtml(card.name)}">
+                <a href="${escapeHtml(card.href)}" class="hc-cat-card${isFaq ? ' hc-cat-card--faq' : ''}" style="--hc-accent: ${escapeHtml(card.accent)};" aria-label="${escapeHtml(card.name)}">
                     <div class="hc-cat-card__header">
                         <span class="hc-cat-card__icon" aria-hidden="true"><span class="material-icons">${escapeHtml(card.icon)}</span></span>
                         <div>
@@ -340,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${card.description ? `<p class="hc-cat-card__desc">${escapeHtml(card.description)}</p>` : ''}
                         </div>
                     </div>
-                    ${previewHtml ? `<ul class="hc-cat-card__articles">${previewHtml}</ul>` : ''}
+                    ${bodyHtml}
                     <span class="hc-cat-card__more">
                         ${escapeHtml(moreLabel)}
                         <span class="material-icons" aria-hidden="true">arrow_forward</span>
@@ -376,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p class="hc-pop-card__category">${escapeHtml(loc(article.categoryName))}</p>
                         <h3 class="hc-pop-card__title">${escapeHtml(loc(article.question))}</h3>
                     </div>
-                    <span class="material-icons hc-pop-card__chevron" aria-hidden="true">chevron_right</span>
+                    <span class="material-icons hc-pop-card__chevron" aria-hidden="true">arrow_forward</span>
                 </a>
             `).join('');
         },

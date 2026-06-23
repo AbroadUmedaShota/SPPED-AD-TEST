@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "title": "サポートお問い合わせ受付",
+    "summary": "公開お問い合わせフォームの投稿保存、添付保存、受付メール送信の仕組み整理。",
+    "status": "draft"
+  },
+  "documents": [
+    {
+      "id": "support-contact-overview",
+      "title": "概要",
+      "path": "README.md",
+      "summary": "サポートお問い合わせ受付の方針と仕様正本への参照。"
+    },
+    {
+      "id": "support-contact-gas",
+      "title": "GAS実装・配備手順",
+      "path": "gas/README.md",
+      "summary": "専用 Apps Script Web App のAPI、Script Properties、配備手順。"
+    }
+  ]
+}

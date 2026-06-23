@@ -6,6 +6,22 @@
   <meta name="description" content="SPEED AD - 営業プロセスの無駄をゼロにする次世代のリード獲得ツール">
   <meta name="keywords" content="SPEED AD, 展示会, WEBアンケート, 名刺データ化, 御礼メール, ログイン">
   <title>SPEED AD - 営業プロセスの無駄をゼロにする次世代のリード獲得ツール。</title>
+  <script>
+    (function(w, d, s, l, i) {
+      var productionHosts = ['speed-ad.com', 'www.speed-ad.com'];
+      if (productionHosts.indexOf(w.location.hostname) === -1) {
+        return;
+      }
+      w[l] = w[l] || [];
+      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var firstScript = d.getElementsByTagName(s)[0];
+      var tagManagerScript = d.createElement(s);
+      var dataLayerParam = l !== 'dataLayer' ? '&l=' + l : '';
+      tagManagerScript.async = true;
+      tagManagerScript.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dataLayerParam;
+      firstScript.parentNode.insertBefore(tagManagerScript, firstScript);
+    })(window, document, 'script', 'dataLayer', 'GTM-NSC8G2DB');
+  </script>
   <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +29,8 @@
   <link rel="stylesheet" href="css/login-front.css?v=20260602-reasons-matrix-a">
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。この行＋下部の script を消せば撤去完了 -->
   <link rel="stylesheet" href="css/emblem-tools.css">
+  <!-- lettering-tools（開発者向け・?lettering=1 で起動）。この行＋下部の script を消せば撤去完了 -->
+  <link rel="stylesheet" href="css/lettering-tools.css">
   <style>
     body.login-front-edit--watermark {
       position: relative;
@@ -97,6 +115,17 @@
   </style>
 </head>
 <body id="before-login" class="login-front-edit--watermark" data-login-panel-theme="e2">
+  <script>
+    (function(w, d, i) {
+      var productionHosts = ['speed-ad.com', 'www.speed-ad.com'];
+      if (productionHosts.indexOf(w.location.hostname) === -1) {
+        return;
+      }
+      var tagManagerNoScript = d.createElement('noscript');
+      tagManagerNoScript.innerHTML = '<iframe src="https://www.googletagmanager.com/ns.html?id=' + i + '" height="0" width="0" style="display:none;visibility:hidden"></iframe>';
+      d.body.insertBefore(tagManagerNoScript, d.body.firstChild);
+    })(window, document, 'GTM-NSC8G2DB');
+  </script>
   <a class="skip-link" href="#top">本文へスキップ</a>
   <main id="top">
     <div class="lp-page lp-page--first">
@@ -120,7 +149,7 @@
             <a class="site-top-header__nav-link" href="#features-title">機能</a>
             <a class="site-top-header__nav-link" href="#flow-title">流れ</a>
             <a class="site-top-header__nav-link" href="#capabilities">選ばれる理由</a>
-            <a class="site-top-header__nav-link" href="https://support.speed-ad.com/customer-voices/">導入事例</a>
+            <a class="site-top-header__nav-link" href="https://support.speed-ad.com/customer-voices/" target="_blank" rel="noopener noreferrer">導入事例</a>
             <a class="site-top-header__cta" href="?intent=signup#top" data-signup-trigger>無料ではじめる</a>
           </nav>
         </div>
@@ -363,7 +392,7 @@
                 <h3>チュートリアルで迷わず使える</h3>
               </div>
               <p>ヘルプ、FAQ、チュートリアルから、基本操作や困ったときの対処を確認できます。</p>
-              <a class="capability-item__link" href="https://support.speed-ad.com/tutorial/">チュートリアルを見る <span aria-hidden="true">→</span></a>
+              <a class="capability-item__link" href="https://support.speed-ad.com/tutorial/" target="_blank" rel="noopener noreferrer">チュートリアルを見る <span aria-hidden="true">→</span></a>
             </div>
           </article>
           <article class="capability-item">
@@ -382,7 +411,7 @@
                 <h3>業界最安値でコストダウンできる</h3>
               </div>
               <p>導入費用や高額なシステム利用料がなく、名刺データ化も実際の件数で精算のため、今までよりも確実にコストを抑えられます。</p>
-              <a class="capability-item__link" href="https://support.speed-ad.com/plans/">料金プランを見る <span aria-hidden="true">→</span></a>
+              <a class="capability-item__link" href="https://support.speed-ad.com/plans/" target="_blank" rel="noopener noreferrer">料金プランを見る <span aria-hidden="true">→</span></a>
             </div>
           </article>
           <article class="capability-item">
@@ -502,7 +531,7 @@
             </div>
           </div>
         </div>
-        <a class="voice-teaser__link" href="https://support.speed-ad.com/customer-voices/">すべての声を見る <span aria-hidden="true">→</span></a>
+        <a class="voice-teaser__link" href="https://support.speed-ad.com/customer-voices/" target="_blank" rel="noopener noreferrer">すべての声を見る <span aria-hidden="true">→</span></a>
       </div>
     </section>
     </div>
@@ -612,6 +641,8 @@
   <script src="js/login-front-fullpage.js?v=20260602-tail-scroll-stop" defer></script>
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。撤去時はこの行とhead内のcssリンクを削除 -->
   <script src="js/emblem-tools.js" defer></script>
+  <!-- lettering-tools（開発者向け・?lettering=1 で起動）。撤去時はこの行とhead内のcssリンクを削除 -->
+  <script src="js/lettering-tools.js" defer></script>
 </body>
 </html>
 

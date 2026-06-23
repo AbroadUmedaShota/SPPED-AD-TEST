@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>料金カード改修案 ｜ 比較テーブル型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  body{background:#EEF1F5;color:var(--navy);}
+  .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
+  .frame{background:#fff;border-radius:20px;box-shadow:0 18px 50px rgba(16,41,77,.10);padding:44px 40px;max-width:1240px;width:100%;}
+
+  /* この案専用の調整（横並び05 比較テーブル風カラム型ベース） */
+
+  /* レスポンシブ対応：各カラムを独立したカードにしつつ、隣接を詰めて従来の見た目を維持 */
+  .row.d5{border:none;border-radius:0;overflow:visible;gap:0;}
+  .row.d5 .c{border:1px solid var(--line);border-right:1px solid var(--line);border-radius:0;box-shadow:none;}
+  .row.d5 .c + .c{margin-left:-1px;}            /* 隣接カードの枠線を重ねて距離0・二重線を防止 */
+  .row.d5 .c:first-child{border-top-left-radius:14px;border-bottom-left-radius:14px;}
+  .row.d5 .c:last-child{border-top-right-radius:14px;border-bottom-right-radius:14px;}
+  .row.d5 .c--prem{position:relative;z-index:1;}/* クリーム背景のカードを前面に（角丸が隣に隠れない） */
+
+  /* ===== レスポンシブ：5列 → 3列 → 2列 → 1列 =====
+     折り返したら連結をやめ、各カードを独立した角丸カード（余白＋影）に切り替える */
+  @media (max-width:1080px){
+    .frame{padding:32px 28px;}
+    .row.d5{grid-template-columns:repeat(3,1fr);gap:14px;}
+    .row.d5 .c{border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(16,41,77,.05);}
+    .row.d5 .c + .c{margin-left:0;}
+    .row.d5 .c:first-child,.row.d5 .c:last-child{border-radius:14px;}
+  }
+  @media (max-width:760px){
+    .frame{padding:24px 20px;}
+    .row.d5{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:520px){
+    .stage{padding:24px 14px;}
+    .row.d5{grid-template-columns:1fr;}
+  }
+  .row.d5 .c-spec{margin-bottom:0;}
+  .t5-spec{width:100%;text-align:left;}
+  .t5-top{text-align:center;}
+  .t5-line{font-size:13px;line-height:1.6;color:var(--navy);font-weight:500;}
+  .t5-line b{font-weight:800;font-size:15px;}
+  .t5-line2{font-size:12px;letter-spacing:-0.02em;}  /* 1行に収めて全カードの説明文開始位置を揃える（太字は15px維持） */
+  .c--prem .t5-line2{text-align:center;} /* オンデマンドの納期行は中央揃え */
+  .t5-hr{height:1px;background:var(--line);margin:7px 0;}
+  /* プレミアム用スロット：全カード共通でアイコンの上に確保（オンデマンドのみ表示）。
+     アイコンを少し上げるため上部余白を詰める */
+  .row.d5 .c{padding:14px 14px 14px;}
+  .row.d5 .c-ico{width:36px;height:36px;margin-bottom:7px;}
+  .row.d5 .c-name{margin-bottom:5px;}
+  .row.d5 .c-price{margin-top:0;margin-bottom:7px;}
+  /* プレミアム限定：オンデマンドカードの右上に絶対配置（フローを占めず、価格の上下余白を詰める） */
+  .c-gate{position:absolute;top:11px;right:11px;font-size:10px;font-weight:800;color:var(--gold-deep);
+    letter-spacing:.02em;line-height:1;}
+  .c--prem .t5-line b{color:var(--gold-deep);}
+
+  /* 説明文は上段揃え（直下に配置） */
+  .row.d5 .c-desc{margin:10px 0 0;}
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" rx="14" fill="#27445E"/>
+  <rect x="31" y="33" width="9" height="34" rx="2" fill="#9FB6D6"/>
+  <rect x="43" y="33" width="9" height="34" rx="2" fill="#6E93C8"/>
+  <rect x="55" y="33" width="9" height="34" rx="2" fill="#3E6AD6"/>
+  <rect x="67" y="33" width="9" height="34" rx="2" fill="#C2922F"/>
+</svg>
+</template>
+<div class="stage">
+  <div class="frame">
+    <div id="root"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="plans-data.jsx"></script>
+<script type="text/babel">
+  function Spec({ p }) {
+    return (
+      <div className="t5-spec">
+        <div className="t5-top">
+          <div className="t5-line">データ化項目数：<b>{p.items}</b></div>
+        </div>
+        <div className="t5-hr" />
+        <div className="t5-line t5-line2">
+          {p.premium
+            ? <><b>会期当日</b>にデータ化</>
+            : <>会期終了から<b>{p.days}営業日</b>でデータ化</>}
+        </div>
+      </div>
+    );
+  }
+
+  function TCard({ p }) {
+    return (
+      <div className={'c' + (p.premium ? ' c--prem' : '')} style={{ '--tone': p.tone }}>
+        <div className="c-ico"><Icon name={p.icon} /></div>
+        <div className="c-name">{p.name}</div>
+        <div className="c-price"><span className="c-num">{p.price}</span><span className="c-unit">円/枚</span></div>
+        <div className="c-gate">{p.premium ? 'プレミアム限定' : ''}</div>
+        <div className="c-spec"><Spec p={p} /></div>
+        <p className="c-desc">{p.desc}</p>
+      </div>
+    );
+  }
+
+  function App() {
+    return (
+      <div className="row d5">
+        {window.PLANS.map(p => <TCard key={p.key} p={p} />)}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

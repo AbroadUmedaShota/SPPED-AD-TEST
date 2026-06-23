@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お問い合わせ — SPEED AD Support（デザイン参照）</title>
+<style>
+  :root {
+    --navy: #16324c;
+    --navy-hover: #1d4368;
+    --blue: #2c5d97;
+    --ink: #2a3848;
+    --label: #41566c;
+    --muted: #6b7c8f;
+    --muted-2: #8595a6;
+    --line: #dde5ee;
+    --field-border: #d4dce6;
+    --required: #c0492f;
+    --page-bg: #f4f7fb;
+    --dash: #c6d2df;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+    color: var(--ink);
+    background: #fff;
+  }
+  a { color: inherit; }
+  input::placeholder, textarea::placeholder { color: #9aa8b8; }
+
+  /* ---------- Header ---------- */
+  .site-header { position: relative; z-index: 5; background: #fff; border-bottom: 1px solid var(--line); }
+  .site-header__inner {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1180px; margin: 0 auto; padding: 0 40px; height: 66px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+  .brand__name { font-size: 16px; font-weight: 800; color: var(--navy); letter-spacing: .01em; }
+  .brand__name span { font-weight: 600; color: var(--label); }
+  .site-nav { display: flex; align-items: center; gap: 30px; }
+  .site-nav a { font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; }
+  .site-nav a:hover { color: var(--navy); }
+
+  /* ---------- Contact (案07: minimal centered) ---------- */
+  .contact { background: var(--page-bg); padding: 56px 40px 64px; }
+  .contact__inner { max-width: 520px; margin: 0 auto; }
+  .contact__eyebrow { margin: 0 0 10px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-align: center; }
+  .contact__title { margin: 0 0 8px; color: var(--navy); font-size: 30px; font-weight: 800; text-align: center; }
+  .contact__lead { margin: 0 0 34px; color: var(--muted); font-size: 13.5px; text-align: center; line-height: 1.8; }
+
+  .form { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; }
+  .field__label { font-size: 12.5px; font-weight: 700; color: var(--label); margin-bottom: 7px; }
+  .field__label .req { color: var(--required); }
+  .control {
+    width: 100%; border: 1px solid var(--field-border); border-radius: 9px;
+    padding: 13px 14px; font-size: 14px; color: var(--navy); background: #fff;
+    outline: none; font-family: inherit;
+  }
+  .control:focus { border-color: var(--blue); }
+  textarea.control { min-height: 130px; resize: vertical; line-height: 1.7; }
+
+  .submit {
+    margin-top: 6px; width: 100%; background: var(--navy); color: #fff;
+    font-size: 14.5px; font-weight: 700; padding: 15px; border: 0; border-radius: 10px; cursor: pointer;
+  }
+  .submit:hover { background: var(--navy-hover); }
+
+  /* ---------- Uploader ---------- */
+  .uploader { font-family: inherit; }
+  .dropzone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; text-align: center; cursor: pointer;
+    border: 1.5px dashed var(--dash); border-radius: 11px; background: #f7fafc;
+    padding: 26px 20px; transition: border-color .15s, background .15s;
+  }
+  .dropzone.is-drag { border-color: var(--blue); background: #e7eff9; }
+  .dropzone__icon {
+    display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+    background: #e7eff9; color: var(--blue); font-size: 18px; font-weight: 800; line-height: 1;
+  }
+  .dropzone__title { color: var(--label); font-size: 13.5px; font-weight: 700; }
+  .dropzone__sub { color: var(--muted-2); font-size: 12px; }
+
+  .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 12px; margin-top: 14px; }
+  .thumb { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid #e2e9f1; background: #fff; }
+  .thumb img { width: 100%; height: 92px; object-fit: cover; display: block; }
+  .thumb__remove {
+    position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+    border: none; background: rgba(18,50,76,.78); color: #fff; font-size: 13px; line-height: 1;
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .thumb__name { padding: 6px 8px; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .uploader__count { margin-top: 10px; font-size: 12px; color: var(--muted-2); }
+
+  /* ---------- Footer ---------- */
+  .site-footer { background: #fff; border-top: 1px solid var(--line); }
+  .site-footer__inner {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.1fr; gap: 32px;
+    max-width: 1180px; margin: 0 auto; padding: 42px 40px 50px;
+  }
+  .copyright { color: var(--muted-2); font-size: 13px; font-weight: 700; }
+  .footcol__title { font-size: 12px; font-weight: 800; color: var(--navy); letter-spacing: .06em; margin-bottom: 15px; }
+  .footcol__links { display: flex; flex-direction: column; gap: 11px; }
+  .footcol__links a { font-size: 13px; color: var(--label); text-decoration: none; }
+  .footcol__links a:hover { color: var(--navy); }
+</style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="#">
+        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+          <polygon points="11,2 20,19 2,19" fill="#16324c"></polygon>
+          <polygon points="11,9.5 14.6,19 7.4,19" fill="#ffffff"></polygon>
+        </svg>
+        <span class="brand__name">SPEED AD <span>Support</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="#">ヘルプ</a>
+        <a href="#">FAQ</a>
+        <a href="#">お問い合わせ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= CONTACT (案07) ================= -->
+  <main class="contact">
+    <div class="contact__inner">
+      <p class="contact__eyebrow">CONTACT</p>
+      <h1 class="contact__title">お問い合わせ</h1>
+      <p class="contact__lead">必要な項目のみ。お気軽にお送りください。</p>
+
+      <form class="form" id="contactForm">
+        <div class="field">
+          <label class="field__label" for="f-name">お名前</label>
+          <input class="control" id="f-name" type="text" placeholder="山田 太郎">
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-email">メールアドレス</label>
+          <input class="control" id="f-email" type="email" placeholder="name@example.com">
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-subject">件名</label>
+          <input class="control" id="f-subject" type="text" placeholder="お問い合わせの件名">
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-message">お問い合わせ内容</label>
+          <textarea class="control" id="f-message" placeholder="ご質問・ご要望をご記入ください。"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="field__label">添付ファイル（任意）</label>
+          <div class="uploader" id="uploader">
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            <label class="dropzone" id="dropzone" for="fileInput">
+              <span class="dropzone__icon">&uarr;</span>
+              <span class="dropzone__title">クリック、またはドラッグ＆ドロップ</span>
+              <span class="dropzone__sub">PNG / JPG（複数添付できます） ・ 10MBまで</span>
+            </label>
+            <div class="thumbs" id="thumbs"></div>
+            <div class="uploader__count" id="count" hidden></div>
+          </div>
+        </div>
+
+        <button class="submit" type="submit">送信する</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="copyright">&copy; SPEED AD</div>
+      <div>
+        <div class="footcol__title">サポート</div>
+        <div class="footcol__links">
+          <a href="#">ヘルプ</a><a href="#">FAQ</a><a href="#">チュートリアル</a><a href="#">お問い合わせ</a>
+        </div>
+      </div>
+      <div>
+        <div class="footcol__title">公開情報</div>
+        <div class="footcol__links">
+          <a href="#">公式サイト</a><a href="#">導入事例</a><a href="#">料金プラン</a><a href="#">お知らせ</a>
+        </div>
+      </div>
+      <div>
+        <div class="footcol__title">規約等</div>
+        <div class="footcol__links">
+          <a href="#">利用規約</a><a href="#">プライバシーポリシー</a><a href="#">特定商取引法に基づく表示</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+/* Image uploader — click + drag&drop + thumbnail preview + remove.
+   Reference behavior only; wire to real upload endpoint in the app. */
+(function () {
+  var input = document.getElementById('fileInput');
+  var dropzone = document.getElementById('dropzone');
+  var thumbs = document.getElementById('thumbs');
+  var count = document.getElementById('count');
+  var files = []; // { id, name, url, file }
+
+  function render() {
+    thumbs.innerHTML = '';
+    files.forEach(function (it) {
+      var cell = document.createElement('div');
+      cell.className = 'thumb';
+
+      var img = document.createElement('img');
+      img.src = it.url; img.alt = it.name;
+
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'thumb__remove'; rm.title = '削除';
+      rm.textContent = '\u00d7';
+      rm.addEventListener('click', function (e) {
+        e.preventDefault();
+        URL.revokeObjectURL(it.url);
+        files = files.filter(function (x) { return x.id !== it.id; });
+        render();
+      });
+
+      var name = document.createElement('div');
+      name.className = 'thumb__name'; name.textContent = it.name;
+
+      cell.appendChild(img); cell.appendChild(rm); cell.appendChild(name);
+      thumbs.appendChild(cell);
+    });
+    if (files.length) { count.hidden = false; count.textContent = files.length + ' 件の画像を添付中'; }
+    else { count.hidden = true; }
+  }
+
+  function addFiles(list) {
+    var imgs = Array.prototype.slice.call(list || []).filter(function (f) {
+      return f.type && f.type.indexOf('image/') === 0;
+    });
+    imgs.forEach(function (f) {
+      files.push({ id: Math.random().toString(36).slice(2), name: f.name, url: URL.createObjectURL(f), file: f });
+    });
+    render();
+  }
+
+  input.addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  dropzone.addEventListener('dragover', function (e) { e.preventDefault(); dropzone.classList.add('is-drag'); });
+  dropzone.addEventListener('dragleave', function (e) { e.preventDefault(); dropzone.classList.remove('is-drag'); });
+  dropzone.addEventListener('drop', function (e) {
+    e.preventDefault(); dropzone.classList.remove('is-drag');
+    addFiles(e.dataTransfer.files);
+  });
+
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    // Demo only.
+    alert('送信（デモ）。添付画像: ' + files.length + ' 件');
+  });
+})();
+</script>
+</body>
+</html>

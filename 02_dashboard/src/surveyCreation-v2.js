@@ -3,7 +3,7 @@
  * アンケート作成・編集 v2 ページ専用スクリプト
  */
 
-import { loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
+import { loadCommonHtml, resolveDashboardAssetPath, resolveDashboardDataPath } from './utils.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initializeDatepickers } from './ui/datepicker.js';
@@ -12,6 +12,13 @@ import { initThemeToggle } from './lib/themeToggle.js';
 import { handleOpenModal } from './modalHandler.js';
 import { populateQrCodeModal } from './qrCodeModal.js';
 import { formatMessage, normalizeLocale } from './services/i18n/messages.js';
+import {
+  buildDefaultSurveyName,
+  fetchDefaultNewSurveyTemplate,
+  getLocalizedValue,
+  isReadOnlySurvey,
+  resolveDefaultSurveyPeriod
+} from './services/surveyDefaults.js';
 
 function getCurrentLocale() {
   if (typeof window.getCurrentLanguage === 'function') {
@@ -176,6 +183,7 @@ let nextId = 1;
 let isMultilingual = false;
 let currentLangs = ['ja']; 
 let activeLang = 'ja';
+let isReadOnlyMode = false;
 
 let sortables = {
   questions: null,
@@ -199,6 +207,65 @@ function buildRelatedSettingsUrl(path, surveyId) {
   }
   const query = params.toString();
   return `./${path}${query ? `?${query}` : ''}`;
+}
+
+function setControlDisabled(element, disabled) {
+  if (!element) return;
+  element.disabled = disabled;
+  element.setAttribute('aria-disabled', String(disabled));
+  element.classList.toggle('opacity-50', disabled);
+  element.classList.toggle('cursor-not-allowed', disabled);
+}
+
+function syncReadOnlyModeUi() {
+  if (!isReadOnlyMode) return;
+
+  document.body.dataset.readOnlySurvey = 'true';
+
+  const heading = document.querySelector('h1');
+  if (heading && !document.getElementById('readOnlySurveyNotice')) {
+    const notice = el('div', {
+      id: 'readOnlySurveyNotice',
+      class: 'mb-6 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-800'
+    }, '標準機能確認用のサンプルアンケートです。内容の確認、プレビュー、QR表示はできますが、編集・保存はできません。');
+    heading.insertAdjacentElement('afterend', notice);
+  }
+
+  [
+    'createSurveyBtn',
+    'createSurveyBtnMobile',
+    'addFirstQuestionBtn',
+    'addQuestionInlineBtn',
+    'addQuestionMobileBtn',
+    'fab-main-button'
+  ].forEach((id) => setControlDisabled(document.getElementById(id), true));
+
+  document.getElementById('fab-container')?.classList.add('hidden');
+  document.getElementById('addQuestionInlineArea')?.classList.add('hidden');
+  document.getElementById('inlineQuestionTypeMenu')?.classList.add('hidden');
+  document.getElementById('inlineQuestionTypeMenuBottom')?.classList.add('hidden');
+  document.getElementById('mobileQuestionTypeMenu')?.classList.add('hidden');
+
+  document
+    .querySelectorAll('#basicInfoBody input, #basicInfoBody textarea, #basicInfoBody select, #questionListContainer input, #questionListContainer textarea, #questionListContainer select')
+    .forEach((element) => {
+      element.disabled = true;
+      element.setAttribute('aria-disabled', 'true');
+    });
+
+  document
+    .querySelectorAll('#questionListContainer button, [data-required-badge], [role="button"][title="設問タイプを変更"]')
+    .forEach((element) => {
+      if (element.id === 'showPreviewBtn' || element.id === 'showPreviewBtnMobile') return;
+      element.setAttribute('aria-disabled', 'true');
+      element.classList.add('pointer-events-none', 'opacity-50');
+    });
+}
+
+function setReadOnlyMode(enabled) {
+  isReadOnlyMode = Boolean(enabled);
+  syncReadOnlyModeUi();
+  updateSaveButtonState();
 }
 
 // 一度でも操作されたフィールドのみエラーを表示するための管理
@@ -501,6 +568,79 @@ function defaultQuestion(type) {
   return base;
 }
 
+function normalizeLocalizedObject(value, fallback = '') {
+  if (!value) return { ja: fallback };
+  if (typeof value === 'string') return { ja: value };
+  return { ...value };
+}
+
+function buildQuestionFromTemplate(templateQuestion) {
+  const type = templateQuestion?.type || 'free_answer';
+  const question = defaultQuestion(type);
+  question.text = normalizeLocalizedObject(templateQuestion.text);
+  question.required = Boolean(templateQuestion.required);
+
+  if (CHOICE_TYPES.has(type)) {
+    question.options = Array.isArray(templateQuestion.options) && templateQuestion.options.length > 0
+      ? templateQuestion.options.map((option) => normalizeLocalizedObject(option))
+      : question.options;
+  }
+
+  if (MATRIX_TYPES.has(type)) {
+    question.matrixRows = Array.isArray(templateQuestion.matrixRows)
+      ? templateQuestion.matrixRows.map((row) => normalizeLocalizedObject(row))
+      : question.matrixRows;
+    question.matrixCols = Array.isArray(templateQuestion.matrixCols)
+      ? templateQuestion.matrixCols.map((col) => normalizeLocalizedObject(col))
+      : question.matrixCols;
+  }
+
+  if (templateQuestion.config && typeof templateQuestion.config === 'object') {
+    question.config = { ...(question.config || {}), ...templateQuestion.config };
+  }
+
+  return question;
+}
+
+function setFieldValueIfEmpty(id, value) {
+  const input = document.getElementById(id);
+  if (input && !input.value && value) {
+    input.value = value;
+  }
+}
+
+function setPeriodRangeValue(periodInput, start, end) {
+  if (!periodInput || !start || !end) return;
+  if (periodInput._flatpickr) {
+    periodInput._flatpickr.setDate([start, end], false);
+  }
+  periodInput.value = `${start} 〜 ${end}`;
+}
+
+async function applyDefaultNewSurveyTemplateIfNeeded({ hasSurveyId }) {
+  if (hasSurveyId) return;
+
+  try {
+    const template = await fetchDefaultNewSurveyTemplate(resolveDashboardDataPath);
+    const period = resolveDefaultSurveyPeriod(template);
+
+    setFieldValueIfEmpty('surveyName_ja', buildDefaultSurveyName(template));
+    setFieldValueIfEmpty('displayTitle_ja', getLocalizedValue(template.displayTitle));
+    setFieldValueIfEmpty('description_ja', getLocalizedValue(template.description));
+
+    const periodInput = document.getElementById('periodRange');
+    if (periodInput && !periodInput.value) {
+      setPeriodRangeValue(periodInput, period.start, period.end);
+    }
+
+    if (questions.length === 0 && Array.isArray(template.questions)) {
+      questions = template.questions.map(buildQuestionFromTemplate);
+    }
+  } catch (error) {
+    console.warn('新規アンケート初期値テンプレートの読み込みに失敗しました', error);
+  }
+}
+
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -741,6 +881,11 @@ function validateForm() {
 
 function updateSaveButtonState() {
   if (window.SpeedAD?.tutorial?.isActive?.()) return; // tutorial-guard
+  if (isReadOnlyMode) {
+    setControlDisabled(document.getElementById('createSurveyBtn'), true);
+    setControlDisabled(document.getElementById('createSurveyBtnMobile'), true);
+    return;
+  }
   const valid = validateForm();
   document.getElementById('createSurveyBtn').disabled = !valid;
   const mobBtn = document.getElementById('createSurveyBtnMobile');
@@ -847,6 +992,7 @@ function renderAllQuestions() {
   });
   renumberQuestions(); // 内部で rebuildSeparators も呼ぶ
   updateMultiLangVisibility();
+  syncReadOnlyModeUi();
 }
 
 function buildQuestionCard(q, index) {
@@ -1014,8 +1160,8 @@ function buildQuestionCard(q, index) {
     requiredBadge.setAttribute('aria-pressed', String(q.required));
   }
 
-  requiredBadge.addEventListener('click', (e) => { e.stopPropagation(); syncRequired(!q.required); });
-  requiredBadge.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); syncRequired(!q.required); } });
+  requiredBadge.addEventListener('click', (e) => { e.stopPropagation(); if (!isReadOnlyMode) syncRequired(!q.required); });
+  requiredBadge.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!isReadOnlyMode) syncRequired(!q.required); } });
 
   const toggleIcon = icon('expand_more', 'text-[24px] transition-transform duration-300 text-gray-400 group-hover:text-primary');
   toggleIcon.style.transform = 'rotate(180deg)';
@@ -1689,6 +1835,7 @@ function showTypeChangeDialog(q, card) {
 }
 
 function applyTypeChange(q, card, newType) {
+  if (isReadOnlyMode) return;
   const oldType = q.type;
   const fromChoice = CHOICE_TYPES.has(oldType);
   const toChoice = CHOICE_TYPES.has(newType);
@@ -1824,6 +1971,7 @@ function openInsertTypeMenu(anchorEl, insertIndex) {
 
 /** 指定インデックスの位置に設問を挿入する */
 function insertQuestionAt(type, insertIndex) {
+  if (isReadOnlyMode) return;
   const q = defaultQuestion(type);
   questions.splice(insertIndex, 0, q);
   // renderAllQuestions で全再描画（セパレーターも再配置される）
@@ -1853,6 +2001,7 @@ function rebuildSeparators() {
 }
 
 function addQuestion(type) {
+  if (isReadOnlyMode) return;
   const q = defaultQuestion(type);
   questions.push(q);
   const container = document.getElementById('questionListContainer');
@@ -1867,6 +2016,10 @@ function addQuestion(type) {
 }
 
 function deleteQuestion(id) {
+  if (isReadOnlyMode) {
+    showToast('サンプルアンケートは編集できません', 'warning');
+    return;
+  }
   showConfirm(
     '設問を削除',
     'この設問を削除しますか？削除すると元に戻せません。',
@@ -1883,6 +2036,10 @@ function deleteQuestion(id) {
 }
 
 function duplicateQuestion(id) {
+  if (isReadOnlyMode) {
+    showToast('サンプルアンケートは編集できません', 'warning');
+    return;
+  }
   const srcIdx = questions.findIndex(q => q.id === id);
   if (srcIdx < 0) return;
   const copy = JSON.parse(JSON.stringify(questions[srcIdx]));
@@ -2387,6 +2544,11 @@ function attemptSave() {
     return;
   }
 
+  if (isReadOnlyMode) {
+    showNotice('標準機能確認用のサンプルアンケートは編集・保存できません。', 'info', 'サンプルアンケート');
+    return;
+  }
+
   // 保存試行時は全必須フィールドを touched 扱いにしてエラーを表示する
   ['surveyName_ja', 'displayTitle_ja', 'periodRange'].forEach(id => touchedFields.add(id));
 
@@ -2441,11 +2603,7 @@ async function loadFromUrlParams() {
     if (periodStart && periodEnd) {
       const periodInput = document.getElementById('periodRange');
       if (periodInput) {
-        if (periodInput._flatpickr) {
-          periodInput._flatpickr.setDate([periodStart, periodEnd], false);
-        } else {
-          periodInput.value = `${periodStart} 〜 ${periodEnd}`;
-        }
+        setPeriodRangeValue(periodInput, periodStart, periodEnd);
       }
     }
 
@@ -2454,7 +2612,8 @@ async function loadFromUrlParams() {
       console.log('Loaded Survey ID from URL:', surveyId);
       // 将来的に dataset や hidden に持たせる場合を想定
       document.body.dataset.currentSurveyId = surveyId;
-      await loadSurveyData(surveyId);
+      const loadedSurvey = await loadSurveyData(surveyId);
+      setReadOnlyMode(isReadOnlySurvey(loadedSurvey));
 
       // 関連設定リンクに surveyId パラメータを付与
       const bizcardLink = document.getElementById('openBizcardSettingsBtn') || document.getElementById('bizcardDataSettingsSection') || document.getElementById('linkBizcardSettings');
@@ -2463,13 +2622,17 @@ async function loadFromUrlParams() {
       if (emailLink) emailLink.href = buildRelatedSettingsUrl('thankYouEmailSettings.html', surveyId);
       const thankYouScreenLink = document.getElementById('openThankYouScreenSettingsBtn') || document.getElementById('linkThankYouScreenSettings');
       if (thankYouScreenLink) thankYouScreenLink.href = buildRelatedSettingsUrl('thankYouScreenSettings.html', surveyId);
+    } else {
+      await applyDefaultNewSurveyTemplateIfNeeded({ hasSurveyId: false });
     }
 
     // JS からの value 代入では input/change イベントが発火しないため、
     // 保存ボタン状態を明示的に再評価する
     updateSaveButtonState();
+    return { surveyId };
   } catch (e) {
     console.warn('URLパラメータの解析に失敗しました', e);
+    return { surveyId: null };
   }
 }
 
@@ -2490,13 +2653,18 @@ async function loadSurveyData(surveyId) {
     if(idDisp) idDisp.textContent = surveyId;
     
     const titleInput = document.getElementById('displayTitle_ja');
-    if(titleInput) titleInput.value = surveyNameJa;
+    const displayTitleJa = (typeof json.displayTitle === 'object') ? (json.displayTitle.ja || '') : (json.displayTitle || '');
+    if(titleInput) titleInput.value = displayTitleJa || surveyNameJa;
+
+    const descriptionInput = document.getElementById('description_ja');
+    const descriptionJa = (typeof json.description === 'object') ? (json.description.ja || '') : (json.description || '');
+    if(descriptionInput) descriptionInput.value = descriptionJa;
     
     const periodInput = document.getElementById('periodRange');
     const periodDisp = document.getElementById('surveyPeriodDisplay');
     if(json.periodStart && json.periodEnd) {
-      const pStr = `${json.periodStart} - ${json.periodEnd}`;
-      if(periodInput) periodInput.value = pStr;
+      const pStr = `${json.periodStart} 〜 ${json.periodEnd}`;
+      if(periodInput) setPeriodRangeValue(periodInput, json.periodStart, json.periodEnd);
       if(periodDisp) periodDisp.textContent = pStr;
     }
     
@@ -2536,9 +2704,11 @@ async function loadSurveyData(surveyId) {
     });
     
     showToast('アンケートデータを読み込みました', 'success');
+    return json;
   } catch(e) {
     console.warn("アンケートデータの読み込みに失敗:", e);
     showToast('既存アンケートの読み込みに失敗しました', 'warning');
+    return null;
   }
 }
 
@@ -2606,10 +2776,14 @@ async function init() {
   initQrButtons();
   initPreviewButtons();
 
-  await loadFromUrlParams();
+  const initialParams = await loadFromUrlParams();
   renderLangSelectionAndTabs();
+  if (!initialParams?.surveyId) {
+    await applyDefaultNewSurveyTemplateIfNeeded({ hasSurveyId: false });
+  }
   updateOutline();
   updateEmptyState();
+  updateSaveButtonState();
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background:#fff; }
+    .msym { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; letter-spacing:normal; text-transform:none; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0">
+</helmet>
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,system-ui,sans-serif; background:#fff; min-height:100vh;">
+
+  <dc-import name="SpeedHeader" hint-size="100%,66px"></dc-import>
+
+  <!-- ヘッダー -->
+  <div style="max-width:1080px; margin:0 auto; padding:64px 32px 0; text-align:center;">
+    <p style="margin:0 0 14px; color:#9aa8b8; font-size:12px; font-weight:800; letter-spacing:.24em;">HELP CENTER</p>
+    <h1 style="margin:0 0 14px; color:#16324c; font-size:32px; font-weight:800; letter-spacing:.01em;">カテゴリから探す</h1>
+    <p style="margin:0 auto; color:#6b7c8f; font-size:14px; line-height:1.9; max-width:460px;">目的別に記事をまとめました。知りたいテーマからお進みください。</p>
+  </div>
+
+  <!-- カテゴリ -->
+  <div style="max-width:1080px; margin:0 auto; padding:40px 32px 0;">
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+
+      <!-- はじめに -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">rocket_launch</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">はじめに</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">初期設定や画面の見方など</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">SPEED AD とはどのようなサービスですか？</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">まず何から始めればいいですか？</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- 使い方 -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">tune</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">SPEED AD の使い方</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">各機能の具体的な操作方法</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">新しいアンケートを作成するには？</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">回答者によって表示する質問を変えられますか？</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- アカウント設定 -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">manage_accounts</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">アカウント設定</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">登録情報やセキュリティ設定</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">登録しているメールアドレスを変更したい</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">登録情報を確認・変更したい</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- 料金・請求 -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">receipt_long</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">料金・請求</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">プラン内容・お支払い・請求書</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">無料プランではどこまでできますか？</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">お礼メールを自社のアドレスから送信したい</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">10件の記事 →</a>
+      </div>
+
+      <!-- 困ったときは -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">troubleshoot</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">困ったときは</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">ログインや表示の問題など</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">ログインできません</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">QRコードが読み取れません</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- チュートリアル -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">play_circle</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">チュートリアル</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">動画で使い方を学ぶ</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">チュートリアルをもう一度見たい</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">【動画】アンケート作成の基本</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- お役立ち情報 -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#f1f4f8;"><span class="msym" style="font-size:24px; color:#2c5d97;">lightbulb</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">お役立ち情報</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">上記以外のお役立ち情報</div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; flex:1;">
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">新機能のリクエストはできますか？</span></a>
+          <a href="#" style="display:flex; gap:9px; text-decoration:none;"><span style="color:#aebccd;">›</span><span style="color:#50637a; font-size:13px; line-height:1.5;">導入事例を知りたい</span></a>
+        </div>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">5件の記事 →</a>
+      </div>
+
+      <!-- よくある質問 -->
+      <div style="display:flex; flex-direction:column; border:1px solid #e7ecf2; border-radius:14px; padding:24px; background:#f7f9fc;" style-hover="border-color:#c3cfdd;">
+        <div style="display:flex; gap:14px; align-items:flex-start; margin-bottom:18px;">
+          <span style="flex:0 0 auto; display:grid; place-items:center; width:44px; height:44px; border-radius:11px; background:#fff; border:1px solid #e7ecf2;"><span class="msym" style="font-size:24px; color:#2c5d97;">quiz</span></span>
+          <div><div style="color:#16324c; font-size:15.5px; font-weight:800;">よくある質問</div><div style="margin-top:3px; color:#8595a6; font-size:12px;">サービス全般に関するご質問</div></div>
+        </div>
+        <p style="margin:0; flex:1; color:#6b7c8f; font-size:13px; line-height:1.8;">料金・機能・契約まわりのよくいただくご質問をまとめています。</p>
+        <a href="#" style="margin-top:18px; color:#2c5d97; font-size:12.5px; font-weight:700; text-decoration:none;">FAQ を見る →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- よく読まれている記事 -->
+  <div style="max-width:1080px; margin:0 auto; padding:64px 32px 0;">
+    <div style="text-align:center; margin-bottom:28px;">
+      <h2 style="margin:0 0 8px; color:#16324c; font-size:22px; font-weight:800;">よく読まれている記事</h2>
+      <p style="margin:0; color:#8595a6; font-size:13px;">多くのユーザーに選ばれた記事</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">はじめに</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">SPEED AD とはどのようなサービスですか？</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">はじめに</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">まず何から始めればいいですか？</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">アカウント設定</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">登録しているメールアドレスを変更したい</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">困ったときは</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">ログインできません</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">料金・請求</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">無料プランではどこまでできますか？</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+      <a href="#" style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border:1px solid #e7ecf2; border-radius:12px; padding:20px 22px; text-decoration:none;" style-hover="border-color:#c3cfdd;"><span><span style="display:block; color:#9aa8b8; font-size:11.5px; font-weight:700; margin-bottom:6px;">SPEED AD の使い方</span><span style="color:#16324c; font-size:14px; font-weight:700; line-height:1.55;">新しいアンケートを作成するには？</span></span><span style="color:#c3cfdd; flex:0 0 auto;">→</span></a>
+    </div>
+  </div>
+
+  <!-- 問い合わせ帯 -->
+  <div style="max-width:1080px; margin:0 auto; padding:48px 32px 80px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; border:1px solid #e7ecf2; border-radius:16px; padding:32px 36px; background:#f7f9fc;">
+      <div>
+        <div style="color:#16324c; font-size:18px; font-weight:800;">お探しの答えは見つかりましたか？</div>
+        <p style="margin:6px 0 0; color:#6b7c8f; font-size:13.5px;">解決しなかった場合は、サポートチームがお手伝いします。</p>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="#" style="background:#16324c; color:#fff; font-size:14px; font-weight:700; padding:13px 26px; border-radius:10px; text-decoration:none;">お問い合わせ</a>
+        <a href="#" style="background:#fff; color:#16324c; font-size:14px; font-weight:700; padding:13px 26px; border-radius:10px; text-decoration:none; border:1px solid #d4dce6;">よくある質問を見る</a>
+      </div>
+    </div>
+  </div>
+
+  <dc-import name="SpeedFooter" hint-size="100%,190px"></dc-import>
+
+</div>
+</x-dc>
+</body>
+</html>

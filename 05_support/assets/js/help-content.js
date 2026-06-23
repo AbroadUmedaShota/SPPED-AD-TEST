@@ -4,19 +4,20 @@ import { resolveLocalizedValue } from './services/i18n/messages.js';
 // 本番(ルート)では ''、サブパス配信(GitHub Pages 等)では '/.../05_support' を前置する
 const BASE = resolveSupportBasePath();
 
-// カテゴリごとの表示メタ (help-center.js と同期)
+// カテゴリごとの表示メタ (help-center.js と同期)。アクセントはネイビー1色に統一 (design handoff)
+const HC_ACCENT = '#2c5d97';
 const CATEGORY_META = {
-    'getting-started':  { icon: 'flag',           accent: '#5B7DFF' },
-    'account':          { icon: 'account_circle', accent: '#8B6DB8' },
-    'how-to-use':       { icon: 'build',          accent: '#3BAA8E' },
-    'plans-billing':    { icon: 'receipt_long',   accent: '#D4A642' },
-    'troubleshooting':  { icon: 'support_agent',  accent: '#C85646' },
-    'tutorial':         { icon: 'school',         accent: '#2EACB9' },
-    'misc':             { icon: 'more_horiz',     accent: '#7A7A7A' },
+    'getting-started':  { icon: 'rocket_launch',   accent: HC_ACCENT },
+    'account':          { icon: 'manage_accounts', accent: HC_ACCENT },
+    'how-to-use':       { icon: 'tune',            accent: HC_ACCENT },
+    'plans-billing':    { icon: 'receipt_long',    accent: HC_ACCENT },
+    'troubleshooting':  { icon: 'troubleshoot',    accent: HC_ACCENT },
+    'tutorial':         { icon: 'play_circle',     accent: HC_ACCENT },
+    'misc':             { icon: 'lightbulb',       accent: HC_ACCENT },
 };
 
 function getCategoryMeta(id) {
-    return CATEGORY_META[id] || { icon: 'help_outline', accent: '#4285F4' };
+    return CATEGORY_META[id] || { icon: 'help_outline', accent: HC_ACCENT };
 }
 
 function escapeHtml(str) {
@@ -42,7 +43,8 @@ function normalizeSupportHref(url) {
     }
     if (cleaned === 'help.html') return `${BASE}/help/`;
     if (cleaned === 'faq.html') return `${BASE}/faq/`;
-    if (cleaned === 'bug-report.html') return `${BASE}/bug-report/`;
+    if (cleaned === 'contact.html') return `${BASE}/contact/`;
+    if (cleaned === 'bug-report.html') return `${BASE}/contact/`;
     return cleaned;
 }
 

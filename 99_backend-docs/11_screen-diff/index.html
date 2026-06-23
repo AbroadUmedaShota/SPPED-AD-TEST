@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画面差分（モックアップ↔本番） / バックエンド仕組み整理</title>
+  <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    .shot-frame { background: var(--color-base-background-sub, #f4f4f4); }
+    .shot-img { cursor: zoom-in; }
+    .lightbox-backdrop { background: rgba(0,0,0,0.82); }
+    summary { list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    .acc-chevron { transition: transform .2s ease; }
+    details[open] .acc-chevron { transform: rotate(180deg); }
+  </style>
+</head>
+<body class="bg-background text-on-background">
+<div class="min-h-screen bg-background">
+  <header class="border-b border-outline-variant bg-surface">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold text-primary">HOME / 11_screen-diff</p>
+        <h1 class="text-headline-medium font-bold leading-tight text-on-surface">画面差分（モックアップ↔本番）</h1>
+        <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">
+          モックアップと本番のスクリーンショットを画面ごとに左右で並べ、何がどう違うかを整理します。
+          差分は方向と性質で4分類（本番に不足／本番先行／UI差／要実機確認）し、画面ごと・画像ごとに記載します。
+        </p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <span class="material-icons text-sm">compare</span>左=モックアップ
+          </span>
+          <span class="inline-flex items-center gap-1 rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface">
+            <span class="material-icons text-sm">public</span>右=本番（speed-ad.com）
+          </span>
+          <span class="inline-flex items-center gap-1 rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface">
+            <span class="material-icons text-sm">touch_app</span>画像クリックで拡大
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+          <span class="material-icons text-base">home</span>
+          HOMEへ戻る
+        </a>
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./README.md" target="_blank" rel="noopener">
+          <span class="material-icons text-base">open_in_new</span>
+          READMEを開く
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <!-- 凡例 -->
+    <section class="rounded-lg border border-outline-variant bg-surface p-4" aria-labelledby="legend-title">
+      <p id="legend-title" class="text-sm font-bold text-on-surface">差分の分類（凡例）</p>
+      <div id="legendBox" class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </section>
+
+    <!-- 集計 -->
+    <section class="mt-6" aria-labelledby="summary-title">
+      <h2 id="summary-title" class="sr-only">集計</h2>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">差分あり</p>
+          <p class="mt-1 text-headline-medium font-bold text-primary" id="statDiff">–</p>
+          <p class="text-xs text-on-surface-variant">不足・先行・UI差・要実機のいずれかがある画面</p>
+        </div>
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">問題なし</p>
+          <p class="mt-1 text-headline-medium font-bold text-on-surface" id="statOk">–</p>
+          <p class="text-xs text-on-surface-variant">目立った差分が見当たらない画面</p>
+        </div>
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">確認不可</p>
+          <p class="mt-1 text-headline-medium font-bold text-on-surface" id="statNa">–</p>
+          <p class="text-xs text-on-surface-variant">状態差・前提未成立で比較できない画面</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 画面別サマリ（アコーディオン・デフォルト閉じ） -->
+    <section class="mt-8" aria-labelledby="overview-title">
+      <details class="rounded-lg border border-outline-variant bg-surface">
+        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 hover:bg-surface-variant">
+          <h2 id="overview-title" class="text-title-large font-bold text-on-surface">画面別サマリ</h2>
+          <span class="inline-flex items-center gap-1 text-sm text-on-surface-variant">
+            <span class="hidden sm:inline">開閉</span>
+            <span class="material-icons acc-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="overflow-x-auto border-t border-outline-variant">
+          <table class="w-full min-w-[720px] border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-outline-variant text-left text-on-surface-variant">
+                <th class="px-4 py-3 font-semibold">画面</th>
+                <th class="px-4 py-3 font-semibold">状態</th>
+                <th class="px-4 py-3 font-semibold">差分内訳</th>
+                <th class="px-4 py-3 font-semibold">概要</th>
+              </tr>
+            </thead>
+            <tbody id="overviewBody"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- 画面別比較 -->
+    <section class="mt-10" aria-labelledby="detail-title">
+      <h2 id="detail-title" class="text-title-large font-bold text-on-surface">画面別の左右比較</h2>
+      <div id="screens" class="mt-5 space-y-8"></div>
+    </section>
+
+    <section class="mt-8 rounded-lg border border-outline-variant bg-surface p-5">
+      <h2 class="text-title-medium font-bold text-on-surface">扱い</h2>
+      <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+        目視比較による観測メモです。「本番に不足」はモックにあって本番にない要素、「本番先行」は本番にあってモックにない要素（モック未更新の可能性）、「UI差」はレイアウト・表示の違い、「要実機確認」は静止画では判定できない挙動です。差分の解消可否・優先度・対応方針は別途判断します。
+        スクショは <code>アーカイブ/画面整理用フォルダ/</code> 取り込み分と、本番をPlaywrightで撮影した分（読み取り専用）を <code>images/</code> に格納しています。
+      </p>
+    </section>
+  </main>
+</div>
+
+<!-- lightbox -->
+<div id="lightbox" class="lightbox-backdrop fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <button id="lightboxClose" class="absolute right-4 top-4 inline-flex items-center gap-1 rounded-lg bg-surface px-3 py-2 text-sm font-semibold text-on-surface" type="button">
+    <span class="material-icons text-base">close</span>閉じる
+  </button>
+  <figure class="max-h-full max-w-full overflow-auto">
+    <img id="lightboxImg" class="mx-auto block max-w-none rounded-lg" alt="">
+    <figcaption id="lightboxCap" class="mt-2 text-center text-sm font-semibold text-white"></figcaption>
+  </figure>
+</div>
+
+<script>
+const IMG = './images/';
+
+// 差分の分類: lack=本番に不足(モックにあり/本番なし) ahead=本番先行(本番にあり/モックなし) ui=UI差 verify=要実機
+const CAT = {
+  lack:   { short: '不足',   label: '本番に不足', color: 'var(--color-state-error)',   desc: 'モックにあり／本番にない' },
+  ahead:  { short: '先行',   label: '本番先行',   color: 'var(--color-primary)',       desc: '本番にあり／モックにない' },
+  ui:     { short: 'UI差',   label: 'UI差',       color: 'var(--color-state-warning)', desc: 'レイアウト・表示の違い' },
+  verify: { short: '実機',   label: '要実機確認', color: 'var(--color-text-sub)',      desc: '静止画では判定不可' },
+};
+const F = (c, t) => ({ c, t });
+
+const SCREENS = [
+  {
+    id: 'login-front', title: 'ログイン前画面', status: 'diff',
+    short: 'Googleログイン・導入事例・背景ロゴが本番に不足',
+    pairs: [
+      { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png', diff: [
+        F('lack', 'Googleログインボタンがモックのフォーム内にあり、本番にない'),
+        F('lack', '導入事例セクションがモック下部にあり、本番にない'),
+        F('lack', '背景のロゴ（ウォーターマーク）がモックにあり、本番にない'),
+        F('ui', 'ヒーローのログインフォームの余白・高さが本番はやや広い'),
+      ] },
+    ],
+  },
+  {
+    id: 'dashboard', title: 'Dashboard', status: 'diff',
+    short: '複製ボタンの配置が違う（モック=詳細モーダル／本番=一覧のアクション列）',
+    pairs: [
+      { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png', diff: [
+        F('ui', '複製（コピー）ボタンの配置が違う：本番は一覧のアクション列に複製アイコンがある（モックの一覧にはない）'),
+        F('verify', 'アクションボタンのホバー時ツールチップ（位置・内容）は静止画で判定不可。上記のボタン構成の差に連動するとみられる'),
+      ] },
+      { label: 'アクション列（複製ボタン）', zoom: true, mock: 'dashboard_action_mock.png', prod: 'dashboard_action_prod.png', diff: [
+        F('ui', '本番の一覧アクション列は複製アイコンを含む5つ（編集／QR／複製／SPEEDレビュー／DL）。モックは複製なしの4つ'),
+      ] },
+      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [
+        F('ui', '複製ボタンの配置が違う：モックは詳細モーダル下部に「複製」ボタンがある（本番のモーダルにはない）'),
+      ] },
+      { label: '詳細モーダルのボタン列', zoom: true, mock: 'dashboard_modalbtn_mock.png', prod: 'dashboard_modalbtn_prod.png', diff: [
+        F('ui', 'モックのモーダルは「…／データダウンロード／複製／閉じる」。本番は「…／データダウンロード／閉じる」で複製がない'),
+      ] },
+      { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [
+        F('verify', 'アンケート名がモックは自動入力済み／本番は空欄（自動採番の有無は要実機）'),
+      ] },
+    ],
+  },
+  {
+    id: 'survey-edit', title: 'アンケート作成・編集', status: 'diff',
+    short: 'UIが別物。設問ナビ等が不足、メモ欄等は本番先行',
+    pairs: [
+      { label: '作成・編集画面', mock: 'survey-edit_mock.png', prod: 'survey-edit_prod.png', diff: [
+        F('ui', 'レイアウト：モック=2カラム（右に設問ナビ）／本番=シングルカラム（操作は最下部バー）'),
+        F('lack', '右「設問ナビ」パネル（未入力を赤ドットでリアルタイム表示）が本番にない'),
+        F('ui', '操作ボタンの名称・配置差（モック=右縦並び／本番=下部横並び）'),
+        F('ui', '多言語：モック=独立セクション「多言語機能 Premium」／本番=基本情報冒頭トグル（Premium表記なし）'),
+        F('lack', 'アンケートID（「発行前」）がモック上部にあり、本番の編集画面に出ない'),
+        F('ui', 'セクション名差（オプション機能/関連設定/設問リスト ↔ 連携設定/追加設定/設問設定）'),
+        F('ahead', '「メモ欄」が本番にあり、モックにない'),
+        F('ahead', '名刺連携オフ時の注記文が本番にあり、モックにない'),
+        F('verify', '右下の＋ボタンが動かない（挙動のため要実機）'),
+      ] },
+      { label: 'プレビュー', mock: 'survey-edit_mock_preview.png', prod: 'survey-edit_prod_preview.png', diff: [
+        F('ui', 'モック=編集画面上のモーダル overlay／本番=フルページ遷移'),
+        F('lack', 'プレビューの注意バナーが本番にない'),
+        F('lack', '「閉じる」ボタン・モーダルヘッダーが本番になく、閉じ方が分かりにくい'),
+      ] },
+      { label: '設問表示UI', mock: 'survey-edit_mock_question.png', prod: 'survey-edit_prod_question.png', diff: [
+        F('ui', '設問カード構造（モック=基本/回答/高度の3サブ展開／本番=タイプDD＋インライン）'),
+        F('lack', '「高度設定（条件分岐等）」アコーディオンが本番にない'),
+        F('ui', 'Q番号表示の有無・必須設定の位置差'),
+      ] },
+    ],
+  },
+  {
+    id: 'sidebar', title: 'サイドバー', status: 'diff',
+    short: 'テーマ切替が本番で機能しない',
+    pairs: [
+      { label: 'サイドバー（全体）', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png', diff: [
+        F('lack', 'テーマ切替が本番で機能しない（押しても切り替わらない）'),
+      ] },
+      { label: 'テーマ切替（該当箇所を拡大）', mock: 'sidebar_crop_mock.png', prod: 'sidebar_crop_prod.png',
+        note: 'テーマ切替の位置（両環境とも項目は存在）。挙動の差：本番は押しても切り替わらない／モックは切り替わるが対応画面がまちまちで網羅されていない。' },
+    ],
+  },
+  {
+    id: 'bizcard', title: '名刺データ化設定', status: 'diff',
+    short: 'UIが別物。利用案内等が不足、基本情報等は本番先行',
+    pairs: [
+      { label: '名刺データ化設定', mock: 'bizcard_mock.png', prod: 'bizcard_prod.png', diff: [
+        F('ui', 'レイアウト：モック=2カラム（右に利用案内）／本番=シングルカラム'),
+        F('lack', '右「利用案内」サイドバー（単価・料金表・残数・クーポン）が本番にない'),
+        F('lack', '「名刺のデータ化」ON/OFFトグル・「基盤利用テンプレート」選択が本番にない'),
+        F('ui', 'プラン選択：モック=スライダー数値入力／本番=5プランのラジオ（無料/通常/即日/超特急/オンデマンド）'),
+        F('ahead', '「アンケート基本情報」セクションが本番にあり、モックにない'),
+        F('ahead', '下部アコーディオン（注意書き/請求詳細/名刺詳細）が本番にあり、モックにない'),
+      ] },
+    ],
+  },
+  {
+    id: 'thankyou-email', title: 'お礼メール設定', status: 'diff',
+    short: 'テンプレ選択・SMARTが不足／費用明細は本番先行',
+    pairs: [
+      { label: 'お礼メール設定', mock: 'thankyou-email_mock.png', prod: 'thankyou-email_prod.png', diff: [
+        F('lack', 'テンプレート選択ドロップダウンが本番にない'),
+        F('lack', '「SMART（調査票品目内訳）」セクションが本番にない'),
+        F('ui', '差し込み変数：モック=折りたたみ／本番=タグボタン常時表示'),
+        F('ahead', '右パネルの費用明細が本番のほうが詳細（月別送信数/試用/クーポン等）'),
+        F('ui', '最下部ボタンの左右配置が逆'),
+      ] },
+      { label: '最下部ボタン', zoom: true, mock: 'thankyou-email_btn_mock.png', prod: 'thankyou-email_btn_prod.png', diff: [
+        F('ui', 'ボタンの左右配置が逆（モック=保存が左／本番=保存が右）'),
+      ] },
+    ],
+  },
+  {
+    id: 'thankyou-screen', title: 'サンクス画面設定', status: 'diff',
+    short: 'テストシナリオ選択が不足／バナー差・トグル既定は要確認',
+    pairs: [
+      { label: 'サンクス画面設定', mock: 'thankyou-screen_mock.png', prod: 'thankyou-screen_prod.png', diff: [
+        F('lack', '「テストシナリオ」選択ドロップダウンが本番にない'),
+        F('ui', 'プレミアム機能バナーの色・バッジ・アイコンが違う'),
+        F('verify', '連続回答トグルがモックOFF／本番ON（データ差か既定差かは要実機）'),
+      ] },
+      { label: 'プレミアムバナー', zoom: true, mock: 'thankyou-screen_banner_mock.png', prod: 'thankyou-screen_banner_prod.png', diff: [
+        F('ui', 'バナー：モック=オレンジ背景＋Premiumバッジ／本番=青背景＋丸インフォアイコン'),
+      ] },
+    ],
+  },
+  {
+    id: 'account', title: 'アカウント情報モーダル', status: 'diff',
+    short: 'セクションの枠線・区切り線が若干違う',
+    pairs: [
+      { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png', diff: [
+        F('ui', 'セクションの枠線・区切り線（枠の表示方法）が若干違う'),
+      ] },
+      { label: 'セクション見出し', zoom: true, mock: 'account_header_mock.png', prod: 'account_header_prod.png', diff: [
+        F('ui', '見出し周りの枠線・区切り線/余白の表示が若干違う（本番は見出し直下に∧アコーディオン）'),
+      ] },
+    ],
+  },
+  {
+    id: 'speed-review', title: 'スピードレビュー', status: 'diff',
+    short: '回答詳細が不足／サイドバー・グラフ・表のUI差が多い',
+    pairs: [
+      { label: 'スピードレビュー画面', mock: 'speed-review_mock.png', prod: 'speed-review_prod.png', diff: [
+        F('ui', '本番はサイドバーが常時展開でコンテンツ幅を圧迫'),
+        F('ui', '時間別回答グラフ：モック=折れ線（時刻帯）／本番=棒（数値列で時刻帯でない）'),
+        F('ui', '絞り込みフィルタ：モック=小ポップオーバー／本番=右「CLEAR FILTERS」＋属性パネル展開'),
+        F('ui', 'テーブル列：モック=回答者ID/調査ID/会社/氏名/業界 ↔ 本番=回答者番号/回答日時/氏名/会社名/設問回答全文'),
+      ] },
+      { label: '時間別回答グラフ', zoom: true, mock: 'speed-review_graph_mock.png', prod: 'speed-review_graph_prod.png', diff: [
+        F('ui', '時間別回答グラフ：モック=折れ線（時刻帯）／本番=棒グラフ'),
+      ] },
+      { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null, diff: [
+        F('lack', '回答詳細モーダル（行クリックで名刺情報＋回答を表示）が本番にない'),
+      ] },
+      { label: '設問表示', mock: 'speed-review_mock_question.png', prod: 'speed-review_prod_question.png', diff: [
+        F('ui', '設問選択モーダルの選択中強調の方式・リスト表示構造が違う'),
+      ] },
+    ],
+  },
+  {
+    id: 'group', title: 'グループ作成・管理', status: 'ok',
+    short: '差分なし（新規作成モーダルはほぼ一致）',
+    note: 'グループ新規作成モーダルはモック・本番でほぼ一致。',
+    pairs: [
+      { label: 'グループ新規作成モーダル', mock: 'group_mock.png', prod: 'group_prod.png', diff: [] },
+    ],
+  },
+  {
+    id: 'pw-forgot', title: 'パスワード再設定（pw忘れ）', status: 'ok',
+    short: '差分なし（画像が完全一致）',
+    note: 'モック・本番でピクセル単位まで一致。差分なし。',
+    pairs: [
+      { label: 'パスワード再設定', mock: 'pw-forgot_mock.png', prod: 'pw-forgot_prod.png',
+        note: 'モック・本番でピクセル完全一致（差分なし）。' },
+    ],
+  },
+  {
+    id: 'premium', title: 'プレミアム画面', status: 'ok',
+    short: '差分なし（プラン画面はモック・本番でほぼ一致）',
+    note: '本番は管理画面から「プレミアムプラン画面へ戻る」で同じプラン画面に到達。モック・本番でほぼ一致（高さに軽微な差のみ）。',
+    pairs: [
+      { label: 'プレミアムプラン画面', mock: 'premium_mock.png', prod: 'premium_prod.png', diff: [] },
+    ],
+  },
+  {
+    id: 'billing', title: '請求関連画面', status: 'na',
+    short: '請求未発生のため確認不可',
+    note: '現状、請求が立っていないため比較できず。請求発生後に再確認が必要。',
+  },
+];
+
+const STATUS = {
+  diff: { label: '差分あり', icon: 'report_problem', iconStyle: 'color:var(--color-state-warning)' },
+  ok:   { label: '問題なし', icon: 'check_circle', iconCls: 'text-success' },
+  na:   { label: '確認不可', icon: 'help_outline', iconCls: 'text-on-surface-variant' },
+};
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function catChip(c, extra) {
+  const k = CAT[c];
+  const tail = (extra != null) ? ` ${extra}` : '';
+  return `<span class="inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-xs font-bold" style="color:${k.color};border-color:${k.color}">${k.short}${tail}</span>`;
+}
+
+function screenCats(s) {
+  const n = { lack: 0, ahead: 0, ui: 0, verify: 0 };
+  (s.pairs || []).forEach(p => (p.diff || []).forEach(x => { if (n[x.c] != null) n[x.c]++; }));
+  return n;
+}
+function catSummaryHtml(s) {
+  const n = screenCats(s);
+  const order = ['lack', 'ahead', 'ui', 'verify'];
+  const chips = order.filter(c => n[c] > 0).map(c => catChip(c, n[c])).join(' ');
+  return chips || '<span class="text-xs text-on-surface-variant">差分なし</span>';
+}
+
+function statusChip(status) {
+  const s = STATUS[status];
+  const iconAttr = s.iconStyle ? ` style="${s.iconStyle}"` : '';
+  const iconCls = s.iconCls ? ' ' + s.iconCls : '';
+  return `<span class="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-variant px-2.5 py-1 text-xs font-bold text-on-surface">
+    <span class="material-icons text-sm${iconCls}"${iconAttr}>${s.icon}</span>${s.label}</span>`;
+}
+
+function renderLegend() {
+  const order = ['lack', 'ahead', 'ui', 'verify'];
+  document.getElementById('legendBox').innerHTML = order.map(c => {
+    const k = CAT[c];
+    return `<div class="flex items-center gap-2">${catChip(c)}<span class="text-xs text-on-surface-variant">${esc(k.label)}：${esc(k.desc)}</span></div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const c = { diff: 0, ok: 0, na: 0 };
+  SCREENS.forEach(s => c[s.status]++);
+  document.getElementById('statDiff').textContent = c.diff + '画面';
+  document.getElementById('statOk').textContent = c.ok + '画面';
+  document.getElementById('statNa').textContent = c.na + '画面';
+}
+
+function renderOverview() {
+  const body = document.getElementById('overviewBody');
+  body.innerHTML = SCREENS.map(s => {
+    let cell;
+    if (s.status === 'diff') cell = `<div class="flex flex-wrap gap-1">${catSummaryHtml(s)}</div>`;
+    else if (s.status === 'ok') cell = '<span class="text-on-surface-variant">差分なし</span>';
+    else cell = '<span class="text-on-surface-variant">–</span>';
+    return `<tr class="border-b border-outline-variant last:border-0 hover:bg-surface-variant">
+      <td class="px-4 py-3 font-semibold text-on-surface"><a class="hover:text-primary" href="#sec-${s.id}">${esc(s.title)}</a></td>
+      <td class="px-4 py-3">${statusChip(s.status)}</td>
+      <td class="px-4 py-3">${cell}</td>
+      <td class="px-4 py-3 text-on-surface-variant">${esc(s.short)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function shotCol(side, file, label) {
+  const tag = side === 'mock'
+    ? '<span class="inline-flex items-center gap-1 rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">モックアップ</span>'
+    : '<span class="inline-flex items-center gap-1 rounded bg-surface-variant px-2 py-0.5 text-xs font-bold text-on-surface">本番</span>';
+  const inner = file
+    ? `<img class="shot-img w-full" loading="lazy" src="${IMG}${esc(file)}" alt="${esc(label)} ${side}"
+         data-full="${IMG}${esc(file)}" data-cap="${esc(label)}（${side === 'mock' ? 'モックアップ' : '本番'}）">`
+    : `<div class="flex h-40 items-center justify-center text-sm text-on-surface-variant">該当スクショなし</div>`;
+  return `<figure class="min-w-0">
+    <figcaption class="mb-1 flex items-center gap-2 text-xs text-on-surface-variant">${tag}</figcaption>
+    <div class="shot-frame overflow-hidden rounded-lg border border-outline-variant">${inner}</div>
+  </figure>`;
+}
+
+function renderPair(p) {
+  const hasDiff = p.diff && p.diff.length;
+  const body = hasDiff
+    ? `<ul class="mb-3 space-y-1.5">
+        ${p.diff.map(x => `<li class="flex items-start gap-2 text-sm text-on-surface-variant">
+          <span class="mt-0.5">${catChip(x.c)}</span><span>${esc(x.t)}</span></li>`).join('')}
+      </ul>`
+    : (p.note
+        ? `<p class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2 text-xs text-on-surface-variant">${esc(p.note)}</p>`
+        : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`);
+  const zoomBadge = p.zoom ? '<span class="inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary"><span class="material-icons text-sm">zoom_in</span>拡大</span>' : '';
+  return `<div class="rounded-lg border border-outline-variant bg-background p-3">
+    <p class="mb-2 flex items-center gap-2 text-sm font-bold text-on-surface">${zoomBadge}${esc(p.label)}</p>
+    ${body}
+    <div class="grid gap-3 md:grid-cols-2">
+      ${shotCol('mock', p.mock, p.label)}
+      ${shotCol('prod', p.prod, p.label)}
+    </div>
+  </div>`;
+}
+
+function renderScreen(s) {
+  const head = `<div class="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant p-4">
+    <div class="flex items-center gap-3">
+      <h3 class="text-title-medium font-bold text-on-surface">${esc(s.title)}</h3>
+      ${statusChip(s.status)}
+    </div>
+    <a class="text-xs font-semibold text-primary hover:underline" href="#detail-title">▲ 一覧へ</a>
+  </div>`;
+
+  let bodyHtml = '';
+  if (s.status === 'diff') {
+    const summary = `<div class="border-b border-outline-variant p-4">
+      <p class="text-sm font-bold text-on-surface">差分サマリ</p>
+      <div class="mt-2 flex flex-wrap gap-1.5">${catSummaryHtml(s)}</div>
+    </div>`;
+    const pairs = `<div class="space-y-4 p-4">${s.pairs.map(renderPair).join('')}</div>`;
+    bodyHtml = summary + pairs;
+  } else {
+    const noteHtml = `<div class="${s.pairs ? 'border-b border-outline-variant ' : ''}p-4">
+      <p class="text-sm leading-6 text-on-surface-variant">${esc(s.note || s.short)}</p>
+    </div>`;
+    const pairsHtml = s.pairs ? `<div class="space-y-4 p-4">${s.pairs.map(renderPair).join('')}</div>` : '';
+    bodyHtml = noteHtml + pairsHtml;
+  }
+
+  return `<article id="sec-${s.id}" class="scroll-mt-4 overflow-hidden rounded-lg border border-outline-variant bg-surface">
+    ${head}${bodyHtml}
+  </article>`;
+}
+
+function renderScreens() {
+  document.getElementById('screens').innerHTML = SCREENS.map(renderScreen).join('');
+}
+
+// lightbox
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightboxImg');
+const lbCap = document.getElementById('lightboxCap');
+function openLightbox(src, cap) {
+  lbImg.src = src; lbCap.textContent = cap || '';
+  lb.classList.remove('hidden'); lb.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  lb.classList.add('hidden'); lb.classList.remove('flex');
+  lbImg.src=''; document.body.style.overflow = '';
+}
+document.addEventListener('click', e => {
+  const img = e.target.closest('.shot-img');
+  if (img) { openLightbox(img.dataset.full, img.dataset.cap); return; }
+  if (e.target.closest('#lightboxClose') || e.target === lb) closeLightbox();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+renderLegend();
+renderStats();
+renderOverview();
+renderScreens();
+</script>
+</body>
+</html>

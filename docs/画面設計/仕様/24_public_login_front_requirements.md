@@ -59,6 +59,8 @@ document_type: 画面要件定義
 - ログイン成功モック: `user` は `02_dashboard/index.html`、`new` は `04_first-login/index.html`、`admin` は `03_admin/index.html`
 - フッターの `導入事例`: `https://support.speed-ad.com/customer-voices/`
 - フッターの `特定商取引法に基づく表示`: `https://support.speed-ad.com/tokushoho/`（ローカル確認: `05_support/tokushoho/`）
+- 外部サイトおよび `support.speed-ad.com` への導線は新規タブで開き、ページ内アンカー、ログイン、新規登録、パスワード再設定などの主要操作は同一タブまたは同一画面内で処理する
+- Google Tag Manager は `GTM-NSC8G2DB` を使用し、`speed-ad.com` / `www.speed-ad.com` の本番ホストでのみ有効化する。localhost、dev、stg、その他のモック確認環境ではGTM scriptおよび補助iframeを生成しない
 
 ### 3.4. お知らせ表示
 
@@ -100,6 +102,8 @@ document_type: 画面要件定義
 - `選ばれる理由` が9項目表示され、ステータスバッジなしで説明文が表示される
 - `業界最安値でコストダウンが期待できる` の `料金プランを見る` から料金プラン比較ページへ遷移できる
 - `チュートリアルで迷わず使える` の `チュートリアルを見る` からチュートリアルページへ遷移できる
+- 外部サイトおよびsupport配下へのリンクは新規タブで開き、主要操作やページ内アンカーは現在のタブ内で動作する
+- ローカル/DEV/STGではGTMが通信せず、本番ホストでのみ `GTM-NSC8G2DB` が読み込まれる
 - キーボードだけでログイン、CTA、モーダル開閉、フォーカス復帰ができる
 - フッターの `導入事例` から一覧へ遷移する
 - フッターの `特定商取引法に基づく表示` からsupport配下の法定表示ページへ遷移し、404にならない

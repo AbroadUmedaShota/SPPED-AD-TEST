@@ -256,7 +256,7 @@ async function loadAndRenderCharts(surveyId) {
             // 1. Try Dashboard Data (data/...)
             const localUrl = resolveDashboardDataPath(relativePath);
             try {
-                const res = await fetch(localUrl);
+                const res = await fetch(localUrl, { cache: 'no-store' });
                 if (res.ok) return await res.json();
             } catch (e) {
                 console.warn(`Local fetch failed for ${relativePath}`, e);
@@ -265,7 +265,7 @@ async function loadAndRenderCharts(surveyId) {
             // 2. Try Demo Data (docs/サンプル/...)
             const demoUrl = resolveDemoDataPath(relativePath);
             try {
-                const res = await fetch(demoUrl);
+                const res = await fetch(demoUrl, { cache: 'no-store' });
                 if (res.ok) return await res.json();
             } catch (e) {
                 console.warn(`Demo fetch failed for ${relativePath}`, e);

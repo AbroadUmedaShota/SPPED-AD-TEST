@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "id": "12_release-follow-up",
+    "title": "6/15リリース後優先度整理",
+    "summary": "6/15リリース時点の未完了機能を、リリース必達、短期導入、通常ロードマップの3区分で整理します。",
+    "sourceStatus": "Backlog / Chatwork / Gmail要旨 / 共有向け再編集",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "RF-001",
+      "title": "未完了機能の3分類",
+      "category": "優先度整理",
+      "sourceStatus": "Backlog再確認 / 共有向け再編集",
+      "path": "01_release-priority-classification.md",
+      "summary": "リリースに間に合わせたかった機能、リリース後早く導入したい機能、順次開発予定の機能を分けて整理します。",
+      "tags": ["6/15リリース", "DB移管", "未完了機能", "優先度", "Backlog"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["SPDAD2026-158", "SPDAD2026-159-166", "SPDAD2026-147", "SPDAD2026-111", "SPDAD2026-103", "SPDAD2026-105"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "打合せでの使い方",
+      "items": [
+        {
+          "id": "RF-001-A",
+          "documentId": "RF-001",
+          "timing": "最初に確認",
+          "label": "リリース必達だった残件",
+          "summary": "6/15時点で本来間に合わせたかった機能と不具合を確認します。"
+        },
+        {
+          "id": "RF-001-B",
+          "documentId": "RF-001",
+          "timing": "次に確認",
+          "label": "短期導入したい機能",
+          "summary": "営業開始や顧客利用への影響が大きい機能を確認します。"
+        },
+        {
+          "id": "RF-001-C",
+          "documentId": "RF-001",
+          "timing": "最後に確認",
+          "label": "通常ロードマップ",
+          "summary": "リリース後に順次開発する機能の優先順位を確認します。"
+        }
+      ]
+    }
+  ]
+}

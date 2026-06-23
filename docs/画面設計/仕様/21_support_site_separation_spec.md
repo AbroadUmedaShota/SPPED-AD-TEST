@@ -185,6 +185,8 @@ flowchart TD
 - **リネームしない理由：** 既存URL変更によるSEO・ブックマーク・外部リンク破壊のコスト回避。
 - `contactModal.html`（汎用お問い合わせ窓口）の扱い（維持 or support移設）は §9 未決事項で確定する。
 
+> 2026-06-14 現在の実装では、サポートサイト上の汎用お問い合わせは `/contact/` に統合済み。`/bug-report/` は互換URLとして `/contact/` へ転送する。統合後のお問い合わせフォーム仕様は `23_support_contact_form_requirements.md` を参照する。
+
 ### 4.2 クロスドメイン認証の3方式比較
 
 サポートサイトへ遷移した後、ユーザーを特定する手段の選択肢。
@@ -536,7 +538,7 @@ python -m http.server 8001 --directory 05_support
 - お知らせ詳細 → お知らせ一覧：`/news/`
 - 導入事例一覧 → 導入事例詳細：`/customer-voices/<slug>/`
 - 導入事例詳細 → 導入事例一覧：`/customer-voices/`
-- 導入事例詳細 → 無料ではじめる：`https://app.speed-ad.com/?intent=signup#top`
+- 導入事例詳細 → 無料ではじめる：`https://speed-ad.com/?intent=signup#top`
 - 共通フッター → 料金プラン：`/plans/`
 - 共通フッター → お知らせ：`/news/`
 - 共通フッター → 導入事例：`/customer-voices/`
@@ -558,7 +560,7 @@ python -m http.server 8001 --directory 05_support
 
 | # | 項目 | 期限 | 意思決定者 |
 |---|---|---|---|
-| 1 | 共有アセットの管理方式（複製／CDN共有） | M1 | 開発リード | 
+| 1 | 共有アセットの管理方式（複製／CDN共有） | M1 | 開発リード |
 | 2 | デプロイ構成（同リポジトリ＋別ワークフロー／別リポジトリ）**最優先** | M1 | PO＋開発リード |
 | 3 | `index.html` の将来配置（本書スコープ外・別途検討） | — | — |
 | 4 | マーケ・法務合意（規約3種URL変更・同意記録ポリシー・`/privacy/`と全社ポリシーの階層） | M2 | 法務＋マーケ |

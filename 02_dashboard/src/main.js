@@ -35,9 +35,39 @@ import { initPasswordChange } from './password_change.js';
 import { initBugReportPage } from './bug-report.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
-import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
+import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath, resolveDashboardDataPath } from './utils.js';
 import { initHelpPopovers } from './ui/helpPopover.js';
 import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
+import {
+    buildDefaultSurveyName,
+    fetchDefaultNewSurveyTemplate,
+    getLocalizedValue,
+    resolveDefaultSurveyPeriod
+} from './services/surveyDefaults.js';
+
+async function applyNewSurveyModalDefaults({ surveyNameInput, displayTitleInput, surveyMemoInput, periodRangeInput, periodRangePicker }) {
+    try {
+        const template = await fetchDefaultNewSurveyTemplate(resolveDashboardDataPath);
+        const period = resolveDefaultSurveyPeriod(template);
+
+        if (surveyNameInput && !surveyNameInput.value) {
+            surveyNameInput.value = buildDefaultSurveyName(template);
+        }
+        if (displayTitleInput && !displayTitleInput.value) {
+            displayTitleInput.value = getLocalizedValue(template.displayTitle);
+        }
+        if (surveyMemoInput && !surveyMemoInput.value && template.memo) {
+            surveyMemoInput.value = template.memo;
+        }
+        if (periodRangePicker && typeof periodRangePicker.setDate === 'function') {
+            periodRangePicker.setDate([period.startDate, period.endDate], false);
+        } else if (periodRangeInput && !periodRangeInput.value) {
+            periodRangeInput.value = `${period.start} 〜 ${period.end}`;
+        }
+    } catch (error) {
+        console.warn('新規アンケート初期値テンプレートの読み込みに失敗しました', error);
+    }
+}
 
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
@@ -65,17 +95,16 @@ function openNewSurveyModalWithSetup(afterOpen) {
 
         const surveyNameInput = document.getElementById('surveyName');
         const displayTitleInput = document.getElementById('displayTitle');
+        const surveyMemoInput = document.getElementById('surveyMemo');
         const periodRangeInput = document.getElementById('newSurveyPeriodRange');
 
-        // デフォルト値を設定（高速作成用）
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-        if (surveyNameInput && !surveyNameInput.value) {
-            surveyNameInput.value = `アンケート_${dateStr}`;
-        }
-        if (displayTitleInput && !displayTitleInput.value) {
-            displayTitleInput.value = `アンケート`;
-        }
+        applyNewSurveyModalDefaults({
+            surveyNameInput,
+            displayTitleInput,
+            surveyMemoInput,
+            periodRangeInput,
+            periodRangePicker
+        });
 
         const surveyNameError = document.getElementById('surveyName-error');
         const displayTitleError = document.getElementById('displayTitle-error');
@@ -114,7 +143,7 @@ function openNewSurveyModalWithSetup(afterOpen) {
             // Get values
             const surveyName = surveyNameInput.value.trim();
             const displayTitle = displayTitleInput.value.trim();
-            const surveyMemo = document.getElementById('surveyMemo').value.trim();
+            const surveyMemo = surveyMemoInput.value.trim();
             const fallbackFlatpickr = periodRangeInput && periodRangeInput._flatpickr;
             const selectedDates = Array.isArray(periodRangePicker && periodRangePicker.selectedDates)
                 ? periodRangePicker.selectedDates

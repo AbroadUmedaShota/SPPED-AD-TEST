@@ -1,0 +1,252 @@
+/* =====================================================================
+   Lettering Tools — 「SPEED AD」レタリング当てはめ確認ツール（開発者向け）
+   起動: URL に ?lettering=1 が付いている時だけ歯車が出る。
+   完全クライアントサイド・揮発（リロードで消える／保存しない）。
+   撤去: このファイルと js/lettering-tools.js を削除し、index.html の
+        <link>/<script> 2行を消すだけ。本番に残留なし。
+   すべてのクラスは .lt- プレフィックス。本番では body.lt-active が付かず無害。
+   ===================================================================== */
+
+/* 起動トリガー（歯車）— 対象(SPEED AD)は左寄せなので右上に置いて被らせない */
+.lt-gear {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9998;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9px;
+  background: rgba(16, 42, 76, 0.85);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.lt-gear:hover { background: rgba(16, 42, 76, 1); transform: scale(1.08); }
+
+/* パネル本体 */
+.lt-panel {
+  position: fixed;
+  top: 58px;
+  right: 12px;
+  z-index: 9998;
+  width: 300px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  padding: 14px 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(13, 28, 51, 0.97);
+  color: #e9eef6;
+  font-family: "Inter", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 13px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+.lt-panel[hidden] { display: none; }
+
+.lt-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.lt-panel__title { font-weight: 700; font-size: 13px; letter-spacing: 0.04em; }
+.lt-panel__close {
+  border: none;
+  background: transparent;
+  color: #c2cde0;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.lt-panel__close:hover { color: #fff; }
+
+/* セクション */
+.lt-sec { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.lt-sec:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.lt-sec__label {
+  display: block;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9fb0c9;
+  margin-bottom: 8px;
+}
+
+/* スロットタブ */
+.lt-tabs { display: flex; gap: 6px; }
+.lt-tab {
+  flex: 1 1 auto;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  background: transparent;
+  color: #e9eef6;
+  cursor: pointer;
+  font-size: 12px;
+}
+.lt-tab:hover { background: rgba(255, 255, 255, 0.08); }
+.lt-tab[aria-pressed="true"] {
+  background: #2f6fb0;
+  border-color: #2f6fb0;
+  color: #fff;
+  font-weight: 600;
+}
+.lt-tab__dot { display: inline-block; width: 6px; height: 6px; margin-left: 5px; border-radius: 50%; background: #6fd08a; vertical-align: middle; }
+
+/* ファイル入力 */
+.lt-file { width: 100%; margin-top: 8px; font-size: 11px; color: #c2cde0; }
+.lt-file::file-selector-button {
+  margin-right: 8px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: transparent;
+  color: #e9eef6;
+  cursor: pointer;
+}
+.lt-note { margin-top: 6px; font-size: 10.5px; color: #8295b1; line-height: 1.5; }
+
+/* チェック行 */
+.lt-check { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: #cdd8ea; cursor: pointer; }
+.lt-check input { accent-color: #2f6fb0; width: 15px; height: 15px; }
+
+/* 数値の見える化 */
+.lt-readout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.lt-readout__cell {
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.lt-readout__name { display: block; font-size: 10px; color: #9fb0c9; letter-spacing: 0.04em; }
+.lt-readout__val {
+  display: block;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* アクションボタン */
+.lt-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.lt-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  background: transparent;
+  color: #e9eef6;
+  cursor: pointer;
+  font-size: 12px;
+}
+.lt-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+.lt-btn:disabled { opacity: 0.4; cursor: default; }
+.lt-btn--primary { background: #2f6fb0; border-color: #2f6fb0; color: #fff; font-weight: 600; }
+.lt-btn--primary:hover:not(:disabled) { background: #3a7cc0; }
+
+.lt-msg { margin-top: 8px; font-size: 11px; line-height: 1.5; color: #ffd28a; min-height: 0; }
+.lt-msg:empty { display: none; }
+
+/* 対象要素を一時的に配置基準にする */
+.lt-host { position: relative !important; }
+.lt-host--inline { display: inline-block !important; }
+/* 元テキストを隠す。visibility:hidden は子（オーバーレイ画像）にも継承されて
+   しまうため、文字色を透明にする方式で隠す（レイアウト＝矩形は保持され、画像
+   オーバーレイは影響を受けない）。 */
+.lt-text-hidden { color: transparent !important; -webkit-text-fill-color: transparent !important; }
+
+/* オーバーレイ層（対象要素の子）。クリックは断片(.lt-img)のみ受ける */
+.lt-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+/* 断片ラッパ。overflow:hidden で内側 img のスライス（クリップ）を表現する */
+.lt-img {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  pointer-events: auto;
+  cursor: move;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+.lt-img > img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  max-height: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.lt-img--selected { outline: 1px dashed rgba(120, 180, 255, 0.95); outline-offset: 1px; }
+
+/* カットモード中はカーソルを十字に */
+body.lt-cutting .lt-img { cursor: crosshair; }
+
+/* マス目（配置合わせ用グリッド）。ドラッグは妨げない */
+.lt-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0, transparent 19px, rgba(47, 111, 176, 0.16) 19px, rgba(47, 111, 176, 0.16) 20px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 19px, rgba(47, 111, 176, 0.16) 19px, rgba(47, 111, 176, 0.16) 20px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 99px, rgba(47, 111, 176, 0.42) 99px, rgba(47, 111, 176, 0.42) 100px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 99px, rgba(47, 111, 176, 0.42) 99px, rgba(47, 111, 176, 0.42) 100px);
+}
+.lt-grid[hidden] { display: none; }
+
+/* リサイズハンドル（body 直下 fixed） */
+.lt-handle {
+  position: fixed;
+  z-index: 9999;
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: #fff;
+  border: 1.5px solid #2f6fb0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+.lt-handle--nw { cursor: nwse-resize; }
+.lt-handle--ne { cursor: nesw-resize; }
+.lt-handle--sw { cursor: nesw-resize; }
+.lt-handle--se { cursor: nwse-resize; }
+
+.lt-frame {
+  position: fixed;
+  z-index: 9998;
+  pointer-events: none;
+  border: 1px dashed rgba(120, 180, 255, 0.9);
+}
+
+.lt-hint {
+  position: fixed;
+  z-index: 9999;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(13, 28, 51, 0.95);
+  color: #dbe6f6;
+  font: 600 11px/1 "Inter", sans-serif;
+  pointer-events: none;
+  white-space: nowrap;
+}

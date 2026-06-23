@@ -158,6 +158,17 @@ function parseStoredDateFilter(value) {
     return parsed.slice(0, 2);
 }
 
+function isStoredDateRangeUsable(range, availableRange) {
+    if (!Array.isArray(range) || range.length === 0) return false;
+    if (!availableRange?.start || !availableRange?.end) return true;
+
+    const rangeStart = range[0] || range[1];
+    const rangeEnd = range[1] || range[0];
+    if (!(rangeStart instanceof Date) || !(rangeEnd instanceof Date)) return false;
+
+    return rangeEnd >= availableRange.start && rangeStart <= availableRange.end;
+}
+
 // --- Functions ---
 function hexToRgba(hex, alpha = 1) {
     const normalized = hex.replace('#', '');
@@ -1801,7 +1812,8 @@ function setupEventListeners() {
     }
 
     const storedRange = parseStoredDateFilter(restoredUiState?.currentDateFilter);
-    const initialRange = storedRange || resolveDateRangeFromValue('all', availableDateRange);
+    const usableStoredRange = isStoredDateRangeUsable(storedRange, availableDateRange) ? storedRange : null;
+    const initialRange = usableStoredRange || resolveDateRangeFromValue('all', availableDateRange);
     if (daySelect && daySelect.querySelector('option[value="all"]')) {
         daySelect.value = 'all';
     }
@@ -1811,7 +1823,7 @@ function setupEventListeners() {
             startDatePicker.setDate(initialRange[0], false);
             endDatePicker.setDate(initialRange[1], false);
         }
-        if (storedRange && daySelect) {
+        if (usableStoredRange && daySelect) {
             const isAllRange = availableDateRange
                 && formatDateYmd(initialRange[0]) === formatDateYmd(availableDateRange.start)
                 && formatDateYmd(initialRange[1]) === formatDateYmd(availableDateRange.end);
@@ -2998,61 +3010,64 @@ export async function initializePage() {
             isFreeAccountUser = false; // それ以外の場合、プレミアムアカウントと見なす
         }
 
-        // 1. Fetch all data sources in parallel
-        const [surveys, answers, personalInfo, enqueteDetails] = await Promise.all([
-            fetch(resolveDashboardDataPath('core/surveys.json')).then(res => res.json()),
-            fetch(resolveDemoDataPath(`answers/${surveyId}.json`)).then(res => {
-                if (!res.ok) return []; // Return empty array if answer file not found
-                return res.json();
-            }),
-            fetch(resolveDemoDataPath(`business-cards/${surveyId}.json`)).then(res => {
-                if (!res.ok) return []; // Return empty array if personal info file not found
-                return res.json();
-            }),
-            fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
-                if (!res.ok) return {}; // Return empty object if enquete file not found
-                return res.json();
-            })
-        ]);
+        // 1. Fetch all data sources. For the standard sample, canonical response
+        // files live under data/responses, so read those paths before demo fallbacks
+        // to avoid expected 404s in browser consoles.
+        const noStoreFetchOptions = { cache: 'no-store' };
+        const surveys = await fetch(resolveDashboardDataPath('core/surveys.json'), noStoreFetchOptions).then(res => res.json());
 
-        // Fallback to local data if demo dataset files are unavailable
-        let answersData = answers;
-        let personalInfoData = personalInfo;
-        let enqueteDetailsData = enqueteDetails;
+        let answersData = [];
+        let personalInfoData = [];
+        let enqueteDetailsData = {};
+
+        try {
+            const answersResponse = await fetch(resolveDashboardDataPath(`responses/answers/${surveyId}.json`), noStoreFetchOptions);
+            if (answersResponse.ok) {
+                const data = await answersResponse.json();
+                if (data && !Array.isArray(data) && Array.isArray(data.answers)) {
+                    answersData = data.answers;
+                } else if (Array.isArray(data)) {
+                    answersData = data;
+                }
+            }
+        } catch (error) {
+            console.warn('回答データの読み込みに失敗しました', error);
+        }
 
         if (!Array.isArray(answersData) || answersData.length === 0) {
-            const url = resolveDashboardDataPath(`responses/answers/${surveyId}.json`);
-            console.log('Fetching answers from:', url); // ★デバッグ用ログ
-            const r1 = await fetch(url);
-            const data = r1.ok ? await r1.json() : [];
-            if (data && !Array.isArray(data) && Array.isArray(data.answers)) {
-                answersData = data.answers;
-            } else if (Array.isArray(data)) {
-                answersData = data;
-            } else {
-                answersData = [];
-            }
-            console.log('Fetched answersData:', answersData); // ★デバッグ用ログ
+            const demoAnswersResponse = await fetch(resolveDemoDataPath(`answers/${surveyId}.json`), noStoreFetchOptions);
+            answersData = demoAnswersResponse.ok ? await demoAnswersResponse.json() : [];
         }
+
+        try {
+            const businessCardsResponse = await fetch(resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`), noStoreFetchOptions);
+            if (businessCardsResponse.ok) {
+                personalInfoData = await businessCardsResponse.json();
+            }
+        } catch (error) {
+            console.warn('名刺データの読み込みに失敗しました', error);
+        }
+
         if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
-            // Try loading from data/responses/business-cards/
-            const url = resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`);
-            console.log('Fetching personal info from:', url);
-            const r2 = await fetch(url);
-            if (r2.ok) {
-                personalInfoData = await r2.json();
-            } else {
-                // Fallback: Try data/business-cards/ (in case of different directory structure)
-                const url2 = resolveDashboardDataPath(`business-cards/${surveyId}.json`);
-                console.log('Fetching personal info fallback from:', url2);
-                const r3 = await fetch(url2);
-                personalInfoData = r3.ok ? await r3.json() : [];
-            }
-            console.log('Fetched personalInfoData:', personalInfoData);
+            const demoBusinessCardsResponse = await fetch(resolveDemoDataPath(`business-cards/${surveyId}.json`), noStoreFetchOptions);
+            personalInfoData = demoBusinessCardsResponse.ok ? await demoBusinessCardsResponse.json() : [];
         }
+
+        try {
+            const surveyDetailsResponse = await fetch(resolveDashboardDataPath(`surveys/${surveyId}.json`), noStoreFetchOptions);
+            enqueteDetailsData = surveyDetailsResponse.ok ? await surveyDetailsResponse.json() : {};
+        } catch (error) {
+            console.warn('アンケート詳細データの読み込みに失敗しました', error);
+        }
+
         if (!enqueteDetailsData || !enqueteDetailsData.details) {
-            const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
-            enqueteDetailsData = r3.ok ? await r3.json() : {};
+            const demoSurveyResponse = await fetch(resolveDemoDataPath(`surveys/${surveyId}.json`), noStoreFetchOptions);
+            enqueteDetailsData = demoSurveyResponse.ok ? await demoSurveyResponse.json() : {};
+        }
+
+        if (!enqueteDetailsData || !enqueteDetailsData.details) {
+            const enqueteResponse = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`), noStoreFetchOptions);
+            enqueteDetailsData = enqueteResponse.ok ? await enqueteResponse.json() : {};
         }
 
         // 2. Find the survey definition
@@ -3084,6 +3099,9 @@ export async function initializePage() {
         }
         if (restoredUiState && ['all', 'completed', 'processing'].includes(restoredUiState.currentStatusFilter)) {
             currentStatusFilter = restoredUiState.currentStatusFilter;
+        }
+        if (currentSurvey.isSample && currentStatusFilter !== 'all') {
+            currentStatusFilter = 'all';
         }
 
         // 3. Create a map for quick lookup of personal info

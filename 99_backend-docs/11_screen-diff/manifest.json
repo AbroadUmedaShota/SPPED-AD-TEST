@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "id": "11_screen-diff",
+    "title": "画面差分（モックアップ↔本番）",
+    "summary": "モックアップ（abroadumedashota.github.io）と本番（speed-ad.com）のスクリーンショットを画面ごとに左右で並べ、本番に足りない・異なる点を整理します。",
+    "sourceStatus": "観測スクショ / 目視比較 / 未確認あり",
+    "hasUnconfirmed": true,
+    "premise": "本番環境から見て足りないものをリストアップ（モックアップにはあって本番にはない／異なる差分）。左=モックアップ、右=本番。"
+  },
+  "documents": [
+    {
+      "id": "DIFF-INDEX",
+      "title": "画面差分一覧",
+      "category": "画面差分",
+      "sourceStatus": "目視比較",
+      "path": "index.html",
+      "summary": "9画面の左右比較と差分リスト、差分なし・確認不可の画面状態を1ページに集約します。",
+      "tags": ["画面差分", "モックアップ", "本番", "スクショ比較"],
+      "hasUnconfirmed": true
+    }
+  ]
+}
