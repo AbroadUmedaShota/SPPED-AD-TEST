@@ -253,7 +253,7 @@
     body.innerHTML = DEFECTS.map((d, index) => `
       <tr class="defect-row border-b border-outline-variant" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(d.key)} の詳細を開く">
         <td class="px-3 py-2 align-top">${chip(d.p, PRIORITY_CLASS)}</td>
-        <td class="whitespace-nowrap px-3 py-2 align-top font-medium text-on-surface">${escapeHtml(d.key)}</td>
+        <td class="whitespace-nowrap px-3 py-2 align-top font-medium"><a class="backlog-link inline-flex items-center gap-1 text-primary underline decoration-dotted underline-offset-2 hover:opacity-80" href="${BACKLOG_BASE + encodeURIComponent(d.key)}" target="_blank" rel="noopener" aria-label="${escapeHtml(d.key)} をBacklogで開く">${escapeHtml(d.key)}<span class="material-icons text-sm">open_in_new</span></a></td>
         <td class="px-3 py-2 align-top">${chip(d.prod, ENV_CLASS)}</td>
         <td class="px-3 py-2 align-top">${chip(d.stg, ENV_CLASS)}</td>
         <td class="px-3 py-2 align-top leading-6 text-on-surface">${escapeHtml(d.sum)}</td>
@@ -263,6 +263,10 @@
     `).join('');
 
     document.getElementById('rowCount').textContent = `${DEFECTS.length}件`;
+
+    body.querySelectorAll('.backlog-link').forEach(link => {
+      link.addEventListener('click', event => event.stopPropagation());
+    });
 
     body.querySelectorAll('.defect-row').forEach(row => {
       const d = DEFECTS[Number(row.dataset.index)];
