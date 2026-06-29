@@ -355,6 +355,20 @@
   overflow: hidden;
   background: #fff;
 }
+.article-body figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.article-body figcaption {
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line-2);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+  background: var(--brand-softer);
+}
 .article-body blockquote {
   margin: 24px 0;
   padding: 14px 18px;
