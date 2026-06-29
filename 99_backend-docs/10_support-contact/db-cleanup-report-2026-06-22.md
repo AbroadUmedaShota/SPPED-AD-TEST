@@ -60,24 +60,36 @@
 - Skipped attachment count: 0
 - Attachment error count: 4
 
-添付4件はGAS実行時に `DriveApp.File.setTrashed` のDrive書き込み承認が不足し、Drive APIでの個別ゴミ箱移動も `The user has not granted the app ... write access to the file` で拒否された。シート行は削除済みで、削除前データはバックアップシートに保持されている。
+添付4件はGAS実行時に `DriveApp.File.setTrashed` のDrive書き込み承認が不足し、Drive APIでの個別ゴミ箱移動も `The user has not granted the app ... write access to the file` で拒否された。2026-06-29 に確認者GASへ残添付専用の再実行関数を追加してファイル名安全確認までは再確認したが、`DriveApp.File.setTrashed` は引き続き `https://www.googleapis.com/auth/drive` の承認不足で失敗した。シート行は削除済みで、削除前データはバックアップシートに保持されている。
 
 残添付ファイル:
 
 | submission_id | fileId | ファイル名 | 状態 |
 | --- | --- | --- | --- |
-| `7fe3ea83-0308-4182-80a2-4d6067fe3bf0` | `1pJpzNYUd6JN-Q9IkUWgDs1SKwMIgIbGs` | `7fe3ea83-0308-4182-80a2-4d6067fe3bf0-1-codex-test.png` | Drive書き込み承認不足で未削除 |
-| `bc19d151-46a3-4a05-9efe-64706809bdfb` | `1eMhiGKnbzYCqwSwl8vVo91aOSmT2dtbL` | `bc19d151-46a3-4a05-9efe-64706809bdfb-1-fabicon.png` | Drive書き込み承認不足で未削除 |
-| `3d6bd3bc-a065-4908-9f73-b0b048ad0b06` | `15eel6WUJZ_p1ESKBRPYskeZOSmVY58ev` | `3d6bd3bc-a065-4908-9f73-b0b048ad0b06-1-codex-permission-check.png` | Drive書き込み承認不足で未削除 |
-| `70a13837-4725-4b56-ab5f-22a5135ea3ca` | `1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh` | `70a13837-4725-4b56-ab5f-22a5135ea3ca-1-codex-production-check.webp` | Drive書き込み承認不足で未削除 |
+| `7fe3ea83-0308-4182-80a2-4d6067fe3bf0` | `1pJpzNYUd6JN-Q9IkUWgDs1SKwMIgIbGs` | `7fe3ea83-0308-4182-80a2-4d6067fe3bf0-1-codex-test.png` | ファイル名確認済み。Drive書き込み承認不足で未削除 |
+| `bc19d151-46a3-4a05-9efe-64706809bdfb` | `1eMhiGKnbzYCqwSwl8vVo91aOSmT2dtbL` | `bc19d151-46a3-4a05-9efe-64706809bdfb-1-fabicon.png` | ファイル名確認済み。Drive書き込み承認不足で未削除 |
+| `3d6bd3bc-a065-4908-9f73-b0b048ad0b06` | `15eel6WUJZ_p1ESKBRPYskeZOSmVY58ev` | `3d6bd3bc-a065-4908-9f73-b0b048ad0b06-1-codex-permission-check.png` | ファイル名確認済み。Drive書き込み承認不足で未削除 |
+| `70a13837-4725-4b56-ab5f-22a5135ea3ca` | `1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh` | `70a13837-4725-4b56-ab5f-22a5135ea3ca-1-codex-production-check.webp` | ファイル名確認済み。Drive書き込み承認不足で未削除 |
+
+再実行方法:
+
+1. `customer@speed-ad.com` で確認者GASを開き、Driveフル権限を含む承認を完了する。
+2. Apps Scriptエディタから `previewResidualAttachmentCleanup()` を実行し、上記4件が `ready` または `already_trashed` であることを確認する。
+3. `executeResidualAttachmentCleanup('DELETE_TEST_CONTACT_ROWS_20260622')` を実行する。
+4. `previewResidualAttachmentCleanup()` を再実行し、4件が `already_trashed` になったことを確認する。
 
 ## 検証結果
 
 - ローカル契約テスト: `node --test tests/support-contact-contract.test.mjs` passed
 - GAS構文チェック: `Code.gs` parse passed
 - 差分チェック: `git diff --check` passed
-- GAS反映: 確認者GASをバージョン `12` (`support contact db cleanup safe`) へ反映済み
+- GAS反映: 確認者GASをバージョン `17` (`support contact viewer apps script hash token`) へ反映済み
 - 一時実行入口: バージョン `11` で使用後、バージョン `12` から削除済み。公開HTMLに `cleanupAction` と一時トークンが含まれないことを確認済み
-- 追加ハードニング: ローカルコードでは確認用トークン経由のDB整理補助関数を削除済み。`customer` / `default` のGoogleトークンが `invalid_rapt` になったため、バージョン `13` への追加 redeploy は再認証後に実施する
-- 確認アプリ表示確認: Web App URL が 200 を返し、`SPEED AD お問い合わせ確認` のHTMLを返すことを確認済み
-- 新規テスト投稿: 未実施。DB整理後の新規投稿検証は、テストモードトークン付きフォームまたは `submitContact` で別途実施する
+- 追加ハードニング: `customer@speed-ad.com` の `clasp` profile を再認証し、確認用トークン経由のDB整理補助関数を含まないローカル最新コードを既存デプロイへ反映済み
+- 公開HTML確認: `cleanupAction`、一時トークン、`previewContactDbCleanupWithToken` / `executeContactDbCleanupWithToken` が含まれないことを確認済み
+- 確認アプリ表示確認: トークンなしURLは 200 でアプリ内の無効URL表示になることを確認済み
+- 実トークン付き確認: 通知メールの確認アプリURLから、一覧、該当詳細、可視URL上のトークン除去を確認済み
+- 添付プレビュー確認: 残添付 `1pJpzNYUd6JN-Q9IkUWgDs1SKwMIgIbGs` を確認アプリ経由で読み込み、画像データURLとDriveリンクを取得できることを確認済み
+- 更新確認: 既存の検証行 `87cba07a-a8f6-42da-885d-781821adf768` でステータスと内部メモを一時更新し、取得確認後に表示値を元へ戻した
+- DB整理関数のWeb経路確認: 確認画面の通常経路から `previewResidualAttachmentCleanup` を呼び出しても、Apps Script実行ユーザー確認で拒否されることを確認済み
+- 新規テスト投稿: 未実施。ローカル環境に `CONTACT_TEST_MODE_TOKEN` の実値がなく、公開投稿GASのScript Property変更は今回の対象外のため、既存の検証行で更新系の実動作確認を代替した

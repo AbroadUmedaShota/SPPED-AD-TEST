@@ -55,7 +55,7 @@ SPEED AD の運用面について、`s-umeda@abroad-o.com` が日常確認、編
 | 環境 | 対象リソース | 所有者境界 | 付与グループ | `s-umeda@abroad-o.com` の操作範囲 | 危険操作 | 戻し手順 | 最終確認日 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Apps Script | サポートお問い合わせ受付 `1qODYRRKo8X2ps9V6TI5Q8RzR-TswCUS7sx8gZYDEpfgaKeqJhHDl10KT` | 現状は `customer@speed-ad.com` 所有 | 未設定 | `clasp list`、`clasp push --force`、バージョン作成、デプロイ一覧確認 | 既存 Web App の更新、通知先、テストモードトークン変更 | 公開デプロイ `AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D` はバージョン `16`。戻しは直前安定版 `12` へ redeploy する。 | 2026-06-22 |
-| Apps Script | サポートお問い合わせ確認アプリ `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW` | 現状は `customer@speed-ad.com` 所有 | 未設定 | 短期運用では通知URLフラグメント内の確認用トークンで一覧、詳細、添付プレビュー、対応ステータス更新が可能。Googleアカウント単位制御は中期対応 | Web App URL変更、確認用トークン変更、Spreadsheet/Drive参照先変更、DB整理関数実行 | 現行デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` はバージョン `12`。不具合時はバージョン `9` へ戻すか、公開投稿GASの `CONTACT_VIEWER_BASE_URL` を空に戻し、通知内のSpreadsheetリンクをフォールバックにする。 | 2026-06-22 |
+| Apps Script | サポートお問い合わせ確認アプリ `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW` | 現状は `customer@speed-ad.com` 所有 | 未設定 | 短期運用では通知URLフラグメント内の確認用トークンで一覧、詳細、添付プレビュー、対応ステータス更新が可能。Googleアカウント単位制御は中期対応 | Web App URL変更、確認用トークン変更、Spreadsheet/Drive参照先変更、DB整理関数実行 | 現行デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` はバージョン `17`。不具合時はバージョン `9` へ戻すか、公開投稿GASの `CONTACT_VIEWER_BASE_URL` を空に戻し、通知内のSpreadsheetリンクをフォールバックにする。 | 2026-06-29 |
 | Spreadsheet | お問い合わせ保存先 `1tv6xEckXPd8bIwbGfE-aJ-XxkIUDreglmcioCpkH-98` | 現状は `customer@speed-ad.com` owner | 個人 writer で暫定付与 | `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` は writer。API 読取確認済み | 共有権限変更 | `customer@speed-ad.com` で共有権限を戻す | 2026-06-21 |
 | Drive | 添付保存フォルダ `1rcFGJh9l3NwUeYt2MIR8p2A-DVYxxEwY` | 現状は `customer@speed-ad.com` owner | 個人 writer で暫定付与 | `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` は writer。Drive UI で付与し API 読取確認済み | 添付削除、共有範囲変更 | フォルダ共有を `customer@speed-ad.com` owner 側で戻す | 2026-06-21 |
 | Google Workspace | Groups / Gmail alias / Drive / Apps Script | `abroad-o.com` 管理へ寄せる | `speed-ad-ops-admin` 予定 | 管理コンソール権限は未確認 | ユーザー、グループ、メール認証、Alias 変更 | 管理コンソール監査ログと変更前値で戻す | 未確認 |
@@ -66,7 +66,7 @@ SPEED AD の運用面について、`s-umeda@abroad-o.com` が日常確認、編
 
 補足: Drive 添付保存フォルダは API での権限付与が `appNotAuthorizedToFile` で失敗したため、`customer@speed-ad.com` の Google Drive UI から編集者として共有した。付与後は Drive API の権限一覧読み取りで `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` が `writer` であることを確認済み。添付ありテスト投稿 `3d6bd3bc-a065-4908-9f73-b0b048ad0b06` は `storageStatus=stored` / `mailStatus=sent` で成功し、作成ファイル `15eel6WUJZ_p1ESKBRPYskeZOSmVY58ev` でも両名の `writer` 継承を確認した。`s-umeda@abroad-o.com` 指定の Drive プレビューでもアクセス拒否なく表示できることを確認した。
 
-補足: 2026-06-22 に問い合わせ仕様を `confirmed` として扱い、作業DB `contact_submissions` のテスト投稿整理を実施した。整理は確認者GASの `previewContactDbCleanup` と `executeContactDbCleanup` で行い、同一Spreadsheet内へバックアップシート `contact_submissions_backup_20260622_060551` を作成後、既知テスト受付IDまたは内部メールアドレスかつテスト判定語を含む12行を削除した。削除後プレビューでは候補0件、残行3件。添付4件はDrive書き込み承認不足によりGAS / Drive API ともゴミ箱移動できなかったため、対象 fileId と理由を `99_backend-docs/10_support-contact/db-cleanup-report-2026-06-22.md` に記録した。ローカルコードでは確認用トークン経由のDB整理補助関数も削除済みだが、`customer` / `default` のGoogleトークンが `invalid_rapt` になったため、追加ハードニングの再デプロイは再認証後に行う。
+補足: 2026-06-22 に問い合わせ仕様を `confirmed` として扱い、作業DB `contact_submissions` のテスト投稿整理を実施した。整理は確認者GASの `previewContactDbCleanup` と `executeContactDbCleanup` で行い、同一Spreadsheet内へバックアップシート `contact_submissions_backup_20260622_060551` を作成後、既知テスト受付IDまたは内部メールアドレスかつテスト判定語を含む12行を削除した。削除後プレビューでは候補0件、残行3件。添付4件はDrive書き込み承認不足によりGAS / Drive API ともゴミ箱移動できなかったため、対象 fileId と理由を `99_backend-docs/10_support-contact/db-cleanup-report-2026-06-22.md` に記録した。2026-06-29 に `customer@speed-ad.com` の `clasp` profile を再認証し、確認者GASの既存デプロイをバージョン `17` (`support contact viewer apps script hash token`) へ反映した。通知メールの実 `#token=` URLで一覧、詳細、添付プレビュー、ステータス更新、内部メモ保存、トークン除去を確認済み。公開HTMLに一時実行入口と確認用トークン経由のDB整理補助関数は残っていない。添付4件のゴミ箱移動は引き続き Drive フル権限承認待ち。
 
 ## 5. サポートお問い合わせ移行手順
 
@@ -119,6 +119,8 @@ CONTACT_TEST_MODE_TOKEN=<Script Properties only>
 - 確認アプリの既存デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` をバージョン `9` (`support contact viewer ux fixes`) へ redeploy した。公開HTMLに `sessionStorage` 復帰、添付ビューアのフォーカス復帰、閉じるボタンへの初期フォーカスが含まれることを確認した。
 - STG supportサイトを `s3://stg.support.speed-ad.com/` へ同期し、CloudFront `EDJ1GHHD1FP7Q` の invalidation `I3RL1KPW9OHCAPX1F6707VFANA` を完了した。`https://stg.support.speed-ad.com/contact/` は 200、テストモードのメール通知文言、トークン不備エラー文言、送信ボタン制御のJS反映を確認済み。
 - 本番 supportサイトを `s3://support.speed-ad.com/` へ同期し、CloudFront `E2ESLIURIYZA6G` の invalidation `IA62JJQE5VPAJ2WY1HS352AJJ0` を完了した。`https://support.speed-ad.com/contact/` は 200、テストモードのメール通知文言、トークン不備エラー文言、送信ボタン制御のJS反映を確認済み。
+- 2026-06-29 に確認者GASの既存デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` をバージョン `17` (`support contact viewer apps script hash token`) へ redeploy した。Apps Script iframe 内でも通知メールの `#token=` と `id` を読み取り、一覧、詳細、添付プレビュー、ステータス更新、内部メモ保存、可視URLのトークン除去が動くことを確認済み。
+- 残添付4件はファイル名が削除対象 `submission_id` で始まることを再確認済み。ただし `DriveApp.File.setTrashed` は Drive フル権限承認不足で継続ブロック。Apps Scriptエディタで `customer@speed-ad.com` がDriveスコープを承認後、`previewResidualAttachmentCleanup()` と `executeResidualAttachmentCleanup('DELETE_TEST_CONTACT_ROWS_20260622')` で再実行する。
 
 ### 5.2 `abroad-o.com` 側への移行手順
 

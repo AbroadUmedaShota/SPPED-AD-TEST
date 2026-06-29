@@ -145,7 +145,14 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /function updateContactSubmissionStatus/);
   assert.match(code, /function previewContactDbCleanup/);
   assert.match(code, /function executeContactDbCleanup/);
+  assert.match(code, /function previewResidualAttachmentCleanup/);
+  assert.match(code, /function executeResidualAttachmentCleanup/);
   assert.match(code, /function buildContactDbCleanupPlan_/);
+  assert.match(code, /RESIDUAL_ATTACHMENT_CLEANUP_TARGETS/);
+  assert.match(code, /1pJpzNYUd6JN-Q9IkUWgDs1SKwMIgIbGs/);
+  assert.match(code, /1eMhiGKnbzYCqwSwl8vVo91aOSmT2dtbL/);
+  assert.match(code, /15eel6WUJZ_p1ESKBRPYskeZOSmVY58ev/);
+  assert.match(code, /1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh/);
   assert.match(code, /CONTACT_DB_CLEANUP_CONFIRMATION = 'DELETE_TEST_CONTACT_ROWS_20260622'/);
   assert.match(code, /sheet\.getName\(\) \+ '_backup_'/);
   assert.match(code, /yyyyMMdd_HHmmss/);
@@ -153,6 +160,7 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /external_email_not_auto_deleted/);
   assert.match(code, /filename_does_not_start_with_submission_id/);
   assert.match(code, /file\.setTrashed\(true\)/);
+  assert.match(code, /file\.isTrashed\(\)/);
   assert.match(code, /\.sort\(function \(a, b\) \{ return b - a; \}\)/);
   assert.match(code, /function validateViewerAccessToken/);
   assert.match(code, /function assertAttachmentFile_/);
@@ -164,14 +172,17 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /DRIVE_FOLDER_ID/);
   assert.match(html, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(html, /history\.replaceState/);
+  assert.match(html, /google\.script\.url\.getLocation/);
+  assert.match(html, /google\.script\.history\.replace/);
+  assert.match(html, /parseViewerAccessTokenFromAppsScriptLocation/);
   assert.match(html, /cleanAccessTokenFromUrl/);
   assert.match(html, /VIEWER_ACCESS_TOKEN_STORAGE_KEY/);
-  assert.match(html, /getAccessTokenForViewer/);
+  assert.match(html, /applyViewerLocationState/);
   assert.match(html, /sessionStorage/);
   assert.match(html, /attachmentReturnFocus/);
   assert.match(html, /attachmentModalClose\.focus\(\)/);
   assert.match(html, /target\.focus\(\)/);
-  assert.match(html, /showApp\(\)[\s\S]*cleanAccessTokenFromUrl\(\);/);
+  assert.match(html, /showApp\(appsScriptLocation\)[\s\S]*cleanAccessTokenFromUrl\(appsScriptLocation\);/);
   assert.match(html, /validateViewerAccessToken/);
   assert.match(html, /bootstrapViewer/);
   assert.match(html, /callServer\('validateViewerAccessToken', state\.accessToken\)/);
@@ -199,6 +210,18 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9&accessToken=query-token'), 'query-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9#token=hash-token'), 'hash-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9'), '');
+  assert.equal(
+    helpers.parseViewerAccessTokenFromAppsScriptLocation({ parameter: { id: '9' }, parameters: { id: ['9'] }, hash: 'token=apps-script-hash-token' }),
+    'apps-script-hash-token'
+  );
+  assert.equal(
+    helpers.parseViewerAccessTokenFromAppsScriptLocation({ parameter: { accessToken: 'apps-script-query-token' }, parameters: { accessToken: ['apps-script-query-token'] }, hash: '' }),
+    'apps-script-query-token'
+  );
+  assert.equal(
+    helpers.getSubmissionIdFromAppsScriptLocation({ parameter: { id: 'submission-9' }, parameters: { id: ['submission-9'] }, hash: 'token=secret' }),
+    'submission-9'
+  );
   const storage = new Map();
   const mockStorage = {
     getItem: (key) => storage.get(key) || null,
@@ -219,6 +242,18 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
   const cleanedHash = helpers.buildViewerUrlWithoutTokens('https://example.com/view?id=9&foo=bar#section=2&accessToken=hash-token');
   assert.equal(cleanedHash.changed, true);
   assert.equal(cleanedHash.href, 'https://example.com/view?id=9&foo=bar#section=2');
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(helpers.buildAppsScriptLocationWithoutTokens({
+      parameter: { id: '9', token: 'query-token' },
+      parameters: { id: ['9'], token: ['query-token'] },
+      hash: 'token=hash-token&section=2',
+    }))),
+    {
+      parameters: { id: ['9'] },
+      hash: 'section=2',
+      changed: true,
+    }
+  );
 
   assert.equal(helpers.clampAttachmentIndex(-3, ['a', 'b']), 0);
   assert.equal(helpers.clampAttachmentIndex(9, ['a', 'b']), 1);
