@@ -15,7 +15,7 @@
 
 - Script ID: `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW`
 - Web App URL: `https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec`
-- Current version: `12` (`support contact db cleanup safe`)
+- Current version: `17` (`support contact viewer apps script hash token`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -34,7 +34,7 @@
 CONTACT_VIEWER_EMAILS=customer@speed-ad.com,s-umeda@abroad-o.com,t-hayashi@abroad-o.com
 ```
 
-2026-06-21 時点の運用値:
+2026-06-29 時点の運用値:
 
 ```text
 SPREADSHEET_ID=1tv6xEckXPd8bIwbGfE-aJ-XxkIUDreglmcioCpkH-98
@@ -59,6 +59,7 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 添付はその場で大きく開け、複数添付は前後移動できる。
 - `token` がない、または不正なURLでは問い合わせ情報が表示されない。
 - `token` / `accessToken` のクエリやフラグメントは読み取り後に可視URLから消える。同じタブ内の再読み込みでは保持済みトークンで復帰し、不正トークン判定時は保持値を消す。
+- Apps Script HTML Service の iframe 内でも `google.script.url.getLocation` から親URLの `#token=` と `id` を読み取り、通知メールの実URLで一覧・詳細を開ける。
 - 添付ビューアは開いた時に閉じるボタンへフォーカスし、閉じた時に元の添付サムネイルへ戻る。
 - 添付ファイルの Drive リンクはフォールバックとして開ける。
 
@@ -87,5 +88,9 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 2026-06-22 にDB整理関数を追加し、確認者GASの既存デプロイをバージョン `12` (`support contact db cleanup safe`) へ redeploy した。
 - 一時実行入口を使って `contact_submissions` の削除候補12件を削除し、バックアップシート `contact_submissions_backup_20260622_060551` を作成した。削除後プレビューで候補0件を確認済み。
 - 一時実行入口はバージョン `12` から削除済み。公開HTMLに `cleanupAction` と一時トークンが含まれないことを確認済み。
-- ローカルコードでは確認用トークン経由のDB整理補助関数も削除済み。`customer` / `default` のGoogleトークンが `invalid_rapt` になったため、追加ハードニングの再デプロイは再認証後に行う。
-- 添付4件のゴミ箱移動はDrive書き込み承認不足で未完了。対象 fileId と理由は `../db-cleanup-report-2026-06-22.md` に記録済み。
+- 2026-06-29 に `customer@speed-ad.com` の `clasp` profile を再認証し、確認者GASの既存デプロイをバージョン `17` (`support contact viewer apps script hash token`) へ redeploy した。
+- 公開HTMLに `cleanupAction`、一時トークン、確認用トークン経由のDB整理補助関数が含まれないことを確認済み。
+- 通知メールの実 `#token=` URLで、Apps Script iframe 内の一覧、詳細、添付プレビュー、ステータス更新、内部メモ保存が動くことを確認済み。更新確認は既存の検証行 `87cba07a-a8f6-42da-885d-781821adf768` を一時更新し、表示値を元に戻した。
+- トークンなしの確認アプリURLはGoogle認証へリダイレクトせず、アプリ内で無効URL表示になることを確認済み。
+- DB整理系関数は確認画面の通常経路から呼び出しても、Apps Script実行ユーザー確認で拒否されることを確認済み。
+- 添付4件のゴミ箱移動はDrive書き込み承認不足で未完了。対象 fileId と理由、再実行手順は `../db-cleanup-report-2026-06-22.md` に記録済み。

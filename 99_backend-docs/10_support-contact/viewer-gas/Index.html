@@ -457,6 +457,65 @@
       };
     }
 
+    function getFirstLocationParameter(location, key) {
+      if (!location) return '';
+      if (location.parameter && location.parameter[key]) {
+        return String(location.parameter[key] || '');
+      }
+      const values = location.parameters && location.parameters[key];
+      if (Array.isArray(values) && values.length) {
+        return String(values[0] || '');
+      }
+      return '';
+    }
+
+    function parseViewerAccessTokenFromAppsScriptLocation(location) {
+      const searchToken = getFirstLocationParameter(location, 'token') || getFirstLocationParameter(location, 'accessToken');
+      if (searchToken) return searchToken;
+      const hash = String((location && location.hash) || '').replace(/^#/, '');
+      if (!hash) return '';
+      const params = new URLSearchParams(hash);
+      return params.get('token') || params.get('accessToken') || '';
+    }
+
+    function getSubmissionIdFromAppsScriptLocation(location) {
+      return getFirstLocationParameter(location, 'id');
+    }
+
+    function buildAppsScriptLocationWithoutTokens(location) {
+      const cleanedParameters = {};
+      let changed = false;
+      const parameters = (location && location.parameters) || {};
+      Object.keys(parameters).forEach((key) => {
+        if (key === 'token' || key === 'accessToken') {
+          changed = true;
+          return;
+        }
+        cleanedParameters[key] = parameters[key];
+      });
+
+      if (location && location.parameter) {
+        Object.keys(location.parameter).forEach((key) => {
+          if (key === 'token' || key === 'accessToken' || cleanedParameters[key]) return;
+          cleanedParameters[key] = [String(location.parameter[key] || '')];
+        });
+      }
+
+      const hash = String((location && location.hash) || '').replace(/^#/, '');
+      const hashParams = new URLSearchParams(hash);
+      if (hashParams.has('token') || hashParams.has('accessToken')) {
+        hashParams.delete('token');
+        hashParams.delete('accessToken');
+        changed = true;
+      }
+
+      return {
+        parameters: cleanedParameters,
+        hash: hashParams.toString(),
+        changed,
+      };
+    }
+
     function readViewerAccessTokenFromSession(storage) {
       try {
         return storage ? String(storage.getItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY) || '') : '';
@@ -591,7 +650,10 @@
 
     window.__CONTACT_VIEWER_TEST__ = {
       parseViewerAccessTokenFromUrl,
+      parseViewerAccessTokenFromAppsScriptLocation,
       buildViewerUrlWithoutTokens,
+      buildAppsScriptLocationWithoutTokens,
+      getSubmissionIdFromAppsScriptLocation,
       readViewerAccessTokenFromSession,
       writeViewerAccessTokenToSession,
       clearViewerAccessTokenFromSession,
@@ -608,24 +670,36 @@
     };
     /* CONTACT_VIEWER_TEST_HELPERS_END */
 
-    function getAccessTokenFromUrl() {
-      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
-      if (serverToken) return serverToken;
-      return parseViewerAccessTokenFromUrl(window.location.href);
+    function getAppsScriptLocation() {
+      return new Promise((resolve) => {
+        if (window.google && google.script && google.script.url && typeof google.script.url.getLocation === 'function') {
+          google.script.url.getLocation(resolve);
+          return;
+        }
+        resolve(null);
+      });
     }
 
-    function getAccessTokenForViewer() {
+    function applyViewerLocationState(location) {
       const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
-      if (serverToken) return serverToken;
-      const urlToken = parseViewerAccessTokenFromUrl(window.location.href);
+      const urlToken = parseViewerAccessTokenFromAppsScriptLocation(location) || parseViewerAccessTokenFromUrl(window.location.href);
+      const token = serverToken || urlToken || readViewerAccessTokenFromSession(window.sessionStorage);
       if (urlToken) {
         writeViewerAccessTokenToSession(window.sessionStorage, urlToken);
-        return urlToken;
       }
-      return readViewerAccessTokenFromSession(window.sessionStorage);
+      state.accessToken = token;
+      const submissionId = getSubmissionIdFromAppsScriptLocation(location) || window.CONTACT_VIEWER_INITIAL_ID || '';
+      if (submissionId) {
+        state.selectedId = submissionId;
+      }
     }
 
-    function cleanAccessTokenFromUrl() {
+    function cleanAccessTokenFromUrl(location) {
+      const appsScriptCleaned = buildAppsScriptLocationWithoutTokens(location);
+      if (appsScriptCleaned.changed && window.google && google.script && google.script.history && typeof google.script.history.replace === 'function') {
+        google.script.history.replace({}, appsScriptCleaned.parameters, appsScriptCleaned.hash);
+        return;
+      }
       const result = buildViewerUrlWithoutTokens(window.location.href);
       if (result.changed) {
         window.history.replaceState({}, document.title, result.href);
@@ -655,7 +729,7 @@
 
     const state = {
       selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
-      accessToken: getAccessTokenForViewer(),
+      accessToken: window.CONTACT_VIEWER_ACCESS_TOKEN || readViewerAccessTokenFromSession(window.sessionStorage),
       submissions: [],
       counts: { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 },
       loading: false,
@@ -1160,11 +1234,11 @@
       }
     }
 
-    function showApp() {
+    function showApp(appsScriptLocation) {
       viewerEmail.textContent = viewerContext.email || '';
       deniedView.hidden = true;
       appView.hidden = false;
-      cleanAccessTokenFromUrl();
+      cleanAccessTokenFromUrl(appsScriptLocation);
       refreshButton.addEventListener('click', loadList);
       searchInput.addEventListener('input', () => {
         window.clearTimeout(searchInput._timer);
@@ -1176,8 +1250,10 @@
 
     async function bootstrapViewer() {
       viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
+      const appsScriptLocation = await getAppsScriptLocation();
+      applyViewerLocationState(appsScriptLocation);
       if (viewerContext.allowed) {
-        showApp();
+        showApp(appsScriptLocation);
         return;
       }
       if (!state.accessToken) {
@@ -1190,7 +1266,7 @@
         const validatedContext = await callServer('validateViewerAccessToken', state.accessToken);
         viewerContext = validatedContext || viewerContext;
         if (validatedContext && validatedContext.allowed) {
-          showApp();
+          showApp(appsScriptLocation);
           return;
         }
         showDenied(viewerContext.tokenConfigured

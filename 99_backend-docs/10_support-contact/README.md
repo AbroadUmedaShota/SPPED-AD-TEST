@@ -38,15 +38,17 @@ Apps Script エディタで `initializeContactStorage` と `checkContactConfigur
 
 外部メールアドレスの行は、既知テスト受付IDに一致しない限り自動削除しません。添付ファイルは、Drive上のファイル名が削除対象 `submission_id` で始まる場合だけゴミ箱へ移動します。
 
-2026-06-22 の整理結果は [db-cleanup-report-2026-06-22.md](./db-cleanup-report-2026-06-22.md) に記録します。
+2026-06-22 の整理結果と 2026-06-29 の確認アプリ正常化結果は [db-cleanup-report-2026-06-22.md](./db-cleanup-report-2026-06-22.md) に記録します。
 
 2026-06-22 実行結果:
 
 - `previewContactDbCleanup` で全15行中12件を削除候補として確認。
 - `executeContactDbCleanup` でバックアップシート `contact_submissions_backup_20260622_060551` を作成し、候補12行を削除。
 - 削除後プレビューで候補0件、残行3件を確認。
-- 添付4件のゴミ箱移動は、GAS / Drive API ともDrive書き込み承認不足で未完了。対象 fileId と理由は整理レポートに記録済み。
-- ローカルコードでは確認用トークン経由のDB整理補助関数も削除済み。Googleトークン再認証後に確認者GASへ追加反映する。
+- 添付4件のゴミ箱移動は、GAS / Drive API ともDrive書き込み承認不足で未完了。2026-06-29 に残添付専用の再実行関数でファイル名安全確認までは再確認済み。対象 fileId、理由、再実行手順は整理レポートに記録済み。
+- `customer@speed-ad.com` のGoogle再認証後、確認者GASの既存デプロイをバージョン `17` (`support contact viewer apps script hash token`) へ反映済み。
+- 確認アプリは Apps Script iframe 内でも通知メールの `#token=` と `id` を読み取り、一覧、詳細、添付プレビュー、ステータス更新、内部メモ保存が動くことを確認済み。
+- 公開HTMLに `cleanupAction`、一時トークン、確認用トークン経由のDB整理補助関数が残っていないことを確認済み。
 
 ## 資料
 

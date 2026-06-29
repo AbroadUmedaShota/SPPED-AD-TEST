@@ -31,6 +31,24 @@ var CONTACT_DB_CLEANUP_MARKERS = [
   'production-check',
   'contactTestMode'
 ];
+var RESIDUAL_ATTACHMENT_CLEANUP_TARGETS = [
+  {
+    submission_id: '7fe3ea83-0308-4182-80a2-4d6067fe3bf0',
+    fileId: '1pJpzNYUd6JN-Q9IkUWgDs1SKwMIgIbGs'
+  },
+  {
+    submission_id: 'bc19d151-46a3-4a05-9efe-64706809bdfb',
+    fileId: '1eMhiGKnbzYCqwSwl8vVo91aOSmT2dtbL'
+  },
+  {
+    submission_id: '3d6bd3bc-a065-4908-9f73-b0b048ad0b06',
+    fileId: '15eel6WUJZ_p1ESKBRPYskeZOSmVY58ev'
+  },
+  {
+    submission_id: '70a13837-4725-4b56-ab5f-22a5135ea3ca',
+    fileId: '1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh'
+  }
+];
 var CONTACT_HEADERS = [
   'submission_id',
   'submitted_at',
@@ -199,6 +217,17 @@ function executeContactDbCleanup(confirmation) {
   var operatorEmail = assertContactDbCleanupOperator_();
   assertContactDbCleanupConfirmation_(confirmation);
   return executeContactDbCleanup_(operatorEmail);
+}
+
+function previewResidualAttachmentCleanup() {
+  var operatorEmail = assertContactDbCleanupOperator_();
+  return inspectResidualAttachmentCleanup_(operatorEmail, false);
+}
+
+function executeResidualAttachmentCleanup(confirmation) {
+  var operatorEmail = assertContactDbCleanupOperator_();
+  assertContactDbCleanupConfirmation_(confirmation);
+  return inspectResidualAttachmentCleanup_(operatorEmail, true);
 }
 
 function buildContactDbCleanupPreview_(operatorEmail) {
@@ -401,6 +430,58 @@ function trashContactDbCleanupAttachments_(candidates) {
       }
       result.files.push(fileResult);
     });
+  });
+
+  return result;
+}
+
+function inspectResidualAttachmentCleanup_(operatorEmail, shouldTrash) {
+  var result = {
+    ok: true,
+    mode: shouldTrash ? 'execute-residual-attachments' : 'preview-residual-attachments',
+    generatedAt: new Date().toISOString(),
+    operatorEmail: operatorEmail,
+    targetCount: RESIDUAL_ATTACHMENT_CLEANUP_TARGETS.length,
+    trashedCount: 0,
+    skippedCount: 0,
+    errorCount: 0,
+    files: []
+  };
+
+  RESIDUAL_ATTACHMENT_CLEANUP_TARGETS.forEach(function (target) {
+    var fileResult = {
+      submission_id: target.submission_id,
+      fileId: target.fileId,
+      name: '',
+      trashed: false,
+      status: ''
+    };
+    try {
+      var file = DriveApp.getFileById(target.fileId);
+      var fileName = file.getName();
+      fileResult.name = fileName;
+      fileResult.trashed = file.isTrashed();
+      if (String(fileName || '').indexOf(target.submission_id + '-') !== 0) {
+        fileResult.status = 'skipped';
+        fileResult.reason = 'filename_does_not_start_with_submission_id';
+        result.skippedCount += 1;
+      } else if (fileResult.trashed) {
+        fileResult.status = 'already_trashed';
+        result.trashedCount += 1;
+      } else if (shouldTrash) {
+        file.setTrashed(true);
+        fileResult.trashed = true;
+        fileResult.status = 'trashed';
+        result.trashedCount += 1;
+      } else {
+        fileResult.status = 'ready';
+      }
+    } catch (err) {
+      fileResult.status = 'error';
+      fileResult.error = String(err);
+      result.errorCount += 1;
+    }
+    result.files.push(fileResult);
   });
 
   return result;
