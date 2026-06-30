@@ -82,13 +82,13 @@ const api = {
 
   /**
    * 「アンケートを保存する」差し替え。本番ハンドラは showToast のみで画面遷移しないため、
-   * チュートリアル側で完了ステップ（28）への進行を実行する。
+   * チュートリアル側で完了ステップ（29）への進行を実行する。
    */
   handleAttemptSave() {
     if (!isActiveNow()) return;
     enableQrButton();
     if (typeof internalHooks.goToStep === 'function') {
-      internalHooks.goToStep(28);
+      internalHooks.goToStep(29);
     }
   },
 

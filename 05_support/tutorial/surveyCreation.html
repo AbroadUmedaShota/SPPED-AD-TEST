@@ -502,7 +502,7 @@
                 </button>
                 <div id="optionsCardBody" class="v2-accordion-body border-t border-gray-100 px-5 py-3 flex gap-4">
                   <!-- 名刺画像添付 -->
-                  <div class="flex-1 flex items-center justify-between gap-3">
+                  <div id="bizcardEnabledOption" class="flex-1 flex items-center justify-between gap-3">
                     <div class="min-w-0">
                       <p class="font-bold text-sm text-gray-700 flex items-center gap-1 leading-tight">名刺画像添付機能
                         <button type="button" class="help-trigger help-inline-button material-icons text-[14px]" data-help-key="noBizcardCapture" aria-label="名刺画像添付機能の説明を表示">help_outline</button>
@@ -511,6 +511,20 @@
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input type="checkbox" id="bizcardEnabled" class="sr-only peer" checked>
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <div class="w-px bg-gray-100 self-stretch"></div>
+                  <!-- 連絡先入力の必須化 -->
+                  <div id="requireContactInfoOption" class="flex-1 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-gray-700 flex items-center gap-1 leading-tight">連絡先の入力を必須化
+                        <button type="button" class="help-trigger help-inline-button material-icons text-[14px]" data-help-key="requireContactInfo" aria-label="連絡先の入力を必須化の説明を表示">help_outline</button>
+                      </p>
+                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">名刺画像か基本情報（氏名・会社名等）が無いと送信不可</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="requireContactInfo" class="sr-only peer" checked>
                       <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
                   </div>

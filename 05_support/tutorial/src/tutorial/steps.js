@@ -1,5 +1,5 @@
 // steps.js
-// チュートリアル全 28 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
+// チュートリアル全 29 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
 //
 // 各ステップフィールド:
 //   id, block, target, contextTarget, mode, placement, title, body
@@ -12,10 +12,10 @@
 //   hideBack           : 戻るボタン非表示（ページ境界）
 //   completeButtonLabel: 次へボタンを完了ラベルに差し替え
 //
-// id 8, 27, 28 は user-action-bridge（本番ハンドラ経由 or 完了）。
-// step 23（タブレット切替 user-action）+ step 24（タブレット表示確認 info, onLeaveActionでプレビュー閉じ）に分離。
-// step 25（QR表示 user-action）+ step 26（QR確認 info, onLeaveActionでQR閉じ）に分離。
-// 旧10は新10〜13に分割（名刺画像添付/名刺データ化/お礼メール/回答完了画面）、選択肢4個別は新17に統合（multi-option一括）、評定尺度3個別は新20に統合（rating-bundle一括）。
+// id 8, 28, 29 は user-action-bridge（本番ハンドラ経由 or 完了）。
+// step 24（タブレット切替 user-action）+ step 25（タブレット表示確認 info, onLeaveActionでプレビュー閉じ）に分離。
+// step 26（QR表示 user-action）+ step 27（QR確認 info, onLeaveActionでQR閉じ）に分離。
+// オプション機能カードは step10（名刺画像添付）と step11（連絡先の入力を必須化）にトグル単位で分割。関連設定は step12〜14（名刺データ化/お礼メール/回答完了画面）。選択肢4個別は step18 に統合（multi-option一括）、評定尺度3個別は step21 に統合（rating-bundle一括）。
 
 const TOMORROW_OFFSET_DAYS = 1;
 const PERIOD_LENGTH_DAYS = 3;
@@ -110,7 +110,7 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 10, block: 'C', target: '#optionsCardBody', mode: 'info', placement: 'left',
+    id: 10, block: 'C', target: '#bizcardEnabledOption', contextTarget: '#optionsCardBody', mode: 'info', placement: 'left',
     title: '名刺画像添付機能',
     body:
       '回答時に名刺を撮影するステップを追加できる機能です。\n'
@@ -119,25 +119,36 @@ export const TUTORIAL_STEPS = [
       + 'ここでは変更せずに『次へ』へ進みます。',
   },
   {
-    id: 11, block: 'C', target: '#openBizcardSettingsBtn', contextTarget: '#relatedSettingsCardBody',
-    mode: 'user-action-bridge', placement: 'left',
+    id: 11, block: 'C', target: '#requireContactInfoOption', contextTarget: '#optionsCardBody', mode: 'info', placement: 'left',
+    title: '連絡先の入力を必須化',
+    body:
+      '回答送信時に、回答者の連絡先を必ず取得するための設定です。\n'
+      + 'ONにすると、名刺画像も基本情報（氏名・メール・会社名・電話番号）も無い回答は送信できなくなります。\n'
+      + '送信できないとき、回答者の画面には不足している項目が一覧で表示されます。\n\n'
+      + 'ここでは変更せずに『次へ』へ進みます。',
+  },
+  {
+    id: 12, block: 'C', target: '#openBizcardSettingsBtn', contextTarget: '#relatedSettingsCardBody',
+    mode: 'info', placement: 'left',
     title: '名刺データ化設定',
     body:
       '収集した名刺画像をテキスト情報に変換（データ化）する設定です。\n'
       + '展示会後の名刺入力作業をまるごと任せられます。\n\n'
-      + 'このボタンを押して、名刺データ化設定の使い方を続けて体験しましょう。',
+      + 'このボタンから開きます。設定の使い方は専用のチュートリアルで別途ご案内します。\n'
+      + 'ここでは開かずに『次へ』へ進みます。',
   },
   {
-    id: 12, block: 'C', target: '#openThankYouEmailSettingsBtn', contextTarget: '#relatedSettingsCardBody',
-    mode: 'user-action-bridge', placement: 'left',
+    id: 13, block: 'C', target: '#openThankYouEmailSettingsBtn', contextTarget: '#relatedSettingsCardBody',
+    mode: 'info', placement: 'left',
     title: 'お礼メール設定',
     body:
       '回答完了後に回答者へ自動送信するお礼メールを設定できます。\n'
       + '回答直後にフォローの第一接点を作れます。\n\n'
-      + 'このボタンを押して、お礼メール設定の使い方を続けて体験しましょう。',
+      + 'このボタンから開きます。設定の使い方は専用のチュートリアルで別途ご案内します。\n'
+      + 'ここでは開かずに『次へ』へ進みます。',
   },
   {
-    id: 13, block: 'C', target: '#openThankYouScreenSettingsBtn', contextTarget: '#relatedSettingsCardBody',
+    id: 14, block: 'C', target: '#openThankYouScreenSettingsBtn', contextTarget: '#relatedSettingsCardBody',
     mode: 'info', placement: 'left',
     title: '回答完了画面（サンクス画面）設定',
     body:
@@ -146,12 +157,12 @@ export const TUTORIAL_STEPS = [
       + 'ここでは開かずに『次へ』へ進みます。',
   },
   {
-    id: 14, block: 'C', target: '#addFirstQuestionBtn', mode: 'user-action', placement: 'top',
+    id: 15, block: 'C', target: '#addFirstQuestionBtn', mode: 'user-action', placement: 'top',
     title: '最初の設問を追加',
     body: '『最初の設問を追加』ボタンを押してください。',
   },
   {
-    id: 15, block: 'C', target: '#inlineQuestionTypeMenu button[data-question-type="single_answer"]',
+    id: 16, block: 'C', target: '#inlineQuestionTypeMenu button[data-question-type="single_answer"]',
     waitForElement: true, mode: 'user-action', placement: 'right',
     title: '単一選択（シングルアンサー）を選択',
     body:
@@ -159,7 +170,7 @@ export const TUTORIAL_STEPS = [
       + '『シングルアンサー』を押してください。',
   },
   {
-    id: 16, block: 'C', target: null, targetResolver: 'lastInsertedQuestionField', fieldPath: 'questionText',
+    id: 17, block: 'C', target: null, targetResolver: 'lastInsertedQuestionField', fieldPath: 'questionText',
     mode: 'autofill', placement: 'right',
     title: '設問文を入力',
     body:
@@ -169,7 +180,7 @@ export const TUTORIAL_STEPS = [
     autoInput: { kind: 'text', value: '製品Aの満足度はいかがですか？' },
   },
   {
-    id: 17, block: 'C', target: null, targetResolver: 'lastInsertedQuestionFieldOptionsAll',
+    id: 18, block: 'C', target: null, targetResolver: 'lastInsertedQuestionFieldOptionsAll',
     mode: 'autofill', placement: 'right',
     title: '選択肢を4つ入力',
     body:
@@ -179,13 +190,13 @@ export const TUTORIAL_STEPS = [
     autoInput: { kind: 'multi-option', values: ['とても満足', '満足', 'やや不満', '不満'] },
   },
   {
-    id: 18, block: 'C', target: '#addQuestionInlineBtn', waitForElement: true,
+    id: 19, block: 'C', target: '#addQuestionInlineBtn', waitForElement: true,
     mode: 'user-action', placement: 'top',
     title: '2 問目を追加',
     body: '設問の下の『設問を追加』ボタンを押してください。',
   },
   {
-    id: 19, block: 'C', target: '#inlineQuestionTypeMenuBottom button[data-question-type="rating_scale"]',
+    id: 20, block: 'C', target: '#inlineQuestionTypeMenuBottom button[data-question-type="rating_scale"]',
     waitForElement: true, mode: 'user-action', placement: 'right',
     title: '段階評価（評定尺度）を選択',
     body:
@@ -193,7 +204,7 @@ export const TUTORIAL_STEPS = [
       + '『評定尺度』を押してください。',
   },
   {
-    id: 20, block: 'C', target: null, targetResolver: 'lastInsertedQuestionFieldRatingAll',
+    id: 21, block: 'C', target: null, targetResolver: 'lastInsertedQuestionFieldRatingAll',
     mode: 'autofill', placement: 'right',
     title: '評定尺度の設問文・ラベルを入力',
     body:
@@ -205,14 +216,14 @@ export const TUTORIAL_STEPS = [
 
   // ブロック D: プレビュー〜完了
   {
-    id: 21, block: 'D', target: '#showPreviewBtn', mode: 'user-action', placement: 'left',
+    id: 22, block: 'D', target: '#showPreviewBtn', mode: 'user-action', placement: 'left',
     title: 'プレビューを開く',
     body:
       '回答者にどのように表示されるかを確認できます。\n'
       + '画面右側の『プレビュー』ボタンを押してください。',
   },
   {
-    id: 22, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
+    id: 23, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     title: 'スマートフォン表示を確認',
     body:
@@ -221,7 +232,7 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 23, block: 'D', target: '#v2-preview-tablet-btn', waitForElement: true,
+    id: 24, block: 'D', target: '#v2-preview-tablet-btn', waitForElement: true,
     mode: 'user-action', placement: 'bottom',
     title: 'タブレット表示に切り替える',
     body:
@@ -229,7 +240,7 @@ export const TUTORIAL_STEPS = [
       + '『タブレット』ボタンを押して、見え方を切り替えてください。',
   },
   {
-    id: 24, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
+    id: 25, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     onLeaveAction: 'closePreviewModal',
     title: 'タブレット表示を確認',
@@ -238,14 +249,14 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 25, block: 'D', target: '#openQrModalBtn', mode: 'user-action', placement: 'left',
+    id: 26, block: 'D', target: '#openQrModalBtn', mode: 'user-action', placement: 'left',
     title: 'QR コードを表示',
     body:
       '回答用のQRコードを表示してみましょう。\n'
       + '『QR発行』ボタンを押してください。',
   },
   {
-    id: 26, block: 'D', target: '#qrCodeModal .modal-content-transition', waitForElement: true,
+    id: 27, block: 'D', target: '#qrCodeModal .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     onLeaveAction: 'closeQrModal',
     title: 'QR コードを確認',
@@ -256,7 +267,7 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 27, block: 'D', target: '#createSurveyBtn', mode: 'user-action-bridge', placement: 'left',
+    id: 28, block: 'D', target: '#createSurveyBtn', mode: 'user-action-bridge', placement: 'left',
     title: 'アンケートを保存する',
     body:
       '画面右側の『アンケートを保存する』ボタンを押してください。\n'
@@ -264,7 +275,7 @@ export const TUTORIAL_STEPS = [
       + '（練習のため実際には保存されません）',
   },
   {
-    id: 28, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
+    id: 29, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
     title: 'チュートリアル完了',
     // ※「今練習したもの」を実際に公開できる、という旨は事実と異なるため記載しない。
     // 練習中の入力はチュートリアル内で完結しており、アカウント側へ引き継がれない。

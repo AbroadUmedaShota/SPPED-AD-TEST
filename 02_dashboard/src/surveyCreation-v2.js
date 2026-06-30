@@ -3,6 +3,7 @@
  * アンケート作成・編集 v2 ページ専用スクリプト
  */
 
+import './components/req-opt-toggle.js';
 import { loadCommonHtml, resolveDashboardAssetPath, resolveDashboardDataPath } from './utils.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
@@ -539,7 +540,7 @@ function getTypeLabel(type) {
 }
 
 function defaultQuestion(type) {
-  const base = { id: generateId(), type, text: { ja: '' }, required: false };
+  const base = { id: generateId(), type, text: { ja: '' }, required: true };
   if (CHOICE_TYPES.has(type)) {
     base.options = [{ja: '選択肢1'}, {ja: '選択肢2'}];
   }
@@ -564,8 +565,15 @@ function defaultQuestion(type) {
   }
   if (type === 'explanation_card') {
     base.config = { description: {ja: ''} };
+    base.required = false; // 説明カードは回答欄を持たないため必須対象外
   }
   return base;
+}
+
+// 回答欄を持たない設問タイプは必須にできない。出所（新規/テンプレート/保存データ）を問わず強制する。
+function enforceRequiredRules(question) {
+  if (question && question.type === 'explanation_card') question.required = false;
+  return question;
 }
 
 function normalizeLocalizedObject(value, fallback = '') {
@@ -599,7 +607,7 @@ function buildQuestionFromTemplate(templateQuestion) {
     question.config = { ...(question.config || {}), ...templateQuestion.config };
   }
 
-  return question;
+  return enforceRequiredRules(question);
 }
 
 function setFieldValueIfEmpty(id, value) {
@@ -1130,16 +1138,14 @@ function buildQuestionCard(q, index) {
   typeWrapper.append(typeBadge);
   const typeLabel = typeWrapper; // 既存の参照名を維持
 
-  const reqBg = q.required ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-400';
-  const requiredBadge = el('span', {
-    class: `text-[11px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0 cursor-pointer select-none transition-colors border shadow-sm ${reqBg}`,
+  // 説明カードは回答欄を持たないため必須/任意トグル自体を出さない
+  const requiredBadge = q.type === 'explanation_card' ? null : el('req-opt-toggle', {
+    class: 'flex-shrink-0',
     'data-required-badge': '',
-    role: 'button',
-    tabindex: '0',
     title: '必須/任意を切り替え',
-    'aria-label': q.required ? '必須（クリックで任意に変更）' : '任意（クリックで必須に変更）',
-    'aria-pressed': String(q.required),
-  }, q.required ? '必須' : '任意');
+    value: q.required ? 'required' : 'optional',
+    'anim-ms': '200',
+  });
 
   const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, q.text[currentLangs[0]] || '設問文を入力してください');
 
@@ -1151,17 +1157,23 @@ function buildQuestionCard(q, index) {
 
   actionGroup.append(duplicateBtn, deleteBtn);
 
-  function syncRequired(val) {
-    q.required = val;
-    const newBg = q.required ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-400';
-    requiredBadge.className = `text-[11px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0 cursor-pointer select-none transition-colors border shadow-sm ${newBg}`;
-    requiredBadge.textContent = q.required ? '必須' : '任意';
-    requiredBadge.setAttribute('aria-label', q.required ? '必須（クリックで任意に変更）' : '任意（クリックで必須に変更）');
-    requiredBadge.setAttribute('aria-pressed', String(q.required));
-  }
+  if (requiredBadge) {
+    const syncRequired = (val) => {
+      q.required = val;
+      const next = val ? 'required' : 'optional';
+      if (requiredBadge.value !== next) requiredBadge.value = next;
+    };
 
-  requiredBadge.addEventListener('click', (e) => { e.stopPropagation(); if (!isReadOnlyMode) syncRequired(!q.required); });
-  requiredBadge.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (!isReadOnlyMode) syncRequired(!q.required); } });
+    requiredBadge.addEventListener('change', (e) => {
+      e.stopPropagation();
+      if (isReadOnlyMode) {
+        // 読み取り専用時は実状態へ戻す
+        requiredBadge.value = q.required ? 'required' : 'optional';
+        return;
+      }
+      syncRequired(e.detail.value === 'required');
+    });
+  }
 
   const toggleIcon = icon('expand_more', 'text-[24px] transition-transform duration-300 text-gray-400 group-hover:text-primary');
   toggleIcon.style.transform = 'rotate(180deg)';
@@ -1193,7 +1205,7 @@ function buildBasicSection(q, cardNode, requiredBadge) {
   const section = el('section', { class: 'px-5 py-4 space-y-4' });
   const sectionHeader = el('div', { class: 'flex items-center gap-2' });
   sectionHeader.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('edit_note', 'text-[18px] text-gray-400'), '基本設定'));
-  sectionHeader.appendChild(requiredBadge);
+  if (requiredBadge) sectionHeader.appendChild(requiredBadge);
   section.appendChild(sectionHeader);
 
   const firstLang = currentLangs[0];
@@ -1845,6 +1857,16 @@ function applyTypeChange(q, card, newType) {
   // タイプを更新
   q.type = newType;
 
+  // 説明カードは回答欄を持たないため必須にできない。カード化する直前の必須/任意を退避し、
+  // 回答設問へ戻したときに復元する（退避が無ければ既定の必須）。一時プロパティは保存時に出力しない。
+  if (newType === 'explanation_card') {
+    if (oldType !== 'explanation_card') q._requiredBeforeCard = q.required;
+    q.required = false;
+  } else if (oldType === 'explanation_card') {
+    q.required = (q._requiredBeforeCard !== undefined) ? q._requiredBeforeCard : true;
+    delete q._requiredBeforeCard;
+  }
+
   // データの引き継ぎ/リセット
   if (fromChoice && toChoice) {
     // 選択肢系→選択肢系: 選択肢をそのまま保持
@@ -2469,6 +2491,12 @@ function buildPreviewData() {
     editorLanguage: currentLangs[0] || 'ja',
     activeLanguages: currentLangs,
     questions: normalizedQuestions,
+    settings: {
+      // 名刺画像も基本情報も無い場合に送信を止めるバリデーション（既定: 有効）
+      requireContactInfo: document.getElementById('requireContactInfo')?.checked !== false,
+      bizcardEnabled: document.getElementById('bizcardEnabled')?.checked !== false,
+      allowContinuousAnswer: document.getElementById('allowContinuousAnswer')?.checked !== false,
+    },
   };
 }
 
@@ -2700,7 +2728,7 @@ async function loadSurveyData(surveyId) {
         base.matrixRows = (q.rows || []).map(r => ({ ja: r.text || '' }));
         base.matrixCols = (q.options || []).map(c => ({ ja: c.text || '' }));
       }
-      return base;
+      return enforceRequiredRules(base);
     });
     
     showToast('アンケートデータを読み込みました', 'success');

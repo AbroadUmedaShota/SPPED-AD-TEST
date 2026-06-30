@@ -2312,6 +2312,12 @@ function buildPreviewData() {
     editorLanguage: currentLangs[0] || 'ja',
     activeLanguages: currentLangs,
     questions: normalizedQuestions,
+    settings: {
+      // 名刺画像も基本情報も無い場合に送信を止めるバリデーション（既定: 有効）
+      requireContactInfo: document.getElementById('requireContactInfo')?.checked !== false,
+      bizcardEnabled: document.getElementById('bizcardEnabled')?.checked !== false,
+      allowContinuousAnswer: document.getElementById('allowContinuousAnswer')?.checked !== false,
+    },
   };
 }
 
