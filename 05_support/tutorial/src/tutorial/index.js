@@ -28,7 +28,6 @@ import {
   clearProgress,
   markCompleted,
   isCompleted,
-  writeReturn,
 } from './state.js';
 import { installGlobalApi, enableTargetForTutorial } from './guards.js';
 import { loadCommonHtml } from '../utils.js';
@@ -65,39 +64,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // クロスチュートリアル遷移インターセプタ（capture フェーズ）。
-  // step11/12 は user-action-bridge のため、ボタン直接クリックでも「次へ」代行クリック
-  // (escapeTargetEl.click()) でもこの capture が先に発火し、本番 href 遷移を止めて
-  // サブチュートリアルへ送る。本番 DOM の href は書き換えない。
-  // どちらの分岐も直後に location.assign でページ遷移するため、進行中ステップの
-  // リスナー解放（cleanupActiveStep）は不要（遷移で DOM ごと破棄される）。
-  // start パラメータ付き（ハブからの単体起動・入口ステップ）では復帰コンテキストを書かない
-  // → サブチュートリアル完了後はハブへ戻る。step11/12 からのチェーン時のみ復帰を書く。
+  // 名刺データ化／お礼メールの設定ボタンの遷移インターセプタ（capture フェーズ）。
+  // チュートリアル中はこれらのボタンの本番遷移（実ページへの移動）を常に止める。画面が変わると
+  // ガイドが壊れるため。本番 DOM の href は書き換えない。
+  // サブチュートリアルへ送るのは「ハブからの単体起動（?start=...）」の入口ステップのときだけ。
+  // アンケート作成チュートリアル本編では、名刺データ化・お礼メールは独立したチュートリアルとして
+  // 扱い、途中で起動して挟み込まない（本編は info ステップで案内のみ／復帰コンテキストも書かない）。
   const isLeadInLaunch = !!new URLSearchParams(window.location.search).get('start');
   document.addEventListener('click', (ev) => {
     if (!api.isActive()) return;
     const bizBtn = ev.target.closest && ev.target.closest('#openBizcardSettingsBtn');
-    if (bizBtn) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      if (!isLeadInLaunch) writeReturn({ url: 'surveyCreation.html', step: 12 });
-      window.location.assign('bizcard-settings.html?tutorial=1&step=1');
-      return;
-    }
     const tyBtn = ev.target.closest && ev.target.closest('#openThankYouEmailSettingsBtn');
-    if (tyBtn) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      if (!isLeadInLaunch) writeReturn({ url: 'surveyCreation.html', step: 13 });
+    if (!bizBtn && !tyBtn) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    // 本編フローでは中継しない（独立チュートリアル化）。入口ステップ起動時のみサブへ送る。
+    if (!isLeadInLaunch) return;
+    if (bizBtn) {
+      window.location.assign('bizcard-settings.html?tutorial=1&step=1');
+    } else {
       window.location.assign('thank-you-email.html?tutorial=1&step=1');
-      return;
     }
   }, true);
 
   await waitForCommonHtml();
 
   // ハブから名刺/お礼メールカードで起動した場合（?start=...）は、編集画面で「設定ボタンを指す
-  // 入口ステップ」だけを見せ、クリックでサブチュートリアルへ送る。本編28ステップは実行しない。
+  // 入口ステップ」だけを見せ、クリックでサブチュートリアルへ送る。本編29ステップは実行しない。
   const leadInKind = new URLSearchParams(window.location.search).get('start');
   if (leadInKind === 'bizcard' || leadInKind === 'thankyou') {
     initOverlay({ total: 1 });
