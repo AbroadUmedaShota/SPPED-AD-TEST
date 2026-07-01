@@ -483,12 +483,12 @@ function updateBizcardButtonState() {
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '撮影済み' : '名刺を撮影';
+        textSpan.textContent = hasImages ? '名刺を変更' : '名刺を撮影';
     }
     if (hasImages) {
-        DOMElements.bizcardCameraButton.disabled = true;
-        DOMElements.bizcardCameraButton.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
-        DOMElements.bizcardCameraButton.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.disabled = false;
+        DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
     } else {
         DOMElements.bizcardCameraButton.disabled = false;
         DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
@@ -1075,6 +1075,8 @@ function startBizcardUploadFlow(targetSide = null) {
     // それ以外は表面の選択から開始
     if (targetSide) {
         showChoice(targetSide, true);
+    } else if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        showBizcardEditModal();
     } else {
         showChoice();
     }

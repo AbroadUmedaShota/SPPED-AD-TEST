@@ -54,7 +54,6 @@ function initializeDOMElements() {
 
         // --- カラーピッカーテスト機能用要素 ---
         surveyMainWrapper: document.getElementById('survey-main-wrapper'),
-        footer: document.querySelector('footer'),
     };
 }
 
@@ -193,10 +192,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             disablePullToRefresh();
             history.pushState(null, '', location.href); // <-- Add this line
         }
-
-        // 固定フッターの高さに合わせて本文下端の余白を調整
-        window.addEventListener('resize', adjustFooterSpacing);
-        adjustFooterSpacing();
 
         // テキストエリアの自動リサイズ
         DOMElements.surveyForm.addEventListener('input', (e) => {
@@ -487,12 +482,12 @@ function updateBizcardButtonState() {
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '撮影済み' : '名刺を撮影';
+        textSpan.textContent = hasImages ? '名刺を変更' : '名刺を撮影';
     }
     if (hasImages) {
-        DOMElements.bizcardCameraButton.disabled = true;
-        DOMElements.bizcardCameraButton.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
-        DOMElements.bizcardCameraButton.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.disabled = false;
+        DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
     } else {
         DOMElements.bizcardCameraButton.disabled = false;
         DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
@@ -500,15 +495,7 @@ function updateBizcardButtonState() {
     }
 }
 
-// フッターを画面下部に固定した分、本文の下端がフッター裏に隠れないよう余白を合わせる
-function adjustFooterSpacing() {
-    if (!DOMElements.footer || !DOMElements.mainContent) return;
-    // 縦: 固定フッターの高さ分、本文下端に余白を確保
-    // （横方向の本文↔フッターの中央寄せズレは CSS の scrollbar-gutter: stable で吸収する）
-    DOMElements.mainContent.style.paddingBottom = `${DOMElements.footer.offsetHeight + 16}px`;
-}
-
-// 名刺プレビューの開閉状態（フッターを畳んで上の設問を見やすくする）
+// 名刺プレビューの開閉状態
 let bizcardPreviewCollapsed = false;
 
 function applyBizcardPreviewCollapsed() {
@@ -533,7 +520,6 @@ function updateBizcardPreview() {
 
     if (!hasFront && !hasBack) {
         previewArea.classList.add('hidden');
-        adjustFooterSpacing();
         return;
     }
 
@@ -561,8 +547,6 @@ function updateBizcardPreview() {
         summaryEl.textContent = (hasFront && hasBack) ? '（表面・裏面）' : hasFront ? '（表面）' : '（裏面）';
     }
     applyBizcardPreviewCollapsed();
-
-    adjustFooterSpacing();
 }
 
 // プレビューエリアのイベントリスナーを初期化する（一度だけ呼ぶ）
@@ -572,7 +556,6 @@ function initBizcardPreviewListeners() {
     if (previewToggle) previewToggle.addEventListener('click', () => {
         bizcardPreviewCollapsed = !bizcardPreviewCollapsed;
         applyBizcardPreviewCollapsed();
-        adjustFooterSpacing();
     });
 
     const frontImg = document.getElementById('bizcard-preview-front');
@@ -1114,6 +1097,8 @@ function startBizcardUploadFlow(targetSide = null) {
     // それ以外は表面の選択から開始
     if (targetSide) {
         showChoice(targetSide, true);
+    } else if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        showBizcardEditModal();
     } else {
         showChoice();
     }
@@ -1298,7 +1283,6 @@ function renderSurvey() {
     renderSurveyTitle();
     renderQuestions();
     updateDynamicColors('#FFFFFF'); // スタイルを再適用
-    adjustFooterSpacing();
 }
 
 function renderHeader() {

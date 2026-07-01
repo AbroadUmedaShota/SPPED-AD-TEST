@@ -13,8 +13,7 @@
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
     <style>
         /* --- Layout Fixes & Overrides --- */
-        /* 固定フッター(viewport基準)と本文(スクロール領域基準)の中央寄せ基準を揃え、
-           スクロールバー有無による横ズレを防ぐ */
+        /* スクロールバー有無による横ズレを防ぐ */
         html {
             scrollbar-gutter: stable;
         }
@@ -108,8 +107,8 @@
             </div>
         </main>
 
-        <!-- フッター（画面下部に固定・プレビューは上側へ伸びる） -->
-        <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white py-4" style="box-shadow: 0 -2px 8px rgba(0,0,0,0.08);">
+        <!-- フッター -->
+        <footer class="bg-white py-4" style="box-shadow: 0 -2px 8px rgba(0,0,0,0.08);">
             <div class="survey-content-wrapper flex flex-col items-center gap-4">
                 <!-- 名刺プレビューエリア（撮影後に表示・フッター内） -->
                 <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm">
