@@ -508,6 +508,16 @@ function adjustFooterSpacing() {
     DOMElements.mainContent.style.paddingBottom = `${DOMElements.footer.offsetHeight + 16}px`;
 }
 
+// 名刺プレビューの開閉状態（フッターを畳んで上の設問を見やすくする）
+let bizcardPreviewCollapsed = false;
+
+function applyBizcardPreviewCollapsed() {
+    const body = document.getElementById('bizcard-preview-body');
+    const chevron = document.getElementById('bizcard-preview-chevron');
+    if (body) body.classList.toggle('hidden', bizcardPreviewCollapsed);
+    if (chevron) chevron.textContent = bizcardPreviewCollapsed ? 'expand_more' : 'expand_less';
+}
+
 // 名刺プレビューエリアを更新する
 function updateBizcardPreview() {
     const previewArea = document.getElementById('bizcard-preview-area');
@@ -546,11 +556,25 @@ function updateBizcardPreview() {
         backActions.classList.add('bizcard-preview-back-actions-hidden');
     }
 
+    const summaryEl = document.getElementById('bizcard-preview-summary');
+    if (summaryEl) {
+        summaryEl.textContent = (hasFront && hasBack) ? '（表面・裏面）' : hasFront ? '（表面）' : '（裏面）';
+    }
+    applyBizcardPreviewCollapsed();
+
     adjustFooterSpacing();
 }
 
 // プレビューエリアのイベントリスナーを初期化する（一度だけ呼ぶ）
 function initBizcardPreviewListeners() {
+    // 撮影済み名刺ヘッダーで開閉（閉じるとフッターが縮み、上の設問に戻りやすい）
+    const previewToggle = document.getElementById('bizcard-preview-toggle');
+    if (previewToggle) previewToggle.addEventListener('click', () => {
+        bizcardPreviewCollapsed = !bizcardPreviewCollapsed;
+        applyBizcardPreviewCollapsed();
+        adjustFooterSpacing();
+    });
+
     const frontImg = document.getElementById('bizcard-preview-front');
     const backImg = document.getElementById('bizcard-preview-back');
     const backEmpty = document.getElementById('bizcard-preview-back-empty');

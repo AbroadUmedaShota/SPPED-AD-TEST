@@ -112,8 +112,16 @@
         <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white py-4" style="box-shadow: 0 -2px 8px rgba(0,0,0,0.08);">
             <div class="survey-content-wrapper flex flex-col items-center gap-4">
                 <!-- 名刺プレビューエリア（撮影後に表示・フッター内） -->
-                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                    <p class="text-sm font-medium text-gray-600 mb-3">撮影済み名刺</p>
+                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <button type="button" id="bizcard-preview-toggle" class="w-full flex items-center justify-between px-4 py-2.5 text-left">
+                        <span class="flex items-center gap-2 text-sm font-medium text-gray-600 min-w-0">
+                            <span class="material-icons text-green-500 text-lg shrink-0">check_circle</span>
+                            <span class="shrink-0">撮影済み名刺</span>
+                            <span id="bizcard-preview-summary" class="text-xs text-gray-400 font-normal truncate"></span>
+                        </span>
+                        <span id="bizcard-preview-chevron" class="material-icons text-gray-400 shrink-0">expand_less</span>
+                    </button>
+                    <div id="bizcard-preview-body" class="px-4 pb-4">
                     <div class="flex gap-4">
                         <div class="flex-1">
                             <p class="text-xs text-center text-gray-500 mb-2">表面</p>
@@ -138,6 +146,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
                 <div class="w-full grid grid-cols-2 gap-3">
