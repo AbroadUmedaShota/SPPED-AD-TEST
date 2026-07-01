@@ -44,6 +44,7 @@ function initializeDOMElements() {
         manualInputModal: document.getElementById('manual-input-modal'),
         leaveConfirmModal: document.getElementById('leave-confirm-modal'),
         draftRestoreModal: document.getElementById('draft-restore-modal'),
+        contactRequiredModal: document.getElementById('contact-required-modal'),
         toastNotification: document.getElementById('toast-notification'),
         toastMessage: document.getElementById('toast-message'),
         submittingModal: document.getElementById('submitting-modal'),
@@ -53,7 +54,6 @@ function initializeDOMElements() {
 
         // --- カラーピッカーテスト機能用要素 ---
         surveyMainWrapper: document.getElementById('survey-main-wrapper'),
-        footer: document.querySelector('footer'),
     };
 }
 
@@ -176,7 +176,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 DOMElements.bizcardCameraButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
             }
             if (DOMElements.bizcardManualButton) {
-                DOMElements.bizcardManualButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
+                // プレビューでもバリデーション動作を確認できるよう手入力モーダルは有効化
+                DOMElements.bizcardManualButton.addEventListener('click', openManualInputModal);
             }
         } else {
             setupEventListeners();
@@ -354,8 +355,12 @@ function setupEventListeners() {
     }
     initBizcardPreviewListeners();
     if (DOMElements.bizcardManualButton) {
-        DOMElements.bizcardManualButton.addEventListener('click', () => {
-            if (isPreview) { showToast('プレビューのため、この機能は使用できません'); return; }
+        DOMElements.bizcardManualButton.addEventListener('click', openManualInputModal);
+    }
+}
+
+// 「名刺が手元に無い方」モーダル（基本情報の手入力）
+function openManualInputModal() {
             const formId = 'manual-bizcard-form';
             const body = `
             <form id="${formId}" class="space-y-4">
@@ -456,8 +461,6 @@ function setupEventListeners() {
                     });
                 }
             });
-        });
-    }
 }
 
 // ... (他の関数の間)
@@ -479,17 +482,27 @@ function updateBizcardButtonState() {
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '撮影済み' : '名刺を撮影';
+        textSpan.textContent = hasImages ? '名刺を変更' : '名刺を撮影';
     }
     if (hasImages) {
-        DOMElements.bizcardCameraButton.disabled = true;
-        DOMElements.bizcardCameraButton.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
-        DOMElements.bizcardCameraButton.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.disabled = false;
+        DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
     } else {
         DOMElements.bizcardCameraButton.disabled = false;
         DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
         DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
     }
+}
+
+// 名刺プレビューの開閉状態
+let bizcardPreviewCollapsed = false;
+
+function applyBizcardPreviewCollapsed() {
+    const body = document.getElementById('bizcard-preview-body');
+    const chevron = document.getElementById('bizcard-preview-chevron');
+    if (body) body.classList.toggle('hidden', bizcardPreviewCollapsed);
+    if (chevron) chevron.textContent = bizcardPreviewCollapsed ? 'expand_more' : 'expand_less';
 }
 
 // 名刺プレビューエリアを更新する
@@ -528,10 +541,23 @@ function updateBizcardPreview() {
         backEmpty.classList.remove('hidden');
         backActions.classList.add('bizcard-preview-back-actions-hidden');
     }
+
+    const summaryEl = document.getElementById('bizcard-preview-summary');
+    if (summaryEl) {
+        summaryEl.textContent = (hasFront && hasBack) ? '（表面・裏面）' : hasFront ? '（表面）' : '（裏面）';
+    }
+    applyBizcardPreviewCollapsed();
 }
 
 // プレビューエリアのイベントリスナーを初期化する（一度だけ呼ぶ）
 function initBizcardPreviewListeners() {
+    // 撮影済み名刺ヘッダーで開閉（閉じるとフッターが縮み、上の設問に戻りやすい）
+    const previewToggle = document.getElementById('bizcard-preview-toggle');
+    if (previewToggle) previewToggle.addEventListener('click', () => {
+        bizcardPreviewCollapsed = !bizcardPreviewCollapsed;
+        applyBizcardPreviewCollapsed();
+    });
+
     const frontImg = document.getElementById('bizcard-preview-front');
     const backImg = document.getElementById('bizcard-preview-back');
     const backEmpty = document.getElementById('bizcard-preview-back-empty');
@@ -1071,6 +1097,8 @@ function startBizcardUploadFlow(targetSide = null) {
     // それ以外は表面の選択から開始
     if (targetSide) {
         showChoice(targetSide, true);
+    } else if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        showBizcardEditModal();
     } else {
         showChoice();
     }
@@ -1086,19 +1114,22 @@ function showModal(modalElement, title, body, options = {}) {
     const cancelButtonHTML = onCancel ? `<button id="modal-cancel-button" class="px-4 py-2 text-sm font-medium rounded-md border border-outline-variant hover:bg-surface-container-high">${cancelText}</button>` : '';
 
     modalElement.innerHTML = `
-        <div class="bg-surface rounded-lg shadow-xl max-w-lg w-full m-4">
-            <div class="flex justify-between items-center p-4 border-b border-outline-variant">
+        <div class="bg-surface rounded-lg shadow-xl max-w-lg w-full my-4 mx-4 max-h-[calc(100dvh-2rem)] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-outline-variant shrink-0">
                 <h3 class="text-lg font-bold">${title}</h3>
                 <button class="close-modal-button text-on-surface-variant hover:text-on-surface">&times;</button>
             </div>
-            <div class="p-6">${body}</div>
-            <div class="flex justify-end items-center p-4 bg-surface-container rounded-b-lg gap-3">
+            <div class="p-6 overflow-y-auto grow">${body}</div>
+            <div class="flex justify-end items-center p-4 bg-surface-container rounded-b-lg gap-3 shrink-0">
                 ${cancelButtonHTML}
                 ${saveButtonHTML}
             </div>
         </div>
     `;
     modalElement.style.display = 'flex';
+    // 小型端末で縦にはみ出しても下部ボタンへ到達できるよう上寄せ＋モーダル全体をスクロール可に
+    modalElement.style.alignItems = 'flex-start';
+    modalElement.style.overflowY = 'auto';
 
     if (onSave) {
         modalElement.querySelector('#modal-save-button').addEventListener('click', () => {
@@ -1369,8 +1400,8 @@ function createQuestionElement(question, index) {
             question.options.forEach(opt => {
                 controlArea.innerHTML += `
                     <div class="flex items-center gap-3">
-                        <input type="radio" id="${question.id}-${opt.value}" name="${question.id}" value="${opt.value}" class="form-radio text-primary">
-                        <label for="${question.id}-${opt.value}">${resolveSurveyText(opt.text)}</label>
+                        <input type="radio" id="${question.id}-${opt.value}" name="${question.id}" value="${opt.value}" class="form-radio text-primary w-5 h-5 shrink-0">
+                        <label for="${question.id}-${opt.value}" class="flex-1 min-h-[44px] flex items-center py-2 cursor-pointer">${resolveSurveyText(opt.text)}</label>
                     </div>`;
             });
             break;
@@ -1384,9 +1415,10 @@ function createQuestionElement(question, index) {
                 input.id = `${question.id}-${opt.value}`;
                 input.name = question.id;
                 input.value = opt.value;
-                input.className = 'form-checkbox text-primary';
+                input.className = 'form-checkbox text-primary w-5 h-5 shrink-0';
                 const label = document.createElement('label');
                 label.htmlFor = input.id;
+                label.className = 'flex-1 min-h-[44px] flex items-center py-2 cursor-pointer';
                 label.textContent = resolveSurveyText(opt.text);
                 div.appendChild(input);
                 div.appendChild(label);
@@ -1470,37 +1502,23 @@ function createQuestionElement(question, index) {
             const rsMaxLabel = resolveSurveyText(rsCfg.maxLabel) || '';
             const rsShowMid = !!rsCfg.showMidLabel;
             const rsMidLabel = rsShowMid ? (resolveSurveyText(rsCfg.midLabel) || '') : '';
-            const rsMidIndex = Math.ceil(rsPoints / 2); // 中間ポイントのインデックス
+            // 中間ラベルはスケールの視覚的中央に配置する。
+            // flex-1 の等幅分割では行全体の中心は常に50%（偶数段階なら中央2つの間＝例:10段階は5と6の間、
+            // 奇数段階なら中央の選択肢の真下＝例:5段階は3の下）。
+            const rsMidPercent = 50;
 
             // 外枠コンテナ
             const rsContainer = document.createElement('div');
-            rsContainer.className = 'border border-gray-200 rounded-xl px-4 py-5 sm:px-6';
+            rsContainer.className = 'border border-gray-200 rounded-xl px-2 py-5 sm:px-6';
 
-            // メイン行（左ラベル + ラジオ群 + 右ラベル）
-            const rsMainRow = document.createElement('div');
-            rsMainRow.className = 'flex items-start gap-3 sm:gap-4';
-
-            // 左ラベル
-            const rsLeftLabel = document.createElement('span');
-            rsLeftLabel.className = 'text-xs sm:text-sm text-gray-500 font-medium pt-1 shrink-0 max-w-[60px] sm:max-w-[80px] leading-snug';
-            rsLeftLabel.textContent = rsMinLabel;
-
-            // ラジオボタン群
+            // ラジオボタン群（全幅・等幅分割。左右ラベルは下部へ逃がすので横幅を奪わない）
             const rsRadioGroup = document.createElement('div');
-            rsRadioGroup.className = 'flex items-start justify-between flex-1';
-
-            // 中間ラベル表示エリア（常時表示）
-            let rsMidDisplay = null;
-            if (rsShowMid && rsMidLabel) {
-                rsMidDisplay = document.createElement('div');
-                rsMidDisplay.className = 'text-center text-xs text-gray-400 font-medium mt-2';
-                rsMidDisplay.textContent = rsMidLabel;
-            }
-
+            rsRadioGroup.className = 'flex items-stretch';
 
             for (let i = 1; i <= rsPoints; i++) {
                 const label = document.createElement('label');
-                label.className = 'flex flex-col items-center gap-1.5 cursor-pointer group';
+                // ラベル全体をタップ領域に（縦44px確保・横は等幅分割で狭幅でも縮む）
+                label.className = 'flex items-center justify-center cursor-pointer group flex-1 min-w-0 min-h-[44px]';
 
                 const radio = document.createElement('input');
                 radio.type = 'radio';
@@ -1508,57 +1526,58 @@ function createQuestionElement(question, index) {
                 radio.value = String(i);
                 radio.className = 'sr-only peer';
 
-                // カスタムラジオ円
+                // カスタムラジオ円（番号を内包）。モバイルは24px・sm以上で36pxに拡大
                 const circle = document.createElement('span');
-                circle.className = 'w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-300 transition-all flex items-center justify-center group-hover:border-primary peer-checked:border-primary peer-checked:bg-white peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40';
+                circle.className = 'w-6 h-6 sm:w-9 sm:h-9 rounded-full border-2 border-gray-400 text-xs sm:text-sm text-gray-600 font-medium transition-all flex items-center justify-center group-hover:border-primary peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40';
+                circle.textContent = String(i);
 
-                // 内側の塗りつぶし丸
-                const innerDot = document.createElement('span');
-                innerDot.className = 'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary scale-0 transition-transform peer-checked:scale-100';
-
-                circle.appendChild(innerDot);
-
-                // 番号テキスト
-                const numText = document.createElement('span');
-                numText.className = 'text-xs sm:text-sm text-gray-500 font-medium';
-                numText.textContent = String(i);
-
-                label.append(radio, circle, numText);
+                label.append(radio, circle);
 
                 // peer-checked CSS がネイティブで動かない場合のフォールバック（JS制御）
                 radio.addEventListener('change', () => {
                     rsRadioGroup.querySelectorAll('label').forEach(lbl => {
                         const r = lbl.querySelector('input[type="radio"]');
-                        const c = lbl.querySelector('span:first-of-type');
-                        const d = c?.querySelector('span');
+                        const c = lbl.querySelector('span');
+                        if (!c) return;
                         if (r && r.checked) {
-                            c.classList.remove('border-gray-300');
-                            c.classList.add('border-primary');
-                            if (d) { d.classList.remove('scale-0'); d.classList.add('scale-100'); }
+                            c.classList.remove('border-gray-400', 'text-gray-600');
+                            c.classList.add('border-primary', 'bg-primary', 'text-white');
                         } else {
-                            c.classList.add('border-gray-300');
-                            c.classList.remove('border-primary');
-                            if (d) { d.classList.add('scale-0'); d.classList.remove('scale-100'); }
+                            c.classList.add('border-gray-400', 'text-gray-600');
+                            c.classList.remove('border-primary', 'bg-primary', 'text-white');
                         }
                     });
                 });
 
                 rsRadioGroup.appendChild(label);
             }
-
-            // 右ラベル
-            const rsRightLabel = document.createElement('span');
-            rsRightLabel.className = 'text-xs sm:text-sm text-gray-500 font-medium pt-1 shrink-0 max-w-[60px] sm:max-w-[80px] leading-snug text-right';
-            rsRightLabel.textContent = rsMaxLabel;
-
-            rsMainRow.append(rsLeftLabel, rsRadioGroup, rsRightLabel);
-            rsContainer.appendChild(rsMainRow);
-
-            // 中間ラベルをコンテナ末尾に追加（常時表示）
-            if (rsMidDisplay) {
-                rsContainer.appendChild(rsMidDisplay);
+            // 中間ラベル: 数字の上側・中央に配置してコンパクトにする
+            if (rsShowMid && rsMidLabel) {
+                const rsMidRow = document.createElement('div');
+                rsMidRow.className = 'relative h-4 mb-1';
+                const rsMidDisplay = document.createElement('span');
+                rsMidDisplay.className = 'absolute -translate-x-1/2 text-xs text-gray-600 font-medium whitespace-nowrap';
+                rsMidDisplay.style.left = `${rsMidPercent}%`;
+                rsMidDisplay.textContent = rsMidLabel;
+                rsMidRow.appendChild(rsMidDisplay);
+                rsContainer.appendChild(rsMidRow);
             }
 
+            rsContainer.appendChild(rsRadioGroup);
+
+            // 左右ラベル: スケール直下の両端に配置（横並びで幅を奪わないので見切れない）
+            if (rsMinLabel || rsMaxLabel) {
+                const rsEnds = document.createElement('div');
+                rsEnds.className = 'flex justify-between gap-2 mt-2';
+                const rsMin = document.createElement('span');
+                rsMin.className = 'text-xs text-gray-600 font-medium leading-snug max-w-[45%]';
+                rsMin.textContent = rsMinLabel;
+                const rsMax = document.createElement('span');
+                rsMax.className = 'text-xs text-gray-600 font-medium leading-snug max-w-[45%] text-right';
+                rsMax.textContent = rsMaxLabel;
+                rsEnds.append(rsMin, rsMax);
+                rsContainer.appendChild(rsEnds);
+            }
 
             controlArea.appendChild(rsContainer);
             break;
@@ -1620,11 +1639,17 @@ function createQuestionElement(question, index) {
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
-                // DPIスケーリングで高解像度ディスプレイに対応
+                // DPIスケーリングで高解像度ディスプレイに対応。
+                // 表示サイズ(CSSピクセル)を固定し、描画バッファのみ dpr 倍にする。
+                // （表示サイズを固定しないと iPhone 等で表示高さが dpr 倍に化ける）
                 const dpr = window.devicePixelRatio || 1;
                 const rect = canvas.getBoundingClientRect();
-                canvas.width = rect.width * dpr;
-                canvas.height = rect.height * dpr;
+                const cssWidth = rect.width;
+                const cssHeight = canvasHeight;
+                canvas.style.width = `${cssWidth}px`;
+                canvas.style.height = `${cssHeight}px`;
+                canvas.width = Math.round(cssWidth * dpr);
+                canvas.height = Math.round(cssHeight * dpr);
                 ctx.scale(dpr, dpr);
 
                 // 描画状態
@@ -1711,9 +1736,11 @@ function createQuestionElement(question, index) {
                     const rect = canvas.getBoundingClientRect();
                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    // ctx は既に dpr でスケール済みなので、描画座標は CSS ピクセルで渡す
+                    // （ここで *dpr すると二重スケールになりタップ位置とズレる）
                     return {
-                        x: (clientX - rect.left) * dpr,
-                        y: (clientY - rect.top) * dpr
+                        x: clientX - rect.left,
+                        y: clientY - rect.top
                     };
                 };
 
@@ -2004,11 +2031,88 @@ function validateForm() {
     return isFormValid;
 }
 
+// --- 連絡先（名刺画像 or 基本情報）バリデーション ---
+
+// 回答送信に連絡先が必須か（設定が無ければ既定で有効）
+function isContactInfoRequired() {
+    return state.surveyData?.settings?.requireContactInfo !== false;
+}
+
+// 名刺画像（表・裏いずれか）が登録済みか
+function hasBizcardImage() {
+    const images = state.answers.bizcardImages;
+    return !!(images && (images.front || images.back));
+}
+
+// 「名刺が手元に無い方」モーダルの基本4項目のうち、未入力の項目を返す
+const CONTACT_FIELD_LABELS = {
+    name: '氏名',
+    email: 'メールアドレス',
+    company: '会社名',
+    phone: '電話番号',
+};
+
+function getMissingContactFields() {
+    const info = state.answers.manualBizcardInfo || {};
+    return Object.keys(CONTACT_FIELD_LABELS)
+        .filter((key) => String(info[key] || '').trim() === '');
+}
+
+// 送信可否: 名刺画像あり、または基本4項目すべて入力済みならOK
+function validateContactInfo() {
+    if (!isContactInfoRequired()) return true;
+    if (hasBizcardImage()) return true;
+    return getMissingContactFields().length === 0;
+}
+
+// 不足項目を伝えるモーダルを表示
+function showContactRequiredModal() {
+    const missing = getMissingContactFields();
+    const listHTML = missing.map((key) => `
+        <li class="flex items-center gap-2 text-sm text-red-700">
+            <span class="material-icons text-[18px]">error_outline</span>
+            <span>${CONTACT_FIELD_LABELS[key]}</span>
+        </li>
+    `).join('');
+
+    const body = `
+        <div class="space-y-4">
+            <p class="text-sm text-gray-700 leading-relaxed">
+                回答を送信するには、<span class="font-bold">名刺画像の撮影</span>、または
+                <span class="font-bold">「名刺が手元に無い方」からの基本情報の入力</span>が必要です。
+            </p>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-xs font-bold text-red-700 mb-2">入力が必要な項目</p>
+                <ul class="space-y-1.5">${listHTML}</ul>
+            </div>
+            <p class="text-xs text-gray-500">いずれかの方法でご登録のうえ、再度送信してください。</p>
+        </div>
+    `;
+
+    showModal(DOMElements.contactRequiredModal, '送信に必要な情報が不足しています', body, {
+        saveText: '基本情報を入力する',
+        cancelText: '閉じる',
+        onSave: () => {
+            DOMElements.contactRequiredModal.style.display = 'none';
+            openManualInputModal();
+        },
+        onCancel: () => {
+            DOMElements.contactRequiredModal.style.display = 'none';
+        },
+    });
+}
+
 async function handleSubmit() {
     if (state.isSubmitting) return;
 
     if (!validateForm()) {
         showToast(t('common.required'));
+        return;
+    }
+
+    // 名刺画像も基本情報も無い場合は送信を止め、不足項目を提示する
+    if (!validateContactInfo()) {
+        showContactRequiredModal();
         return;
     }
 

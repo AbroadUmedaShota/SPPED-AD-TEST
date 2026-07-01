@@ -13,6 +13,10 @@
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
     <style>
         /* --- Layout Fixes & Overrides --- */
+        /* スクロールバー有無による横ズレを防ぐ */
+        html {
+            scrollbar-gutter: stable;
+        }
         body {
             padding-left: 0 !important;
         }
@@ -51,14 +55,21 @@
         /* --- 名刺プレビュー --- */
         .bizcard-preview-img {
             width: 100%;
-            height: auto;
-            max-height: 160px;
+            height: 96px;
             object-fit: contain;
             background-color: #f3f4f6;
             border-radius: 6px;
         }
         .bizcard-preview-back-empty {
-            height: 160px;
+            height: 96px;
+        }
+        @media (min-width: 640px) {
+            .bizcard-preview-img {
+                height: 160px;
+            }
+            .bizcard-preview-back-empty {
+                height: 160px;
+            }
         }
         .bizcard-preview-back-actions-hidden {
             display: none !important;
@@ -84,7 +95,8 @@
             <div class="survey-content-wrapper">
                         <!-- Language Switcher -->
                 <div id="language-switcher-container" class="relative flex justify-end items-center mb-4">
-                    <select id="language-select" class="w-40 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <label for="language-select" class="sr-only">言語選択</label>
+                    <select id="language-select" aria-label="言語選択" class="w-40 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:border-indigo-500 sm:text-sm rounded-md">
                         <!-- Language options will be dynamically inserted here by JS -->
                     </select>
                 </div>                <div id="survey-title-container" class="mb-6"></div>
@@ -92,10 +104,23 @@
                     <!-- エラーメッセージ表示領域 -->
                 </div>
                 <form id="survey-form" class="space-y-6"></form>
+            </div>
+        </main>
 
-                <!-- 名刺プレビューエリア（撮影後に表示） -->
-                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4 mt-6">
-                    <p class="text-sm font-medium text-gray-600 mb-3">撮影済み名刺</p>
+        <!-- フッター -->
+        <footer class="bg-white py-4" style="box-shadow: 0 -2px 8px rgba(0,0,0,0.08);">
+            <div class="survey-content-wrapper flex flex-col items-center gap-4">
+                <!-- 名刺プレビューエリア（撮影後に表示・フッター内） -->
+                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <button type="button" id="bizcard-preview-toggle" class="w-full flex items-center justify-between px-4 py-2.5 text-left">
+                        <span class="flex items-center gap-2 text-sm font-medium text-gray-600 min-w-0">
+                            <span class="material-icons text-green-500 text-lg shrink-0">check_circle</span>
+                            <span class="shrink-0">撮影済み名刺</span>
+                            <span id="bizcard-preview-summary" class="text-xs text-gray-400 font-normal truncate"></span>
+                        </span>
+                        <span id="bizcard-preview-chevron" class="material-icons text-gray-400 shrink-0">expand_less</span>
+                    </button>
+                    <div id="bizcard-preview-body" class="px-4 pb-4">
                     <div class="flex gap-4">
                         <div class="flex-1">
                             <p class="text-xs text-center text-gray-500 mb-2">表面</p>
@@ -121,20 +146,15 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
-        </main>
-
-        <!-- フッター -->
-        <footer class="bg-white shadow-md py-6">
-            <div class="survey-content-wrapper flex flex-col items-center gap-4">
-                <div class="w-full grid grid-cols-2 gap-4">
-                    <button id="bizcard-camera-button" type="button" class="w-full justify-center flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 whitespace-nowrap">
-                        <span class="material-icons">photo_camera</span>
-                        <span>名刺を撮影</span>
+                <div class="w-full grid grid-cols-2 gap-3">
+                    <button id="bizcard-camera-button" type="button" class="min-w-0 w-full justify-center flex items-center gap-1.5 px-3 py-2 border rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                        <span class="material-icons text-lg">photo_camera</span>
+                        <span class="truncate">名刺を撮影</span>
                     </button>
-                    <button id="submit-survey-button" type="button" class="w-full justify-center flex items-center px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-bold shadow-sm hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap">
-                        送信する
+                    <button id="submit-survey-button" type="button" class="min-w-0 w-full justify-center flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-bold shadow-sm hover:bg-blue-700 disabled:opacity-50">
+                        <span class="truncate">送信する</span>
                     </button>
                 </div>
                 <div>
@@ -158,6 +178,7 @@
     <div id="manual-input-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
     <div id="leave-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
     <div id="draft-restore-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
+    <div id="contact-required-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
     <div id="image-magnify-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-[60]"></div>
             <div id="toast-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden transform transition-all duration-300 ease-in-out">
                 <p id="toast-message" class="whitespace-nowrap overflow-hidden text-ellipsis"></p>

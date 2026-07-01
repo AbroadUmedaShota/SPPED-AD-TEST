@@ -44,6 +44,7 @@ function initializeDOMElements() {
         manualInputModal: document.getElementById('manual-input-modal'),
         leaveConfirmModal: document.getElementById('leave-confirm-modal'),
         draftRestoreModal: document.getElementById('draft-restore-modal'),
+        contactRequiredModal: document.getElementById('contact-required-modal'),
         toastNotification: document.getElementById('toast-notification'),
         toastMessage: document.getElementById('toast-message'),
         submittingModal: document.getElementById('submitting-modal'),
@@ -176,7 +177,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 DOMElements.bizcardCameraButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
             }
             if (DOMElements.bizcardManualButton) {
-                DOMElements.bizcardManualButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
+                // プレビューでもバリデーション動作を確認できるよう手入力モーダルは有効化
+                DOMElements.bizcardManualButton.addEventListener('click', openManualInputModal);
             }
         } else {
             setupEventListeners();
@@ -354,8 +356,12 @@ function setupEventListeners() {
     }
     initBizcardPreviewListeners();
     if (DOMElements.bizcardManualButton) {
-        DOMElements.bizcardManualButton.addEventListener('click', () => {
-            if (isPreview) { showToast('プレビューのため、この機能は使用できません'); return; }
+        DOMElements.bizcardManualButton.addEventListener('click', openManualInputModal);
+    }
+}
+
+// 「名刺が手元に無い方」モーダル（基本情報の手入力）
+function openManualInputModal() {
             const formId = 'manual-bizcard-form';
             const body = `
             <form id="${formId}" class="space-y-4">
@@ -456,8 +462,6 @@ function setupEventListeners() {
                     });
                 }
             });
-        });
-    }
 }
 
 // ... (他の関数の間)
@@ -479,12 +483,12 @@ function updateBizcardButtonState() {
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '撮影済み' : '名刺を撮影';
+        textSpan.textContent = hasImages ? '名刺を変更' : '名刺を撮影';
     }
     if (hasImages) {
-        DOMElements.bizcardCameraButton.disabled = true;
-        DOMElements.bizcardCameraButton.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
-        DOMElements.bizcardCameraButton.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.disabled = false;
+        DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
     } else {
         DOMElements.bizcardCameraButton.disabled = false;
         DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
@@ -1071,6 +1075,8 @@ function startBizcardUploadFlow(targetSide = null) {
     // それ以外は表面の選択から開始
     if (targetSide) {
         showChoice(targetSide, true);
+    } else if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        showBizcardEditModal();
     } else {
         showChoice();
     }
@@ -2004,11 +2010,88 @@ function validateForm() {
     return isFormValid;
 }
 
+// --- 連絡先（名刺画像 or 基本情報）バリデーション ---
+
+// 回答送信に連絡先が必須か（設定が無ければ既定で有効）
+function isContactInfoRequired() {
+    return state.surveyData?.settings?.requireContactInfo !== false;
+}
+
+// 名刺画像（表・裏いずれか）が登録済みか
+function hasBizcardImage() {
+    const images = state.answers.bizcardImages;
+    return !!(images && (images.front || images.back));
+}
+
+// 「名刺が手元に無い方」モーダルの基本4項目のうち、未入力の項目を返す
+const CONTACT_FIELD_LABELS = {
+    name: '氏名',
+    email: 'メールアドレス',
+    company: '会社名',
+    phone: '電話番号',
+};
+
+function getMissingContactFields() {
+    const info = state.answers.manualBizcardInfo || {};
+    return Object.keys(CONTACT_FIELD_LABELS)
+        .filter((key) => String(info[key] || '').trim() === '');
+}
+
+// 送信可否: 名刺画像あり、または基本4項目すべて入力済みならOK
+function validateContactInfo() {
+    if (!isContactInfoRequired()) return true;
+    if (hasBizcardImage()) return true;
+    return getMissingContactFields().length === 0;
+}
+
+// 不足項目を伝えるモーダルを表示
+function showContactRequiredModal() {
+    const missing = getMissingContactFields();
+    const listHTML = missing.map((key) => `
+        <li class="flex items-center gap-2 text-sm text-red-700">
+            <span class="material-icons text-[18px]">error_outline</span>
+            <span>${CONTACT_FIELD_LABELS[key]}</span>
+        </li>
+    `).join('');
+
+    const body = `
+        <div class="space-y-4">
+            <p class="text-sm text-gray-700 leading-relaxed">
+                回答を送信するには、<span class="font-bold">名刺画像の撮影</span>、または
+                <span class="font-bold">「名刺が手元に無い方」からの基本情報の入力</span>が必要です。
+            </p>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-xs font-bold text-red-700 mb-2">入力が必要な項目</p>
+                <ul class="space-y-1.5">${listHTML}</ul>
+            </div>
+            <p class="text-xs text-gray-500">いずれかの方法でご登録のうえ、再度送信してください。</p>
+        </div>
+    `;
+
+    showModal(DOMElements.contactRequiredModal, '送信に必要な情報が不足しています', body, {
+        saveText: '基本情報を入力する',
+        cancelText: '閉じる',
+        onSave: () => {
+            DOMElements.contactRequiredModal.style.display = 'none';
+            openManualInputModal();
+        },
+        onCancel: () => {
+            DOMElements.contactRequiredModal.style.display = 'none';
+        },
+    });
+}
+
 async function handleSubmit() {
     if (state.isSubmitting) return;
 
     if (!validateForm()) {
         showToast(t('common.required'));
+        return;
+    }
+
+    // 名刺画像も基本情報も無い場合は送信を止め、不足項目を提示する
+    if (!validateContactInfo()) {
+        showContactRequiredModal();
         return;
     }
 
