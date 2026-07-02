@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await waitForCommonHtml();
 
   // ハブから名刺/お礼メールカードで起動した場合（?start=...）は、編集画面で「設定ボタンを指す
-  // 入口ステップ」だけを見せ、クリックでサブチュートリアルへ送る。本編29ステップは実行しない。
+  // 入口ステップ」だけを見せ、クリックでサブチュートリアルへ送る。本編31ステップは実行しない。
   const leadInKind = new URLSearchParams(window.location.search).get('start');
   if (leadInKind === 'bizcard' || leadInKind === 'thankyou') {
     initOverlay({ total: 1 });
@@ -405,8 +405,10 @@ function resolveTargetAndRender(step) {
   // 動的解決
   if (step.targetResolver === 'lastInsertedQuestionField') {
     let card = lastInsertedQuestionEl;
-    if (!card) {
-      // フォールバック: DOM 上の最新 .question-card
+    if (!card || !document.body.contains(card)) {
+      // フォールバック: DOM 上の最新 .question-card。
+      // lastInsertedQuestionEl が未更新（Observer 非同期）／再描画で detached の
+      // 場合も含め、必ず live な末尾カード（＝直近追加の設問）へ寄せる。
       const items = document.querySelectorAll('.question-card');
       card = items.length > 0 ? items[items.length - 1] : null;
     }
@@ -457,7 +459,7 @@ function resolveTargetAndRender(step) {
   // 新: 直近質問カード内の選択肢リストコンテナ全体を返す（multi-option用）
   if (step.targetResolver === 'lastInsertedQuestionFieldOptionsAll') {
     let card = lastInsertedQuestionEl;
-    if (!card) {
+    if (!card || !document.body.contains(card)) {
       const items = document.querySelectorAll('.question-card');
       card = items.length > 0 ? items[items.length - 1] : null;
     }
@@ -468,14 +470,46 @@ function resolveTargetAndRender(step) {
     return;
   }
 
-  // 新: 直近質問カード（評定尺度）要素自体を返す（rating-bundle用）
-  if (step.targetResolver === 'lastInsertedQuestionFieldRatingAll') {
-    let card = lastInsertedQuestionEl;
-    if (!card) {
-      const items = document.querySelectorAll('.question-card');
-      card = items.length > 0 ? items[items.length - 1] : null;
+  // プレビュー/QR/保存ボタンは右カラム（#outline-column）内にあり、画面幅で表示形態が変わる:
+  //   <1024px            : 右カラムは display:none、下部固定バーのモバイル版ボタンを使う
+  //   1024–1279px        : 右カラムは画面外のドロワー。NAVトグルで開いてからデスクトップ版を指す
+  //   >=1280px           : 右カラムはグリッド内に常時表示、デスクトップ版をそのまま指す
+  // step.action で対象を切り替え、実際に「見えている」コントロールを解決する。
+  if (step.targetResolver === 'actionButton') {
+    const MAP = {
+      preview: ['showPreviewBtn', 'showPreviewBtnMobile'],
+      qr: ['openQrModalBtn', 'openQrModalBtnMobile'],
+      save: ['createSurveyBtn', 'createSurveyBtnMobile'],
+    };
+    const pair = MAP[step.action];
+    if (!pair) { finalize(null); return; }
+    const [desktopId, mobileId] = pair;
+    const bar = document.getElementById('mobile-action-bar');
+    const barVisible = bar && window.getComputedStyle(bar).display !== 'none';
+    if (barVisible) {
+      finalize(document.getElementById(mobileId));
+      return;
     }
-    finalize(card);
+    const desktopEl = document.getElementById(desktopId);
+    if (!desktopEl) { finalize(null); return; }
+    // translate-x-full クラスは xl 未満で常に付与されているため（xl: variant が
+    // メディアクエリで上書きするだけ）、クラス有無ではなく実座標で画面内判定する。
+    const vw = window.innerWidth;
+    const r = desktopEl.getBoundingClientRect();
+    const onScreen = r.width > 0 && r.left < vw && r.right > 0;
+    if (onScreen) {
+      finalize(desktopEl);
+      return;
+    }
+    // ドロワーが閉じている（1024–1279px）: NAVトグルで開いてから、スライド完了後に指す。
+    const toggle = document.getElementById('outline-map-toggle-btn');
+    const drawer = document.getElementById('outline-column');
+    if (toggle) {
+      try { toggle.click(); } catch (_e) { if (drawer) drawer.classList.remove('translate-x-full'); }
+    } else if (drawer) {
+      drawer.classList.remove('translate-x-full');
+    }
+    window.setTimeout(() => finalize(document.getElementById(desktopId)), 360);
     return;
   }
 
@@ -608,32 +642,6 @@ function runAutoInput(step, targetEl) {
     return;
   }
 
-  // 評定尺度の設問文＋min/maxを一括autofill（targetResolver='lastInsertedQuestionFieldRatingAll'）
-  // targetEl は .question-card 要素自体が来る前提
-  if (ai.kind === 'rating-bundle' && targetEl) {
-    const card = targetEl;
-    const inputsToReadonly = [];
-    // 設問文
-    const qInput = card.querySelector('[data-lang-wrapper] input.input-field');
-    if (qInput && ai.text != null) {
-      setInputValue(qInput, ai.text);
-      inputsToReadonly.push(qInput);
-    }
-    // min/max ラベル
-    const grids = card.querySelectorAll('.grid > div');
-    const minInput = grids[0]?.querySelector('[data-lang-wrapper] input');
-    const maxInput = grids[1]?.querySelector('[data-lang-wrapper] input');
-    if (minInput && ai.minLabel != null) {
-      setInputValue(minInput, ai.minLabel);
-      inputsToReadonly.push(minInput);
-    }
-    if (maxInput && ai.maxLabel != null) {
-      setInputValue(maxInput, ai.maxLabel);
-      inputsToReadonly.push(maxInput);
-    }
-    setInputsReadonly(inputsToReadonly);
-    return;
-  }
 }
 
 function setInputValue(input, value) {
@@ -702,9 +710,12 @@ function bindUserActionListener(step, targetEl) {
 }
 
 function captureLastInsertedQuestionIfNeeded(step, baselineCount, done) {
-  // ステップ 15 / 19 のクリック直後に最新 .question-card を記録しておく
-  // シングルアンサー選択=15, 評定尺度選択=19（step10を4分割し+3シフト）
-  if (step.id !== 15 && step.id !== 19) {
+  // 設問カードを実際に生成する「型選択」ステップ（16=シングルアンサー選択 /
+  // 20=評定尺度選択）のクリック直後に、増えた最新 .question-card を記録する。
+  // ※ 15/19（設問を追加ボタン）はメニューを開くだけでカードは増えないため対象外。
+  //   ここを 15/19 にすると、次ステップ（17/21）の同期解決時に
+  //   lastInsertedQuestionEl が旧カードのまま残り、ハイライトが直前の設問へズレる。
+  if (step.id !== 16 && step.id !== 20) {
     done();
     return;
   }

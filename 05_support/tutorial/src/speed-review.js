@@ -3058,7 +3058,13 @@ export async function initializePage() {
         // 2. Find the survey definition
         currentSurvey = surveys.find(s => s.id === surveyId);
         if (!currentSurvey) {
-            throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
+            // チュートリアル自己完結バンドルでは core/surveys.json を空に保つ（一覧の「初回0件」前提の維持）。
+            // その場合でも、デモ設問定義（demo_surveys/<id>.json）から最小の survey 定義を組み立てて継続する。
+            if (enqueteDetailsData && (enqueteDetailsData.details || enqueteDetailsData.name)) {
+                currentSurvey = { ...enqueteDetailsData, id: surveyId };
+            } else {
+                throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
+            }
         }
         // 設問詳細情報を結合
         const normalizedDetails = Array.isArray(enqueteDetailsData.details)

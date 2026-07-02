@@ -1,21 +1,21 @@
 // steps.js
-// チュートリアル全 29 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
+// チュートリアル全 31 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
 //
 // 各ステップフィールド:
 //   id, block, target, contextTarget, mode, placement, title, body
 //   autoInput          : 自動入力ペイロード（mode='autofill'）
-//                        kind: 'text' | 'flatpickr-range' | 'multi-option' | 'rating-bundle'
-//   targetResolver     : 'lastInsertedQuestionField' | 'lastInsertedQuestionFieldOptionsAll' | 'lastInsertedQuestionFieldRatingAll'
+//                        kind: 'text' | 'flatpickr-range' | 'multi-option'
+//   targetResolver     : 'lastInsertedQuestionField' | 'lastInsertedQuestionFieldOptionsAll'
 //   fieldPath/optionIndex : targetResolver パラメタ
 //   onLeaveAction      : 'closePreviewModal' | 'closeQrModal'（次stepに遷移する直前に index.js が実行）
 //   waitForElement     : 対象出現待ち
 //   hideBack           : 戻るボタン非表示（ページ境界）
 //   completeButtonLabel: 次へボタンを完了ラベルに差し替え
 //
-// id 8, 28, 29 は user-action-bridge（本番ハンドラ経由 or 完了）。
-// step 24（タブレット切替 user-action）+ step 25（タブレット表示確認 info, onLeaveActionでプレビュー閉じ）に分離。
-// step 26（QR表示 user-action）+ step 27（QR確認 info, onLeaveActionでQR閉じ）に分離。
-// オプション機能カードは step10（名刺画像添付）と step11（連絡先の入力を必須化）にトグル単位で分割。関連設定は step12〜14（名刺データ化/お礼メール/回答完了画面）。選択肢4個別は step18 に統合（multi-option一括）、評定尺度3個別は step21 に統合（rating-bundle一括）。
+// id 8, 30, 31 は user-action-bridge（本番ハンドラ経由 or 完了）。
+// step 26（タブレット切替 user-action）+ step 27（タブレット表示確認 info, onLeaveActionでプレビュー閉じ）に分離。
+// step 28（QR表示 user-action）+ step 29（QR確認 info, onLeaveActionでQR閉じ）に分離。
+// オプション機能カードは step10（名刺画像添付）と step11（連絡先の入力を必須化）にトグル単位で分割。関連設定は step12〜14（名刺データ化/お礼メール/回答完了画面）。選択肢4個別は step18 に統合（multi-option一括）。評定尺度は step21〜23 に「設問文／最小ラベル／最大ラベル」の1フィールド=1ステップで分割（各ステップは該当inputのみをハイライト）。
 
 const TOMORROW_OFFSET_DAYS = 1;
 const PERIOD_LENGTH_DAYS = 3;
@@ -204,26 +204,47 @@ export const TUTORIAL_STEPS = [
       + '『評定尺度』を押してください。',
   },
   {
-    id: 21, block: 'C', target: null, targetResolver: 'lastInsertedQuestionFieldRatingAll',
+    id: 21, block: 'C', target: null, targetResolver: 'lastInsertedQuestionField', fieldPath: 'questionText',
     mode: 'autofill', placement: 'right',
-    title: '評定尺度の設問文・ラベルを入力',
+    title: '評定尺度の設問文を入力',
     body:
-      '評定尺度の設問文と最小・最大ラベルを自動入力します。\n'
-      + '練習のため「今回のサービス全体の満足度をお聞かせください。」「とても不満」「とても満足」を入力しました。\n\n'
+      '回答者に何を評価してもらうかを書く欄です。\n'
+      + '練習のため「今回のサービス全体の満足度をお聞かせください。」を自動入力しました。\n\n'
       + '下の『次へ』ボタンを押してください。',
-    autoInput: { kind: 'rating-bundle', text: '今回のサービス全体の満足度をお聞かせください。', minLabel: 'とても不満', maxLabel: 'とても満足' },
+    autoInput: { kind: 'text', value: '今回のサービス全体の満足度をお聞かせください。' },
+  },
+  {
+    id: 22, block: 'C', target: null, targetResolver: 'lastInsertedQuestionField', fieldPath: 'minLabel',
+    mode: 'autofill', placement: 'right',
+    title: '最小値ラベルを入力',
+    body:
+      '尺度の左端（最小値）に表示するラベルです。\n'
+      + '練習のため「とても不満」を自動入力しました。\n\n'
+      + '下の『次へ』ボタンを押してください。',
+    autoInput: { kind: 'text', value: 'とても不満' },
+  },
+  {
+    id: 23, block: 'C', target: null, targetResolver: 'lastInsertedQuestionField', fieldPath: 'maxLabel',
+    mode: 'autofill', placement: 'right',
+    title: '最大値ラベルを入力',
+    body:
+      '尺度の右端（最大値）に表示するラベルです。\n'
+      + '練習のため「とても満足」を自動入力しました。\n\n'
+      + '下の『次へ』ボタンを押してください。',
+    autoInput: { kind: 'text', value: 'とても満足' },
   },
 
   // ブロック D: プレビュー〜完了
   {
-    id: 22, block: 'D', target: '#showPreviewBtn', mode: 'user-action', placement: 'left',
+    id: 24, block: 'D', target: null, targetResolver: 'actionButton', action: 'preview',
+    mode: 'user-action', placement: 'left',
     title: 'プレビューを開く',
     body:
       '回答者にどのように表示されるかを確認できます。\n'
-      + '画面右側の『プレビュー』ボタンを押してください。',
+      + 'ハイライトされた『プレビュー』ボタンを押してください。',
   },
   {
-    id: 23, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
+    id: 25, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     title: 'スマートフォン表示を確認',
     body:
@@ -232,7 +253,7 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 24, block: 'D', target: '#v2-preview-tablet-btn', waitForElement: true,
+    id: 26, block: 'D', target: '#v2-preview-tablet-btn', waitForElement: true,
     mode: 'user-action', placement: 'bottom',
     title: 'タブレット表示に切り替える',
     body:
@@ -240,7 +261,7 @@ export const TUTORIAL_STEPS = [
       + '『タブレット』ボタンを押して、見え方を切り替えてください。',
   },
   {
-    id: 25, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
+    id: 27, block: 'D', target: '#surveyPreviewModalV2 .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     onLeaveAction: 'closePreviewModal',
     title: 'タブレット表示を確認',
@@ -249,14 +270,15 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 26, block: 'D', target: '#openQrModalBtn', mode: 'user-action', placement: 'left',
+    id: 28, block: 'D', target: null, targetResolver: 'actionButton', action: 'qr',
+    mode: 'user-action', placement: 'left',
     title: 'QR コードを表示',
     body:
       '回答用のQRコードを表示してみましょう。\n'
       + '『QR発行』ボタンを押してください。',
   },
   {
-    id: 27, block: 'D', target: '#qrCodeModal .modal-content-transition', waitForElement: true,
+    id: 29, block: 'D', target: '#qrCodeModal .modal-content-transition', waitForElement: true,
     mode: 'info', placement: 'left',
     onLeaveAction: 'closeQrModal',
     title: 'QR コードを確認',
@@ -267,15 +289,16 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 28, block: 'D', target: '#createSurveyBtn', mode: 'user-action-bridge', placement: 'left',
+    id: 30, block: 'D', target: null, targetResolver: 'actionButton', action: 'save',
+    mode: 'user-action-bridge', placement: 'left',
     title: 'アンケートを保存する',
     body:
-      '画面右側の『アンケートを保存する』ボタンを押してください。\n'
+      'ハイライトされた保存ボタンを押してください。\n'
       + '保存してもこの画面のまま、ダッシュボードへ自動では移動しません。\n\n'
       + '（練習のため実際には保存されません）',
   },
   {
-    id: 29, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
+    id: 31, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
     title: 'チュートリアル完了',
     // ※「今練習したもの」を実際に公開できる、という旨は事実と異なるため記載しない。
     // 練習中の入力はチュートリアル内で完結しており、アカウント側へ引き継がれない。

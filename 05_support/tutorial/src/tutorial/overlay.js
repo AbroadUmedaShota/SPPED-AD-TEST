@@ -339,18 +339,30 @@ export function hideStuckHint() {
 
 function scrollIntoViewIfNeeded(el) {
   const rect = el.getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) return; // 非表示要素は対象外
   const vh = window.innerHeight;
   const vw = window.innerWidth;
-  const topMargin = 80;  // 進行バー（48px）＋余白
-  const bottomMargin = 40;
-  const outside =
-    rect.top < topMargin ||
-    rect.bottom > vh - bottomMargin ||
-    rect.left < 0 ||
-    rect.right > vw;
-  if (outside) {
+  // 進行バー（48px）＋余白を除いた表示可能域。この中央帯（縦 30%〜70%）から
+  // 要素の中心が外れていたら中央へ寄せる。「視野内だが端に貼り付く」状態も救済し、
+  // フォーカス対象をできるだけ画面中央付近に置いて見やすくする。
+  const topSafe = 96;
+  const bottomSafe = 96;
+  const usable = Math.max(0, vh - topSafe - bottomSafe);
+  const comfortTop = topSafe + usable * 0.30;
+  const comfortBottom = topSafe + usable * 0.70;
+  const elCenter = rect.top + rect.height / 2;
+  const verticallyOff =
+    elCenter < comfortTop ||
+    elCenter > comfortBottom ||
+    rect.top < topSafe ||
+    rect.bottom > vh - bottomSafe;
+  const horizontallyOff = rect.left < 0 || rect.right > vw;
+  if (verticallyOff || horizontallyOff) {
+    // 表示域より高い要素（モーダル等）は中央寄せすると上端が隠れるため上寄せにする。
+    const block = rect.height > usable ? 'start' : 'center';
     try {
-      el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
+      // inline は 'nearest'：縦寄せが目的で、不要な横スクロールは避ける。
+      el.scrollIntoView({ block, inline: 'nearest', behavior: 'smooth' });
     } catch (_e) {
       el.scrollIntoView();
     }

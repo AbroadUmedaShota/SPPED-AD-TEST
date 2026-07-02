@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<!-- ⚠ 02_dashboard/speed-review.html のコピー（05_support/tutorial/speed-review.html 自己完結バンドル）。元画面の構造変更時は本ファイルおよび同梱 src/ 等の同期が必要。 -->
+<html lang="ja" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPEED-AD - SPEEDレビュー</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css">
+    <link rel="stylesheet" href="src/tutorial/tutorial.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900">
+    </noscript>
+    <style>
+        .processing-text {
+            color: #9CA3AF;
+            /* Tailwind gray-400 */
+            font-weight: 500;
+        }
+
+        .processing-text::after {
+            content: '.';
+            animation: dots 1.5s steps(3, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                color: rgba(0, 0, 0, 0);
+                text-shadow:
+                    .2em 0 0 rgba(0, 0, 0, 0),
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            40% {
+                color: #9CA3AF;
+                text-shadow:
+                    .2em 0 0 rgba(0, 0, 0, 0),
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            60% {
+                text-shadow:
+                    .2em 0 0 #9CA3AF,
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            80%,
+            100% {
+                text-shadow:
+                    .2em 0 0 #9CA3AF,
+                    .4em 0 0 #9CA3AF;
+            }
+        }
+
+        /* カレンダーハイライト用 */
+        .event-duration-highlight {
+            background-color: rgba(26, 115, 232, 0.1) !important;
+            border-bottom: 2px solid #1a73e8 !important;
+        }
+
+        .graph-data-table-container {
+            height: auto;
+            min-height: 120px;
+            max-height: 320px;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            padding-right: 4px;
+            transition: max-height 0.3s ease;
+        }
+
+        .graph-data-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .graph-data-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #ffffff;
+            box-shadow: inset 0 -1px 0 #e5e7eb;
+        }
+
+        .graph-data-table__label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .graph-table-total-row {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            background-color: #f9fafb;
+            font-weight: 700;
+            box-shadow: inset 0 1px 0 #e5e7eb;
+        }
+
+        .graph-data-table__row.is-highlighted {
+            background-color: rgba(26, 115, 232, 0.08);
+        }
+
+        .graph-data-table__row.is-highlighted td {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+
+        .table-scroll-shadow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 28px;
+            background: linear-gradient(to left, rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0));
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .table-scroll-shadow.is-visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 767px) {
+            .graph-data-table-container {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background h-full">
+
+    <div class="relative flex min-h-screen flex-col">
+
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+        <div id="header-placeholder"></div>
+        <div id="sidebar-placeholder"></div>
+
+        <main class="bg-background pt-8" id="main-content">
+            <div class="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div
+                    class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">SPEEDレビュー
+                    </h1>
+                    <p id="review-survey-name" class="text-sm text-on-surface-variant">アンケート名: (ここにアンケート名が入ります)</p>
+                </div>
+
+                <!-- Analytics Dashboard -->
+                <div id="analytics-dashboard" class="space-y-4 mb-6 hidden">
+                    <!-- KPI Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div
+                            class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col justify-between items-start h-full">
+                            <div class="flex items-center gap-3">
+                                <div class="kpi-icon-badge" aria-hidden="true">
+                                    <span class="material-icons text-xl">poll</span>
+                                </div>
+                                <div class="text-lg text-on-surface-variant font-bold">回答総数</div>
+                            </div>
+                            <div class="flex items-end gap-3 mt-4">
+                                <div id="kpi-total-answers" class="text-5xl font-extrabold text-primary leading-none">-
+                                </div>
+                            </div>
+                        </div>
+                        <div id="kpi-current-question-card"
+                            class="bg-surface border border-outline-variant rounded-2xl shadow-sm md:col-span-2 flex flex-col justify-center transition-all cursor-pointer hover:ring-2 hover:bg-primary/5 ring-primary/20 group">
+                            <div class="flex items-stretch h-full">
+                                <!-- 左側：設問選択エリア（クリック領域のメイン） -->
+                                <div class="flex-1 p-5 min-w-0 flex flex-col justify-center">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span
+                                            class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active
+                                            Question</span>
+                                        <div class="h-px flex-1 bg-outline-variant/30"></div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <!-- 設問アイコン -->
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center shrink-0">
+                                            <span class="material-icons text-primary text-lg">quiz</span>
+                                        </div>
+                                        <!-- 設問名 -->
+                                        <div class="flex-1 min-w-0 flex items-center gap-2">
+                                            <div id="dashboard-current-question"
+                                                class="text-lg font-bold text-on-surface truncate">...</div>
+                                            <span
+                                                class="material-icons text-on-surface-variant group-hover:text-primary transition-colors shrink-0">expand_more</span>
+                                        </div>
+                                    </div>
+                                    <button id="question-change-link" type="button"
+                                        class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80">
+                                        <span class="material-icons text-sm">edit</span>
+                                        設問を変更
+                                    </button>
+                                </div>
+                                <!-- 右側：ナビゲーションエリア（セパレーター付き） -->
+                                <div
+                                    class="shrink-0 flex items-center px-6 border-l border-outline-variant/50 bg-surface-variant/5 rounded-r-2xl">
+                                    <button id="graphButton" type="button"
+                                        class="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95 border-none">
+                                        <span class="material-icons text-sm">analytics</span>
+                                        <span class="whitespace-nowrap">詳細分析</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="non-chart-question-notice"
+                        class="hidden rounded-xl border border-outline-variant bg-surface-variant/20 px-4 py-3 text-sm text-on-surface-variant">
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div id="analytics-charts-row" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Column: Time Series Chart (1/3 width) -->
+                        <div
+                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm col-span-1 flex flex-col self-start">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-medium text-on-surface-variant">時間帯別回答数</h3>
+                                <!-- Axis Mode Switch -->
+                                <div class="flex p-0.5 bg-surface-variant rounded-md">
+                                    <button id="ts-axis-auto-btn" type="button"
+                                        class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all bg-surface text-primary shadow-sm"
+                                        title="投稿がある範囲のみ表示">自動</button>
+                                    <button id="ts-axis-fixed-btn" type="button"
+                                        class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all text-on-surface-variant hover:text-on-surface"
+                                        title="9:00-19:00で固定表示">固定</button>
+                                </div>
+                            </div>
+                            <div class="relative w-full h-[220px] min-h-[220px]">
+                                <canvas id="timeSeriesChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Attribute & Data (2/3 width, Shared Card) -->
+                        <div
+                            class="col-span-1 lg:col-span-2 bg-surface border border-outline-variant rounded-xl p-4 shadow-sm h-full">
+                            <div class="flex flex-col md:flex-row gap-4 h-full">
+                                <!-- Attribute Chart -->
+                                <div class="flex-1 w-full md:w-1/2 flex flex-col">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-sm font-medium text-on-surface-variant">回答内容の内訳</h3>
+                                        <div id="matrix-controls-container"></div>
+                                    </div>
+                                    <div class="relative min-h-[180px] w-full flex justify-center flex-1 overflow-hidden">
+                                        <canvas id="attributeChart"></canvas>
+                                        <div id="attributeChartApex" class="w-full"></div>
+                                    </div>
+                                </div>
+                                <!-- Data Table -->
+                                <div
+                                    class="flex-1 w-full md:w-1/2 flex flex-col border-t md:border-t-0 md:border-l border-outline-variant/50 pt-4 md:pt-0 md:pl-4 relative">
+                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">集計データ</h3>
+                                    <div id="graph-data-table-container"
+                                        class="relative w-full custom-scrollbar flex-1 graph-data-table-container">
+                                        <!-- Table will be inserted here by JavaScript -->
+                                        <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div id="main-content-wrapper" class="w-full transition-all duration-300 lg:mr-80">
+                        <div id="review-table-scroll-container"
+                            class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px] overflow-x-auto">
+                            <div id="review-table-scroll-shadow" class="table-scroll-shadow sm:hidden"
+                                aria-hidden="true"></div>
+                            <table class="w-full divide-y divide-outline-variant review-table table-fixed min-w-[960px]"
+                                id="reviewTable">
+                                <thead class="bg-surface-variant">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="answerId">
+                                                <span>回答ID</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="answeredAt">
+                                                <span>回答日時</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="fullName">
+                                                <span>氏名</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="companyName">
+                                                <span>会社名</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 overflow-hidden text-left"
+                                                data-sort-key="dynamicQuestion">
+                                                <span id="dynamic-question-header"
+                                                    class="min-w-0 flex-1 truncate">設問回答</span>
+                                                <span class="material-icons sort-icon opacity-40 shrink-0">unfold_more</span>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reviewTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div
+                            class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
+                            <div class="flex items-center gap-2">
+                                <label for="itemsPerPage" class="sr-only">表示件数</label>
+                                <span>表示件数:</span>
+                                <select id="itemsPerPage"
+                                    class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none"
+                                    aria-label="1ページあたりの表示件数">
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button"
+                                    class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="前へ" id="prevPageBtn" aria-label="前のページへ"><span
+                                        class="material-icons text-lg">chevron_left</span></button>
+                                <div id="pagination-numbers" class="flex items-center gap-1"></div>
+                                <button type="button"
+                                    class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="次へ" id="nextPageBtn" aria-label="次のページへ"><span
+                                        class="material-icons text-lg">chevron_right</span></button>
+                            </div>
+                            <div id="pageInfo" class="font-medium min-w-[120px] text-right">1 - 0 / 全 0件</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="right-sidebar-overlay" class="estimate-sidebar-overlay"></div>
+                <!-- Sidebar (Floating Style like bizcardSettings.html) -->
+                <aside id="right-sidebar"
+                    class="fixed top-24 right-8 w-80 transition-transform duration-300 ease-in-out z-40 translate-x-0">
+                    <!-- Toggle Button -->
+                    <button id="right-sidebar-toggle-btn" type="button"
+                        class="absolute -left-10 top-8 bg-surface p-2 rounded-l-full shadow-lg hover:bg-surface-variant focus:outline-none focus:ring-2 ring-offset-2 ring-primary transition-colors flex items-center justify-center lg:flex"
+                        aria-label="サイドバーを開閉する">
+                        <span class="material-icons transition-transform duration-300">chevron_right</span>
+                    </button>
+
+                    <!-- Inner Card Content -->
+                    <div
+                        class="overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface/95 p-6 text-on-surface shadow-2xl shadow-primary/5 backdrop-blur-xl space-y-6 custom-scrollbar">
+                        <div class="toolbox-card">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Filter
+                                    Options</span>
+                                <div class="h-px flex-1 bg-outline-variant/30"></div>
+                            </div>
+
+                            <!-- Search Tabs -->
+                            <div class="flex p-1 bg-surface-variant rounded-lg mb-6">
+                                <button id="simple-search-tab" type="button"
+                                    class="search-tab-btn is-active flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm"
+                                    data-tab="simple">簡易検索</button>
+                                <button id="detailed-search-tab" type="button"
+                                    class="search-tab-btn flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface"
+                                    data-tab="detailed">詳細検索</button>
+                            </div>
+
+                            <!-- Simple Search Content -->
+                            <div id="simple-search-content" class="space-y-4">
+                                <div class="input-group">
+                                    <select id="dayFilterSelect" class="input-field pl-10 pr-3">
+                                        <option value="all">会期全体</option>
+                                        <option value="custom">カスタム範囲</option>
+                                    </select>
+                                    <label for="dayFilterSelect" class="input-label">表示対象日</label>
+                                    <span
+                                        class="calendar-icon material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">calendar_today</span>
+                                </div>
+                                <div class="input-group">
+                                    <select id="statusFilterSelect" class="input-field pl-10 pr-3">
+                                        <option value="all">全て表示</option>
+                                        <option value="completed">データ化完了</option>
+                                        <option value="processing">データ化進行中</option>
+                                    </select>
+                                    <label for="statusFilterSelect" class="input-label">ステータス</label>
+                                    <span
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">filter_list</span>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Search Content -->
+                            <div id="detailed-search-content" class="space-y-4 hidden">
+                                <div class="input-group">
+                                    <input type="text" id="startDateInput" placeholder=" " class="input-field pl-10">
+                                    <label for="startDateInput" class="input-label">開始日時</label>
+                                    <span
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">schedule</span>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="endDateInput" placeholder=" " class="input-field pl-10">
+                                    <label for="endDateInput" class="input-label">終了日時</label>
+                                    <span
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">schedule</span>
+                                </div>
+                                <div class="input-group">
+                                    <select id="statusFilterSelectDetailed" class="input-field pl-10 pr-3">
+                                        <option value="all">全て表示</option>
+                                        <option value="completed">データ化完了</option>
+                                        <option value="processing">データ化進行中</option>
+                                    </select>
+                                    <label for="statusFilterSelectDetailed" class="input-label">ステータス</label>
+                                    <span
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">filter_list</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 pt-6 border-t border-outline-variant/30 mt-6">
+                                <button id="resetFiltersButton" type="button"
+                                    class="w-full px-4 py-2 rounded-md font-semibold transition-colors shadow-sm bg-secondary/10 text-secondary hover:bg-secondary/20 border-none"
+                                    aria-label="フィルターをリセット">
+                                    フィルターをリセット
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </aside>
+            </div>
+    </main>
+
+
+    <div id="footer-placeholder"></div>
+    </div>
+
+    <div id="modal-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    <script type="module" src="src/main.js"></script>
+    <script type="module" src="src/speed-review.js?v=3"></script>
+    <script type="module" src="src/tutorial/index-speedreview.js"></script>
+    <script type="module" src="src/testScenarioOverlay.js"></script>
+    <script>
+      function renderMatrixChartApex(canvasId, question, questionAnswers, selectedRowId, colorPalette) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        canvas.innerHTML = ''; // Clear previous chart
+
+        if (question.type === 'matrix_sa') {
+            const targetRowId = selectedRowId || (question.rows.length > 0 ? question.rows[0].id : null);
+            if (!targetRowId) return;
+
+            const optionsData = question.options;
+            const counts = {};
+            optionsData.forEach(opt => counts[opt.value] = 0);
+            let rowTotal = 0;
+
+            questionAnswers.forEach(resp => {
+                if (!resp || !resp.details) return;
+                const answerDetail = resp.details.find(d => d.question === question.text);
+                if (!answerDetail || !answerDetail.answer) return;
+
+                const answerForQuestion = answerDetail.answer;
+                const answerForRow = answerForQuestion[targetRowId];
+
+                if (answerForRow) {
+                    if (counts.hasOwnProperty(answerForRow)) {
+                        counts[answerForRow]++;
+                    }
+                    rowTotal++;
+                }
+            });
+
+            const chartData = optionsData.map(opt => counts[opt.value]);
+            const chartLabels = optionsData.map(opt => opt.text);
+            
+            const chartOptions = {
+                series: chartData,
+                labels: chartLabels,
+                chart: {
+                    type: 'donut',
+                    height: 220,
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: '回答数',
+                                    formatter: () => rowTotal
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    fontSize: '12px',
+                    labels: { colors: '#6b7280' },
+                    itemMargin: { horizontal: 6, vertical: 2 },
+                },
+                tooltip: {
+                    y: {
+                        formatter: (val) => val + "件"
+                    }
+                },
+                colors: colorPalette
+            };
+            const chart = new ApexCharts(canvas, chartOptions);
+            chart.render();
+            return chart;
+
+        } else if (question.type === 'matrix_ma') {
+            const optionsData = question.options;
+            const counts = {};
+            optionsData.forEach(opt => counts[opt.value] = 0);
+
+            questionAnswers.forEach(resp => {
+                if (!resp || !resp.details) return;
+                const answerDetail = resp.details.find(d => d.question === question.text);
+                if (!answerDetail || !answerDetail.answer) return;
+
+                const answer = answerDetail.answer;
+                if (!answer) return;
+                
+                let targetAnswer = answer;
+                // Filter by selected row if not 'all'
+                if (selectedRowId && selectedRowId !== 'all') {
+                    if (answer.hasOwnProperty(selectedRowId)) {
+                        targetAnswer = { [selectedRowId]: answer[selectedRowId] };
+                    } else {
+                        targetAnswer = {};
+                    }
+                }
+
+                Object.values(targetAnswer).forEach(selectedOptionsArray => {
+                    if (Array.isArray(selectedOptionsArray)) {
+                        selectedOptionsArray.forEach(optValue => {
+                            if (counts.hasOwnProperty(optValue)) {
+                                counts[optValue]++;
+                            }
+                        });
+                    }
+                });
+            });
+
+            const chartOptions = {
+                series: [{
+                    name: '回答数',
+                    data: optionsData.map(opt => counts[opt.value])
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                colors: colorPalette,
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        borderRadius: 4,
+                    }
+                },
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: (val) => val + "件"
+                },
+                xaxis: {
+                    categories: optionsData.map(o => o.text),
+                },
+                title: {
+                    text: selectedRowId === 'all' ? '選択肢ごとの合計回答数' : undefined
+                }
+            };
+            const chart = new ApexCharts(canvas, chartOptions);
+            chart.render();
+            return chart;
+        }
+    }
+    </script>
+</body>
+
+</html>

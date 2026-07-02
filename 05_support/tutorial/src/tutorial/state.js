@@ -106,6 +106,9 @@ export function resetAll() {
   // お礼メールチュートリアル
   safeRemoveItem('speedad-tutorial-thankyou-progress');
   safeRemoveItem('speedad-tutorial-thankyou-completed');
+  // SPEEDレビューチュートリアル
+  safeRemoveItem('speedad-tutorial-speedreview-progress');
+  safeRemoveItem('speedad-tutorial-speedreview-completed');
   // 旧バージョンで保存されたエントリ種別キーの掃除（現在は未使用）
   safeRemoveItem('speedad-tutorial-entry');
   // 復帰コンテキスト

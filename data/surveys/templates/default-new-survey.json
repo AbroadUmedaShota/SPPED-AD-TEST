@@ -30,7 +30,7 @@
       "text": {
         "ja": "興味のあるサービスを選択してください"
       },
-      "required": false,
+      "required": true,
       "options": [
         { "ja": "アンケート作成" },
         { "ja": "名刺データ化" },
@@ -43,7 +43,7 @@
       "text": {
         "ja": "導入予定時期を教えてください"
       },
-      "required": false,
+      "required": true,
       "options": [
         { "ja": "1か月以内" },
         { "ja": "3か月以内" },
@@ -56,7 +56,7 @@
       "text": {
         "ja": "ご意見・ご要望をご記入ください"
       },
-      "required": false,
+      "required": true,
       "config": {
         "multiline": true,
         "minLength": "",
