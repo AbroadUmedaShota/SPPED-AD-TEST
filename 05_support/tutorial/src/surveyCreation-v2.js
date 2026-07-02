@@ -1094,6 +1094,7 @@ function buildAnswerSection(q, typeLabel) {
   if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q, typeLabel);
   if (q.type === 'rating_scale') return buildRatingScaleSection(q, typeLabel);
   if (q.type === 'free_answer') return buildFreeAnswerSection(q, typeLabel);
+  if (q.type === 'date_time') return buildDateTimeSection(q, typeLabel);
   const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
   const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
   hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
@@ -1157,6 +1158,57 @@ function buildFreeAnswerSection(q, typeLabel) {
   section.appendChild(limitsGrid);
 
   syncMode();
+  return section;
+}
+
+function buildDateTimeSection(q, typeLabel) {
+  if (!q.config) q.config = { showDate: true, showTime: false };
+  const cfg = q.config;
+  if (cfg.showDate === undefined) cfg.showDate = true;
+  if (cfg.showTime === undefined) cfg.showTime = false;
+
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+
+  section.appendChild(el('p', { class: 'text-xs text-gray-500 leading-relaxed' }, '回答者に入力させる項目を選びます。両方オンにすると日付と時刻の両方を入力できます。'));
+
+  const rows = el('div', { class: 'space-y-2.5' });
+
+  const buildToggleRow = (key, iconName, title, desc) => {
+    const info = el('div', { class: 'flex items-center gap-2 min-w-0' },
+      icon(iconName, 'text-[20px] text-gray-400 shrink-0'),
+      el('div', { class: 'min-w-0' },
+        el('p', { class: 'text-sm font-bold text-gray-700 leading-tight' }, title),
+        el('p', { class: 'text-xs text-gray-400 mt-0.5 leading-snug' }, desc),
+      ),
+    );
+
+    const input = el('input', { type: 'checkbox', class: 'sr-only peer' });
+    input.checked = cfg[key] === true;
+    input.addEventListener('change', () => {
+      const otherKey = key === 'showDate' ? 'showTime' : 'showDate';
+      // 日付・時刻の両方をオフにはできない（入力欄が消えてしまうため）
+      if (!input.checked && cfg[otherKey] !== true) {
+        input.checked = true;
+        showToast('日付・時刻の少なくとも一方をオンにしてください', 'warning');
+        return;
+      }
+      cfg[key] = input.checked;
+    });
+
+    const knob = el('div', { class: "w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" });
+    const labelWrap = el('label', { class: 'relative inline-flex items-center cursor-pointer flex-shrink-0' }, input, knob);
+
+    return el('div', { class: 'flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3' }, info, labelWrap);
+  };
+
+  rows.appendChild(buildToggleRow('showDate', 'calendar_today', '日付', '年月日を入力できるようにする'));
+  rows.appendChild(buildToggleRow('showTime', 'schedule', '時刻', '時:分を入力できるようにする'));
+  section.appendChild(rows);
+
   return section;
 }
 
@@ -2537,6 +2589,14 @@ async function loadSurveyData(surveyId) {
       if (MATRIX_TYPES.has(type)) {
         base.matrixRows = (q.rows || []).map(r => ({ ja: r.text || '' }));
         base.matrixCols = (q.options || []).map(c => ({ ja: c.text || '' }));
+      }
+      if (type === 'date_time') {
+        // 保存済みの入力モードから日付/時刻トグルを復元（無ければ旧typeで判定、既定は日付のみ）
+        const mode = q.meta?.dateTimeConfig?.inputMode || q.inputMode
+          || (q.type === 'time' ? 'time' : q.type === 'date' ? 'date' : 'date');
+        base.config = mode === 'datetime' ? { showDate: true, showTime: true }
+          : mode === 'time' ? { showDate: false, showTime: true }
+          : { showDate: true, showTime: false };
       }
       return base;
     });
