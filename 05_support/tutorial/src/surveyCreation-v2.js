@@ -1186,23 +1186,38 @@ function buildDateTimeSection(q, typeLabel) {
       ),
     );
 
-    const input = el('input', { type: 'checkbox', class: 'sr-only peer' });
+    // 視覚専用の隠しチェックボックス（peer-checked でノブの色/位置を切り替える）。
+    // ネイティブの label トグルは設問カード（Sortable 管理下）では効かないため、
+    // 他のカード内トグル同様に role="switch" + 明示 click で状態を制御する。
+    const input = el('input', { type: 'checkbox', class: 'sr-only peer', tabindex: '-1', 'aria-hidden': 'true' });
     input.checked = cfg[key] === true;
-    input.addEventListener('change', () => {
+
+    const knob = el('div', { class: "w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" });
+    // フォーカスリングは実際のフォーカス先である span に付ける（input は tabindex=-1 で非フォーカスのため peer-focus は効かない）
+    const sw = el('span', {
+      class: 'relative inline-flex items-center cursor-pointer flex-shrink-0 rounded-full outline-none focus:ring-2 focus:ring-green-300',
+      role: 'switch',
+      'aria-checked': String(input.checked),
+      'aria-label': title,
+      tabindex: '0',
+    }, input, knob);
+
+    const toggle = () => {
       const otherKey = key === 'showDate' ? 'showTime' : 'showDate';
+      const next = !input.checked;
       // 日付・時刻の両方をオフにはできない（入力欄が消えてしまうため）
-      if (!input.checked && cfg[otherKey] !== true) {
-        input.checked = true;
+      if (!next && cfg[otherKey] !== true) {
         showToast('日付・時刻の少なくとも一方をオンにしてください', 'warning');
         return;
       }
-      cfg[key] = input.checked;
-    });
+      input.checked = next;
+      cfg[key] = next;
+      sw.setAttribute('aria-checked', String(next));
+    };
+    sw.addEventListener('click', toggle);
+    sw.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
 
-    const knob = el('div', { class: "w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" });
-    const labelWrap = el('label', { class: 'relative inline-flex items-center cursor-pointer flex-shrink-0' }, input, knob);
-
-    return el('div', { class: 'flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3' }, info, labelWrap);
+    return el('div', { class: 'flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3' }, info, sw);
   };
 
   rows.appendChild(buildToggleRow('showDate', 'calendar_today', '日付', '年月日を入力できるようにする'));
