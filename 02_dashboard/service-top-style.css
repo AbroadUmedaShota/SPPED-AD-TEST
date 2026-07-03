@@ -3062,19 +3062,8 @@ body.dark-mode .outline-highlight {
     padding: 3px 2px;   /* アクティブ/ドロップ受けリング(2px)がスクロールでクリップされないための余白 */
 }
 .lang-others::-webkit-scrollbar { display: none; }
-/* WCAG 1.4.3: ヒント文字 #5b6472（白背景で約5.8:1、マージン確保） */
-.lang-hint {
-    margin-left: auto;
-    flex-shrink: 0;
-    font-size: 11.5px;
-    color: #5b6472;
-    white-space: nowrap;
-    -webkit-user-select: none;
-    user-select: none;
-}
-/* レスポンシブ: 狭い幅ではヒントを隠し、その他言語だけ横スクロールさせる（縦書き化を防ぐ） */
+/* レスポンシブ: 狭い幅では余白を詰めて、その他言語だけ横スクロールさせる（縦書き化を防ぐ） */
 @media (max-width: 900px) {
-    .lang-hint { display: none; }
     .lang-tabbar__row { gap: 10px; padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
