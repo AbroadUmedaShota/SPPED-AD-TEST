@@ -436,22 +436,39 @@ function renderLangSelectionAndTabs() {
     panel.appendChild(btn);
   });
 
-  // 言語タブ帯（ソケット型デザイン）を組み立てる。
-  // 第一言語は左端の「ソケット」に収まり、その他言語は仕切りの右側に並ぶ。
-  // 言語が1つだけの時は並べ替え不能なので、仕切り・その他・ヒント・ドラッグを無効化する。
+  // 言語タブ帯（フィールドセット型デザイン）を組み立てる。
+  // 第一言語は左端の「囲み枠」に収まり、その他言語は仕切りの右側に並ぶ。
+  // 言語が1つだけの時は並べ替え不能なので、仕切り・その他・ドラッグを無効化する。
   const canReorder = currentLangs.length > 1;
 
   tabsContainer.className = 'lang-tabbar__row';
   tabsContainer.setAttribute('role', 'tablist');
   tabsContainer.innerHTML = '';
 
-  // ソケット（第一言語の枠）。role="presentation" で tablist の直下は tab のみが意味を持つようにする
-  const socket = el('div', { class: 'lang-socket', role: 'presentation' });
-  socket.appendChild(el('span', { class: 'lang-socket__label', 'aria-hidden': 'true' }, '第一言語'));
-  socket.appendChild(makeLangChip(currentLangs[0], true, canReorder));
+  // 第一言語の囲み枠。role="presentation" で tablist の直下は tab のみが意味を持つようにする
+  const fieldset = el('div', { class: 'lang-fieldset', role: 'presentation' });
 
-  // ドラッグ中のみ出現するドロップ受け（第一言語化）
-  const overlay = el('div', { class: 'lang-socket__overlay', 'aria-hidden': 'true' },
+  // 凡例（「第一言語」ラベル ＋ ? 説明ボタン ＋ クリック開閉ツールチップ）
+  const legend = el('div', { class: 'lang-legend' });
+  const helpWrap = el('span', { class: 'lang-help-wrap' });  // ツールチップの位置基準（? ボタンの直下に出す）
+  const helpBtn = el('button', {
+    id: 'langHelpBtn', class: 'lang-help', type: 'button',
+    'aria-expanded': 'false', 'aria-describedby': 'langPrimaryTip', 'aria-label': '第一言語について',
+    onclick: toggleLangTip
+  }, '?');
+  const tip = el('div', {
+    id: 'langPrimaryTip', class: 'lang-tip', role: 'tooltip', hidden: true
+  }, LANG_PRIMARY_TIP);
+  helpWrap.append(helpBtn, tip);
+  legend.append(el('span', { class: 'lang-legend__text' }, '第一言語'), helpWrap);
+  fieldset.appendChild(legend);
+  ensureLangTipDismissers();
+
+  // 第一言語チップ（枠の中・ドラッグ不可）
+  fieldset.appendChild(makeLangChip(currentLangs[0], true, canReorder));
+
+  // ドラッグ中のみ出現するドロップ受け（その他言語→枠へドロップで第一言語化）
+  const overlay = el('div', { class: 'lang-fieldset__overlay', 'aria-hidden': 'true' },
     el('span', {}, 'ここにドロップ'));
   overlay.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -460,8 +477,8 @@ function renderLangSelectionAndTabs() {
   });
   overlay.addEventListener('dragleave', () => { if (langOverId === 'slot') { langOverId = null; updateLangDnd(); } });
   overlay.addEventListener('drop', (e) => { e.preventDefault(); if (langDragId) promoteLang(langDragId); });
-  socket.appendChild(overlay);
-  tabsContainer.appendChild(socket);
+  fieldset.appendChild(overlay);
+  tabsContainer.appendChild(fieldset);
 
   // 仕切り + その他言語（ラッパは role="presentation"、tab の意味は各チップに閉じる）
   const divider = el('div', { class: 'lang-divider', 'aria-hidden': 'true' });
@@ -497,18 +514,22 @@ function langGripSvg() {
   return `<svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true" focusable="false">${dots}</svg>`;
 }
 
-// 言語タブ（チップ）を生成する。isPrimary=ソケット内の第一言語タブ、canReorder=D&D有効
+// 言語タブ（チップ）を生成する。isPrimary=枠内の第一言語タブ（ドラッグ不可）、canReorder=並べ替え有効
 function makeLangChip(langCode, isPrimary, canReorder) {
   const langObj = SUPPORTED_LANGS.find(l => l.code === langCode);
   const langName = langObj ? langObj.name : langCode;
   const isActive = langCode === activeLang;
+  // 第一言語チップはドラッグ不可（マウスでの入れ替えは「その他→枠へドロップ」で行う）。
+  // 並べ替え自体は全チップで Ctrl+矢印キーからも可能。
+  const draggable = canReorder && !isPrimary;
 
   // aria-label はチップ内の全テキストを上書きするため、後から付く「未入力 N」バッジは
   // updateTranslationBadges() がこの基本ラベルに件数を連結して同期する
   const baseLabel = isPrimary ? `${langName}（第一言語）` : langName;
-  const title = canReorder
-    ? 'クリック/Enter/Spaceで切替、矢印キーで移動、Ctrl+矢印またはドラッグで並べ替え'
-    : 'クリックまたはEnter/Spaceで切替、矢印キーで移動';
+  let title;
+  if (!canReorder) title = 'クリックまたはEnter/Spaceで編集対象に';
+  else if (isPrimary) title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印で並べ替え';
+  else title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印またはドラッグで並べ替え';
 
   const chip = el('div', {
     class: `lang-chip${isPrimary ? ' lang-chip--primary' : ''}${isActive ? ' active' : ''}`,
@@ -522,17 +543,19 @@ function makeLangChip(langCode, isPrimary, canReorder) {
     onclick: () => activateLangTab(langCode),
     onkeydown: (e) => handleLangTabKeydown(e, langCode)
   });
-  chip.draggable = canReorder;
+  chip.draggable = draggable;
 
-  if (canReorder) {
+  if (draggable) {
     const grip = el('span', { class: 'lang-chip__grip', 'aria-hidden': 'true' });
     grip.innerHTML = langGripSvg();
     chip.appendChild(grip);
   }
   chip.appendChild(el('span', { class: 'lang-chip__name' }, langName));
-  chip.appendChild(el('div', { class: 'lang-chip__ring', 'aria-hidden': 'true' }));
 
-  if (canReorder) attachLangChipDnd(chip, langCode);
+  if (draggable) {
+    chip.appendChild(el('div', { class: 'lang-chip__ring', 'aria-hidden': 'true' }));
+    attachLangChipDnd(chip, langCode);
+  }
   return chip;
 }
 
@@ -596,13 +619,13 @@ function finishLangReorder(prevFirstLang) {
   }
 }
 
-// ドラッグ状態の見た目更新（ソケットのドロップ受け・各チップのリング）
+// ドラッグ状態の見た目更新（枠のドロップ受け・各チップのリング）
 function updateLangDnd() {
   const row = document.getElementById('languageEditorTabsV2');
   if (!row) return;
   const draggingNonPrimary = !!langDragId && currentLangs.indexOf(langDragId) > 0;
 
-  const overlay = row.querySelector('.lang-socket__overlay');
+  const overlay = row.querySelector('.lang-fieldset__overlay');
   if (overlay) {
     overlay.classList.toggle('is-active', draggingNonPrimary);
     overlay.classList.toggle('is-hover', draggingNonPrimary && langOverId === 'slot');
@@ -614,6 +637,46 @@ function updateLangDnd() {
     ring.classList.toggle('is-sensor', !!langDragId && langDragId !== id);
     ring.classList.toggle('is-src', langDragId === id);
     ring.classList.toggle('is-over', langOverId === id && langDragId !== id);
+  });
+}
+
+// ─────────────────────────────────────────
+// 第一言語の説明ツールチップ（? ボタンでクリック開閉・Esc/外側クリックで閉じる）
+// ─────────────────────────────────────────
+const LANG_PRIMARY_TIP = '回答画面で最初に表示される言語です。ほかの言語タブをこの枠へドラッグ、またはキーボードの Ctrl+左右キーで第一言語を入れ替えられます。';
+let langTipDismissersBound = false;
+
+function closeLangTip() {
+  const tip = document.getElementById('langPrimaryTip');
+  const btn = document.getElementById('langHelpBtn');
+  if (tip) tip.hidden = true;
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function toggleLangTip(e) {
+  if (e) e.stopPropagation();
+  const tip = document.getElementById('langPrimaryTip');
+  const btn = document.getElementById('langHelpBtn');
+  if (!tip || !btn) return;
+  const willOpen = tip.hidden;
+  tip.hidden = !willOpen;
+  btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+// 外側クリック・Esc でツールチップを閉じるハンドラを一度だけ document に取り付ける
+function ensureLangTipDismissers() {
+  if (langTipDismissersBound) return;
+  langTipDismissersBound = true;
+  document.addEventListener('click', (e) => {
+    const tip = document.getElementById('langPrimaryTip');
+    if (!tip || tip.hidden) return;
+    if (e.target.closest('#langHelpBtn') || e.target.closest('#langPrimaryTip')) return;
+    closeLangTip();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const tip = document.getElementById('langPrimaryTip');
+    if (tip && !tip.hidden) { closeLangTip(); document.getElementById('langHelpBtn')?.focus(); }
   });
 }
 
