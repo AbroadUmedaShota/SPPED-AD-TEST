@@ -229,52 +229,7 @@
     .v2-toast--warning { background: #fef3c7; color: #92400e; }
     .v2-toast--info    { background: #dbeafe; color: #1e40af; }
 
-    /* Chrome-like Lang Tabs */
-    .lang-tab {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.375rem;
-      padding: 0.625rem 0.75rem 0.625rem 1rem;
-      cursor: grab;
-      -webkit-user-select: none;
-      user-select: none;
-      transition: background-color 0.2s, color 0.2s;
-      border-radius: 0.75rem 0.75rem 0 0;
-      border: 1px solid transparent;
-      border-bottom: none;
-      position: relative;
-      margin-bottom: -1px; /* Overlap border */
-      z-index: 10;
-      color: #6b7280;
-      min-width: 110px;
-      font-size: 0.875rem;
-    }
-    .lang-tab .translation-progress-badge {
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-    .lang-tab:active { cursor: grabbing; }
-    .lang-tab:hover:not(.active) {
-      background-color: #e5e7eb;
-      color: #374151;
-    }
-    .lang-tab.active {
-      background-color: #ffffff;
-      border-color: #e5e7eb;
-      color: var(--color-primary);
-      font-weight: 700;
-      z-index: 20;
-    }
-    .lang-tab:not(.active)::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background-color: #e5e7eb;
-    }
+    /* 言語タブ帯（ソケットデザイン）のスタイルは service-top-style.css に定義（.lang-tabbar / .lang-chip 等） */
 
     /* 第一言語参照ヒント (多言語モード時、第二・第三言語入力欄の下に表示) */
     .ref-lang-hint {
@@ -378,13 +333,12 @@
 
           <!-- STICKY GLOBAL TABS LIFTED OUT OF GRID -->
           <div id="mainAreaMultilingualTabs" class="sticky top-16 z-40 pt-2 pb-0 w-full bg-gray-50" style="transition: width 0.25s ease, margin-left 0.25s ease; visibility: hidden;">
-            <div class="bg-gray-100 pt-2 px-2 pb-[1px] flex items-end gap-1 rounded-t-xl border-x border-t border-gray-200 max-w-full overflow-hidden relative">
-              <div id="languageEditorTabsV2" class="flex items-end gap-1 w-full overflow-x-auto relative z-10" style="scrollbar-width: none;" role="tablist">
+            <div class="lang-tabbar">
+              <div id="languageEditorTabsV2" class="lang-tabbar__row" role="tablist">
                 <!-- Rendered by JS -->
               </div>
+              <div class="lang-tabbar__underline" aria-hidden="true"></div>
             </div>
-            <!-- The active tab overlaps this line -->
-            <div class="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-400 to-primary rounded-b-sm shadow-[0_2px_10px_rgba(99,102,241,0.2)] relative z-0"></div>
           </div>
 
           <!-- 3-AREA GRID CONTAINER -->
@@ -824,6 +778,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Toast container (showToast の描画先。スタイルは #toast-container / .v2-toast を参照) -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
   <!-- External JS Module -->
   <script type="module" src="src/surveyCreation-v2.js"></script>

@@ -187,9 +187,12 @@ let currentLangs = ['ja'];
 let activeLang = 'ja';
 let isReadOnlyMode = false;
 
+// 言語タブのドラッグ&ドロップ状態（ネイティブ HTML5 D&D。設問/選択肢の SortableJS とは独立）
+let langDragId = null;  // ドラッグ中の言語コード
+let langOverId = null;  // ドロップ受けでホバー中のターゲット（'slot' または 言語コード）
+
 let sortables = {
   questions: null,
-  langTabs: null,
   outline: null,
   options: {}
 };
@@ -314,12 +317,62 @@ function ensureMultiLangInputExists(group, lang) {
   group.appendChild(div);
 }
 
+// 言語タブの切替（クリック・キーボード操作の共通処理。roving tabindex の単一情報源）
+function activateLangTab(langCode) {
+  activeLang = langCode;
+  updateMultiLangVisibility();
+  updateOutline();
+}
+
+// WAI-ARIA APG Tabs パターン（automatic activation）: 左右矢印でフォーカス移動＋即時切替、Enter/Spaceでも切替
+function handleLangTabKeydown(e, langCode) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    activateLangTab(langCode);
+    return;
+  }
+
+  // Ctrl/Cmd + 左右矢印: フォーカス中の言語を並べ替える（ドラッグの代替。先頭へ動かせば第一言語になる）
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    e.preventDefault();
+    const from = currentLangs.indexOf(langCode);
+    if (from === -1 || currentLangs.length <= 1) return;
+    const to = e.key === 'ArrowLeft' ? from - 1 : from + 1;
+    if (to < 0 || to >= currentLangs.length) return;
+
+    const prevFirst = currentLangs[0];
+    currentLangs.splice(from, 1);
+    currentLangs.splice(to, 0, langCode);
+    finishLangReorder(prevFirst);
+
+    // 再描画で作り直されたチップにフォーカスを戻す
+    const moved = document.querySelector(`#languageEditorTabsV2 .lang-chip[data-lang="${langCode}"]`);
+    if (moved) moved.focus();
+    return;
+  }
+
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+
+  const tabs = Array.from(document.querySelectorAll('#languageEditorTabsV2 .lang-chip'));
+  const idx = tabs.findIndex(t => t.dataset.lang === langCode);
+  if (idx === -1 || tabs.length <= 1) return;
+
+  e.preventDefault();
+  const nextIdx = e.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length;
+  const nextTab = tabs[nextIdx];
+  activateLangTab(nextTab.dataset.lang);
+  nextTab.focus();
+}
+
 function updateMultiLangVisibility() {
-  // 単語タブのスタイル更新
-  document.querySelectorAll('.lang-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.lang === activeLang);
+  // 言語タブのスタイル更新（roving tabindex: activeLang のチップのみ tabindex="0"）
+  document.querySelectorAll('.lang-chip').forEach(tab => {
+    const isActive = tab.dataset.lang === activeLang;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    tab.setAttribute('tabindex', isActive ? '0' : '-1');
   });
-  
+
   // input-groupの表示切り替え
   document.querySelectorAll('.multi-lang-input-group').forEach(group => {
     group.querySelectorAll('[data-lang]').forEach(langDiv => {
@@ -383,29 +436,48 @@ function renderLangSelectionAndTabs() {
     panel.appendChild(btn);
   });
 
-  // タブ
+  // 言語タブ帯（ソケット型デザイン）を組み立てる。
+  // 第一言語は左端の「ソケット」に収まり、その他言語は仕切りの右側に並ぶ。
+  // 言語が1つだけの時は並べ替え不能なので、仕切り・その他・ヒント・ドラッグを無効化する。
+  const canReorder = currentLangs.length > 1;
+
+  tabsContainer.className = 'lang-tabbar__row';
+  tabsContainer.setAttribute('role', 'tablist');
   tabsContainer.innerHTML = '';
-  currentLangs.forEach(langCode => {
-    const langObj = SUPPORTED_LANGS.find(l => l.code === langCode);
-    const tab = el('div', {
-      class: `lang-tab ${langCode === activeLang ? 'active' : ''}`,
-      'data-lang': langCode,
-      onclick: () => {
-        activeLang = langCode;
-        updateMultiLangVisibility();
-        updateOutline();
-      }
-    });
 
-    const iconSpan = el('span', { class: 'material-icons text-[16px] opacity-70' }, 'translate');
-    const txt = el('span', { class: 'truncate font-medium' }, langObj ? langObj.name : langCode);
+  // ソケット（第一言語の枠）。role="presentation" で tablist の直下は tab のみが意味を持つようにする
+  const socket = el('div', { class: 'lang-socket', role: 'presentation' });
+  socket.appendChild(el('span', { class: 'lang-socket__label', 'aria-hidden': 'true' }, '第一言語'));
+  socket.appendChild(makeLangChip(currentLangs[0], true, canReorder));
 
-    tab.append(iconSpan, txt);
-    tabsContainer.appendChild(tab);
+  // ドラッグ中のみ出現するドロップ受け（第一言語化）
+  const overlay = el('div', { class: 'lang-socket__overlay', 'aria-hidden': 'true' },
+    el('span', {}, 'ここにドロップ'));
+  overlay.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    try { e.dataTransfer.dropEffect = 'move'; } catch (_) {}
+    if (langOverId !== 'slot') { langOverId = 'slot'; updateLangDnd(); }
   });
+  overlay.addEventListener('dragleave', () => { if (langOverId === 'slot') { langOverId = null; updateLangDnd(); } });
+  overlay.addEventListener('drop', (e) => { e.preventDefault(); if (langDragId) promoteLang(langDragId); });
+  socket.appendChild(overlay);
+  tabsContainer.appendChild(socket);
 
-  initLangTabsSortable();
-  onLangsChanged(); 
+  // 仕切り + その他言語 + ヒント（ラッパは role="presentation"、tab の意味は各チップに閉じる）
+  const divider = el('div', { class: 'lang-divider', 'aria-hidden': 'true' });
+  const others = el('div', { class: 'lang-others', role: 'presentation' });
+  currentLangs.slice(1).forEach(code => others.appendChild(makeLangChip(code, false, canReorder)));
+  const hint = el('div', { class: 'lang-hint', role: 'presentation' }, '枠へドラッグで第一言語に');
+  if (!canReorder) {
+    // インライン display:none で確実に隠す（.lang-* の display 宣言に負けないため）
+    divider.style.display = 'none';
+    others.style.display = 'none';
+    hint.style.display = 'none';
+  }
+  tabsContainer.append(divider, others, hint);
+
+  updateLangDnd();
+  onLangsChanged();
 }
 
 function onLangsChanged() {
@@ -419,20 +491,131 @@ function onLangsChanged() {
   updateMultiLangVisibility();
 }
 
-function initLangTabsSortable() {
-  const container = document.getElementById('languageEditorTabsV2');
-  if (!container || typeof Sortable === 'undefined') return;
-  
-  if (sortables.langTabs) sortables.langTabs.destroy();
-  sortables.langTabs = new Sortable(container, {
-    handle: '.lang-tab',
-    animation: 150,
-    group: 'language-tabs',
-    onEnd: () => {
-      const newOrder = [];
-      container.querySelectorAll('.lang-tab').forEach(t => newOrder.push(t.dataset.lang));
-      currentLangs = newOrder;
-    }
+// ドラッグハンドルの6ドット SVG（静的文字列。currentColor で CSS 側から色制御）
+function langGripSvg() {
+  const dots = ['2.2,2.6', '6.8,2.6', '2.2,7.5', '6.8,7.5', '2.2,12.4', '6.8,12.4']
+    .map(p => { const [x, y] = p.split(','); return `<circle cx="${x}" cy="${y}" r="1.35" fill="currentColor"/>`; })
+    .join('');
+  return `<svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true" focusable="false">${dots}</svg>`;
+}
+
+// 言語タブ（チップ）を生成する。isPrimary=ソケット内の第一言語タブ、canReorder=D&D有効
+function makeLangChip(langCode, isPrimary, canReorder) {
+  const langObj = SUPPORTED_LANGS.find(l => l.code === langCode);
+  const langName = langObj ? langObj.name : langCode;
+  const isActive = langCode === activeLang;
+
+  // aria-label はチップ内の全テキストを上書きするため、後から付く「未入力 N」バッジは
+  // updateTranslationBadges() がこの基本ラベルに件数を連結して同期する
+  const baseLabel = isPrimary ? `${langName}（第一言語）` : langName;
+  const title = canReorder
+    ? 'クリック/Enter/Spaceで切替、矢印キーで移動、Ctrl+矢印またはドラッグで並べ替え'
+    : 'クリックまたはEnter/Spaceで切替、矢印キーで移動';
+
+  const chip = el('div', {
+    class: `lang-chip${isPrimary ? ' lang-chip--primary' : ''}${isActive ? ' active' : ''}`,
+    'data-lang': langCode,
+    role: 'tab',
+    'aria-selected': isActive ? 'true' : 'false',
+    tabindex: isActive ? '0' : '-1',
+    title,
+    'aria-label': baseLabel,
+    'data-base-label': baseLabel,
+    onclick: () => activateLangTab(langCode),
+    onkeydown: (e) => handleLangTabKeydown(e, langCode)
+  });
+  chip.draggable = canReorder;
+
+  if (canReorder) {
+    const grip = el('span', { class: 'lang-chip__grip', 'aria-hidden': 'true' });
+    grip.innerHTML = langGripSvg();
+    chip.appendChild(grip);
+  }
+  chip.appendChild(el('span', { class: 'lang-chip__name' }, langName));
+  chip.appendChild(el('div', { class: 'lang-chip__ring', 'aria-hidden': 'true' }));
+
+  if (canReorder) attachLangChipDnd(chip, langCode);
+  return chip;
+}
+
+// チップにネイティブ D&D リスナーを取り付ける（リング要素がドロップ受けのセンサー）
+function attachLangChipDnd(chip, langCode) {
+  chip.addEventListener('dragstart', (e) => {
+    try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', langCode); } catch (_) {}
+    // 直後に DOM を書き換えるとドラッグが中断するため 1 tick 遅延させる
+    setTimeout(() => { langDragId = langCode; updateLangDnd(); }, 0);
+  });
+  chip.addEventListener('dragend', () => { langDragId = langOverId = null; updateLangDnd(); });
+
+  const ring = chip.querySelector('.lang-chip__ring');
+  ring.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    try { e.dataTransfer.dropEffect = 'move'; } catch (_) {}
+    if (langOverId !== langCode) { langOverId = langCode; updateLangDnd(); }
+  });
+  ring.addEventListener('dragleave', () => { if (langOverId === langCode && ring.isConnected) { langOverId = null; updateLangDnd(); } });
+  ring.addEventListener('drop', (e) => { e.preventDefault(); dropLangOnChip(langCode); });
+}
+
+// 第一言語にする（ソケット/第一言語チップへのドロップ）: 対象と第一言語の位置を交換
+function promoteLang(id) {
+  const prevFirst = currentLangs[0];
+  const fi = currentLangs.indexOf(id);
+  if (fi > 0) { currentLangs[0] = id; currentLangs[fi] = prevFirst; }
+  finishLangReorder(prevFirst);
+}
+
+// チップ上へのドロップ（並べ替え/交換）
+function dropLangOnChip(targetId) {
+  const dragId = langDragId;
+  if (!dragId || dragId === targetId) { langDragId = langOverId = null; updateLangDnd(); return; }
+  const prevFirst = currentLangs[0];
+  const fi = currentLangs.indexOf(dragId), ti = currentLangs.indexOf(targetId);
+  if (ti === 0) { promoteLang(dragId); return; }        // 第一言語チップに重ねた → 第一言語化(交換)
+  if (fi === 0) {                                        // 第一言語を他チップへ → 位置交換
+    const old = currentLangs[0]; currentLangs[0] = currentLangs[ti]; currentLangs[ti] = old;
+  } else {                                               // 他チップ同士 → 挿入並べ替え
+    currentLangs.splice(fi, 1);
+    const nt = currentLangs.indexOf(targetId);
+    currentLangs.splice(fi < ti ? nt + 1 : nt, 0, dragId);
+  }
+  finishLangReorder(prevFirst);
+}
+
+// 並べ替え確定後の共通処理: 全体再描画 + アウトライン更新 + 第一言語変更トースト
+function finishLangReorder(prevFirstLang) {
+  langDragId = langOverId = null;
+  if (!currentLangs.includes(activeLang)) activeLang = currentLangs[0];
+
+  // 第一言語に依存する参照ヒント・未翻訳バッジ・アウトラインを含めて全体再描画する
+  renderLangSelectionAndTabs();
+  updateOutline();
+
+  const newFirstLang = currentLangs[0];
+  if (prevFirstLang != null && newFirstLang !== prevFirstLang) {
+    const langObj = SUPPORTED_LANGS.find(l => l.code === newFirstLang);
+    showToast(`第一言語を${langObj ? langObj.name : newFirstLang}に変更しました`, 'success');
+  }
+}
+
+// ドラッグ状態の見た目更新（ソケットのドロップ受け・各チップのリング）
+function updateLangDnd() {
+  const row = document.getElementById('languageEditorTabsV2');
+  if (!row) return;
+  const draggingNonPrimary = !!langDragId && currentLangs.indexOf(langDragId) > 0;
+
+  const overlay = row.querySelector('.lang-socket__overlay');
+  if (overlay) {
+    overlay.classList.toggle('is-active', draggingNonPrimary);
+    overlay.classList.toggle('is-hover', draggingNonPrimary && langOverId === 'slot');
+  }
+  row.querySelectorAll('.lang-chip').forEach(chip => {
+    const id = chip.dataset.lang;
+    const ring = chip.querySelector('.lang-chip__ring');
+    if (!ring) return;
+    ring.classList.toggle('is-sensor', !!langDragId && langDragId !== id);
+    ring.classList.toggle('is-src', langDragId === id);
+    ring.classList.toggle('is-over', langOverId === id && langDragId !== id);
   });
 }
 
@@ -448,9 +631,7 @@ function initMultilingualToggle() {
     if (mainTabs) {
       mainTabs.style.visibility = toggle.checked ? 'visible' : 'hidden';
     }
-    const basicInfoBody = document.getElementById('basicInfoBody');
-    basicInfoBody?.classList.toggle('rounded-tl-none', toggle.checked);
-    basicInfoBody?.classList.toggle('rounded-tr-none', toggle.checked);
+    // 新しいタブ帯は独立したカードなので、基本情報カードの角丸を潰す必要はない
     document.body.classList.toggle('has-multi-lang-tabs', toggle.checked);
 
     if(!isMultilingual) {
@@ -824,20 +1005,27 @@ function updateTranslationBadges() {
   if (!isMultilingual) return;
   const extraLangs = currentLangs.slice(1); // 第一言語(ja)以外
 
-  // 言語タブのバッジ
-  document.querySelectorAll('#languageEditorTabsV2 .lang-tab[data-lang]').forEach(tab => {
+  // 言語タブ（チップ）の未入力バッジ。第一言語は対象外
+  document.querySelectorAll('#languageEditorTabsV2 .lang-chip[data-lang]').forEach(tab => {
     const lang = tab.dataset.lang;
     if (lang === currentLangs[0]) return;
     const count = countMissingForLang(lang);
-    let badge = tab.querySelector('.translation-progress-badge');
+    let badge = tab.querySelector('.lang-chip__badge');
+    // aria-label がチップ内テキストを上書きするため、バッジの件数はラベル側にも反映する
+    const baseLabel = tab.dataset.baseLabel || tab.getAttribute('aria-label') || '';
     if (count > 0) {
       if (!badge) {
-        badge = el('span', { class: 'translation-progress-badge' });
-        tab.appendChild(badge);
+        // 件数は aria-label にも連結済みのため、視覚バッジ自体は aria-hidden で読み上げ重複を防ぐ
+        badge = el('span', { class: 'lang-chip__badge', 'aria-hidden': 'true' });
+        // リング（絶対配置のドロップ受け）の前に挿入して名前の直後に並べる
+        const ring = tab.querySelector('.lang-chip__ring');
+        if (ring) tab.insertBefore(badge, ring); else tab.appendChild(badge);
       }
       badge.textContent = `未入力 ${count}`;
-    } else if (badge) {
-      badge.remove();
+      tab.setAttribute('aria-label', `${baseLabel}、未入力 ${count}件`);
+    } else {
+      if (badge) badge.remove();
+      tab.setAttribute('aria-label', baseLabel);
     }
   });
 
