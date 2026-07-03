@@ -463,18 +463,16 @@ function renderLangSelectionAndTabs() {
   socket.appendChild(overlay);
   tabsContainer.appendChild(socket);
 
-  // 仕切り + その他言語 + ヒント（ラッパは role="presentation"、tab の意味は各チップに閉じる）
+  // 仕切り + その他言語（ラッパは role="presentation"、tab の意味は各チップに閉じる）
   const divider = el('div', { class: 'lang-divider', 'aria-hidden': 'true' });
   const others = el('div', { class: 'lang-others', role: 'presentation' });
   currentLangs.slice(1).forEach(code => others.appendChild(makeLangChip(code, false, canReorder)));
-  const hint = el('div', { class: 'lang-hint', role: 'presentation' }, '枠へドラッグで第一言語に');
   if (!canReorder) {
     // インライン display:none で確実に隠す（.lang-* の display 宣言に負けないため）
     divider.style.display = 'none';
     others.style.display = 'none';
-    hint.style.display = 'none';
   }
-  tabsContainer.append(divider, others, hint);
+  tabsContainer.append(divider, others);
 
   updateLangDnd();
   onLangsChanged();
