@@ -156,7 +156,7 @@ const QUESTION_TYPES = {
   matrix_ma:        { label: 'マトリックス(MA)',  icon: 'grid_view' },
   date_time:        { label: '日付/時間',         icon: 'event' },
   handwriting:      { label: '手書きスペース',    icon: 'draw' },
-  image:            { label: '画像アップロード',  icon: 'photo_camera' },
+  image:            { label: '画像添付',        icon: 'photo_camera' },
   explanation_card: { label: '説明カード',        icon: 'info_outline' },
 };
 
@@ -1304,7 +1304,7 @@ function buildHandwritingSection(q, typeLabel) {
   return section;
 }
 
-// 回答設定を持たないタイプ（画像アップロード・説明カード）用のスリム表示。
+// 回答設定を持たないタイプ（画像添付・説明カード）用のスリム表示。
 // タイプ変更バッジ（typeLabel）の置き場は維持し、ダミーの設定ボックスは出さない
 function buildNoSettingsSection(q, typeLabel, note) {
   const section = el('section', { class: 'px-5 pb-5 border-t border-gray-100 pt-4' });
