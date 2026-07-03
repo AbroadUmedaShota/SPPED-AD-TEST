@@ -559,7 +559,7 @@ function defaultQuestion(type) {
     base.config = { multiline: true, minLength: '', maxLength: '' };
   }
   if (type === 'date_time') {
-    base.config = { showDate: true, showTime: false };
+    base.config = { showDate: true, showTime: true };
   }
   if (type === 'handwriting') {
     base.config = { height: 200 };
@@ -1474,10 +1474,10 @@ function buildNoSettingsSection(q, typeLabel, note) {
 }
 
 function buildDateTimeSection(q, typeLabel) {
-  if (!q.config) q.config = { showDate: true, showTime: false };
+  if (!q.config) q.config = { showDate: true, showTime: true };
   const cfg = q.config;
   if (cfg.showDate === undefined) cfg.showDate = true;
-  if (cfg.showTime === undefined) cfg.showTime = false;
+  if (cfg.showTime === undefined) cfg.showTime = true;
 
   const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
   const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
@@ -2665,7 +2665,7 @@ function buildPreviewData() {
 
     if (q.type === 'date_time') {
       const showDate = cfg.showDate !== false;
-      const showTime = cfg.showTime === true;
+      const showTime = cfg.showTime !== false;
       base.meta = {
         ...base.meta,
         dateTimeConfig: {
@@ -2956,9 +2956,9 @@ async function loadSurveyData(surveyId) {
         base.matrixCols = (q.options || []).map(c => ({ ja: c.text || '' }));
       }
       if (type === 'date_time') {
-        // 保存済みの入力モードから日付/時刻トグルを復元（無ければ旧typeで判定、既定は日付のみ）
+        // 保存済みの入力モードから日付/時刻トグルを復元（無ければ旧typeで判定、既定は日付・時刻の両方）
         const mode = q.meta?.dateTimeConfig?.inputMode || q.inputMode
-          || (q.type === 'time' ? 'time' : q.type === 'date' ? 'date' : 'date');
+          || (q.type === 'time' ? 'time' : q.type === 'date' ? 'date' : 'datetime');
         base.config = mode === 'datetime' ? { showDate: true, showTime: true }
           : mode === 'time' ? { showDate: false, showTime: true }
           : { showDate: true, showTime: false };
