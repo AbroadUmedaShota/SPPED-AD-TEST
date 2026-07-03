@@ -2887,16 +2887,20 @@ body.dark-mode .outline-highlight {
     background-color: #e5e7eb;
 }
 
-/* ===== Language Tab Bar (socket design) =====
-   第一言語は左端の「ソケット」に収まり、その他言語は仕切りの右に並ぶ。
-   ネイティブ HTML5 D&D で第一言語の入れ替え・並べ替えができる。 */
+/* ===== Language Tab Bar (fieldset design) =====
+   第一言語は左端の「囲み枠（フィールドセット）」に収まり、枠の上辺左に
+   「第一言語」ラベル＋「?」説明ボタンが乗る。その他言語は仕切りの右に並ぶ。
+   ネイティブ HTML5 D&D（その他→枠へドロップで第一言語化）と Ctrl+矢印の
+   キーボード操作で入れ替え・並べ替えができる。 */
 .lang-tabbar {
     width: 100%;
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 0.75rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
+    /* legend（top:-9px）と ? ツールチップ（下方向）を見せるため visible。
+       角丸はカード自身の border-radius で保たれ、子の背景は透明なので崩れない。 */
+    overflow: visible;
 }
 .lang-tabbar__row {
     display: flex;
@@ -2908,41 +2912,100 @@ body.dark-mode .outline-highlight {
 }
 .lang-tabbar__underline {
     height: 3px;
+    border-radius: 0 0 0.75rem 0.75rem;
     background: linear-gradient(90deg, #1e40af, #3b82f6 55%, #60a5fa);
 }
 
-/* ソケット（第一言語の枠） */
-.lang-socket {
+/* 第一言語の囲み枠（フィールドセット） */
+.lang-fieldset {
     position: relative;
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    padding: 7px;
-    background: #e4ebf7;
-    border-radius: 12px;
-    box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.15);
+    padding: 6px;
+    border: 1.5px solid #a8c7f0;
+    border-radius: 11px;
+    background: #f7faff;
 }
-.lang-socket__label {
+/* 枠の上辺左に乗る凡例（ラベル＋?）。折り返させない */
+.lang-legend {
     position: absolute;
     top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 13px;
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ffffff;
+    padding: 0 7px;
     white-space: nowrap;
-    z-index: 7;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #ffffff;            /* on #2563eb ≈ 5.2:1 */
-    background: #2563eb;
-    padding: 2px 9px;
+}
+.lang-legend__text {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #1d4ed8;            /* on #fff ≈ 6.7:1 */
+}
+/* ? ボタン＋ツールチップのラッパ（ツールチップの位置基準） */
+.lang-help-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+/* 「?」説明ボタン（クリック開閉。WCAG 1.4.11: 枠線 #2563eb ≈ 5.2:1） */
+.lang-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
     border-radius: 999px;
+    border: 1.2px solid #2563eb;
+    background: transparent;
+    color: #1d4ed8;            /* on #fff ≈ 6.7:1 */
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+.lang-help:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; }
+/* 説明ツールチップ（下方向・クリックで開閉・Esc/外側クリックで閉じる） */
+.lang-tip {
+    position: absolute;
+    top: calc(100% + 9px);
+    left: -14px;
+    z-index: 50;
+    width: 252px;
+    padding: 10px 12px;
+    background: #1f2937;       /* 白文字 ≈ 14.6:1 */
+    color: #ffffff;
+    font-size: 11.5px;
+    line-height: 1.65;
+    font-weight: 500;
+    text-align: left;
+    white-space: normal;       /* 親 .lang-legend の nowrap を打ち消し、252px 内で折り返す */
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+}
+.lang-tip[hidden] { display: none; }
+.lang-tip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 17px;
+    width: 9px;
+    height: 9px;
+    background: #1f2937;
+    transform: rotate(45deg);
 }
 /* ドラッグ中のみ出現するドロップ受け（第一言語化） */
-.lang-socket__overlay {
+.lang-fieldset__overlay {
     position: absolute;
     inset: -3px;
-    border-radius: 14px;
-    z-index: 6;
+    border-radius: 13px;
+    z-index: 4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2952,13 +3015,13 @@ body.dark-mode .outline-highlight {
     border: 2px dashed #6f97ee;
     background: rgba(239, 246, 255, 0.94);
 }
-.lang-socket__overlay.is-active { opacity: 1; pointer-events: auto; }
-.lang-socket__overlay.is-hover {
+.lang-fieldset__overlay.is-active { opacity: 1; pointer-events: auto; }
+.lang-fieldset__overlay.is-hover {
     border-color: #1d4ed8;
     background: rgba(191, 219, 254, 0.94);
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
-.lang-socket__overlay span {
+.lang-fieldset__overlay span {
     font-size: 11.5px;
     font-weight: 700;
     color: #1d4ed8;
@@ -2968,51 +3031,66 @@ body.dark-mode .outline-highlight {
     pointer-events: none;
 }
 
-/* チップ（言語タブ） */
+/* チップ（言語タブ）。基本＝その他言語タブ（白・枠線・グリップ付き・ドラッグ可） */
 .lang-chip {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     flex-shrink: 0;
-    padding: 9px 14px 9px 10px;
+    padding: 7px 12px 7px 8px;
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 9px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     cursor: grab;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
     -webkit-user-select: none;
     user-select: none;
     font: inherit;
     white-space: nowrap;
     outline: none;
 }
-/* フォーカスリング（WCAG 1.4.11: 白2pxの間隔＋不透明 #1d4ed8 4px。
-   白背景で約5.9:1、ソケット #e4ebf7 でも 3:1 以上を確保） */
+/* フォーカスリング（WCAG 1.4.11: 白2pxの間隔＋不透明 #1d4ed8 4px、約6.7:1） */
 .lang-chip:focus-visible { box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #1d4ed8; }
 .lang-chip[draggable="false"] { cursor: default; }
 .lang-chip:active { cursor: grabbing; }
-.lang-chip--primary {
-    border-color: #cfd9ea;
-    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.12);
+.lang-chip:hover:not(.lang-chip--primary) {
+    background: #f8fafc;
+    border-color: #cfd8e3;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
 }
-/* 編集中（アクティブ）の言語をどのチップでも示す控えめな強調 */
+/* 第一言語チップ（枠の中・グリップ無し・ドラッグ不可・透明背景）
+   min-width で枠を凡例「第一言語 ?」より広く保ち、ラベルの折り返しを防ぐ */
+.lang-chip--primary {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    padding: 7px 14px;
+    min-width: 96px;
+}
+.lang-chip--primary:hover { background: #eef6ff; }
+/* 編集中（アクティブ）の言語を示す控えめな強調 */
 .lang-chip.active {
     border-color: #2563eb;
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
+.lang-chip--primary.active {
+    background: #eaf2ff;
+    border-color: transparent;
+    box-shadow: none;
+}
 .lang-chip__grip {
     display: inline-flex;
     flex: none;
-    color: #b7c0cd;
+    color: #a9b3c2;
 }
 .lang-chip__name {
     font-size: 13.5px;
     font-weight: 600;
-    color: #374151;
+    color: #334155;
     white-space: nowrap;
 }
-.lang-chip--primary .lang-chip__name { font-weight: 700; color: #111827; }
+.lang-chip--primary .lang-chip__name { font-weight: 700; color: #1e293b; }
 .lang-chip.active .lang-chip__name { color: #1d4ed8; }
 /* 未入力バッジ（WCAG 1.4.3: #b91c1c on #fde8e8 で約5.9:1） */
 .lang-chip__badge {
@@ -3027,12 +3105,12 @@ body.dark-mode .outline-highlight {
     border-radius: 999px;
     white-space: nowrap;
 }
-/* ドロップ受けリング（センサー＋ハイライト） */
+/* ドロップ受けリング（その他タブ同士の並べ替え用センサー＋ハイライト） */
 .lang-chip__ring {
     position: absolute;
     inset: -2px;
-    border-radius: 11px;
-    z-index: 4;
+    border-radius: 10px;
+    z-index: 3;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.12s;
@@ -3050,12 +3128,12 @@ body.dark-mode .outline-highlight {
     width: 1px;
     align-self: stretch;
     flex-shrink: 0;
-    background: #e5e7eb;
+    background: #e8edf4;
 }
 .lang-others {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
@@ -3067,7 +3145,7 @@ body.dark-mode .outline-highlight {
     .lang-tabbar__row { gap: 10px; padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .lang-socket__overlay,
+    .lang-fieldset__overlay,
     .lang-chip__ring { transition: none; }
 }
 
