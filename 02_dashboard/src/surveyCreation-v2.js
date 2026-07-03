@@ -164,6 +164,7 @@ const QUESTION_TYPES = {
   matrix_ma:        { label: 'マトリックス(MA)',  icon: 'grid_view' },
   date_time:        { label: '日付/時間',         icon: 'event' },
   handwriting:      { label: '手書きスペース',    icon: 'draw' },
+  image:            { label: '画像アップロード',  icon: 'photo_camera' },
   explanation_card: { label: '説明カード',        icon: 'info_outline' },
 };
 
@@ -1255,6 +1256,8 @@ function buildAnswerSection(q, typeLabel) {
   if (q.type === 'number_answer') return buildNumberSection(q, typeLabel);
   if (q.type === 'date_time') return buildDateTimeSection(q, typeLabel);
   if (q.type === 'handwriting') return buildHandwritingSection(q, typeLabel);
+  if (q.type === 'image') return buildNoSettingsSection(q, typeLabel, '回答画面では写真の撮影またはファイルの選択で回答します');
+  if (q.type === 'explanation_card') return buildNoSettingsSection(q, typeLabel, '回答欄を持たない設問です。本文は設問文に入力してください');
   const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
   const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
   hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
@@ -1456,6 +1459,17 @@ function buildHandwritingSection(q, typeLabel) {
 
   section.appendChild(chipsWrap);
   syncChips();
+  return section;
+}
+
+// 回答設定を持たないタイプ（画像アップロード・説明カード）用のスリム表示。
+// タイプ変更バッジ（typeLabel）の置き場は維持し、ダミーの設定ボックスは出さない
+function buildNoSettingsSection(q, typeLabel, note) {
+  const section = el('section', { class: 'px-5 pb-5 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('p', { class: 'text-xs text-gray-400' }, note));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
   return section;
 }
 
@@ -2920,7 +2934,8 @@ async function loadSurveyData(surveyId) {
       'matrix_ma': 'matrix_ma',
       'handwriting': 'handwriting',
       'explanation': 'explanation_card',
-      'image': 'free_answer'
+      'image': 'image',
+      'image_upload': 'image'
     };
     
     questions = (json.details || []).map(q => {

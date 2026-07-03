@@ -156,6 +156,7 @@ const QUESTION_TYPES = {
   matrix_ma:        { label: 'マトリックス(MA)',  icon: 'grid_view' },
   date_time:        { label: '日付/時間',         icon: 'event' },
   handwriting:      { label: '手書きスペース',    icon: 'draw' },
+  image:            { label: '画像アップロード',  icon: 'photo_camera' },
   explanation_card: { label: '説明カード',        icon: 'info_outline' },
 };
 
@@ -1094,7 +1095,11 @@ function buildAnswerSection(q, typeLabel) {
   if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q, typeLabel);
   if (q.type === 'rating_scale') return buildRatingScaleSection(q, typeLabel);
   if (q.type === 'free_answer') return buildFreeAnswerSection(q, typeLabel);
+  if (q.type === 'number_answer') return buildNumberSection(q, typeLabel);
   if (q.type === 'date_time') return buildDateTimeSection(q, typeLabel);
+  if (q.type === 'handwriting') return buildHandwritingSection(q, typeLabel);
+  if (q.type === 'image') return buildNoSettingsSection(q, typeLabel, '回答画面では写真の撮影またはファイルの選択で回答します');
+  if (q.type === 'explanation_card') return buildNoSettingsSection(q, typeLabel, '回答欄を持たない設問です。本文は設問文に入力してください');
   const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
   const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
   hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
@@ -1158,6 +1163,155 @@ function buildFreeAnswerSection(q, typeLabel) {
   section.appendChild(limitsGrid);
 
   syncMode();
+  return section;
+}
+
+function buildNumberSection(q, typeLabel) {
+  if (!q.config) q.config = { min: '', max: '', unit: '', step: '' };
+  const cfg = q.config;
+  // unit は保存フォーマットに残すが、回答画面が単位表示に未対応のため入力UIは出さない
+
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+
+  const INPUT_CLASS = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors';
+  const LABEL_CLASS = 'block text-xs font-semibold text-gray-600 mb-1';
+
+  const rangeWarning = el('p', { class: 'text-[11px] text-red-500 mt-1 hidden' }, '最小値は最大値以下にしてください');
+
+  function checkRange() {
+    const minNum = Number(cfg.min);
+    const maxNum = Number(cfg.max);
+    const bothSet = cfg.min !== '' && cfg.max !== '' && Number.isFinite(minNum) && Number.isFinite(maxNum);
+    rangeWarning.classList.toggle('hidden', !(bothSet && minNum > maxNum));
+  }
+
+  function buildNumberInput(key, extraAttrs) {
+    return el('input', Object.assign({
+      type: 'number', inputmode: 'decimal', step: 'any',
+      class: INPUT_CLASS,
+      value: (cfg[key] === '' || cfg[key] == null) ? '' : String(cfg[key]),
+      placeholder: '指定なし',
+      oninput: (e) => {
+        const v = e.target.value.trim();
+        if (v === '') {
+          cfg[key] = '';
+        } else {
+          const parsed = parseFloat(v);
+          cfg[key] = Number.isFinite(parsed) ? parsed : '';
+        }
+        checkRange();
+      },
+    }, extraAttrs || {}));
+  }
+
+  const minWrap = el('div');
+  minWrap.append(el('label', { class: LABEL_CLASS }, '最小値'), buildNumberInput('min'));
+  const maxWrap = el('div');
+  maxWrap.append(el('label', { class: LABEL_CLASS }, '最大値'), buildNumberInput('max'));
+  const rangeGrid = el('div', { class: 'grid grid-cols-2 gap-3' });
+  rangeGrid.append(minWrap, maxWrap);
+  section.appendChild(rangeGrid);
+  section.appendChild(rangeWarning);
+
+  const stepWrap = el('div');
+  stepWrap.append(
+    el('label', { class: LABEL_CLASS }, '刻み幅'),
+    buildNumberInput('step', { min: '0' }),
+    el('p', { class: 'text-[11px] text-gray-400 mt-1' }, '未指定なら 1 刻みで回答されます')
+  );
+  const stepGrid = el('div', { class: 'grid grid-cols-2 gap-3' });
+  stepGrid.append(stepWrap, el('div'));
+  section.appendChild(stepGrid);
+
+  checkRange();
+  return section;
+}
+
+function buildHandwritingSection(q, typeLabel) {
+  if (!q.config) q.config = { height: 200 };
+  const cfg = q.config;
+  if (cfg.height == null || cfg.height === '') cfg.height = 200;
+
+  const HEIGHT_MIN = 120;
+  const HEIGHT_MAX = 480;
+
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+
+  section.appendChild(el('label', { class: 'block text-xs font-semibold text-gray-600 mb-1' }, '手書きエリアの高さ (px)・120〜480'));
+
+  const CLASS_ACTIVE   = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-primary text-white border-primary shadow';
+  const CLASS_INACTIVE = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-white border-gray-200 text-gray-600 hover:border-primary hover:text-primary';
+
+  const FIXED_HEIGHTS = [
+    { value: 150, label: '低め' },
+    { value: 200, label: '標準' },
+    { value: 300, label: '高め' },
+  ];
+
+  const chipsWrap = el('div', { class: 'flex flex-wrap items-center gap-2' });
+  const chips = [];
+
+  const heightInput = el('input', {
+    type: 'number', min: String(HEIGHT_MIN), max: String(HEIGHT_MAX), step: '10',
+    class: 'w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
+    value: String(cfg.height),
+  });
+
+  function syncChips() {
+    chips.forEach(({ btn, value }) => {
+      btn.className = cfg.height === value ? CLASS_ACTIVE : CLASS_INACTIVE;
+    });
+  }
+
+  FIXED_HEIGHTS.forEach(({ value, label }) => {
+    const btn = el('button', { type: 'button', class: CLASS_INACTIVE }, `${label} ${value}`);
+    btn.addEventListener('click', () => {
+      cfg.height = value;
+      heightInput.value = String(value);
+      syncChips();
+    });
+    chips.push({ btn, value });
+    chipsWrap.appendChild(btn);
+  });
+
+  heightInput.addEventListener('input', () => {
+    const parsed = parseInt(heightInput.value, 10);
+    cfg.height = Number.isFinite(parsed) ? parsed : 200;
+  });
+  heightInput.addEventListener('change', () => {
+    let v = cfg.height;
+    if (!Number.isFinite(v)) v = 200;
+    v = Math.min(HEIGHT_MAX, Math.max(HEIGHT_MIN, v));
+    cfg.height = v;
+    heightInput.value = String(v);
+    syncChips();
+  });
+
+  const inputWrap = el('div', { class: 'flex items-center gap-1.5' });
+  inputWrap.append(heightInput, el('span', { class: 'text-xs text-gray-500' }, 'px'));
+  chipsWrap.appendChild(inputWrap);
+
+  section.appendChild(chipsWrap);
+  syncChips();
+  return section;
+}
+
+// 回答設定を持たないタイプ（画像アップロード・説明カード）用のスリム表示。
+// タイプ変更バッジ（typeLabel）の置き場は維持し、ダミーの設定ボックスは出さない
+function buildNoSettingsSection(q, typeLabel, note) {
+  const section = el('section', { class: 'px-5 pb-5 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('p', { class: 'text-xs text-gray-400' }, note));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
   return section;
 }
 
@@ -2364,7 +2518,11 @@ function buildPreviewData() {
       // explanation_cardはtextとして表示されるのみ
       const desc = cfg.description;
       if (desc && typeof desc === 'object') {
-        base.text = desc;
+        // 実体（空でない）言語エントリだけ base.text へマージ。空言語は設問文(q.text)を温存
+        const filled = Object.fromEntries(
+          Object.entries(desc).filter(([, v]) => typeof v === 'string' && v.trim() !== '')
+        );
+        if (Object.keys(filled).length > 0) base.text = { ...base.text, ...filled };
       }
     }
 
@@ -2585,7 +2743,8 @@ async function loadSurveyData(surveyId) {
       'matrix_ma': 'matrix_ma',
       'handwriting': 'handwriting',
       'explanation': 'explanation_card',
-      'image': 'free_answer'
+      'image': 'image',
+      'image_upload': 'image'
     };
     
     questions = (json.details || []).map(q => {
