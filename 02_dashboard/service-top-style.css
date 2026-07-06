@@ -3065,13 +3065,15 @@ body.dark-mode .outline-highlight {
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
 }
 /* 第一言語チップ（枠の中・グリップ無し・ドラッグ不可・透明背景）
-   言語名を左右対称パディングで中央に見せる。凡例「第一言語」が収まる最小幅だけ確保 */
+   どの言語を選んでも枠幅が変わらないよう固定幅にし、言語名を中央寄せする
+   （最長 "Tiếng Việt"=66px + 左右パディング/枠が収まる幅） */
 .lang-chip--primary {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    padding: 7px 16px;
-    min-width: 64px;
+    box-sizing: border-box;
+    width: 106px;
+    padding: 7px 12px;
     justify-content: center;
     text-align: center;
 }
@@ -3148,6 +3150,14 @@ body.dark-mode .outline-highlight {
     padding: 3px 2px;   /* アクティブ/ドロップ受けリング(2px)がスクロールでクリップされないための余白 */
 }
 .lang-others::-webkit-scrollbar { display: none; }
+/* 「?」説明ヘルプをタブ帯の右端に固定（第一言語ボックスから離す。横スクロールしても常時見える） */
+.lang-help-slot {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+}
 /* レスポンシブ: 狭い幅では余白を詰めて、その他言語だけ横スクロールさせる（縦書き化を防ぐ） */
 @media (max-width: 900px) {
     .lang-tabbar__row { gap: 10px; padding: 14px; }
