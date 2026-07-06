@@ -253,6 +253,8 @@
     let modalFocusTimeoutId = null;
     let pendingSignupEmail = '';
     const rememberedAccountStorageKey = 'speedad-remembered-login-id';
+    const signupPendingEmailStorageKey = 'speedad-signup-pending-email';
+    const loginPrefillEmailStorageKey = 'speedad-login-prefill-email';
 
     function getModalFocusableElements() {
       if (!modalContent) {
@@ -559,22 +561,25 @@
       window.history.replaceState({}, document.title, nextUrl);
     }
 
-    function maybeApplyLoginEmailFromQuery() {
-      const searchParams = new URLSearchParams(window.location.search);
-      const loginEmail = searchParams.get('login_email');
+    function maybeApplyLoginEmailFromStorage() {
+      let loginEmail = '';
+      try {
+        loginEmail = sessionStorage.getItem(loginPrefillEmailStorageKey) || '';
+      } catch (storageError) {
+        console.warn('ログイン用メールを読み込めませんでした:', storageError);
+        return;
+      }
       if (!loginEmail) {
         return;
       }
       if (emailInput) {
         emailInput.value = loginEmail;
       }
-      searchParams.delete('login_email');
-      const queryString = searchParams.toString();
-      // 注意: ここで hash を '#top' にフォールバックすると、直後の passwordInput.focus() が
-      // ブラウザの「フラグメントへスクロール」処理に上書きされてしまう（#top は <main> でフォーカス不可のため
-      // フォーカスが document.body に戻る）。既存の hash がある場合のみ引き継ぎ、無ければ付与しない。
-      const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash || ''}`;
-      window.history.replaceState({}, document.title, nextUrl);
+      try {
+        sessionStorage.removeItem(loginPrefillEmailStorageKey);
+      } catch (storageError) {
+        console.warn('ログイン用メールを削除できませんでした:', storageError);
+      }
       passwordInput?.focus();
     }
 
@@ -782,6 +787,12 @@
           if (signupSentEmailEl) {
             signupSentEmailEl.textContent = pendingSignupEmail;
           }
+          // メールをURLに載せず、本登録ページへの受け渡しは sessionStorage 経由にする。
+          try {
+            sessionStorage.setItem(signupPendingEmailStorageKey, pendingSignupEmail);
+          } catch (storageError) {
+            console.warn('仮登録メールを保存できませんでした:', storageError);
+          }
           showSignupStep('sent');
         } catch (error) {
           console.error('サインアップエラー:', error);
@@ -794,7 +805,9 @@
 
     if (signupOpenVerifyButton) {
       signupOpenVerifyButton.addEventListener('click', () => {
-        const verifyUrl = `${resolveAppPath('signup-verify.html')}?email=${encodeURIComponent(pendingSignupEmail)}`;
+        // メールアドレスはクエリに載せない。デモボタンは「確認メール内のリンク」を
+        // 不透明トークン(token=demo)で模す。実メールは sessionStorage 側で引き継ぐ。
+        const verifyUrl = `${resolveAppPath('signup-verify.html')}?token=demo`;
         window.location.href = verifyUrl;
       });
     }
@@ -861,7 +874,7 @@
     loadPublicNews();
     loadCustomerVoiceTeasers();
     maybeOpenSignupFromIntent();
-    maybeApplyLoginEmailFromQuery();
+    maybeApplyLoginEmailFromStorage();
   }
 
   const HERO_COPY_GROUPS = [
