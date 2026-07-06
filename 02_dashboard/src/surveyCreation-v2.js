@@ -521,17 +521,14 @@ function makeLangChip(langCode, isPrimary, canReorder) {
   // aria-label はチップ内の全テキストを上書きするため、後から付く「未入力 N」バッジは
   // updateTranslationBadges() がこの基本ラベルに件数を連結して同期する
   const baseLabel = isPrimary ? `${langName}（第一言語）` : langName;
-  let title;
-  if (!canReorder) title = 'クリックまたはEnter/Spaceで編集対象に';
-  else if (isPrimary) title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印で並べ替え';
-  else title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印またはドラッグで並べ替え';
+  // 操作説明は per-chip の title には持たせない（矢印移動のたびに accessible description として
+  // 冗長に読み上げられるため）。操作方法は多言語カードの「?」ツールチップに集約している。
 
   const chip = el('div', {
     class: `lang-chip${isPrimary ? ' lang-chip--primary' : ''}${isActive ? ' active' : ''}`,
     'data-lang': langCode,
     role: 'button',
     tabindex: isActive ? '0' : '-1',
-    title,
     'aria-label': baseLabel,
     'data-base-label': baseLabel,
     onclick: () => activateLangTab(langCode),
@@ -1188,6 +1185,18 @@ function checkValidationForSection(idOrFn) {
   return false;
 }
 
+// 設問見出し・ナビ用の表示テキスト。第一言語が未入力なら他の入力済み言語へフォールバックする。
+// （第一言語を未翻訳の言語に入れ替えた直後、見出しが一斉にプレースホルダー化して
+//   「データが消えた」ように見える問題を防ぐ。翻訳が必要なことは未入力バッジ側で示す）
+function questionDisplayText(q) {
+  const t = (q && q.text) || {};
+  if (t[currentLangs[0]]) return t[currentLangs[0]];
+  for (const lang of currentLangs) {
+    if (t[lang]) return t[lang];
+  }
+  return '設問文を入力してください';
+}
+
 function updateOutline() {
   const outlineList = document.getElementById('outline-questions-list');
   if (!outlineList) return;
@@ -1208,7 +1217,7 @@ function updateOutline() {
   outlineList.innerHTML = '';
   cards.forEach((card, i) => {
     const q = questions.find(q => q.id === card.dataset.questionId);
-    const textStr = q.text?.[currentLangs[0]] || '設問文を入力してください';
+    const textStr = questionDisplayText(q);
     
     // Validate choice length
     let hasError = CHOICE_TYPES.has(q.type) && (!q.options || q.options.length < 2);
@@ -1426,7 +1435,7 @@ function buildQuestionCard(q, index) {
     'anim-ms': '200',
   });
 
-  const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, q.text[currentLangs[0]] || '設問文を入力してください');
+  const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, questionDisplayText(q));
 
   const actionGroup = el('div', { class: 'flex items-center gap-1 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity' });
 
@@ -1498,7 +1507,7 @@ function buildBasicSection(q, cardNode, requiredBadge) {
         q.text[lang] = e.target.value;
         if (isFirst) {
           const sum = cardNode.querySelector('[data-question-summary-text]');
-          if (sum) sum.textContent = e.target.value || '設問文を入力してください';
+          if (sum) sum.textContent = questionDisplayText(q);
           section.querySelectorAll('[data-ref-hint]').forEach(hint => {
             hint.textContent = e.target.value || '';
             hint.classList.toggle('hidden', !e.target.value);
