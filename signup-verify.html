@@ -37,7 +37,12 @@
         <p class="verify-card__lead" role="status" aria-live="polite">アカウントの本登録が完了しました。ログインしてサービスをご利用ください。</p>
         <button type="button" class="button button--filled" id="verify-go-to-login">ログインへ</button>
       </div>
-      <p class="verify-card__note">※本画面はモックです。実際のメール認証・トークン検証は行いません。</p>
+      <div class="verify-step" data-verify-step="invalid" hidden>
+        <h1 id="verify-title-invalid" class="verify-card__title">リンクが無効です</h1>
+        <p class="verify-card__lead" role="status" aria-live="polite">仮登録が確認できません。お手数ですが、最初から新規アカウント作成をやり直してください。</p>
+        <button type="button" class="button button--filled" id="verify-back-to-top">トップへ戻る</button>
+      </div>
+      <p class="verify-card__note">※本画面はモックです。実際のメール認証・トークン検証は行いません。このsessionStorageによる遷移ガードはモックの導線再現であり、本番では認可の代替にしません（メール確認・トークン検証はサーバ側の責務です）。</p>
     </div>
   </main>
 

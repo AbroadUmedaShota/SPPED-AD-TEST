@@ -1,6 +1,12 @@
-// モックのため実トークン検証は行わない。URLの ?email= をそのまま確認済みメールとして扱う。
+// モックのため実トークン検証は行わない。?email= は使わず、仮登録時に sessionStorage へ
+// 置いた保留メールを読む（URLにメールアドレスを一切載せないため）。
+// 注意: このガードはあくまでモックの導線再現。本番では認可の代替にはせず、
+// メール確認・トークン検証はサーバ側の責務として別途実装すること。
 (function () {
   'use strict';
+
+  const SIGNUP_PENDING_EMAIL_KEY = 'speedad-signup-pending-email';
+  const LOGIN_PREFILL_EMAIL_KEY = 'speedad-login-prefill-email';
 
   function getButtonTextNode(buttonElement) {
     return Array.from(buttonElement.childNodes)
@@ -63,6 +69,23 @@
     inputElement.setAttribute('aria-invalid', 'false');
   }
 
+  function readPendingSignupEmail() {
+    try {
+      return sessionStorage.getItem(SIGNUP_PENDING_EMAIL_KEY) || '';
+    } catch (storageError) {
+      console.warn('仮登録メールを読み込めませんでした:', storageError);
+      return '';
+    }
+  }
+
+  function clearPendingSignupEmail() {
+    try {
+      sessionStorage.removeItem(SIGNUP_PENDING_EMAIL_KEY);
+    } catch (storageError) {
+      console.warn('仮登録メールを削除できませんでした:', storageError);
+    }
+  }
+
   function bootstrapSignupVerify() {
     const verifyForm = document.getElementById('verify-form');
     const passwordInput = document.getElementById('verify-password');
@@ -71,16 +94,56 @@
     const passwordConfirmError = document.getElementById('verify-password-confirm-error');
     const submitButton = verifyForm?.querySelector('.button--filled');
     const emailDisplayEl = document.querySelector('[data-verify-email]');
-    const stepPasswordEl = document.querySelector('[data-verify-step="password"]');
-    const stepDoneEl = document.querySelector('[data-verify-step="done"]');
     const goToLoginButton = document.getElementById('verify-go-to-login');
+    const backToTopButton = document.getElementById('verify-back-to-top');
     const verifyCardEl = document.querySelector('.verify-card');
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const email = searchParams.get('email') || '';
+    const verifyStepEls = {
+      password: document.querySelector('[data-verify-step="password"]'),
+      done: document.querySelector('[data-verify-step="done"]'),
+      invalid: document.querySelector('[data-verify-step="invalid"]')
+    };
+    const verifyStepTitleIds = {
+      password: 'verify-title',
+      done: 'verify-title-done',
+      invalid: 'verify-title-invalid'
+    };
+
+    function setActiveVerifyStep(step) {
+      Object.entries(verifyStepEls).forEach(([key, el]) => {
+        if (el) {
+          el.hidden = key !== step;
+        }
+      });
+      if (verifyCardEl && verifyStepTitleIds[step]) {
+        verifyCardEl.setAttribute('aria-labelledby', verifyStepTitleIds[step]);
+      }
+    }
+
+    const pendingEmail = readPendingSignupEmail();
 
     if (emailDisplayEl) {
-      emailDisplayEl.textContent = email ? `確認済みメールアドレス: ${email}` : '確認済みメールアドレス: 不明';
+      emailDisplayEl.textContent = pendingEmail ? `確認済みメールアドレス: ${pendingEmail}` : '確認済みメールアドレス: 不明';
+    }
+
+    function showInvalidStep() {
+      // 古い保留メールが次回の仮登録に紛れ込まないよう、ガード表示のタイミングでも後始末する。
+      clearPendingSignupEmail();
+      setActiveVerifyStep('invalid');
+      backToTopButton?.focus();
+    }
+
+    if (backToTopButton) {
+      backToTopButton.addEventListener('click', () => {
+        // index.html と signup-verify.html は同一ディレクトリ配置前提の相対パス。
+        window.location.href = 'index.html';
+      });
+    }
+
+    // 仮登録(Step1)を経ずに直接アクセスされた場合は本登録フォームを出さず、ガード表示にする。
+    if (!pendingEmail) {
+      showInvalidStep();
+      return;
     }
 
     function clearFormErrors() {
@@ -112,14 +175,7 @@
     }
 
     function showDoneStep() {
-      if (!stepPasswordEl || !stepDoneEl) {
-        return;
-      }
-      stepPasswordEl.hidden = true;
-      stepDoneEl.hidden = false;
-      // リージョン名(aria-labelledby)を完了ステップの見出しに付け替える。
-      // 差し替えないと完了後も「パスワードの設定」のままとリージョン名が読まれてしまう。
-      verifyCardEl?.setAttribute('aria-labelledby', 'verify-title-done');
+      setActiveVerifyStep('done');
       goToLoginButton?.focus();
     }
 
@@ -156,8 +212,14 @@
 
     if (goToLoginButton) {
       goToLoginButton.addEventListener('click', () => {
+        try {
+          sessionStorage.setItem(LOGIN_PREFILL_EMAIL_KEY, pendingEmail);
+        } catch (storageError) {
+          console.warn('ログイン用メールを保存できませんでした:', storageError);
+        }
+        clearPendingSignupEmail();
         // index.html と signup-verify.html は同一ディレクトリ配置前提の相対パス。
-        window.location.href = `index.html?login_email=${encodeURIComponent(email)}`;
+        window.location.href = 'index.html';
       });
     }
 
