@@ -2946,12 +2946,6 @@ body.dark-mode .outline-highlight {
     letter-spacing: 0.02em;
     color: #1d4ed8;            /* on #fff ≈ 6.7:1 */
 }
-/* ? ボタン＋ツールチップのラッパ（ツールチップの位置基準） */
-.lang-help-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-}
 /* 「?」説明ボタン（クリック開閉。WCAG 1.4.11: 枠線 #2563eb ≈ 5.2:1） */
 .lang-help {
     position: relative;
@@ -2977,14 +2971,16 @@ body.dark-mode .outline-highlight {
     position: absolute;
     inset: -6px;
 }
-/* 説明ツールチップ（下方向・クリックで開閉・Esc/外側クリックで閉じる） */
+/* 説明ツールチップ。多言語カード見出しの「?」直下に position:fixed で配置する
+   （祖先の overflow:hidden にクリップされないよう位置は JS が計算）。
+   クリックで開閉・Esc/外側クリック/スクロールで閉じる */
 .lang-tip {
-    position: absolute;
-    top: calc(100% + 9px);
-    left: -14px;
-    z-index: 50;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
     width: 252px;
-    max-width: calc(100vw - 24px);   /* 狭い画面でビューポート外へはみ出さない */
+    max-width: calc(100vw - 16px);   /* 狭い画面でビューポート外へはみ出さない */
     box-sizing: border-box;
     padding: 10px 12px;
     background: #1f2937;       /* 白文字 ≈ 14.6:1 */
@@ -2993,16 +2989,17 @@ body.dark-mode .outline-highlight {
     line-height: 1.65;
     font-weight: 500;
     text-align: left;
-    white-space: normal;       /* 親 .lang-legend の nowrap を打ち消し、252px 内で折り返す */
+    white-space: normal;
     border-radius: 8px;
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
 }
 .lang-tip[hidden] { display: none; }
+/* 「?」ボタンを指す上向きの三角（水平位置は JS が --lang-tip-arrow-left で補正） */
 .lang-tip::before {
     content: '';
     position: absolute;
     top: -4px;
-    left: 17px;
+    left: var(--lang-tip-arrow-left, 20px);
     width: 9px;
     height: 9px;
     background: #1f2937;

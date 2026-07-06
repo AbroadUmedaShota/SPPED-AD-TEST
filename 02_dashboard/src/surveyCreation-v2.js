@@ -453,21 +453,10 @@ function renderLangSelectionAndTabs() {
   // 第一言語の囲み枠
   const fieldset = el('div', { class: 'lang-fieldset' });
 
-  // 凡例（「第一言語」ラベル ＋ ? 説明ボタン ＋ クリック開閉ツールチップ）
+  // 凡例（「第一言語」ラベルのみ。説明の「?」は多言語カードの見出し側に配置）
   const legend = el('div', { class: 'lang-legend' });
-  const helpWrap = el('span', { class: 'lang-help-wrap' });  // ツールチップの位置基準（? ボタンの直下に出す）
-  const helpBtn = el('button', {
-    id: 'langHelpBtn', class: 'lang-help', type: 'button',
-    'aria-expanded': 'false', 'aria-describedby': 'langPrimaryTip', 'aria-label': '第一言語について',
-    onclick: toggleLangTip
-  }, '?');
-  const tip = el('div', {
-    id: 'langPrimaryTip', class: 'lang-tip', role: 'tooltip', hidden: true
-  }, LANG_PRIMARY_TIP);
-  helpWrap.append(helpBtn, tip);
-  legend.append(el('span', { class: 'lang-legend__text' }, '第一言語'), helpWrap);
+  legend.append(el('span', { class: 'lang-legend__text' }, '第一言語'));
   fieldset.appendChild(legend);
-  ensureLangTipDismissers();
 
   // 第一言語チップ（枠の中・ドラッグ不可）
   fieldset.appendChild(makeLangChip(currentLangs[0], true, canReorder));
@@ -483,6 +472,7 @@ function renderLangSelectionAndTabs() {
   overlay.addEventListener('dragleave', () => { if (langOverId === 'slot') { langOverId = null; updateLangDnd(); } });
   overlay.addEventListener('drop', (e) => { e.preventDefault(); if (langDragId) promoteLang(langDragId); });
   fieldset.appendChild(overlay);
+
   tabsContainer.appendChild(fieldset);
 
   // 仕切り + その他言語
@@ -648,7 +638,6 @@ function updateLangDnd() {
 // ─────────────────────────────────────────
 // 第一言語の説明ツールチップ（? ボタンでクリック開閉・Esc/外側クリックで閉じる）
 // ─────────────────────────────────────────
-const LANG_PRIMARY_TIP = '回答画面で最初に表示される言語です。ほかの言語タブをこの枠へドラッグ、またはキーボードの Ctrl+左右キーで第一言語を入れ替えられます。';
 let langTipDismissersBound = false;
 
 function closeLangTip() {
@@ -656,6 +645,23 @@ function closeLangTip() {
   const btn = document.getElementById('langHelpBtn');
   if (tip) tip.hidden = true;
   if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+// ツールチップは position:fixed。祖先の overflow:hidden にクリップされないよう
+// ビューポート基準でボタンの直下に配置する（開くたびに再計算）
+function positionLangTip() {
+  const tip = document.getElementById('langPrimaryTip');
+  const btn = document.getElementById('langHelpBtn');
+  if (!tip || !btn) return;
+  const r = btn.getBoundingClientRect();
+  tip.style.top = `${Math.round(r.bottom + 8)}px`;
+  const w = tip.offsetWidth || 252;
+  let left = r.left - 14;
+  left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  tip.style.left = `${Math.round(left)}px`;
+  // 三角（::before）がボタンを指すよう、実際の左位置に応じて水平オフセットを補正
+  const arrowLeft = Math.max(10, Math.min(r.left + r.width / 2 - left - 4, w - 20));
+  tip.style.setProperty('--lang-tip-arrow-left', `${Math.round(arrowLeft)}px`);
 }
 
 function toggleLangTip(e) {
@@ -666,9 +672,10 @@ function toggleLangTip(e) {
   const willOpen = tip.hidden;
   tip.hidden = !willOpen;
   btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  if (willOpen) positionLangTip();
 }
 
-// 外側クリック・Esc でツールチップを閉じるハンドラを一度だけ document に取り付ける
+// 外側クリック・Esc・スクロールでツールチップを閉じる/追従するハンドラを一度だけ取り付ける
 function ensureLangTipDismissers() {
   if (langTipDismissersBound) return;
   langTipDismissersBound = true;
@@ -683,6 +690,23 @@ function ensureLangTipDismissers() {
     const tip = document.getElementById('langPrimaryTip');
     if (tip && !tip.hidden) { closeLangTip(); document.getElementById('langHelpBtn')?.focus(); }
   });
+  // スクロール/リサイズ時は位置がずれるので閉じる（fixed 配置のため）
+  window.addEventListener('scroll', () => {
+    const tip = document.getElementById('langPrimaryTip');
+    if (tip && !tip.hidden) closeLangTip();
+  }, true);
+  window.addEventListener('resize', () => {
+    const tip = document.getElementById('langPrimaryTip');
+    if (tip && !tip.hidden) closeLangTip();
+  });
+}
+
+// 多言語カード見出しの「?」（静的HTML）にツールチップ開閉を配線する
+function initLangHelpTip() {
+  const btn = document.getElementById('langHelpBtn');
+  if (!btn) return;
+  btn.addEventListener('click', toggleLangTip);
+  ensureLangTipDismissers();
 }
 
 function initMultilingualToggle() {
@@ -3282,6 +3306,7 @@ async function init() {
 
   initMultilingualToggle();
   initLangTabWidthTracking();
+  initLangHelpTip();
   initFab();
   initInlineAddButton();
   initMobileAddButton();
