@@ -2927,11 +2927,12 @@ body.dark-mode .outline-highlight {
     border-radius: 11px;
     background: #f7faff;
 }
-/* 枠の上辺左に乗る凡例（ラベル＋?）。折り返させない */
+/* 枠の上辺中央に乗る凡例。折り返させない */
 .lang-legend {
     position: absolute;
     top: -9px;
-    left: 13px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 6;
     display: inline-flex;
     align-items: center;
