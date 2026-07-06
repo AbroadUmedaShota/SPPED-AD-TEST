@@ -486,6 +486,21 @@ function renderLangSelectionAndTabs() {
   }
   tabsContainer.append(divider, others);
 
+  // 説明ヘルプ「?」はタブ帯の右端（第一言語ボックスから離れた位置）に置く。
+  // sticky で帯が上部に貼り付いた状態でも見えるので発見性も確保できる。
+  const helpSlot = el('div', { class: 'lang-help-slot' });
+  const helpBtn = el('button', {
+    id: 'langHelpBtn', class: 'lang-help', type: 'button',
+    'aria-expanded': 'false', 'aria-describedby': 'langPrimaryTip', 'aria-label': '第一言語について',
+    onclick: toggleLangTip
+  }, '?');
+  const tip = el('div', {
+    id: 'langPrimaryTip', class: 'lang-tip', 'aria-live': 'polite', hidden: true
+  }, LANG_PRIMARY_TIP);
+  helpSlot.append(helpBtn, tip);
+  tabsContainer.append(helpSlot);
+  ensureLangTipDismissers();
+
   updateLangDnd();
   onLangsChanged();
 }
@@ -635,6 +650,7 @@ function updateLangDnd() {
 // ─────────────────────────────────────────
 // 第一言語の説明ツールチップ（? ボタンでクリック開閉・Esc/外側クリックで閉じる）
 // ─────────────────────────────────────────
+const LANG_PRIMARY_TIP = '『第一言語』は回答画面で最初に表示される言語です。言語タブで、他の言語を第一言語の枠へドラッグするか、Ctrl+左右キーで入れ替えられます。';
 let langTipDismissersBound = false;
 
 function closeLangTip() {
@@ -696,14 +712,6 @@ function ensureLangTipDismissers() {
     const tip = document.getElementById('langPrimaryTip');
     if (tip && !tip.hidden) closeLangTip();
   });
-}
-
-// 多言語カード見出しの「?」（静的HTML）にツールチップ開閉を配線する
-function initLangHelpTip() {
-  const btn = document.getElementById('langHelpBtn');
-  if (!btn) return;
-  btn.addEventListener('click', toggleLangTip);
-  ensureLangTipDismissers();
 }
 
 function initMultilingualToggle() {
@@ -3315,7 +3323,6 @@ async function init() {
 
   initMultilingualToggle();
   initLangTabWidthTracking();
-  initLangHelpTip();
   initFab();
   initInlineAddButton();
   initMobileAddButton();
