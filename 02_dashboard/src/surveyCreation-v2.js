@@ -366,10 +366,12 @@ function handleLangTabKeydown(e, langCode) {
 
 function updateMultiLangVisibility() {
   // 言語タブのスタイル更新（roving tabindex: activeLang のチップのみ tabindex="0"）
+  // 役割は role="group" 内のトグルボタン群。編集中の言語を aria-current で示す。
   document.querySelectorAll('.lang-chip').forEach(tab => {
     const isActive = tab.dataset.lang === activeLang;
     tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    if (isActive) tab.setAttribute('aria-current', 'true');
+    else tab.removeAttribute('aria-current');
     tab.setAttribute('tabindex', isActive ? '0' : '-1');
   });
 
@@ -442,11 +444,14 @@ function renderLangSelectionAndTabs() {
   const canReorder = currentLangs.length > 1;
 
   tabsContainer.className = 'lang-tabbar__row';
-  tabsContainer.setAttribute('role', 'tablist');
+  // role="group": 編集言語の選択ボタン群＋「?」説明ボタンを束ねる。
+  // （tablist にすると tab 以外の子=「?」ボタンが混在しセマンティクス違反になるため group を採用）
+  tabsContainer.setAttribute('role', 'group');
+  tabsContainer.setAttribute('aria-label', '編集言語');
   tabsContainer.innerHTML = '';
 
-  // 第一言語の囲み枠。role="presentation" で tablist の直下は tab のみが意味を持つようにする
-  const fieldset = el('div', { class: 'lang-fieldset', role: 'presentation' });
+  // 第一言語の囲み枠
+  const fieldset = el('div', { class: 'lang-fieldset' });
 
   // 凡例（「第一言語」ラベル ＋ ? 説明ボタン ＋ クリック開閉ツールチップ）
   const legend = el('div', { class: 'lang-legend' });
@@ -480,9 +485,9 @@ function renderLangSelectionAndTabs() {
   fieldset.appendChild(overlay);
   tabsContainer.appendChild(fieldset);
 
-  // 仕切り + その他言語（ラッパは role="presentation"、tab の意味は各チップに閉じる）
+  // 仕切り + その他言語
   const divider = el('div', { class: 'lang-divider', 'aria-hidden': 'true' });
-  const others = el('div', { class: 'lang-others', role: 'presentation' });
+  const others = el('div', { class: 'lang-others' });
   currentLangs.slice(1).forEach(code => others.appendChild(makeLangChip(code, false, canReorder)));
   if (!canReorder) {
     // インライン display:none で確実に隠す（.lang-* の display 宣言に負けないため）
@@ -534,8 +539,7 @@ function makeLangChip(langCode, isPrimary, canReorder) {
   const chip = el('div', {
     class: `lang-chip${isPrimary ? ' lang-chip--primary' : ''}${isActive ? ' active' : ''}`,
     'data-lang': langCode,
-    role: 'tab',
-    'aria-selected': isActive ? 'true' : 'false',
+    role: 'button',
     tabindex: isActive ? '0' : '-1',
     title,
     'aria-label': baseLabel,
@@ -543,6 +547,7 @@ function makeLangChip(langCode, isPrimary, canReorder) {
     onclick: () => activateLangTab(langCode),
     onkeydown: (e) => handleLangTabKeydown(e, langCode)
   });
+  if (isActive) chip.setAttribute('aria-current', 'true');  // 編集中の言語
   chip.draggable = draggable;
 
   if (draggable) {
