@@ -1,11 +1,13 @@
 // モックのため実トークン検証は行わない。?email= は使わず、仮登録時に sessionStorage へ
-// 置いた保留メールを読む（URLにメールアドレスを一切載せないため）。
+// 置いた保留情報（email + token）を読む（URLにメールアドレスを一切載せないため）。
+// 解錠条件は「保留情報が存在し、かつURLのtokenと保存tokenが一致すること」。
+// 保留情報の"存在"だけでは解錠しない（古いマーカーが残っているだけの直リンクを弾くため）。
 // 注意: このガードはあくまでモックの導線再現。本番では認可の代替にはせず、
 // メール確認・トークン検証はサーバ側の責務として別途実装すること。
 (function () {
   'use strict';
 
-  const SIGNUP_PENDING_EMAIL_KEY = 'speedad-signup-pending-email';
+  const SIGNUP_PENDING_KEY = 'speedad-signup-pending';
   const LOGIN_PREFILL_EMAIL_KEY = 'speedad-login-prefill-email';
 
   function getButtonTextNode(buttonElement) {
@@ -69,20 +71,34 @@
     inputElement.setAttribute('aria-invalid', 'false');
   }
 
-  function readPendingSignupEmail() {
+  function readPendingSignup() {
+    let raw = null;
     try {
-      return sessionStorage.getItem(SIGNUP_PENDING_EMAIL_KEY) || '';
+      raw = sessionStorage.getItem(SIGNUP_PENDING_KEY);
     } catch (storageError) {
-      console.warn('仮登録メールを読み込めませんでした:', storageError);
-      return '';
+      console.warn('仮登録情報を読み込めませんでした:', storageError);
+      return null;
+    }
+    if (!raw) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || !parsed.email || !parsed.token) {
+        return null;
+      }
+      return { email: String(parsed.email), token: String(parsed.token) };
+    } catch (parseError) {
+      console.warn('仮登録情報の形式が不正です:', parseError);
+      return null;
     }
   }
 
-  function clearPendingSignupEmail() {
+  function clearPendingSignup() {
     try {
-      sessionStorage.removeItem(SIGNUP_PENDING_EMAIL_KEY);
+      sessionStorage.removeItem(SIGNUP_PENDING_KEY);
     } catch (storageError) {
-      console.warn('仮登録メールを削除できませんでした:', storageError);
+      console.warn('仮登録情報を削除できませんでした:', storageError);
     }
   }
 
@@ -120,15 +136,9 @@
       }
     }
 
-    const pendingEmail = readPendingSignupEmail();
-
-    if (emailDisplayEl) {
-      emailDisplayEl.textContent = pendingEmail ? `確認済みメールアドレス: ${pendingEmail}` : '確認済みメールアドレス: 不明';
-    }
-
     function showInvalidStep() {
-      // 古い保留メールが次回の仮登録に紛れ込まないよう、ガード表示のタイミングでも後始末する。
-      clearPendingSignupEmail();
+      // 古い保留情報が次回の仮登録に紛れ込まないよう、ガード表示のタイミングでも後始末する。
+      clearPendingSignup();
       setActiveVerifyStep('invalid');
       backToTopButton?.focus();
     }
@@ -140,10 +150,22 @@
       });
     }
 
-    // 仮登録(Step1)を経ずに直接アクセスされた場合は本登録フォームを出さず、ガード表示にする。
-    if (!pendingEmail) {
+    const pendingSignup = readPendingSignup();
+    const urlToken = new URLSearchParams(window.location.search).get('token') || '';
+
+    // 解錠条件: 保留情報が存在し、かつURLのtokenと保存tokenが一致すること。
+    // 「保留情報の存在」だけでは解錠しない（tokenなし／不一致は直リンク扱いでガード）。
+    const isUnlocked = Boolean(pendingSignup) && Boolean(urlToken) && urlToken === pendingSignup.token;
+
+    if (!isUnlocked) {
       showInvalidStep();
       return;
+    }
+
+    const pendingEmail = pendingSignup.email;
+
+    if (emailDisplayEl) {
+      emailDisplayEl.textContent = `確認済みメールアドレス: ${pendingEmail}`;
     }
 
     function clearFormErrors() {
@@ -217,7 +239,7 @@
         } catch (storageError) {
           console.warn('ログイン用メールを保存できませんでした:', storageError);
         }
-        clearPendingSignupEmail();
+        clearPendingSignup();
         // index.html と signup-verify.html は同一ディレクトリ配置前提の相対パス。
         window.location.href = 'index.html';
       });
