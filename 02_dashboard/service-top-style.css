@@ -2971,6 +2971,12 @@ body.dark-mode .outline-highlight {
     padding: 0;
 }
 .lang-help:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; }
+/* タップ領域を約28pxに拡張（見た目は16pxのまま。タッチ操作の当てやすさ確保） */
+.lang-help::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+}
 /* 説明ツールチップ（下方向・クリックで開閉・Esc/外側クリックで閉じる） */
 .lang-tip {
     position: absolute;
@@ -2978,6 +2984,8 @@ body.dark-mode .outline-highlight {
     left: -14px;
     z-index: 50;
     width: 252px;
+    max-width: calc(100vw - 24px);   /* 狭い画面でビューポート外へはみ出さない */
+    box-sizing: border-box;
     padding: 10px 12px;
     background: #1f2937;       /* 白文字 ≈ 14.6:1 */
     color: #ffffff;
