@@ -137,8 +137,9 @@
     }
 
     function showInvalidStep() {
-      // 古い保留情報が次回の仮登録に紛れ込まないよう、ガード表示のタイミングでも後始末する。
-      clearPendingSignup();
+      // ここで保留情報を消さないこと。無効な直リンク到達（token無し／不一致）で消すと、
+      // 正規の確認メールリンク（?token=一致）をまだ踏んでいない有効な仮登録まで
+      // 巻き添えで破棄してしまう。保留情報は次の仮登録で上書き／本登録完了時に削除される。
       setActiveVerifyStep('invalid');
       backToTopButton?.focus();
     }
