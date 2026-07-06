@@ -3065,14 +3065,17 @@ body.dark-mode .outline-highlight {
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
 }
 /* 第一言語チップ（枠の中・グリップ無し・ドラッグ不可・透明背景）
-   min-width で枠を凡例「第一言語 ?」より広く保ち、ラベルの折り返しを防ぐ */
+   言語名を左右対称パディングで中央に見せる。凡例「第一言語」が収まる最小幅だけ確保 */
 .lang-chip--primary {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    padding: 7px 14px;
-    min-width: 96px;
+    padding: 7px 16px;
+    min-width: 64px;
+    justify-content: center;
+    text-align: center;
 }
+.lang-chip--primary .lang-chip__name { text-align: center; }
 .lang-chip--primary:hover { background: #eef6ff; }
 /* 編集中（アクティブ）の言語を示す控えめな強調 */
 .lang-chip.active {
