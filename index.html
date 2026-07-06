@@ -588,56 +588,54 @@
     <div class="modal__content">
       <button class="modal__close-button" aria-label="モーダルを閉じる" type="button">×</button>
       <h2 id="signup-modal-title" class="modal__title">新規アカウント作成</h2>
-      <form id="signup-form" novalidate>
-        <div class="form-group">
-          <label for="signup-name" class="form-group__label">お名前（任意）</label>
-          <input type="text" id="signup-name" name="signup-name" class="form-group__input" autocomplete="name" placeholder="例）山田 太郎">
-          <div id="signup-name-error" class="form-group__error-message" role="alert"></div>
+      <div class="signup-step" data-signup-step="form">
+        <form id="signup-form" novalidate>
+          <div class="form-group">
+            <label for="signup-name" class="form-group__label">お名前（任意）</label>
+            <input type="text" id="signup-name" name="signup-name" class="form-group__input" autocomplete="name" placeholder="例）山田 太郎">
+            <div id="signup-name-error" class="form-group__error-message" role="alert"></div>
+          </div>
+          <div class="form-group">
+            <label for="signup-email" class="form-group__label">メールアドレス</label>
+            <input type="email" id="signup-email" name="signup-email" class="form-group__input" required aria-required="true" autocomplete="email">
+            <div id="signup-email-error" class="form-group__error-message" role="alert"></div>
+          </div>
+          <div class="form-check">
+            <label class="form-check__label">
+              <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
+              <span><a href="https://support.speed-ad.com/terms/" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://support.speed-ad.com/privacy/" target="_blank" rel="noopener noreferrer">プライバシーポリシー <span aria-hidden="true">↗</span></a>に同意する</span>
+            </label>
+            <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
+          </div>
+          <div class="form-check">
+            <label class="form-check__label">
+              <input type="checkbox" id="privacy-handling-agree" name="privacy-handling-agree" class="form-options__checkbox-input" required aria-required="true">
+              <span>「<a href="https://support.speed-ad.com/privacy/member-registration/" target="_blank" rel="noopener noreferrer">会員登録における個人情報の取扱いについて</a>」を確認し、同意する</span>
+            </label>
+            <div id="privacy-handling-agree-error" class="form-group__error-message" role="alert"></div>
+          </div>
+          <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>仮登録する</button>
+        </form>
+        <div class="divider" role="separator" aria-label="または">
+          <span class="divider__text">または</span>
         </div>
-        <div class="form-group">
-          <label for="signup-email" class="form-group__label">メールアドレス</label>
-          <input type="email" id="signup-email" name="signup-email" class="form-group__input" required aria-required="true" autocomplete="email">
-          <div id="signup-email-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <div class="form-group">
-          <label for="signup-password" class="form-group__label">パスワード</label>
-          <input type="password" id="signup-password" name="signup-password" class="form-group__input" required aria-required="true" autocomplete="new-password" aria-describedby="signup-password-error signup-password-hint">
-          <div id="signup-password-error" class="form-group__error-message" role="alert"></div>
-          <div id="signup-password-hint" class="form-group__password-hint">8文字以上、半角英数字（記号推奨）を組み合わせてください。</div>
-        </div>
-        <div class="form-group">
-          <label for="signup-password-confirm" class="form-group__label">パスワード確認</label>
-          <input type="password" id="signup-password-confirm" name="signup-password-confirm" class="form-group__input" required aria-required="true" autocomplete="new-password" aria-describedby="signup-password-confirm-error">
-          <div id="signup-password-confirm-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <div class="form-check">
-          <label class="form-check__label">
-            <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
-            <span><a href="https://support.speed-ad.com/terms/" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://support.speed-ad.com/privacy/" target="_blank" rel="noopener noreferrer">プライバシーポリシー <span aria-hidden="true">↗</span></a>に同意する</span>
-          </label>
-          <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <div class="form-check">
-          <label class="form-check__label">
-            <input type="checkbox" id="privacy-handling-agree" name="privacy-handling-agree" class="form-options__checkbox-input" required aria-required="true">
-            <span>「<a href="https://support.speed-ad.com/privacy/member-registration/" target="_blank" rel="noopener noreferrer">会員登録における個人情報の取扱いについて</a>」を確認し、同意する</span>
-          </label>
-          <div id="privacy-handling-agree-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>アカウントを作成</button>
-      </form>
-      <div class="divider" role="separator" aria-label="または">
-        <span class="divider__text">または</span>
+        <button class="button button--google" type="button">
+          <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+          Googleでサインアップ
+        </button>
+        <p class="sub-links">アカウントをお持ちですか？ <a href="#" id="show-login-from-modal" class="sub-links__item">ログインはこちら</a></p>
       </div>
-      <button class="button button--google" type="button">
-        <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
-        Googleでサインアップ
-      </button>
-      <p class="sub-links">アカウントをお持ちですか？ <a href="#" id="show-login-from-modal" class="sub-links__item">ログインはこちら</a></p>
+      <div class="signup-step signup-sent" data-signup-step="sent" hidden>
+        <p class="signup-sent__lead" role="status" aria-live="polite">ご入力のメールアドレス宛に確認メールを送信しました。メール内のURLから登録を完了してください。</p>
+        <p class="signup-sent__email" data-signup-sent-email></p>
+        <p class="signup-sent__note">※モック環境のため、実際にはメールは届きません。下のボタンで確認メールのリンクを開いた状態を再現できます。</p>
+        <button type="button" class="button button--filled" id="signup-open-verify">確認メールのリンクを開く</button>
+        <p class="sub-links"><button type="button" id="signup-back-to-form" class="sub-links__item">メールアドレスを入力し直す</button></p>
+      </div>
     </div>
   </div>
 
-  <script src="js/login-front.js?v=20260601-remove-mock-preview" defer></script>
+  <script src="js/login-front.js?v=20260706-signup-provisional" defer></script>
   <script src="js/login-front-fullpage.js?v=20260602-tail-scroll-stop" defer></script>
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。撤去時はこの行とhead内のcssリンクを削除 -->
   <script src="js/emblem-tools.js" defer></script>

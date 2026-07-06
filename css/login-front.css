@@ -1205,6 +1205,17 @@ body.is-hero-font-dragging * {
   text-underline-offset: 3px;
 }
 
+.sub-links button.sub-links__item {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .form-options__checkbox-input {
   flex: 0 0 auto;
   margin-top: 4px;
@@ -2572,6 +2583,94 @@ body.is-hero-font-dragging * {
   margin: 20px 0 0;
   text-align: center;
   font-size: 0.9rem;
+}
+
+/* ==== 仮登録→本登録フロー（signup step / verify page）==== */
+.signup-step[hidden] {
+  display: none;
+}
+
+.signup-sent {
+  padding-top: 8px;
+}
+
+.signup-sent__lead {
+  margin: 0 0 16px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.signup-sent__email {
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  font-weight: 700;
+  word-break: break-all;
+  background: var(--paper-muted);
+}
+
+.signup-sent__note {
+  margin: 0 0 24px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.verify-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--paper);
+}
+
+.verify-card {
+  width: min(480px, 100%);
+  padding: 34px;
+  border-radius: 0.875rem;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.verify-card__title {
+  margin: 0 0 12px;
+  font-family: var(--sans);
+  font-size: 1.5rem;
+  color: var(--ink);
+  text-wrap: balance; /* 主要ブラウザ最新版対応・非対応環境は通常の折返しにフォールバック */
+}
+
+.verify-card__lead {
+  margin: 0 0 24px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.verify-card__email {
+  margin: 0 0 24px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  font-weight: 700;
+  word-break: break-all;
+  background: var(--paper-muted);
+}
+
+.verify-card__note {
+  margin: 20px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.verify-step[hidden] {
+  display: none;
 }
 
 @keyframes spin {
