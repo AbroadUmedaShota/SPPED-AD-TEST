@@ -252,9 +252,22 @@
     let modalReturnFocusElement = null;
     let modalFocusTimeoutId = null;
     let pendingSignupEmail = '';
+    let pendingSignupToken = '';
     const rememberedAccountStorageKey = 'speedad-remembered-login-id';
-    const signupPendingEmailStorageKey = 'speedad-signup-pending-email';
+    const signupPendingStorageKey = 'speedad-signup-pending';
     const loginPrefillEmailStorageKey = 'speedad-login-prefill-email';
+
+    function generateSignupToken() {
+      // モックの一意値でよいため強度は不問。使える範囲で最善のAPIにフォールバックする。
+      if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+      }
+      if (window.crypto?.getRandomValues) {
+        const randomBytes = window.crypto.getRandomValues(new Uint8Array(16));
+        return Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+      }
+      return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+    }
 
     function getModalFocusableElements() {
       if (!modalContent) {
@@ -784,14 +797,20 @@
         try {
           await new Promise((resolve) => setTimeout(resolve, 1800));
           pendingSignupEmail = signupEmailInput?.value.trim() || '';
+          pendingSignupToken = generateSignupToken();
           if (signupSentEmailEl) {
             signupSentEmailEl.textContent = pendingSignupEmail;
           }
           // メールをURLに載せず、本登録ページへの受け渡しは sessionStorage 経由にする。
+          // token を紐づけておき、本登録側では「保留マーカーの存在」だけでなく
+          // URLのtokenと保存tokenの一致を解錠条件にする（古いマーカーの使い回し防止）。
           try {
-            sessionStorage.setItem(signupPendingEmailStorageKey, pendingSignupEmail);
+            sessionStorage.setItem(signupPendingStorageKey, JSON.stringify({
+              email: pendingSignupEmail,
+              token: pendingSignupToken
+            }));
           } catch (storageError) {
-            console.warn('仮登録メールを保存できませんでした:', storageError);
+            console.warn('仮登録情報を保存できませんでした:', storageError);
           }
           showSignupStep('sent');
         } catch (error) {
@@ -806,8 +825,8 @@
     if (signupOpenVerifyButton) {
       signupOpenVerifyButton.addEventListener('click', () => {
         // メールアドレスはクエリに載せない。デモボタンは「確認メール内のリンク」を
-        // 不透明トークン(token=demo)で模す。実メールは sessionStorage 側で引き継ぐ。
-        const verifyUrl = `${resolveAppPath('signup-verify.html')}?token=demo`;
+        // 今回発行したトークンで模す。本登録側はこのtokenと保存tokenの一致を見て解錠する。
+        const verifyUrl = `${resolveAppPath('signup-verify.html')}?token=${encodeURIComponent(pendingSignupToken)}`;
         window.location.href = verifyUrl;
       });
     }
