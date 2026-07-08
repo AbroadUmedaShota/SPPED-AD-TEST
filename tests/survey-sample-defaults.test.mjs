@@ -3,7 +3,7 @@ import { access, readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const SAMPLE_SURVEY_ID = 'sv_0003_26010';
-const SAMPLE_SURVEY_NAME = 'SPEED AD サンプルアンケート（標準機能確認用）';
+const SAMPLE_SURVEY_NAME = 'SPEED ADアンケートサンプル';
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'));
@@ -24,7 +24,7 @@ test('default new survey template is ready for automatic prefill', async () => {
   assert.equal(template.namePrefix, '展示会サンプルアンケート');
   assert.equal(template.displayTitle.ja, 'ご来場者アンケート');
   assert.equal(template.periodOffsetDays.start, 1);
-  assert.equal(template.periodOffsetDays.end, 7);
+  assert.equal(template.periodOffsetDays.end, 3);
   assert.equal(template.questions.length, 4);
   assert.deepEqual(
     template.questions.map((question) => question.text.ja),
@@ -75,7 +75,7 @@ test('global sample survey is data-ready, read-only, and backed by existing samp
   assert.equal(demoAnswers.length, 10);
   assert.equal(demoBusinessCards.length, 10);
 
-  const expectedQuestionIds = Array.from({ length: 11 }, (_, index) => `Q${index + 1}`);
+  const expectedQuestionIds = Array.from({ length: 12 }, (_, index) => `Q${index + 1}`);
   const answerIds = new Set(answers.answers.map((answer) => answer.answerId));
   assert.equal(answerIds.size, 10);
 

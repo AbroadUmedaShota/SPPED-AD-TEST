@@ -3233,22 +3233,27 @@ async function loadSurveyData(surveyId) {
       'image_upload': 'image'
     };
     
+    // 多言語形式（{ja, en, ...}）と文字列の両方を編集用の言語オブジェクトへ揃える
+    const toLangObject = (value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) return { ...value };
+      return { ja: value || '' };
+    };
     questions = (json.details || []).map(q => {
       const type = typeMap[q.type] || q.type;
       const base = {
         id: generateId(),
         type: type,
-        text: { ja: q.text || '' },
+        text: toLangObject(q.text),
         required: q.required || false
       };
-      
+
       if (CHOICE_TYPES.has(type)) {
-        base.options = (q.options || []).map(o => ({ ja: typeof o === 'string' ? o : (o.text || '') }));
+        base.options = (q.options || []).map(o => toLangObject(typeof o === 'string' ? o : o.text));
         if(base.options.length === 0) base.options = [{ja:'選択肢1'}];
       }
       if (MATRIX_TYPES.has(type)) {
-        base.matrixRows = (q.rows || []).map(r => ({ ja: r.text || '' }));
-        base.matrixCols = (q.options || []).map(c => ({ ja: c.text || '' }));
+        base.matrixRows = (q.rows || []).map(r => toLangObject(r.text));
+        base.matrixCols = (q.options || []).map(c => toLangObject(c.text));
       }
       if (type === 'date_time') {
         // 保存済みの入力モードから日付/時刻トグルを復元（無ければ旧typeで判定、既定は日付・時刻の両方）
@@ -3257,6 +3262,17 @@ async function loadSurveyData(surveyId) {
         base.config = mode === 'datetime' ? { showDate: true, showTime: true }
           : mode === 'time' ? { showDate: false, showTime: true }
           : { showDate: true, showTime: false };
+      }
+      if (type === 'rating_scale') {
+        // 保存済みの段階数・両端/中間ラベルを復元（無ければ既定値）
+        const rs = q.meta?.ratingScaleConfig || q.config || {};
+        base.config = {
+          points: rs.points || 5,
+          minLabel: toLangObject(rs.minLabel),
+          maxLabel: toLangObject(rs.maxLabel),
+          showMidLabel: !!rs.showMidLabel,
+          midLabel: toLangObject(rs.midLabel),
+        };
       }
       return enforceRequiredRules(base);
     });

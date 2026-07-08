@@ -56,8 +56,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzNTAsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzNTAsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDE8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "10〜49名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "4"
       }
     ]
   },
@@ -140,8 +143,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCg1MiwgNzAlLCA5MCUpIi8+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMTUwIiByPSI1MCIgZmlsbD0iaHNsKDUyLCA3MCUsIDgwJSkiLz48cmVjdCB4PSIxMDAiIHk9IjI0MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgwLDAsMCwwLjEpIi8+PHRleHQgeD0iMjAwIiB5PSIxNTUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjNTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TaXRlIFBob3RvICMwMDAyPC90ZXh0Pjwvc3ZnPg==",
-        "type": "image"
+        "answer": "100〜299名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "5"
       }
     ]
   },
@@ -221,8 +227,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyMSwgNzAlLCA5MCUpIi8+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMTUwIiByPSI1MCIgZmlsbD0iaHNsKDIxLCA3MCUsIDgwJSkiLz48cmVjdCB4PSIxMDAiIHk9IjI0MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgwLDAsMCwwLjEpIi8+PHRleHQgeD0iMjAwIiB5PSIxNTUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjNTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TaXRlIFBob3RvICMwMDAzPC90ZXh0Pjwvc3ZnPg==",
-        "type": "image"
+        "answer": "50〜99名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "3"
       }
     ]
   },
@@ -291,8 +300,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzMTcsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzMTcsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDQ8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "1〜9名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "4"
       }
     ]
   },
@@ -361,8 +373,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyNzgsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgyNzgsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDU8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "300名以上"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "2"
       }
     ]
   },
@@ -435,8 +450,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxOTEsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxOTEsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDY8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "50〜99名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "5"
       }
     ]
   },
@@ -500,8 +518,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxMzgsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxMzgsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDc8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "10〜49名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "4"
       }
     ]
   },
@@ -576,8 +597,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzNDMsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzNDMsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDg8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "100〜299名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "3"
       }
     ]
   },
@@ -649,8 +673,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxOTksIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxOTksIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDk8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "300名以上"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "5"
       }
     ]
   },
@@ -726,8 +753,11 @@
       },
       {
         "questionId": "Q11",
-        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyOTksIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgyOTksIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMTA8L3RleHQ+PC9zdmc+",
-        "type": "image"
+        "answer": "50〜99名"
+      },
+      {
+        "questionId": "Q12",
+        "answer": "4"
       }
     ]
   }

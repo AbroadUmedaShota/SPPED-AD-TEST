@@ -60,7 +60,7 @@ last_reviewed: 2026-06-19
 | 設問カード挿入後スクロール遅延 | 50ms（`setTimeout` → `smoothScrollIntoView`） | [surveyCreation-v2.js:1775](../../../02_dashboard/src/surveyCreation-v2.js#L1775) |
 | Sortable langTabs / outline / questions animation | 150ms | [surveyCreation-v2.js:360](../../../02_dashboard/src/surveyCreation-v2.js#L360) |
 | 新規作成テンプレート | `data/surveys/templates/default-new-survey.json` | [surveyDefaults.js](../../../02_dashboard/src/services/surveyDefaults.js) |
-| 新規作成会期初期値 | 明日から 7 日間 | `periodOffsetDays.start=1/end=7` |
+| 新規作成会期初期値 | 明日から 3 日間 | `periodOffsetDays.start=1/end=3` |
 | **設問文 / 選択肢 / マトリックスラベル maxlength** | **未指定**（§11） | — |
 | **下書き自動保存** | **未接続**（`surveyService.js` に定義のみ） | — |
 | **datepicker `minDate`** | **引数無し呼出**（新規でも過去日付可） | [surveyCreation-v2.js:2491](../../../02_dashboard/src/surveyCreation-v2.js#L2491) |
@@ -274,7 +274,7 @@ v2 が直接制御する native モーダル:
 
 **新規作成時の自動初期値**:
 - `surveyId` を持たない新規作成では `data/surveys/templates/default-new-survey.json` を読み込み、アンケート名・表示タイトル・説明文・会期・設問を初期入力値として反映する。
-- 会期はテンプレートの `periodOffsetDays` に従い、標準では「明日から 7 日間」を `YYYY-MM-DD 〜 YYYY-MM-DD` 形式で入れる。
+- 会期はテンプレートの `periodOffsetDays` に従い、標準では「明日から 3 日間」を `YYYY-MM-DD 〜 YYYY-MM-DD` 形式で入れる。
 - アンケート名は `namePrefix_YYYYMMDD` 形式で生成する。標準は `展示会サンプルアンケート_YYYYMMDD`。
 - 初期設問は「来場目的」「興味サービス」「導入予定時期」「自由記入」の 4 問。すべて通常の設問として扱い、ユーザーが編集・削除・並び替えできる。
 - URL パラメータで `surveyName` / `displayTitle` / `periodStart` / `periodEnd` が指定された場合は、URL 指定値を優先しテンプレートで上書きしない。
@@ -768,7 +768,7 @@ Chrome / Firefox / Safari / Edge の最新 2 バージョン（暫定、§11 で
 | A5 | FAB → single_answer → free_answer に変更 | ポップオーバー内警告「リセットされます」→「変更する」で options 破棄 |
 | A6 | 設問 3 件作成 → アウトラインでドラッグ並び替え | Q 番号が即座に振り直される |
 | A7 | `surveyCreation.html?surveyName=テスト&displayTitle=TITLE&periodStart=...&periodEnd=...` で開く | 各 field が復元され、保存ボタンが有効化 |
-| A8 | `surveyCreation.html` を URL パラメータ無しで開く | サンプル管理名、`ご来場者アンケート`、翌日〜7日後の会期、説明文、初期設問4問が表示される |
+| A8 | `surveyCreation.html` を URL パラメータ無しで開く | サンプル管理名、`ご来場者アンケート`、翌日〜3日後の会期、説明文、初期設問4問が表示される |
 | A9 | `surveyCreation.html?surveyId=sv_0003_26010` を開く | 共通サンプルが読み込まれ、読取専用通知が出て保存・編集系操作は無効化される |
 | A10 | A9 の状態でプレビュー・QR を開く | 確認用導線として利用できる |
 

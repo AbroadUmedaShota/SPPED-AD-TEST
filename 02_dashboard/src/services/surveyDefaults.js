@@ -29,7 +29,7 @@ export function formatDateCompact(date) {
 export function resolveDefaultSurveyPeriod(template, referenceDate = new Date()) {
   const offsets = template?.periodOffsetDays || {};
   const startOffset = Number.isFinite(Number(offsets.start)) ? Number(offsets.start) : 1;
-  const endOffset = Number.isFinite(Number(offsets.end)) ? Number(offsets.end) : 7;
+  const endOffset = Number.isFinite(Number(offsets.end)) ? Number(offsets.end) : 3;
   return {
     startDate: addDays(referenceDate, startOffset),
     endDate: addDays(referenceDate, endOffset),

@@ -6,6 +6,7 @@ import { handleOpenModal, openModal } from './modalHandler.js'; // openModal を
 import { initBreadcrumbs } from './breadcrumb.js';
 import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js'; // リモートの変更を取り込む
 import { getCurrentGroupAccountType } from './sidebarHandler.js'; // 新しくインポート
+import { resolveSurveyDetailTexts } from './services/i18n/messages.js';
 
 // --- State ---
 let allCombinedData = [];
@@ -3075,9 +3076,10 @@ export async function initializePage() {
         if (!currentSurvey) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
-        // 設問詳細情報を結合
-        const normalizedDetails = Array.isArray(enqueteDetailsData.details)
-            ? enqueteDetailsData.details.map(detail => ({
+        // 設問詳細情報を結合（本画面は設問文を文字列キーとして扱うため、多言語テキストは日本語へ解決する）
+        const localizedDetails = resolveSurveyDetailTexts(enqueteDetailsData.details);
+        const normalizedDetails = Array.isArray(localizedDetails)
+            ? localizedDetails.map(detail => ({
                 ...detail,
                 text: detail.text || detail.question || '',
                 question: detail.question || detail.text || ''
@@ -3085,6 +3087,8 @@ export async function initializePage() {
             : [];
         if (normalizedDetails.length > 0) {
             currentSurvey.details = normalizedDetails;
+        } else {
+            currentSurvey.details = resolveSurveyDetailTexts(currentSurvey.details || []);
         }
         const allowedRows = new Set([25, 50, 100, 200]);
         const allowedSortKeys = new Set(['answerId', 'answeredAt', 'fullName', 'companyName', 'dynamicQuestion']);
