@@ -80,6 +80,17 @@
       font-size: 12.5px; line-height: 1.7;
     }
     .contact-status[hidden] { display: none; }
+    .contact-test-mode {
+      margin: -4px 0 18px;
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: #fff6d8;
+      color: #6d4b00;
+      border: 1px solid #f0d37a;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .contact-test-mode[hidden] { display: none; }
 
     .contact-submit {
       margin-top: 6px; width: 100%; background: var(--c-navy); color: #fff;
@@ -162,8 +173,9 @@
         <p class="contact__eyebrow">CONTACT</p>
         <h1 class="contact__title" id="contact-title">お問い合わせ</h1>
         <p class="contact__lead">お問い合わせ内容を確認のうえ、2〜3営業日以内に担当者よりご返信いたします。</p>
+        <p class="contact-test-mode" id="contactTestModeNotice" hidden tabindex="-1">テストモードで送信します。メール通知はすべて梅田さんのみに送信されます。</p>
 
-        <form class="contact-form" id="contactForm" data-endpoint="https://script.google.com/macros/s/AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D/exec" data-max-attachment-mb="10" novalidate>
+        <form class="contact-form" id="contactForm" data-endpoint="https://script.google.com/macros/s/AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D/exec" data-max-attachment-mb="10" data-webp-quality="0.82" novalidate>
           <div class="contact-field">
             <label class="contact-field__label" for="f-contact-type">問い合わせ種別<span class="req" aria-hidden="true">*</span></label>
             <select class="contact-control contact-select" id="f-contact-type" name="contactType" aria-describedby="f-contact-type-error" required>
@@ -203,11 +215,11 @@
           <div class="contact-field">
             <label class="contact-field__label" for="fileInput">添付ファイル（任意）</label>
             <div class="contact-uploader" id="uploader">
-              <input type="file" id="fileInput" accept="image/*" multiple hidden>
+              <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple hidden>
               <label class="contact-dropzone" id="dropzone" for="fileInput" tabindex="0" role="button">
                 <span class="contact-dropzone__icon" aria-hidden="true">&uarr;</span>
                 <span class="contact-dropzone__title">クリック、またはドラッグ＆ドロップ</span>
-                <span class="contact-dropzone__sub">PNG / JPG（複数添付できます） ・ 10MBまで</span>
+                <span class="contact-dropzone__sub">PNG / JPG / WEBP（送信時にWEBPへ圧縮） ・ 10MBまで</span>
               </label>
               <div class="contact-thumbs" id="thumbs"></div>
               <div class="contact-uploader__count" id="count" hidden></div>
@@ -242,6 +254,6 @@
   <div id="support-footer-placeholder"></div>
 </div>
 <script type="module" src="../assets/js/support-shell.js?v=20260519-plans-news"></script>
-<script type="module" src="../assets/js/contact-form.js?v=20260614-contact-gas"></script>
+<script type="module" src="../assets/js/contact-form.js?v=20260621-webp-viewer"></script>
 </body>
 </html>

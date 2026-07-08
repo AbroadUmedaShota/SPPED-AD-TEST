@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --line: #d8dde6;
+      --text: #17202a;
+      --muted: #667085;
+      --primary: #0f62fe;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    button, select, input, textarea {
+      font: inherit;
+    }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px 12px;
+    }
+    button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+    }
+    button.ghost {
+      background: #f9fafb;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .6;
+    }
+    .muted { color: var(--muted); }
+    .error { color: var(--danger); }
+    .success { color: #067647; }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(320px, 42%) minmax(420px, 1fr);
+      min-height: calc(100vh - 58px);
+    }
+    .list-pane, .detail-pane {
+      padding: 16px;
+      overflow: auto;
+    }
+    .list-pane {
+      border-right: 1px solid var(--line);
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 140px;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .status-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .summary-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .summary-chip strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+    .summary-chip button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      border-radius: 0;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 9px 10px;
+    }
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    tr[data-id] {
+      cursor: pointer;
+    }
+    tr[data-id].selected {
+      background: #edf3ff;
+    }
+    .row-main {
+      display: grid;
+      gap: 4px;
+    }
+    .row-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-width: 64px;
+      justify-content: center;
+      border-radius: 999px;
+      background: #eef2f6;
+      color: #344054;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .detail {
+      display: grid;
+      gap: 14px;
+    }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px 12px;
+    }
+    .label {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .message {
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+    .attachments {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .attachment {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+    }
+    .attachment button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+    .attachment img,
+    .attachment .preview-fallback {
+      display: block;
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+    .attachment .preview-fallback {
+      padding: 12px;
+      min-height: 96px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+    .attachment .preview-button {
+      cursor: zoom-in;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .action-row {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .save-row .status-note {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .save-row a {
+      white-space: nowrap;
+    }
+    .attachment-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 20;
+    }
+    .attachment-modal__dialog {
+      width: min(1100px, 100%);
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
+      overflow: hidden;
+    }
+    .attachment-modal__toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .attachment-modal__body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      min-height: 56vh;
+      position: relative;
+    }
+    .attachment-modal__image {
+      min-height: 50vh;
+      max-height: 76vh;
+      width: 100%;
+      object-fit: contain;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .attachment-modal__loading {
+      position: absolute;
+      inset: 14px 60px 14px 60px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--muted);
+      z-index: 1;
+    }
+    .attachment-modal__meta {
+      padding: 0 14px 14px;
+    }
+    .attachment-modal__nav {
+      min-width: 44px;
+      height: 44px;
+      border-radius: 999px;
+    }
+    .denied {
+      padding: 40px 20px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .list-pane { border-right: 0; border-bottom: 1px solid var(--line); }
+      .action-row { grid-template-columns: 1fr; }
+      .save-row { flex-direction: column; align-items: stretch; }
+      .attachment-modal__body { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SPEED AD お問い合わせ確認</h1>
+    <div>
+      <span class="muted" id="viewerEmail"></span>
+      <button type="button" id="refreshButton">更新</button>
+    </div>
+  </header>
+
+  <main class="denied" id="deniedView" hidden>
+    <h2>アクセスできません</h2>
+    <p class="error" id="deniedMessage"></p>
+  </main>
+
+  <main class="app" id="appView" hidden>
+    <section class="list-pane" aria-label="問い合わせ一覧">
+      <div class="status-summary" id="statusSummary"></div>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="検索">
+        <select id="statusFilter">
+          <option value="active" selected>対応が必要</option>
+          <option value="all">すべて</option>
+          <option value="未対応">未対応</option>
+          <option value="対応中">対応中</option>
+          <option value="保留">保留</option>
+          <option value="対応済み">対応済み</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>受付 / 経過</th>
+            <th>内容</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody id="submissionRows"></tbody>
+      </table>
+    </section>
+
+    <section class="detail-pane" aria-label="問い合わせ詳細">
+      <div class="detail" id="detailView">
+        <div class="section">
+          <p class="muted">一覧から問い合わせを選択してください。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="attachment-modal" id="attachmentModal" hidden aria-hidden="true">
+    <div class="attachment-modal__dialog" role="dialog" aria-modal="true" aria-label="添付ファイルビューア">
+      <div class="attachment-modal__toolbar">
+        <strong>添付ファイル</strong>
+        <div>
+          <span class="muted" id="attachmentModalCounter"></span>
+          <button type="button" class="ghost" id="attachmentModalClose">閉じる</button>
+        </div>
+      </div>
+      <div class="attachment-modal__body">
+        <div class="attachment-modal__loading" id="attachmentModalLoading" hidden>読み込み中...</div>
+        <button type="button" class="ghost attachment-modal__nav" id="attachmentModalPrev" aria-label="前の添付ファイル">←</button>
+        <img class="attachment-modal__image" id="attachmentModalImage" alt="">
+        <button type="button" class="ghost attachment-modal__nav" id="attachmentModalNext" aria-label="次の添付ファイル">→</button>
+      </div>
+      <div class="attachment-modal__meta">
+        <p class="muted" id="attachmentModalCaption"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.CONTACT_VIEWER_INITIAL_ID = <?!= JSON.stringify(initialSubmissionId) ?>;
+    window.CONTACT_VIEWER_ACCESS_TOKEN = <?!= JSON.stringify(initialAccessToken) ?>;
+    window.CONTACT_VIEWER_CONTEXT = <?!= JSON.stringify(viewerContext) ?>;
+  </script>
+  <script>
+    /* CONTACT_VIEWER_TEST_HELPERS_START */
+    const VIEWER_ACCESS_TOKEN_STORAGE_KEY = 'speed-ad-contact-viewer-access-token';
+
+    function parseViewerAccessTokenFromUrl(href) {
+      const url = new URL(href);
+      const searchToken = url.searchParams.get('token') || url.searchParams.get('accessToken') || '';
+      if (searchToken) return searchToken;
+      const hash = String(url.hash || '').replace(/^#/, '');
+      if (!hash) return '';
+      const params = new URLSearchParams(hash);
+      return params.get('token') || params.get('accessToken') || '';
+    }
+
+    function buildViewerUrlWithoutTokens(href) {
+      const url = new URL(href);
+      let changed = false;
+      ['token', 'accessToken'].forEach((key) => {
+        if (url.searchParams.has(key)) {
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+      const hash = String(url.hash || '').replace(/^#/, '');
+      if (hash) {
+        const params = new URLSearchParams(hash);
+        if (params.has('token') || params.has('accessToken')) {
+          params.delete('token');
+          params.delete('accessToken');
+          url.hash = params.toString() ? `#${params.toString()}` : '';
+          changed = true;
+        }
+      }
+      return {
+        href: url.toString(),
+        changed,
+      };
+    }
+
+    function getFirstLocationParameter(location, key) {
+      if (!location) return '';
+      if (location.parameter && location.parameter[key]) {
+        return String(location.parameter[key] || '');
+      }
+      const values = location.parameters && location.parameters[key];
+      if (Array.isArray(values) && values.length) {
+        return String(values[0] || '');
+      }
+      return '';
+    }
+
+    function parseViewerAccessTokenFromAppsScriptLocation(location) {
+      const searchToken = getFirstLocationParameter(location, 'token') || getFirstLocationParameter(location, 'accessToken');
+      if (searchToken) return searchToken;
+      const hash = String((location && location.hash) || '').replace(/^#/, '');
+      if (!hash) return '';
+      const params = new URLSearchParams(hash);
+      return params.get('token') || params.get('accessToken') || '';
+    }
+
+    function getSubmissionIdFromAppsScriptLocation(location) {
+      return getFirstLocationParameter(location, 'id');
+    }
+
+    function buildAppsScriptLocationWithoutTokens(location) {
+      const cleanedParameters = {};
+      let changed = false;
+      const parameters = (location && location.parameters) || {};
+      Object.keys(parameters).forEach((key) => {
+        if (key === 'token' || key === 'accessToken') {
+          changed = true;
+          return;
+        }
+        cleanedParameters[key] = parameters[key];
+      });
+
+      if (location && location.parameter) {
+        Object.keys(location.parameter).forEach((key) => {
+          if (key === 'token' || key === 'accessToken' || cleanedParameters[key]) return;
+          cleanedParameters[key] = [String(location.parameter[key] || '')];
+        });
+      }
+
+      const hash = String((location && location.hash) || '').replace(/^#/, '');
+      const hashParams = new URLSearchParams(hash);
+      if (hashParams.has('token') || hashParams.has('accessToken')) {
+        hashParams.delete('token');
+        hashParams.delete('accessToken');
+        changed = true;
+      }
+
+      return {
+        parameters: cleanedParameters,
+        hash: hashParams.toString(),
+        changed,
+      };
+    }
+
+    function readViewerAccessTokenFromSession(storage) {
+      try {
+        return storage ? String(storage.getItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY) || '') : '';
+      } catch (_error) {
+        return '';
+      }
+    }
+
+    function writeViewerAccessTokenToSession(storage, token) {
+      try {
+        if (storage && token) storage.setItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY, token);
+      } catch (_error) {
+        // Session storage is optional. The URL token still works for the first load.
+      }
+    }
+
+    function clearViewerAccessTokenFromSession(storage) {
+      try {
+        if (storage) storage.removeItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY);
+      } catch (_error) {
+        // Ignore unavailable storage.
+      }
+    }
+
+    function computeQueueCounts(submissions) {
+      const counts = {
+        total: 0,
+        active: 0,
+        未対応: 0,
+        対応中: 0,
+        保留: 0,
+        対応済み: 0,
+      };
+      (submissions || []).forEach((submission) => {
+        const status = normalizeViewerHandledStatus(submission && submission.handled_status);
+        counts.total += 1;
+        if (status === '未対応' || status === '対応中') {
+          counts.active += 1;
+        }
+        if (Object.prototype.hasOwnProperty.call(counts, status)) {
+          counts[status] += 1;
+        }
+      });
+      return counts;
+    }
+
+    function clampAttachmentIndex(index, attachments) {
+      if (!Array.isArray(attachments) || !attachments.length) return -1;
+      const numericIndex = Number(index);
+      if (!Number.isFinite(numericIndex)) return 0;
+      return Math.max(0, Math.min(Math.floor(numericIndex), attachments.length - 1));
+    }
+
+    function normalizeViewerHandledStatus(status) {
+      const normalized = String(status || '').trim();
+      return normalized || '未対応';
+    }
+
+    function shouldResetAttachmentModal(previousSubmissionId, nextSubmissionId) {
+      return String(previousSubmissionId || '') !== String(nextSubmissionId || '');
+    }
+
+    function getAttachmentModalVisibilityState(isVisible) {
+      return {
+        hidden: !isVisible,
+        ariaHidden: isVisible ? null : 'true',
+      };
+    }
+
+    function buildAttachmentModalViewState(attachments, selectedIndex) {
+      const attachmentIndex = clampAttachmentIndex(selectedIndex, attachments);
+      if (attachmentIndex < 0) {
+        return {
+          attachmentIndex,
+          hidden: true,
+          ariaHidden: 'true',
+          loading: false,
+          error: '',
+          imageSrc: '',
+          caption: '',
+          prevDisabled: true,
+          nextDisabled: true,
+        };
+      }
+      const attachment = attachments[attachmentIndex];
+      const loading = !!attachment.previewLoading && !attachment.dataUrl;
+      const error = !loading && attachment.previewError && !attachment.dataUrl ? String(attachment.previewError) : '';
+      return {
+        attachmentIndex,
+        hidden: false,
+        ariaHidden: null,
+        loading,
+        error,
+        imageSrc: loading || error ? '' : (attachment.dataUrl || ''),
+        caption: [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
+          .filter(Boolean)
+          .join(' / '),
+        prevDisabled: attachmentIndex <= 0,
+        nextDisabled: attachmentIndex >= attachments.length - 1,
+      };
+    }
+
+    function buildAttachmentModalClosedState() {
+      return {
+        attachmentIndex: 0,
+        hidden: true,
+        ariaHidden: 'true',
+      };
+    }
+
+    function getDetailAttachmentModalState(_detailState) {
+      return buildAttachmentModalClosedState();
+    }
+
+    function resetAttachmentModalState() {
+      const closedState = getDetailLifecycleResetState('reset');
+      state.attachmentIndex = closedState.attachmentIndex;
+      state.dirty = closedState.dirty;
+      state.attachmentReturnFocus = null;
+      setAttachmentLoading(false);
+      setAttachmentModalVisibility(!closedState.hidden);
+    }
+
+    function getDetailLifecycleResetState(_detailState) {
+      return {
+        attachmentIndex: 0,
+        hidden: true,
+        ariaHidden: 'true',
+        dirty: false,
+      };
+    }
+
+    window.__CONTACT_VIEWER_TEST__ = {
+      parseViewerAccessTokenFromUrl,
+      parseViewerAccessTokenFromAppsScriptLocation,
+      buildViewerUrlWithoutTokens,
+      buildAppsScriptLocationWithoutTokens,
+      getSubmissionIdFromAppsScriptLocation,
+      readViewerAccessTokenFromSession,
+      writeViewerAccessTokenToSession,
+      clearViewerAccessTokenFromSession,
+      computeQueueCounts,
+      clampAttachmentIndex,
+      normalizeViewerHandledStatus,
+      shouldResetAttachmentModal,
+      getAttachmentModalVisibilityState,
+      buildAttachmentModalViewState,
+      buildAttachmentModalClosedState,
+      getDetailAttachmentModalState,
+      getDetailLifecycleResetState,
+      resetAttachmentModalState,
+    };
+    /* CONTACT_VIEWER_TEST_HELPERS_END */
+
+    function getAppsScriptLocation() {
+      return new Promise((resolve) => {
+        if (window.google && google.script && google.script.url && typeof google.script.url.getLocation === 'function') {
+          google.script.url.getLocation(resolve);
+          return;
+        }
+        resolve(null);
+      });
+    }
+
+    function applyViewerLocationState(location) {
+      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
+      const urlToken = parseViewerAccessTokenFromAppsScriptLocation(location) || parseViewerAccessTokenFromUrl(window.location.href);
+      const token = serverToken || urlToken || readViewerAccessTokenFromSession(window.sessionStorage);
+      if (urlToken) {
+        writeViewerAccessTokenToSession(window.sessionStorage, urlToken);
+      }
+      state.accessToken = token;
+      const submissionId = getSubmissionIdFromAppsScriptLocation(location) || window.CONTACT_VIEWER_INITIAL_ID || '';
+      if (submissionId) {
+        state.selectedId = submissionId;
+      }
+    }
+
+    function cleanAccessTokenFromUrl(location) {
+      const appsScriptCleaned = buildAppsScriptLocationWithoutTokens(location);
+      if (appsScriptCleaned.changed && window.google && google.script && google.script.history && typeof google.script.history.replace === 'function') {
+        google.script.history.replace({}, appsScriptCleaned.parameters, appsScriptCleaned.hash);
+        return;
+      }
+      const result = buildViewerUrlWithoutTokens(window.location.href);
+      if (result.changed) {
+        window.history.replaceState({}, document.title, result.href);
+      }
+    }
+
+    function formatElapsedTime(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '-';
+      const diffMs = Date.now() - date.getTime();
+      const diffMinutes = Math.max(Math.floor(diffMs / 60000), 0);
+      if (diffMinutes < 1) return 'たった今';
+      if (diffMinutes < 60) return `${diffMinutes}分前`;
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return `${diffHours}時間前`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays}日前`;
+    }
+
+    function buildMailToHref(email, subject) {
+      if (!email) return '';
+      const params = new URLSearchParams();
+      if (subject) params.set('subject', subject);
+      return `mailto:${encodeURIComponent(email)}${params.toString() ? `?${params.toString()}` : ''}`;
+    }
+
+    const state = {
+      selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
+      accessToken: window.CONTACT_VIEWER_ACCESS_TOKEN || readViewerAccessTokenFromSession(window.sessionStorage),
+      submissions: [],
+      counts: { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 },
+      loading: false,
+      detail: null,
+      detailSnapshot: { handled_status: '', internal_note: '' },
+      dirty: false,
+      attachmentIndex: 0,
+      attachmentRequestSerial: 0,
+      attachmentReturnFocus: null,
+    };
+
+    const appView = document.getElementById('appView');
+    const deniedView = document.getElementById('deniedView');
+    const deniedMessage = document.getElementById('deniedMessage');
+    const viewerEmail = document.getElementById('viewerEmail');
+    const refreshButton = document.getElementById('refreshButton');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const submissionRows = document.getElementById('submissionRows');
+    const detailView = document.getElementById('detailView');
+    const statusSummary = document.getElementById('statusSummary');
+    const attachmentModal = document.getElementById('attachmentModal');
+    const attachmentModalImage = document.getElementById('attachmentModalImage');
+    const attachmentModalCaption = document.getElementById('attachmentModalCaption');
+    const attachmentModalCounter = document.getElementById('attachmentModalCounter');
+    const attachmentModalPrev = document.getElementById('attachmentModalPrev');
+    const attachmentModalNext = document.getElementById('attachmentModalNext');
+    const attachmentModalClose = document.getElementById('attachmentModalClose');
+    const attachmentModalLoading = document.getElementById('attachmentModalLoading');
+
+    function callServer(name, ...args) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)[name](...args);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
+    function setBusy(isBusy) {
+      state.loading = isBusy;
+      refreshButton.disabled = isBusy;
+    }
+
+    function setAttachmentModalVisibility(isVisible) {
+      const visibilityState = getAttachmentModalVisibilityState(isVisible);
+      attachmentModal.hidden = visibilityState.hidden;
+      if (visibilityState.ariaHidden == null) {
+        attachmentModal.removeAttribute('aria-hidden');
+      } else {
+        attachmentModal.setAttribute('aria-hidden', visibilityState.ariaHidden);
+      }
+    }
+
+    function renderStatusSummary() {
+      const chips = [
+        { label: '全件', value: state.counts.total || 0 },
+        { label: '対応が必要', value: state.counts.active || 0 },
+        { label: '未対応', value: state.counts['未対応'] || 0 },
+        { label: '対応中', value: state.counts['対応中'] || 0 },
+        { label: '保留', value: state.counts['保留'] || 0 },
+        { label: '対応済み', value: state.counts['対応済み'] || 0 },
+      ];
+      statusSummary.innerHTML = chips.map((chip) => `
+        <span class="summary-chip">
+          <strong>${escapeHtml(chip.value)}</strong>
+          ${escapeHtml(chip.label)}
+        </span>
+      `).join('');
+    }
+
+    function getStatusFilterLabel(value) {
+      const option = Array.from(statusFilter.options).find((item) => item.value === value);
+      return option ? option.textContent : value;
+    }
+
+    function isDirty() {
+      return state.dirty;
+    }
+
+    function markDirty() {
+      if (!state.detail) return;
+      const statusSelect = document.getElementById('statusSelect');
+      const internalNote = document.getElementById('internalNote');
+      state.dirty = Boolean(
+        statusSelect && internalNote &&
+          (statusSelect.value !== state.detailSnapshot.handled_status ||
+            internalNote.value !== state.detailSnapshot.internal_note)
+      );
+      const statusSaveMessage = document.getElementById('statusSaveMessage');
+      if (statusSaveMessage && state.dirty) {
+        statusSaveMessage.textContent = '未保存の変更があります。';
+        statusSaveMessage.classList.remove('success');
+        statusSaveMessage.classList.add('muted');
+      }
+    }
+
+    function confirmDiscardChanges() {
+      if (!isDirty()) return true;
+      return window.confirm('未保存の変更があります。破棄して別の問い合わせへ移動しますか？');
+    }
+
+    function setDetailSnapshot(submission) {
+      state.detailSnapshot = {
+        handled_status: submission.handled_status || '未対応',
+        internal_note: submission.internal_note || '',
+      };
+      state.dirty = false;
+    }
+
+    function renderList() {
+      submissionRows.innerHTML = state.submissions.map((item) => `
+        <tr data-id="${escapeHtml(item.submission_id)}" class="${item.submission_id === state.selectedId ? 'selected' : ''}">
+          <td>
+            <div class="row-main">
+              <strong>${escapeHtml(formatDate(item.submitted_at))}</strong>
+              <span class="muted">${escapeHtml(formatElapsedTime(item.submitted_at))}</span>
+            </div>
+          </td>
+          <td>
+            <strong>${escapeHtml(item.subject || 'お問い合わせ')}</strong><br>
+            <div class="row-meta">
+              <span>${escapeHtml(item.email || '-')}</span>
+              <span>${escapeHtml(item.contact_type || '-')}</span>
+              <span>${Number(item.attachment_count || 0) > 0 ? `添付 ${escapeHtml(item.attachment_count)}件` : '添付なし'}</span>
+            </div>
+          </td>
+          <td><span class="status">${escapeHtml(item.handled_status || '未対応')}</span></td>
+        </tr>
+      `).join('');
+
+      submissionRows.querySelectorAll('tr[data-id]').forEach((row) => {
+        row.addEventListener('click', () => selectSubmission(row.dataset.id));
+      });
+    }
+
+    function renderDetailEmpty(message) {
+      resetAttachmentModalState();
+      state.detail = null;
+      state.dirty = false;
+      detailView.innerHTML = `<div class="section"><p class="muted">${escapeHtml(message)}</p></div>`;
+    }
+
+    function renderDetail(submission) {
+      resetAttachmentModalState();
+      state.detail = submission;
+      state.dirty = false;
+      const attachments = submission.attachments || [];
+      const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
+      const currentStatus = submission.handled_status || '未対応';
+      detailView.innerHTML = `
+        <section class="section">
+          <h2>${escapeHtml(submission.subject || 'お問い合わせ')}</h2>
+          <div class="grid">
+            <div class="label">受付ID</div><div>${escapeHtml(submission.submission_id)}</div>
+            <div class="label">受付日時</div><div>${escapeHtml(formatDate(submission.submitted_at))}</div>
+            <div class="label">種別</div><div>${escapeHtml(submission.contact_type || '-')}</div>
+            <div class="label">投稿者</div><div>${escapeHtml(submission.name || '-')}</div>
+            <div class="label">メール</div><div><a href="mailto:${escapeHtml(submission.email)}">${escapeHtml(submission.email || '-')}</a></div>
+            <div class="label">投稿元</div><div>${submission.source_url ? `<a href="${escapeHtml(submission.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(submission.source_url)}</a>` : '-'}</div>
+            <div class="label">User-Agent</div><div>${escapeHtml(submission.user_agent || '-')}</div>
+          </div>
+        </section>
+        <section class="section">
+          <h2>本文</h2>
+          <div class="message">${escapeHtml(submission.message || '-')}</div>
+        </section>
+        <section class="section">
+          <h2>対応</h2>
+          <div class="actions">
+            <div class="quick-actions">
+              ${[
+                ['対応中', '対応中にする'],
+                ['対応済み', '対応済みにする'],
+                ['保留', '保留にする'],
+              ].map(([status, label]) => `<button type="button" class="ghost quick-status" data-status="${status}">${label}</button>`).join('')}
+            </div>
+            <div class="action-row">
+              <select id="statusSelect">
+                ${['未対応', '対応中', '対応済み', '保留'].map((status) => `<option value="${status}" ${status === currentStatus ? 'selected' : ''}>${status}</option>`).join('')}
+              </select>
+              <textarea id="internalNote" placeholder="内部メモ">${escapeHtml(submission.internal_note || '')}</textarea>
+              <button type="button" class="primary" id="saveStatusButton">保存</button>
+            </div>
+            <div class="save-row">
+              <div class="status-note">
+                <p class="muted" id="statusSaveMessage"></p>
+                <a href="${escapeHtml(replyMailHref)}" target="_blank" rel="noopener noreferrer" id="replyMailLink">返信メールを作成</a>
+              </div>
+              <span class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</span>
+            </div>
+          </div>
+        </section>
+        <section class="section">
+          <h2>添付</h2>
+          <div class="attachments" id="attachmentList">
+            ${attachments.length ? attachments.map((attachment, index) => renderAttachmentShell(attachment, index)).join('') : '<p class="muted">添付はありません。</p>'}
+          </div>
+        </section>
+      `;
+
+      document.getElementById('saveStatusButton').addEventListener('click', saveStatus);
+      document.querySelectorAll('.quick-status').forEach((button) => {
+        button.addEventListener('click', () => saveStatus(button.dataset.status));
+      });
+      const statusSelect = document.getElementById('statusSelect');
+      const internalNote = document.getElementById('internalNote');
+      statusSelect.addEventListener('change', markDirty);
+      internalNote.addEventListener('input', markDirty);
+      document.querySelectorAll('.preview-button').forEach((button) => {
+        button.addEventListener('click', () => openAttachmentViewer(Number(button.dataset.attachmentIndex || 0)));
+      });
+      attachments.forEach((attachment, index) => loadAttachmentPreview(attachment, index));
+      setDetailSnapshot(submission);
+      markDirty();
+      syncAttachmentModalControls();
+    }
+
+    function renderAttachmentShell(attachment, index) {
+      return `
+        <div class="attachment" data-file-id="${escapeHtml(attachment.fileId)}">
+          <button type="button" class="preview-button" data-attachment-index="${index}">
+            <div class="preview muted">読み込み中...</div>
+          </button>
+          <strong>${escapeHtml(attachment.name || attachment.fileId)}</strong><br>
+          <span class="muted">${escapeHtml(attachment.mimeType || '-')} / ${escapeHtml(attachment.size || '-')} bytes</span><br>
+          ${attachment.originalName ? `<span class="muted">元: ${escapeHtml(attachment.originalName)}</span><br>` : ''}
+          ${attachment.url ? `<a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer">Driveで開く</a>` : ''}
+        </div>
+      `;
+    }
+
+    async function loadAttachmentPreview(attachment, index) {
+      const container = Array.from(detailView.querySelectorAll('[data-file-id]'))
+        .find((element) => element.dataset.fileId === attachment.fileId);
+      if (!container) return;
+      const preview = container.querySelector('.preview');
+      attachment.previewLoading = true;
+      attachment.previewError = '';
+      try {
+        const result = await callServer('getAttachmentPreview', state.accessToken, attachment.fileId);
+        attachment.dataUrl = result.dataUrl;
+        attachment.previewName = result.name;
+        attachment.previewLoading = false;
+        preview.innerHTML = `<img src="${escapeHtml(result.dataUrl)}" alt="${escapeHtml(result.name)}">`;
+      } catch (error) {
+        attachment.previewLoading = false;
+        attachment.previewError = String(error.message || error);
+        preview.textContent = String(error.message || error);
+        preview.classList.add('error');
+      }
+    }
+
+    function renderStatusFilterLabel() {
+      statusFilter.title = getStatusFilterLabel(statusFilter.value);
+    }
+
+    async function loadList() {
+      if (isDirty() && !confirmDiscardChanges()) {
+        return;
+      }
+      setBusy(true);
+      try {
+        const result = await callServer('listContactSubmissions', state.accessToken, {
+          query: searchInput.value,
+          status: statusFilter.value,
+          limit: 100,
+        });
+        state.submissions = result.submissions || [];
+        state.counts = result.counts || state.counts;
+        renderStatusSummary();
+        renderStatusFilterLabel();
+        renderList();
+        if (state.selectedId && state.submissions.some((item) => item.submission_id === state.selectedId)) {
+          await selectSubmission(state.selectedId);
+      } else if (state.submissions.length) {
+          await selectSubmission(state.submissions[0].submission_id);
+        } else {
+          state.selectedId = '';
+          state.detail = null;
+          renderDetailEmpty('一致するお問い合わせがありません。');
+        }
+      } catch (error) {
+        resetAttachmentModalState();
+        renderDetailEmpty(String(error.message || error));
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function selectSubmission(id) {
+      if (id !== state.selectedId && isDirty() && !confirmDiscardChanges()) {
+        return;
+      }
+      state.selectedId = id;
+      renderList();
+      renderDetailEmpty('読み込み中...');
+      try {
+        const result = await callServer('getContactSubmission', state.accessToken, id);
+        state.detail = result.submission;
+        renderDetail(state.detail);
+        setDetailSnapshot(state.detail);
+      } catch (error) {
+        resetAttachmentModalState();
+        renderDetailEmpty(String(error.message || error));
+      }
+    }
+
+    async function saveStatus(nextStatus) {
+      const statusSelect = document.getElementById('statusSelect');
+      if (nextStatus) {
+        statusSelect.value = nextStatus;
+      }
+      const status = statusSelect.value;
+      const note = document.getElementById('internalNote').value;
+      const button = document.getElementById('saveStatusButton');
+      const message = document.getElementById('statusSaveMessage');
+      button.disabled = true;
+      message.textContent = '保存中...';
+      message.classList.remove('error', 'success');
+      try {
+        const result = await callServer('updateContactSubmissionStatus', state.accessToken, state.selectedId, status, note);
+        state.detail = result.submission;
+        renderDetail(state.detail);
+        setDetailSnapshot(state.detail);
+        await loadList();
+        const successMessage = document.getElementById('statusSaveMessage');
+        if (successMessage) {
+          successMessage.textContent = '保存しました。';
+          successMessage.classList.remove('error');
+          successMessage.classList.add('success');
+        }
+      } catch (error) {
+        message.textContent = String(error.message || error);
+        message.classList.add('error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function setAttachmentLoading(isLoading, label) {
+      attachmentModalLoading.hidden = !isLoading;
+      attachmentModalImage.hidden = isLoading;
+      if (isLoading) {
+        attachmentModalLoading.textContent = label || '読み込み中...';
+      }
+    }
+
+    async function ensureAttachmentPreviewLoaded(index) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const attachment = attachments[index];
+      if (!attachment) return null;
+      if (attachment.dataUrl) return attachment;
+      if (!attachment.previewPromise) {
+        attachment.previewPromise = callServer('getAttachmentPreview', state.accessToken, attachment.fileId)
+          .then((result) => {
+            attachment.dataUrl = result.dataUrl;
+            attachment.previewName = result.name;
+            delete attachment.previewError;
+            return attachment;
+          })
+          .finally(() => {
+            delete attachment.previewPromise;
+          });
+      }
+      setAttachmentLoading(true, `${attachment.name || attachment.fileId} を読み込み中...`);
+      try {
+        await attachment.previewPromise;
+      } catch (error) {
+        attachment.previewError = String(error.message || error);
+        setAttachmentLoading(true, attachment.previewError);
+        throw error;
+      }
+      return attachment;
+    }
+
+    async function openAttachmentViewer(index) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      if (!attachments.length) return;
+      state.attachmentReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      state.attachmentIndex = clampAttachmentIndex(index, attachments);
+      if (state.attachmentIndex < 0) return;
+      const attachment = attachments[state.attachmentIndex];
+      const requestSerial = ++state.attachmentRequestSerial;
+      attachment.previewLoading = true;
+      attachment.previewError = '';
+      attachment.previewRequestSerial = requestSerial;
+      setAttachmentModalVisibility(true);
+      setAttachmentLoading(true, `${attachment.name || attachment.fileId} を読み込み中...`);
+      syncAttachmentModalControls();
+      attachmentModalClose.focus();
+      try {
+        await ensureAttachmentPreviewLoaded(state.attachmentIndex);
+      } catch (_error) {
+        // keep the error visible in the modal
+      }
+      if (!state.detail || state.detail.attachments[state.attachmentIndex] !== attachment || attachment.previewRequestSerial !== requestSerial) {
+        return;
+      }
+      attachment.previewLoading = false;
+      syncAttachmentModalControls();
+    }
+
+    function closeAttachmentViewer() {
+      setAttachmentModalVisibility(false);
+      const target = state.attachmentReturnFocus;
+      state.attachmentReturnFocus = null;
+      if (target && typeof target.focus === 'function' && document.contains(target)) {
+        target.focus();
+      }
+    }
+
+    function syncAttachmentModalControls() {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const viewState = buildAttachmentModalViewState(attachments, state.attachmentIndex);
+      state.attachmentIndex = viewState.attachmentIndex;
+      if (viewState.attachmentIndex < 0) {
+        attachmentModalPrev.disabled = true;
+        attachmentModalNext.disabled = true;
+        attachmentModalImage.removeAttribute('src');
+        attachmentModalImage.hidden = false;
+        attachmentModalCaption.textContent = '';
+        attachmentModalCounter.textContent = '';
+        setAttachmentLoading(false);
+        return;
+      }
+      if (viewState.loading) {
+        setAttachmentLoading(true, `${attachments[viewState.attachmentIndex].name || attachments[viewState.attachmentIndex].fileId} を読み込み中...`);
+        attachmentModalImage.hidden = true;
+        attachmentModalImage.removeAttribute('src');
+      } else if (viewState.error) {
+        setAttachmentLoading(true, viewState.error);
+        attachmentModalImage.removeAttribute('src');
+      } else {
+        setAttachmentLoading(false);
+        attachmentModalImage.hidden = false;
+        attachmentModalImage.src = viewState.imageSrc || '';
+      }
+      attachmentModalImage.alt = attachments[viewState.attachmentIndex].name || attachments[viewState.attachmentIndex].fileId || '添付';
+      attachmentModalCaption.textContent = viewState.caption;
+      attachmentModalCounter.textContent = `${viewState.attachmentIndex + 1} / ${attachments.length}`;
+      attachmentModalPrev.disabled = viewState.prevDisabled;
+      attachmentModalNext.disabled = viewState.nextDisabled;
+    }
+
+    async function moveAttachmentViewer(delta) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const nextIndex = clampAttachmentIndex(state.attachmentIndex + delta, attachments);
+      if (nextIndex < 0 || nextIndex >= attachments.length) return;
+      state.attachmentIndex = nextIndex;
+      const attachment = attachments[nextIndex];
+      const requestSerial = ++state.attachmentRequestSerial;
+      attachment.previewLoading = true;
+      attachment.previewError = '';
+      attachment.previewRequestSerial = requestSerial;
+      setAttachmentModalVisibility(true);
+      syncAttachmentModalControls();
+      try {
+        await ensureAttachmentPreviewLoaded(state.attachmentIndex);
+      } catch (_error) {
+        // keep modal open with loading/error state
+      }
+      if (!state.detail || state.detail.attachments[state.attachmentIndex] !== attachment || attachment.previewRequestSerial !== requestSerial) {
+        return;
+      }
+      attachment.previewLoading = false;
+      syncAttachmentModalControls();
+    }
+
+    let viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
+
+    function showDenied(message, shouldCleanUrl) {
+      viewerEmail.textContent = viewerContext.email || '';
+      deniedMessage.textContent = message;
+      deniedView.hidden = false;
+      appView.hidden = true;
+      if (shouldCleanUrl) {
+        clearViewerAccessTokenFromSession(window.sessionStorage);
+        state.accessToken = '';
+        cleanAccessTokenFromUrl();
+      }
+    }
+
+    function showApp(appsScriptLocation) {
+      viewerEmail.textContent = viewerContext.email || '';
+      deniedView.hidden = true;
+      appView.hidden = false;
+      cleanAccessTokenFromUrl(appsScriptLocation);
+      refreshButton.addEventListener('click', loadList);
+      searchInput.addEventListener('input', () => {
+        window.clearTimeout(searchInput._timer);
+        searchInput._timer = window.setTimeout(loadList, 250);
+      });
+      statusFilter.addEventListener('change', loadList);
+      loadList();
+    }
+
+    async function bootstrapViewer() {
+      viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
+      const appsScriptLocation = await getAppsScriptLocation();
+      applyViewerLocationState(appsScriptLocation);
+      if (viewerContext.allowed) {
+        showApp(appsScriptLocation);
+        return;
+      }
+      if (!state.accessToken) {
+        showDenied(viewerContext.tokenConfigured
+          ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。', false);
+        return;
+      }
+      try {
+        const validatedContext = await callServer('validateViewerAccessToken', state.accessToken);
+        viewerContext = validatedContext || viewerContext;
+        if (validatedContext && validatedContext.allowed) {
+          showApp(appsScriptLocation);
+          return;
+        }
+        showDenied(viewerContext.tokenConfigured
+          ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。', true);
+        return;
+      } catch (_error) {
+        showDenied('確認アプリの確認に一時的に失敗しました。再読み込みしてもう一度お試しください。', false);
+        return;
+      }
+    }
+
+    attachmentModal.addEventListener('click', (event) => {
+      if (event.target === attachmentModal) {
+        closeAttachmentViewer();
+      }
+    });
+    attachmentModalClose.addEventListener('click', closeAttachmentViewer);
+    attachmentModalPrev.addEventListener('click', () => moveAttachmentViewer(-1));
+    attachmentModalNext.addEventListener('click', () => moveAttachmentViewer(1));
+    document.addEventListener('keydown', (event) => {
+      if (attachmentModal.hidden) return;
+      if (event.key === 'Escape') closeAttachmentViewer();
+      if (event.key === 'ArrowLeft') moveAttachmentViewer(-1);
+      if (event.key === 'ArrowRight') moveAttachmentViewer(1);
+    });
+    bootstrapViewer();
+  </script>
+</body>
+</html>
