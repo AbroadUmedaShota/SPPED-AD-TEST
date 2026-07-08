@@ -97,7 +97,7 @@ last_reviewed: 2026-04-24
 - `.survey-content-wrapper`（max-width 768px、左右中央寄せ）
 - `.survey-question-card`（背景白、角丸 8px、`border-left: 4px solid transparent`（`.is-required` 付き時のみ動的色）、影 `0 1px 2px 0 rgba(0,0,0,0.05)`、ホバー transition）
 - `.header-unpinned`（**死スタイル**、呼出元なし、§11-6）
-- `.bizcard-preview-img` / `.bizcard-preview-back-empty` / `.bizcard-preview-back-actions-hidden`（名刺プレビューエリア用）
+- `.bizcard-preview-img` / `.bizcard-preview-back-empty`（名刺プレビューエリア用）
 - `#submitting-progress-bar { width: 0%; }`（送信モーダル初期値）
 
 ---
@@ -127,18 +127,12 @@ last_reviewed: 2026-04-24
     │       ├── #error-container (hidden, bg-red-100 p-4)       … 致命エラー時のみ表示、フォーム非表示
     │       ├── <form id="survey-form" class="space-y-6">       … renderQuestions() が fieldset を append
     │       └── #bizcard-preview-area (hidden, mt-6)
-    │           ├── #bizcard-preview-front-container (group)
-    │           │   ├── #bizcard-preview-front (<img>)
-    │           │   └── hover overlay
-    │           │       ├── #bizcard-retake-front (<button> 再撮影)
-    │           │       └── #bizcard-delete-front (<button> 削除)
+    │           ├── #bizcard-preview-front-container
+    │           │   └── #bizcard-preview-front (<img>)
     │           └── #bizcard-preview-back-wrapper
-    │               └── #bizcard-preview-back-container (group)
+    │               └── #bizcard-preview-back-container
     │                   ├── #bizcard-preview-back (<img>, 初期hidden)
-    │                   ├── #bizcard-preview-back-empty (div, 初期visible)    … 「裏面を追加」クリック領域
-    │                   └── #bizcard-preview-back-actions (hidden overlay)
-    │                       ├── #bizcard-retake-back
-    │                       └── #bizcard-delete-back
+    │                   └── #bizcard-preview-back-empty (div, 初期visible)    … 「裏面を追加」クリック領域
     └── <footer class="bg-white shadow-md py-6">
         └── .survey-content-wrapper (flex-col items-center gap-4)
             ├── 2-col grid (w-full, gap-4)
@@ -153,7 +147,7 @@ last_reviewed: 2026-04-24
 #leave-confirm-modal      (empty div、離脱確認 / 手入力保存確認 兼用)
 #draft-restore-modal      (empty div、ドラフト復元)
 #image-magnify-modal      (empty div, z-60, 画像拡大)
-#toast-notification       (fixed top-1/2 left-1/2, 3秒で自動非表示)
+#toast-notification       (fixed bottom-6 left-1/2 画面下部中央, 3秒で自動非表示)
 ```
 
 ### 4.2 セクション詳細
@@ -228,7 +222,6 @@ last_reviewed: 2026-04-24
 | `#bizcard-preview-front` | `hasFront` 時に `src` 更新、`hidden` クラスは HTML 側から付けられていない | [survey-answer.js:516-518](../../../02_dashboard/src/survey-answer.js#L516) |
 | `#bizcard-preview-back` | 裏面登録時 `src` 更新 + `hidden` 除去、未登録時 `hidden` 付与 | [survey-answer.js:521-528](../../../02_dashboard/src/survey-answer.js#L521) |
 | `#bizcard-preview-back-empty` | 裏面登録時 `hidden` 付与、未登録時 `hidden` 除去 | 同上 |
-| `#bizcard-preview-back-actions` | 裏面登録時 `.bizcard-preview-back-actions-hidden` 除去（ホバーオーバーレイ可視化）、未登録時付与 | 同上 |
 
 #### 4.2.8 フッター
 
@@ -262,7 +255,7 @@ last_reviewed: 2026-04-24
 | モーダル | セレクタ | 表示条件 | 閉じる手段 |
 |----------|----------|----------|------------|
 | 送信中 | `#submitting-modal` | `handleSubmit()` 開始時に `showSubmittingModal(true)` | **閉じる手段なし**。送信完了でサンクス画面へ遷移、失敗時のみ `showSubmittingModal(false)` で閉じる（§5.5） |
-| 名刺アップロード | `#bizcard-upload-modal` | `#bizcard-camera-button` / サムネイル再撮影 / 裏面追加 押下 | × / オーバーレイクリック / ESC（ブラウザ標準動作は無し、`showModal()` 内の `modalElement.addEventListener('click', ...)` でオーバーレイクリックを検知） |
+| 名刺アップロード | `#bizcard-upload-modal` | `#bizcard-camera-button` / 裏面追加 押下 | × / オーバーレイクリック / ESC（ブラウザ標準動作は無し、`showModal()` 内の `modalElement.addEventListener('click', ...)` でオーバーレイクリックを検知） |
 | 手入力 | `#manual-input-modal` | `#bizcard-manual-button` 押下 | × / オーバーレイクリック（onCancel が未設定でも `close-modal-button` は存在し、modal の `display='none'`） |
 | 離脱／保存確認 | `#leave-confirm-modal` | `popstate` / 外部リンククリック / 手入力「保存」の確認ステップ | × / オーバーレイクリック（`onCancel` コールバックがあれば実行） |
 | ドラフト復元 | `#draft-restore-modal` | `checkForDraft()` が `survey_draft_{surveyId}_{sessionId}` 検出時 | × / オーバーレイクリック → `onCancel`（ドラフト破棄） |
@@ -504,13 +497,11 @@ last_reviewed: 2026-04-24
 - disabled: false / true
 - クラス: `bg-blue-100 text-blue-800 hover:bg-blue-200` ↔ `bg-gray-100 text-gray-400 cursor-not-allowed`
 
-**削除確認**: `showBizcardDeleteConfirm(side)`（[survey-answer.js:578-608](../../../02_dashboard/src/survey-answer.js#L578)）で `#bizcard-upload-modal` を流用し、確認モーダル表示。保存ボタンを赤く染色（`bg-red-600 hover:bg-red-700`）してから確定。
-
 #### 5.4.2 手入力フロー [**MVP**]
 
 `#bizcard-manual-button` click ハンドラ内にインラインで定義（[survey-answer.js:356-460](../../../02_dashboard/src/survey-answer.js#L356)）。
 
-**入力項目**（全 9 欄、すべて任意、形式バリデーション無し）:
+**入力項目**（全 13 欄、すべて任意、形式バリデーション無し。名刺データ化の納品フォーマットに整合）:
 
 | 論理名 | DOM id / name | type |
 |--------|---------------|------|
@@ -521,9 +512,12 @@ last_reviewed: 2026-04-24
 | 部署名 | `manual-department` / `department` | text |
 | 役職名 | `manual-title` / `title` | text |
 | 電話番号 | `manual-phone` / `phone` | tel |
+| 携帯番号 | `manual-mobile` / `mobile` | tel |
+| FAX番号 | `manual-fax` / `fax` | tel |
 | 郵便番号 | `manual-postal-code` / `postalCode` | text |
 | 住所 | `manual-address` / `address` | text |
 | 建物名 | `manual-building` / `building` | text |
+| URL | `manual-url` / `url` | url |
 
 **2 段階保存**:
 
@@ -540,8 +534,6 @@ last_reviewed: 2026-04-24
 `initBizcardPreviewListeners()`（[survey-answer.js:534-576](../../../02_dashboard/src/survey-answer.js#L534)）で以下をバインド:
 - `#bizcard-preview-front-container` / `#bizcard-preview-back-container` のクリック: 画像拡大（`#bizcard-preview-back` は `hidden` なら無視）
 - `#bizcard-preview-back-empty` のクリック: `startBizcardUploadFlow('back')`（`stopPropagation()`）
-- `#bizcard-retake-front` / `-back`: `startBizcardUploadFlow('front'/'back')`
-- `#bizcard-delete-front` / `-back`: `showBizcardDeleteConfirm('front'/'back')`
 
 ### 5.5 進捗表示・ページング [**MVP**]
 

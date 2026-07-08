@@ -229,18 +229,20 @@
     const showLoginLinkFromModal = document.getElementById('show-login-from-modal');
     const signupNameInput = document.getElementById('signup-name');
     const signupEmailInput = document.getElementById('signup-email');
-    const signupPasswordInput = document.getElementById('signup-password');
-    const signupPasswordConfirmInput = document.getElementById('signup-password-confirm');
     const termsAgreeCheckbox = document.getElementById('terms-agree');
     const privacyHandlingAgreeCheckbox = document.getElementById('privacy-handling-agree');
     const signupNameError = document.getElementById('signup-name-error');
     const signupEmailError = document.getElementById('signup-email-error');
-    const signupPasswordError = document.getElementById('signup-password-error');
-    const signupPasswordConfirmError = document.getElementById('signup-password-confirm-error');
     const termsAgreeError = document.getElementById('terms-agree-error');
     const privacyHandlingAgreeError = document.getElementById('privacy-handling-agree-error');
     const signupAccountButton = signupForm?.querySelector('.button--filled');
     const googleButtonModal = modalContent?.querySelector('.button--google');
+    const signupModalTitle = document.getElementById('signup-modal-title');
+    const signupStepFormEl = modalContent?.querySelector('[data-signup-step="form"]');
+    const signupStepSentEl = modalContent?.querySelector('[data-signup-step="sent"]');
+    const signupSentEmailEl = modalContent?.querySelector('[data-signup-sent-email]');
+    const signupOpenVerifyButton = document.getElementById('signup-open-verify');
+    const signupBackToFormButton = document.getElementById('signup-back-to-form');
     const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
     const customerVoiceTeaserStatus = document.getElementById('customer-voice-teaser-status');
     const publicNewsSection = document.getElementById('public-news-section');
@@ -249,7 +251,23 @@
 
     let modalReturnFocusElement = null;
     let modalFocusTimeoutId = null;
+    let pendingSignupEmail = '';
+    let pendingSignupToken = '';
     const rememberedAccountStorageKey = 'speedad-remembered-login-id';
+    const signupPendingStorageKey = 'speedad-signup-pending';
+    const loginPrefillEmailStorageKey = 'speedad-login-prefill-email';
+
+    function generateSignupToken() {
+      // モックの一意値でよいため強度は不問。使える範囲で最善のAPIにフォールバックする。
+      if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+      }
+      if (window.crypto?.getRandomValues) {
+        const randomBytes = window.crypto.getRandomValues(new Uint8Array(16));
+        return Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+      }
+      return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+    }
 
     function getModalFocusableElements() {
       if (!modalContent) {
@@ -405,10 +423,29 @@
     function clearSignupFormErrors() {
       clearError(signupNameInput, signupNameError);
       clearError(signupEmailInput, signupEmailError);
-      clearError(signupPasswordInput, signupPasswordError);
-      clearError(signupPasswordConfirmInput, signupPasswordConfirmError);
       clearError(termsAgreeCheckbox, termsAgreeError);
       clearError(privacyHandlingAgreeCheckbox, privacyHandlingAgreeError);
+    }
+
+    function setSignupStepVisibility(step) {
+      if (!signupStepFormEl || !signupStepSentEl) {
+        return;
+      }
+      const isSentStep = step === 'sent';
+      signupStepFormEl.hidden = isSentStep;
+      signupStepSentEl.hidden = !isSentStep;
+      if (signupModalTitle) {
+        signupModalTitle.textContent = isSentStep ? '仮登録完了' : '新規アカウント作成';
+      }
+    }
+
+    function showSignupStep(step) {
+      setSignupStepVisibility(step);
+      if (step === 'sent') {
+        signupOpenVerifyButton?.focus();
+      } else {
+        signupNameInput?.focus();
+      }
     }
 
     function hideModal() {
@@ -430,6 +467,7 @@
       modalReturnFocusElement = null;
       clearSignupFormErrors();
       signupForm?.reset();
+      setSignupStepVisibility('form');
     }
 
     function displayError(inputElement, errorElement, message) {
@@ -536,6 +574,28 @@
       window.history.replaceState({}, document.title, nextUrl);
     }
 
+    function maybeApplyLoginEmailFromStorage() {
+      let loginEmail = '';
+      try {
+        loginEmail = sessionStorage.getItem(loginPrefillEmailStorageKey) || '';
+      } catch (storageError) {
+        console.warn('ログイン用メールを読み込めませんでした:', storageError);
+        return;
+      }
+      if (!loginEmail) {
+        return;
+      }
+      if (emailInput) {
+        emailInput.value = loginEmail;
+      }
+      try {
+        sessionStorage.removeItem(loginPrefillEmailStorageKey);
+      } catch (storageError) {
+        console.warn('ログイン用メールを削除できませんでした:', storageError);
+      }
+      passwordInput?.focus();
+    }
+
     function validateLoginForm() {
       let isValid = true;
       clearLoginFormErrors();
@@ -568,26 +628,6 @@
         isValid = false;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmailInput.value)) {
         displayError(signupEmailInput, signupEmailError, '有効なメールアドレスを入力してください。');
-        isValid = false;
-      }
-      if (!signupPasswordInput?.value) {
-        displayError(signupPasswordInput, signupPasswordError, 'パスワードを入力してください。');
-        isValid = false;
-      } else if (signupPasswordInput.value.length < 8) {
-        displayError(signupPasswordInput, signupPasswordError, 'パスワードは8文字以上である必要があります。');
-        isValid = false;
-      } else if (!/[A-Za-z]/.test(signupPasswordInput.value) || !/[0-9]/.test(signupPasswordInput.value)) {
-        displayError(signupPasswordInput, signupPasswordError, 'パスワードは半角英数字を組み合わせてください。');
-        isValid = false;
-      }
-      if (!signupPasswordConfirmInput?.value) {
-        displayError(signupPasswordConfirmInput, signupPasswordConfirmError, '確認用パスワードを入力してください。');
-        isValid = false;
-      } else if (signupPasswordConfirmInput.value !== signupPasswordInput.value) {
-        displayError(signupPasswordConfirmInput, signupPasswordConfirmError, 'パスワードが一致しません。');
-        if (signupPasswordInput.value && signupPasswordInput.getAttribute('aria-invalid') === 'false') {
-          displayError(signupPasswordInput, signupPasswordError, 'パスワードが一致しません。');
-        }
         isValid = false;
       }
       if (termsAgreeCheckbox && !termsAgreeCheckbox.checked) {
@@ -753,15 +793,26 @@
         if (!signupAccountButton) {
           return;
         }
-        showLoading(signupAccountButton, '作成中...');
+        showLoading(signupAccountButton, '送信中...');
         try {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          alert('アカウントが作成されました！ログインしてください。');
-          hideModal();
-          if (emailInput && signupEmailInput) {
-            emailInput.value = signupEmailInput.value;
+          await new Promise((resolve) => setTimeout(resolve, 1800));
+          pendingSignupEmail = signupEmailInput?.value.trim() || '';
+          pendingSignupToken = generateSignupToken();
+          if (signupSentEmailEl) {
+            signupSentEmailEl.textContent = pendingSignupEmail;
           }
-          passwordInput?.focus();
+          // メールをURLに載せず、本登録ページへの受け渡しは sessionStorage 経由にする。
+          // token を紐づけておき、本登録側では「保留マーカーの存在」だけでなく
+          // URLのtokenと保存tokenの一致を解錠条件にする（古いマーカーの使い回し防止）。
+          try {
+            sessionStorage.setItem(signupPendingStorageKey, JSON.stringify({
+              email: pendingSignupEmail,
+              token: pendingSignupToken
+            }));
+          } catch (storageError) {
+            console.warn('仮登録情報を保存できませんでした:', storageError);
+          }
+          showSignupStep('sent');
         } catch (error) {
           console.error('サインアップエラー:', error);
           displayError(signupEmailInput, signupEmailError, 'このメールアドレスは既に使用されています。');
@@ -771,13 +822,26 @@
       });
     }
 
+    if (signupOpenVerifyButton) {
+      signupOpenVerifyButton.addEventListener('click', () => {
+        // メールアドレスはクエリに載せない。デモボタンは「確認メール内のリンク」を
+        // 今回発行したトークンで模す。本登録側はこのtokenと保存tokenの一致を見て解錠する。
+        const verifyUrl = `${resolveAppPath('signup-verify.html')}?token=${encodeURIComponent(pendingSignupToken)}`;
+        window.location.href = verifyUrl;
+      });
+    }
+
+    if (signupBackToFormButton) {
+      signupBackToFormButton.addEventListener('click', () => {
+        showSignupStep('form');
+      });
+    }
+
     const inputsToClear = [
       emailInput,
       passwordInput,
       signupNameInput,
       signupEmailInput,
-      signupPasswordInput,
-      signupPasswordConfirmInput,
       termsAgreeCheckbox,
       privacyHandlingAgreeCheckbox
     ];
@@ -796,10 +860,6 @@
           errorElement = signupNameError;
         } else if (input === signupEmailInput) {
           errorElement = signupEmailError;
-        } else if (input === signupPasswordInput) {
-          errorElement = signupPasswordError;
-        } else if (input === signupPasswordConfirmInput) {
-          errorElement = signupPasswordConfirmError;
         } else if (input === termsAgreeCheckbox) {
           errorElement = termsAgreeError;
         } else if (input === privacyHandlingAgreeCheckbox) {
@@ -807,16 +867,6 @@
         }
         if (errorElement && input.getAttribute('aria-invalid') === 'true') {
           clearError(input, errorElement);
-        }
-        if (input.id === 'signup-password-confirm' && signupPasswordInput?.value === signupPasswordConfirmInput?.value) {
-          if (signupPasswordInput?.getAttribute('aria-invalid') === 'true' && signupPasswordError.textContent === 'パスワードが一致しません。') {
-            clearError(signupPasswordInput, signupPasswordError);
-          }
-        }
-        if (input.id === 'signup-password' && signupPasswordInput?.value === signupPasswordConfirmInput?.value) {
-          if (signupPasswordConfirmInput?.getAttribute('aria-invalid') === 'true' && signupPasswordConfirmError.textContent === 'パスワードが一致しません。') {
-            clearError(signupPasswordConfirmInput, signupPasswordConfirmError);
-          }
         }
       });
       if (input.type === 'checkbox') {
@@ -843,6 +893,7 @@
     loadPublicNews();
     loadCustomerVoiceTeasers();
     maybeOpenSignupFromIntent();
+    maybeApplyLoginEmailFromStorage();
   }
 
   const HERO_COPY_GROUPS = [

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本登録 - SPEED AD</title>
+  <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login-front.css?v=20260706-signup-provisional">
+</head>
+<body>
+  <main class="verify-page">
+    <div class="verify-card" role="region" aria-labelledby="verify-title">
+      <div class="verify-step" data-verify-step="password">
+        <h1 id="verify-title" class="verify-card__title">パスワードの設定</h1>
+        <p class="verify-card__lead">メールアドレスの確認が完了しました。パスワードを設定して登録を完了してください。</p>
+        <p class="verify-card__email" data-verify-email></p>
+        <form id="verify-form" novalidate>
+          <div class="form-group">
+            <label for="verify-password" class="form-group__label">パスワード</label>
+            <input type="password" id="verify-password" name="verify-password" class="form-group__input" required aria-required="true" autocomplete="new-password" aria-describedby="verify-password-error verify-password-hint">
+            <div id="verify-password-error" class="form-group__error-message" role="alert"></div>
+            <div id="verify-password-hint" class="form-group__password-hint">8文字以上、半角英数字（記号推奨）を組み合わせてください。</div>
+          </div>
+          <div class="form-group">
+            <label for="verify-password-confirm" class="form-group__label">パスワード確認</label>
+            <input type="password" id="verify-password-confirm" name="verify-password-confirm" class="form-group__input" required aria-required="true" autocomplete="new-password" aria-describedby="verify-password-confirm-error">
+            <div id="verify-password-confirm-error" class="form-group__error-message" role="alert"></div>
+          </div>
+          <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>登録を完了する</button>
+        </form>
+      </div>
+      <div class="verify-step" data-verify-step="done" hidden>
+        <h1 id="verify-title-done" class="verify-card__title">登録が完了しました</h1>
+        <p class="verify-card__lead" role="status" aria-live="polite">アカウントの本登録が完了しました。ログインしてサービスをご利用ください。</p>
+        <button type="button" class="button button--filled" id="verify-go-to-login">ログインへ</button>
+      </div>
+      <div class="verify-step" data-verify-step="invalid" hidden>
+        <h1 id="verify-title-invalid" class="verify-card__title">リンクが無効です</h1>
+        <p class="verify-card__lead" role="status" aria-live="polite">仮登録が確認できません。お手数ですが、最初から新規アカウント作成をやり直してください。</p>
+        <button type="button" class="button button--filled" id="verify-back-to-top">トップへ戻る</button>
+      </div>
+      <p class="verify-card__note">※本画面はモックです。実際のメール認証・トークン検証は行いません。このsessionStorageによる遷移ガードはモックの導線再現であり、本番では認可の代替にしません（メール確認・トークン検証はサーバ側の責務です）。</p>
+    </div>
+  </main>
+
+  <script src="js/signup-verify.js?v=20260706-signup-provisional" defer></script>
+</body>
+</html>

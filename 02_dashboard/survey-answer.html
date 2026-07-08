@@ -37,6 +37,10 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             margin-bottom: 1.5rem;
             transition: all 0.2s ease-in-out;
+            /* fieldset既定の min-inline-size: min-content を打ち消す。
+               これが無いと幅広テーブル（英語のマトリクス等）でカードが縮まず、
+               ページ全体が横に広がって position:fixed 要素が画面外へ出る */
+            min-inline-size: 0;
         }
 
         .survey-question-card.is-required {
@@ -70,9 +74,6 @@
             .bizcard-preview-back-empty {
                 height: 160px;
             }
-        }
-        .bizcard-preview-back-actions-hidden {
-            display: none !important;
         }
         #submitting-progress-bar {
             width: 0%;
@@ -115,7 +116,7 @@
                     <button type="button" id="bizcard-preview-toggle" class="w-full flex items-center justify-between px-4 py-2.5 text-left">
                         <span class="flex items-center gap-2 text-sm font-medium text-gray-600 min-w-0">
                             <span class="material-icons text-green-500 text-lg shrink-0">check_circle</span>
-                            <span class="shrink-0">撮影済み名刺</span>
+                            <span id="bizcard-preview-header-label" class="shrink-0">撮影済み名刺</span>
                             <span id="bizcard-preview-summary" class="text-xs text-gray-400 font-normal truncate"></span>
                         </span>
                         <span id="bizcard-preview-chevron" class="material-icons text-gray-400 shrink-0">expand_less</span>
@@ -123,25 +124,20 @@
                     <div id="bizcard-preview-body" class="px-4 pb-4">
                     <div class="flex gap-4">
                         <div class="flex-1">
-                            <p class="text-xs text-center text-gray-500 mb-2">表面</p>
-                            <div id="bizcard-preview-front-container" class="relative group">
+                            <p id="bizcard-preview-front-label" class="text-xs text-center text-gray-500 mb-2">表面</p>
+                            <div id="bizcard-preview-front-container" class="relative">
                                 <img id="bizcard-preview-front" src="" alt="名刺 表面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer">
-                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md">
-                                    <button id="bizcard-retake-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
-                                    <button id="bizcard-delete-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
+                                <div id="bizcard-preview-front-empty" class="bizcard-preview-back-empty w-full hidden flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md text-xs text-gray-400 cursor-pointer hover:bg-gray-200">
+                                    表面を追加
                                 </div>
                             </div>
                         </div>
                         <div class="flex-1" id="bizcard-preview-back-wrapper">
-                            <p class="text-xs text-center text-gray-500 mb-2">裏面</p>
-                            <div id="bizcard-preview-back-container" class="relative group">
+                            <p id="bizcard-preview-back-label" class="text-xs text-center text-gray-500 mb-2">裏面</p>
+                            <div id="bizcard-preview-back-container" class="relative">
                                 <img id="bizcard-preview-back" src="" alt="名刺 裏面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer hidden">
                                 <div id="bizcard-preview-back-empty" class="bizcard-preview-back-empty w-full flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md text-xs text-gray-400 cursor-pointer hover:bg-gray-200">
                                     裏面を追加
-                                </div>
-                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md bizcard-preview-back-actions-hidden" id="bizcard-preview-back-actions">
-                                    <button id="bizcard-retake-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
-                                    <button id="bizcard-delete-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +176,7 @@
     <div id="draft-restore-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
     <div id="contact-required-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
     <div id="image-magnify-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-[60]"></div>
-            <div id="toast-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden transform transition-all duration-300 ease-in-out">
+            <div id="toast-notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden transform transition-all duration-300 ease-in-out">
                 <p id="toast-message" class="whitespace-nowrap overflow-hidden text-ellipsis"></p>
             </div>
         

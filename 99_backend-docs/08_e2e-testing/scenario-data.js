@@ -538,7 +538,7 @@
       stg_observation_status: 'stg実走済(2026-06-05)/5アカウント作成＝全件成功、作成した5アカウントとも手動ログインで/dashboard到達成功。作成直後は自動ログインせず alert「アカウントが作成されました！ログインしてください。」表示→要ログイン。メール認証なし・任意の未登録メールで作成可。',
       expected_outcome: '新規アカウントが作成でき（メール認証なし）、作成したメール/パスワードでログインしてダッシュボードに到達できる。',
       evidence_policy: 'サインアップフォーム、作成完了表示、ログイン後ダッシュボードを記録する。メール・実値はマスクする。',
-      notes: '現段階ではメール認証なし・任意の未登録メールアドレスで作成可（実走でアカウント作成まで行う場合はstgデータ追加＝要許可）。サインアップは/loginの「新規アカウント作成」モーダル（フィールド: #signup-name 任意 / #signup-email / #signup-password / #signup-password-confirm / #terms-agree 同意）。Googleサインアップ(OAuth)は別分岐。作成直後に自動ログインされるか(ログアウト要否)は実走で確認する。テスト用メールは使い捨て可。'
+      notes: '【2026-07-06フロント実装更新・要再実走】/loginの「新規アカウント作成」モーダルが仮登録→確認メールリンク（モックのデモ操作）→本登録の2段階フローに変更された。Step1(モーダル内 #signup-form): #signup-name 任意 / #signup-email / #terms-agree / #privacy-handling-agree に同意して送信すると、モーダル内でStep2（確認メール送信文言＋デモ用ボタン #signup-open-verify）に切り替わる。#signup-password / #signup-password-confirm はモーダルから撤去済み。デモボタン押下で signup-verify.html?email=... に遷移し、そこで #verify-password / #verify-password-confirm を入力・送信すると完了表示になり、#verify-go-to-login で index.html?login_email=... に戻りログイン欄がメールプリフィル済みになる。上記stg_observation_status/expected_outcomeは旧UI（単一モーダル＋password欄・alert完了）での実走記録のため、新フロー導入後にstgで再実走して整合を確認する必要がある。Googleサインアップ(OAuth)は別分岐。テスト用メールは使い捨て可。'
     },
     {
       scenario_id: 'STG-SCN-037',

@@ -2,6 +2,7 @@ import { initBreadcrumbs } from './breadcrumb.js';
 import { resolveDemoDataPath, resolveDashboardDataPath, showToast } from './utils.js';
 import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue } from './services/dateFilterService.js';
 import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js';
+import { resolveSurveyDetailTexts } from './services/i18n/messages.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -288,6 +289,8 @@ async function loadAndRenderCharts(surveyId) {
         if (!currentSurvey) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
+        // 本画面は設問文・選択肢を文字列として集計キーに使うため、多言語テキストは日本語へ解決する
+        currentSurvey.details = resolveSurveyDetailTexts(currentSurvey.details);
 
         // Unwrap answers if it's in the new format { surveyId: "...", answers: [...] }
         let answersArray = answers;

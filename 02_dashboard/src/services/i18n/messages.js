@@ -43,8 +43,116 @@ export const messages = {
       requiredBadge: '必須',
       submitButton: '送信する',
       bizcardCameraButton: '名刺を撮影',
+      bizcardChangeButton: '名刺を変更',
       bizcardManualButton: '名刺が手元に無い方',
-      submitting: '送信中...'
+      submitting: '送信中...',
+      previewFeatureDisabled: 'プレビューのため、この機能は使用できません',
+      front: '表面',
+      back: '裏面',
+      capturedBizcardHeader: '撮影済み名刺',
+      previewSummaryBoth: '（表面・裏面）',
+      previewSummaryFront: '（表面）',
+      previewSummaryBack: '（裏面）',
+      addFrontSide: '表面を追加',
+      addBackSide: '裏面を追加',
+      modalSave: '保存',
+      modalCancel: 'キャンセル',
+      unsupportedQuestionType: '未対応の設問タイプです: {type}',
+      previewCompletedTitle: '回答完了',
+      previewCompletedNote: '※ プレビューモードのため回答データは送信されていません',
+      bizcard: {
+        captureTitle: '名刺を撮影',
+        retakeTitle: '再撮影',
+        chooseMethod: '名刺画像の選択方法を選んでください。',
+        chooseRetakeMethod: '再撮影する画像の選択方法を選んでください。',
+        fromStorage: 'ストレージから選択',
+        fromStorageDesc: 'デバイス内の画像ファイルを選びます。',
+        useCamera: 'カメラで撮影',
+        useCameraDesc: 'カメラを起動して名刺を撮影します。',
+        backButton: '戻る',
+        closeButton: '閉じる',
+        confirmTitle: '内容の確認',
+        frontPreview: '表面のプレビュー',
+        backPreview: '裏面のプレビュー',
+        decide: '決定',
+        retake: '撮り直す',
+        ocrLanguage: 'OCR言語: 日本語 (ダミー)',
+        addBack: '裏面を追加する',
+        skipBack: '裏面をスキップ',
+        skipBackToConfirm: '裏面をスキップして確認へ',
+        backChoiceTitle: '裏面の追加',
+        backChooseMethod: '裏面のアップロード方法を選択してください。',
+        toFinalConfirm: '最終確認へ進む',
+        finalTitle: '最終確認',
+        finalDescription: '以下の内容で保存します。',
+        noBack: '裏面なし',
+        saveAndReturn: '保存して回答に戻る',
+        frontUpdated: '表面画像を更新しました。',
+        backUpdated: '裏面画像を更新しました。',
+        saved: '名刺画像を保存しました。',
+        editTitle: '名刺画像の確認・編集',
+        editDefault: 'アップロード済みの名刺画像です。',
+        editRetakeHint: '再撮影する画像をクリックしてください。',
+        editDeleteHint: '削除する画像をクリックしてください。',
+        deleteButton: '削除',
+        noImageTapToCapture: '画像なし（タップで撮影）',
+        nothingToDelete: '削除する画像がありません。',
+        allDeleted: '名刺画像をすべて削除しました。',
+        sideDeleted: '{side}の画像を削除しました。'
+      },
+      manualInput: {
+        title: '名刺情報を手入力',
+        lastName: '姓',
+        firstName: '名',
+        fullName: '氏名',
+        email: 'メールアドレス',
+        company: '会社名',
+        department: '部署名',
+        jobTitle: '役職名',
+        phone: '電話番号',
+        mobile: '携帯番号',
+        fax: 'FAX番号',
+        postalCode: '郵便番号',
+        address: '住所',
+        building: '建物名',
+        url: 'URL',
+        confirmTitle: '入力内容の確認',
+        confirmBody: 'この内容で保存しますか？',
+        fix: '修正する',
+        saved: '名刺情報を保存しました。'
+      },
+      draftRestore: {
+        title: '回答の復元',
+        body: '未送信の回答がありますが、復元しますか？',
+        restore: '復元する',
+        startFresh: '新しく始める',
+        restored: '入力内容を復元しました。'
+      },
+      leaveConfirm: {
+        title: 'ページを離れますか？',
+        body: '変更が保存されていません。このページを離れてよろしいですか？',
+        leave: '離れる',
+        stay: 'とどまる'
+      },
+      contactRequired: {
+        title: '送信に必要な情報が不足しています',
+        descriptionHtml: '回答を送信するには、<span class="font-bold">名刺画像の撮影</span>、または<span class="font-bold">「名刺が手元に無い方」からの基本情報の入力</span>が必要です。',
+        missingHeader: '入力が必要な項目',
+        note: 'いずれかの方法でご登録のうえ、再度送信してください。',
+        openManualInput: '基本情報を入力する',
+        close: '閉じる'
+      },
+      handwriting: {
+        penOn: 'ペンモードをオンにする',
+        eraser: '消しゴム',
+        colorPalette: 'カラーパレット',
+        penThickness: 'ペンの太さ',
+        undo: '戻る',
+        redo: '進む',
+        reset: 'リセット',
+        tapToEnablePen: 'タップしてペンモードをオン',
+        penModeOff: 'ペンモードがオフです'
+      }
     },
     thankYouScreen: {
       documentTitle: 'SpeedAd - アンケート回答完了',
@@ -114,14 +222,122 @@ export const messages = {
       requiredBadge: 'Required',
       submitButton: 'Submit',
       bizcardCameraButton: 'Scan business card',
-      bizcardManualButton: 'I do not have a business card',
-      submitting: 'Submitting...'
+      bizcardChangeButton: 'Change business card',
+      bizcardManualButton: 'No business card?',
+      submitting: 'Submitting...',
+      previewFeatureDisabled: 'This feature is not available in preview mode.',
+      front: 'Front',
+      back: 'Back',
+      capturedBizcardHeader: 'Captured business card',
+      previewSummaryBoth: '(front & back)',
+      previewSummaryFront: '(front)',
+      previewSummaryBack: '(back)',
+      addFrontSide: 'Add front side',
+      addBackSide: 'Add back side',
+      modalSave: 'Save',
+      modalCancel: 'Cancel',
+      unsupportedQuestionType: 'Unsupported question type: {type}',
+      previewCompletedTitle: 'Response completed',
+      previewCompletedNote: '* Preview mode: your response has not been submitted.',
+      bizcard: {
+        captureTitle: 'Scan business card',
+        retakeTitle: 'Retake',
+        chooseMethod: 'Choose how to add your business card image.',
+        chooseRetakeMethod: 'Choose how to retake the image.',
+        fromStorage: 'Choose from storage',
+        fromStorageDesc: 'Select an image file from your device.',
+        useCamera: 'Take a photo',
+        useCameraDesc: 'Launch the camera to capture your business card.',
+        backButton: 'Back',
+        closeButton: 'Close',
+        confirmTitle: 'Confirm details',
+        frontPreview: 'Front side preview',
+        backPreview: 'Back side preview',
+        decide: 'OK',
+        retake: 'Retake',
+        ocrLanguage: 'OCR language: Japanese (dummy)',
+        addBack: 'Add back side',
+        skipBack: 'Skip back side',
+        skipBackToConfirm: 'Skip back side',
+        backChoiceTitle: 'Add back side',
+        backChooseMethod: 'Choose how to upload the back side.',
+        toFinalConfirm: 'Continue',
+        finalTitle: 'Final confirmation',
+        finalDescription: 'The following images will be saved.',
+        noBack: 'No back side',
+        saveAndReturn: 'Save and return',
+        frontUpdated: 'Front image updated.',
+        backUpdated: 'Back image updated.',
+        saved: 'Business card images saved.',
+        editTitle: 'Review and edit business card images',
+        editDefault: 'These are your uploaded business card images.',
+        editRetakeHint: 'Tap the image you want to retake.',
+        editDeleteHint: 'Tap the image you want to delete.',
+        deleteButton: 'Delete',
+        noImageTapToCapture: 'No image (tap to capture)',
+        nothingToDelete: 'There is no image to delete.',
+        allDeleted: 'All business card images have been deleted.',
+        sideDeleted: 'The {side} image has been deleted.'
+      },
+      manualInput: {
+        title: 'Enter business card details manually',
+        lastName: 'Last name',
+        firstName: 'First name',
+        fullName: 'Name',
+        email: 'Email',
+        company: 'Company',
+        department: 'Department',
+        jobTitle: 'Job title',
+        phone: 'Phone',
+        mobile: 'Mobile',
+        fax: 'Fax',
+        postalCode: 'Postal code',
+        address: 'Address',
+        building: 'Building',
+        url: 'URL',
+        confirmTitle: 'Confirm your details',
+        confirmBody: 'Save with these details?',
+        fix: 'Edit',
+        saved: 'Business card details saved.'
+      },
+      draftRestore: {
+        title: 'Restore your answers',
+        body: 'You have unsubmitted answers. Restore them?',
+        restore: 'Restore',
+        startFresh: 'Start over',
+        restored: 'Your answers have been restored.'
+      },
+      leaveConfirm: {
+        title: 'Leave this page?',
+        body: 'Your changes have not been saved. Leave this page anyway?',
+        leave: 'Leave',
+        stay: 'Stay'
+      },
+      contactRequired: {
+        title: 'Information required before submitting',
+        descriptionHtml: 'To submit your response, please <span class="font-bold">capture your business card</span> or <span class="font-bold">enter your basic details via "No business card?"</span>.',
+        missingHeader: 'Required fields',
+        note: 'Please complete one of the options above and submit again.',
+        openManualInput: 'Enter basic details',
+        close: 'Close'
+      },
+      handwriting: {
+        penOn: 'Turn pen mode on',
+        eraser: 'Eraser',
+        colorPalette: 'Color palette',
+        penThickness: 'Pen thickness',
+        undo: 'Undo',
+        redo: 'Redo',
+        reset: 'Reset',
+        tapToEnablePen: 'Tap to turn pen mode on',
+        penModeOff: 'Pen mode is off'
+      }
     },
     thankYouScreen: {
       documentTitle: 'SpeedAd - Survey Completed',
       title: 'Thank you for completing the survey!',
       body: 'Your feedback will help us improve our service.',
-      continuousAnswerButton: 'Submit another response'
+      continuousAnswerButton: 'Answer again'
     },
     thankYouSettings: {
       pageTitleFallback: 'Thank-you Screen Settings',
@@ -352,6 +568,40 @@ export function resolveLocalizedValue(value, locale, fallbackLocale = 'ja') {
 
   const firstValue = Object.values(value).find((entry) => typeof entry === 'string' && entry.trim());
   return typeof firstValue === 'string' ? firstValue : '';
+}
+
+/**
+ * アンケート設問定義（details）内の多言語テキスト（{ja, en, ...}）を単一言語の文字列へ解決する。
+ * SPEEDレビュー・グラフ分析など「設問文＝文字列」前提の画面が、
+ * 多言語形式のアンケート定義を読み込む境界で使う。
+ */
+export function resolveSurveyDetailTexts(details, locale = 'ja') {
+  if (!Array.isArray(details)) {
+    return details;
+  }
+  const resolveText = (value) => (typeof value === 'string' ? value : resolveLocalizedValue(value, locale));
+  const resolveEntry = (entry) => {
+    if (typeof entry === 'string' || !entry || typeof entry !== 'object') {
+      return entry;
+    }
+    return { ...entry, text: resolveText(entry.text) };
+  };
+  return details.map((detail) => {
+    if (!detail || typeof detail !== 'object') {
+      return detail;
+    }
+    const resolved = { ...detail, text: resolveText(detail.text) };
+    if (Array.isArray(detail.options)) {
+      resolved.options = detail.options.map(resolveEntry);
+    }
+    if (Array.isArray(detail.rows)) {
+      resolved.rows = detail.rows.map(resolveEntry);
+    }
+    if (Array.isArray(detail.columns)) {
+      resolved.columns = detail.columns.map(resolveEntry);
+    }
+    return resolved;
+  });
 }
 
 export function normalizeLocalizedRecord(value, activeLocales = ['ja'], fallbackLocale = 'ja') {

@@ -146,10 +146,7 @@ function applyStaticTranslations() {
         submitLabel.textContent = t('surveyAnswer.submitButton');
     }
 
-    const bizcardCameraLabel = DOMElements.bizcardCameraButton?.querySelector('span:last-child');
-    if (bizcardCameraLabel) {
-        bizcardCameraLabel.textContent = t('surveyAnswer.bizcardCameraButton');
-    }
+    updateBizcardButtonState();
 
     if (DOMElements.bizcardManualButton) {
         DOMElements.bizcardManualButton.textContent = t('surveyAnswer.bizcardManualButton');
@@ -158,6 +155,18 @@ function applyStaticTranslations() {
     if (DOMElements.submittingText) {
         DOMElements.submittingText.textContent = t('surveyAnswer.submitting');
     }
+
+    // 名刺プレビューエリアの固定ラベル（HTML直書き分）
+    const setText = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = t(key);
+    };
+    setText('bizcard-preview-header-label', 'surveyAnswer.capturedBizcardHeader');
+    setText('bizcard-preview-front-label', 'surveyAnswer.front');
+    setText('bizcard-preview-back-label', 'surveyAnswer.back');
+    setText('bizcard-preview-front-empty', 'surveyAnswer.addFrontSide');
+    setText('bizcard-preview-back-empty', 'surveyAnswer.addBackSide');
+    updateBizcardPreview();
 }
 
 // --- 初期化 ---
@@ -173,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
             }
             if (DOMElements.bizcardCameraButton) {
-                DOMElements.bizcardCameraButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
+                DOMElements.bizcardCameraButton.addEventListener('click', () => showToast(t('surveyAnswer.previewFeatureDisabled')));
             }
             if (DOMElements.bizcardManualButton) {
                 // プレビューでもバリデーション動作を確認できるよう手入力モーダルは有効化
@@ -349,7 +358,7 @@ function setupEventListeners() {
     const isPreview = new URLSearchParams(window.location.search).get('preview') === '1';
     if (DOMElements.bizcardCameraButton) {
         DOMElements.bizcardCameraButton.addEventListener('click', () => {
-            if (isPreview) { showToast('プレビューのため、この機能は使用できません'); return; }
+            if (isPreview) { showToast(t('surveyAnswer.previewFeatureDisabled')); return; }
             startBizcardUploadFlow();
         });
     }
@@ -366,49 +375,61 @@ function openManualInputModal() {
             <form id="${formId}" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="manual-last-name" class="block text-sm font-medium text-on-surface-variant">姓</label>
+                        <label for="manual-last-name" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.lastName')}</label>
                         <input type="text" id="manual-last-name" name="lastName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
                     <div>
-                        <label for="manual-first-name" class="block text-sm font-medium text-on-surface-variant">名</label>
+                        <label for="manual-first-name" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.firstName')}</label>
                         <input type="text" id="manual-first-name" name="firstName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
                 </div>
                 <div>
-                    <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
+                    <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.email')}</label>
                     <input type="email" id="manual-email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-company" class="block text-sm font-medium text-on-surface-variant">会社名</label>
+                    <label for="manual-company" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.company')}</label>
                     <input type="text" id="manual-company" name="company" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-department" class="block text-sm font-medium text-on-surface-variant">部署名</label>
+                    <label for="manual-department" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.department')}</label>
                     <input type="text" id="manual-department" name="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-title" class="block text-sm font-medium text-on-surface-variant">役職名</label>
+                    <label for="manual-title" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.jobTitle')}</label>
                     <input type="text" id="manual-title" name="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
+                    <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.phone')}</label>
                     <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
+                    <label for="manual-mobile" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.mobile')}</label>
+                    <input type="tel" id="manual-mobile" name="mobile" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-fax" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.fax')}</label>
+                    <input type="tel" id="manual-fax" name="fax" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.postalCode')}</label>
                     <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
+                    <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.address')}</label>
                     <input type="text" id="manual-address" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">建物名</label>
+                    <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.building')}</label>
                     <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-url" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.url')}</label>
+                    <input type="url" id="manual-url" name="url" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
             </form>
         `;
-            showModal(DOMElements.manualInputModal, '名刺情報を手入力', body, {
+            showModal(DOMElements.manualInputModal, t('surveyAnswer.manualInput.title'), body, {
                 onSave: () => {
                     const form = document.getElementById(formId);
                     const formData = new FormData(form);
@@ -424,32 +445,35 @@ function openManualInputModal() {
                     const confirmationBody = `
                         <div class="space-y-2 text-sm text-on-surface-variant">
                             ${Object.entries({
-                                '氏名': manualInfo.name,
-                                'メールアドレス': manualInfo.email,
-                                '会社名': manualInfo.company,
-                                '部署名': manualInfo.department,
-                                '役職名': manualInfo.title,
-                                '電話番号': manualInfo.phone,
-                                '郵便番号': manualInfo.postalCode,
-                                '住所': manualInfo.address,
-                                '建物名': manualInfo.building
+                                [t('surveyAnswer.manualInput.fullName')]: manualInfo.name,
+                                [t('surveyAnswer.manualInput.email')]: manualInfo.email,
+                                [t('surveyAnswer.manualInput.company')]: manualInfo.company,
+                                [t('surveyAnswer.manualInput.department')]: manualInfo.department,
+                                [t('surveyAnswer.manualInput.jobTitle')]: manualInfo.title,
+                                [t('surveyAnswer.manualInput.phone')]: manualInfo.phone,
+                                [t('surveyAnswer.manualInput.mobile')]: manualInfo.mobile,
+                                [t('surveyAnswer.manualInput.fax')]: manualInfo.fax,
+                                [t('surveyAnswer.manualInput.postalCode')]: manualInfo.postalCode,
+                                [t('surveyAnswer.manualInput.address')]: manualInfo.address,
+                                [t('surveyAnswer.manualInput.building')]: manualInfo.building,
+                                [t('surveyAnswer.manualInput.url')]: manualInfo.url
                             }).map(([label, value]) => `<p><span class="font-semibold text-on-surface">${label}:</span> ${value || ''}</p>`).join('')}
                         </div>
-                        <p class="mt-6 text-on-surface">この内容で保存しますか？</p>
+                        <p class="mt-6 text-on-surface">${t('surveyAnswer.manualInput.confirmBody')}</p>
                     `;
 
                     // 既存の手入力モーダルを一旦隠す
                     DOMElements.manualInputModal.style.display = 'none';
 
                     // 確認モーダルを表示
-                    showModal(DOMElements.leaveConfirmModal, '入力内容の確認', confirmationBody, {
-                        saveText: '保存', // 「はい、保存します」から「保存」へ変更
-                        cancelText: '修正する',
+                    showModal(DOMElements.leaveConfirmModal, t('surveyAnswer.manualInput.confirmTitle'), confirmationBody, {
+                        saveText: t('surveyAnswer.modalSave'),
+                        cancelText: t('surveyAnswer.manualInput.fix'),
                         onSave: () => {
                             // 元の保存処理
                             state.answers.manualBizcardInfo = manualInfo;
                             state.hasUnsavedChanges = true;
-                            showToast('名刺情報を保存しました。');
+                            showToast(t('surveyAnswer.manualInput.saved'));
                             console.log('Manual bizcard info saved:', manualInfo);
                             DOMElements.leaveConfirmModal.style.display = 'none';
                         },
@@ -475,6 +499,9 @@ function autoResizeTextarea(element) {
 }
 
 // --- 名刺アップロードフロー ---
+// 表裏サムネイル共通の固定枠。画像サイズに関わらず枠が先にあり、画像は枠内に収める
+const BIZCARD_FRAME_CLASS = 'w-full h-36 sm:h-48 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center overflow-hidden';
+
 // ボタン状態更新関数を追加
 function updateBizcardButtonState() {
     if (!DOMElements.bizcardCameraButton) return;
@@ -482,7 +509,7 @@ function updateBizcardButtonState() {
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '名刺を変更' : '名刺を撮影';
+        textSpan.textContent = hasImages ? t('surveyAnswer.bizcardChangeButton') : t('surveyAnswer.bizcardCameraButton');
     }
     if (hasImages) {
         DOMElements.bizcardCameraButton.disabled = false;
@@ -509,10 +536,10 @@ function applyBizcardPreviewCollapsed() {
 function updateBizcardPreview() {
     const previewArea = document.getElementById('bizcard-preview-area');
     const frontImg = document.getElementById('bizcard-preview-front');
+    const frontEmpty = document.getElementById('bizcard-preview-front-empty');
     const backImg = document.getElementById('bizcard-preview-back');
     const backEmpty = document.getElementById('bizcard-preview-back-empty');
-    const backActions = document.getElementById('bizcard-preview-back-actions');
-    if (!previewArea || !frontImg || !backImg || !backEmpty || !backActions) return;
+    if (!previewArea || !frontImg || !frontEmpty || !backImg || !backEmpty) return;
 
     const images = state.answers.bizcardImages;
     const hasFront = !!(images && images.front);
@@ -528,6 +555,12 @@ function updateBizcardPreview() {
     // 表面
     if (hasFront) {
         frontImg.src = images.front;
+        frontImg.classList.remove('hidden');
+        frontEmpty.classList.add('hidden');
+    } else {
+        frontImg.classList.add('hidden');
+        frontImg.removeAttribute('src');
+        frontEmpty.classList.remove('hidden');
     }
 
     // 裏面
@@ -535,16 +568,16 @@ function updateBizcardPreview() {
         backImg.src = images.back;
         backImg.classList.remove('hidden');
         backEmpty.classList.add('hidden');
-        backActions.classList.remove('bizcard-preview-back-actions-hidden');
     } else {
         backImg.classList.add('hidden');
+        backImg.removeAttribute('src');
         backEmpty.classList.remove('hidden');
-        backActions.classList.add('bizcard-preview-back-actions-hidden');
     }
 
     const summaryEl = document.getElementById('bizcard-preview-summary');
     if (summaryEl) {
-        summaryEl.textContent = (hasFront && hasBack) ? '（表面・裏面）' : hasFront ? '（表面）' : '（裏面）';
+        summaryEl.textContent = (hasFront && hasBack) ? t('surveyAnswer.previewSummaryBoth')
+            : hasFront ? t('surveyAnswer.previewSummaryFront') : t('surveyAnswer.previewSummaryBack');
     }
     applyBizcardPreviewCollapsed();
 }
@@ -559,78 +592,29 @@ function initBizcardPreviewListeners() {
     });
 
     const frontImg = document.getElementById('bizcard-preview-front');
+    const frontEmpty = document.getElementById('bizcard-preview-front-empty');
     const backImg = document.getElementById('bizcard-preview-back');
     const backEmpty = document.getElementById('bizcard-preview-back-empty');
-    const retakeFront = document.getElementById('bizcard-retake-front');
-    const deleteFront = document.getElementById('bizcard-delete-front');
-    const retakeBack = document.getElementById('bizcard-retake-back');
-    const deleteBack = document.getElementById('bizcard-delete-back');
 
-    // コンテナクリック → 拡大表示（ボタン以外の領域）
+    // コンテナクリック → 拡大表示
     const frontContainer = document.getElementById('bizcard-preview-front-container');
     const backContainer = document.getElementById('bizcard-preview-back-container');
     if (frontContainer) frontContainer.addEventListener('click', () => {
-        if (frontImg && frontImg.src) openMagnifyModal(frontImg.src);
+        if (frontImg && !frontImg.classList.contains('hidden') && frontImg.src) openMagnifyModal(frontImg.src);
     });
     if (backContainer) backContainer.addEventListener('click', () => {
         if (backImg && !backImg.classList.contains('hidden') && backImg.src) openMagnifyModal(backImg.src);
     });
 
-    // 裏面「追加」クリック → 裏面撮影フローを起動
+    // 表面/裏面の「追加」クリック → 該当面の撮影フローを起動
+    if (frontEmpty) frontEmpty.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startBizcardUploadFlow('front');
+    });
     if (backEmpty) backEmpty.addEventListener('click', (e) => {
         e.stopPropagation();
         startBizcardUploadFlow('back');
     });
-
-    // ボタンはバブリングを止めて各処理のみ実行
-    if (retakeFront) retakeFront.addEventListener('click', (e) => {
-        e.stopPropagation();
-        startBizcardUploadFlow('front');
-    });
-    if (deleteFront) deleteFront.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showBizcardDeleteConfirm('front');
-    });
-    if (retakeBack) retakeBack.addEventListener('click', (e) => {
-        e.stopPropagation();
-        startBizcardUploadFlow('back');
-    });
-    if (deleteBack) deleteBack.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showBizcardDeleteConfirm('back');
-    });
-}
-
-function showBizcardDeleteConfirm(side) {
-    const label = side === 'front' ? '表面' : '裏面';
-    showModal(DOMElements.bizcardUploadModal, '画像の削除', `
-        <p class="text-center text-gray-700">${label}の画像を削除してもよろしいですか？</p>
-    `, {
-        saveText: '削除する',
-        cancelText: 'キャンセル',
-        onSave: () => {
-            if (!state.answers.bizcardImages) return;
-            state.answers.bizcardImages[side] = null;
-            state.hasUnsavedChanges = true;
-            if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
-                state.answers.bizcardImages = null;
-            }
-            DOMElements.bizcardUploadModal.style.display = 'none';
-            updateBizcardButtonState();
-            updateBizcardPreview();
-            showToast(`${label}の画像を削除しました。`);
-        },
-        onCancel: () => {
-            DOMElements.bizcardUploadModal.style.display = 'none';
-        },
-    });
-
-    // 削除ボタンを赤くする
-    const saveBtn = DOMElements.bizcardUploadModal.querySelector('#modal-save-button');
-    if (saveBtn) {
-        saveBtn.classList.remove('bg-primary', 'hover:bg-primary-dark', 'text-on-primary');
-        saveBtn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white');
-    }
 }
 
 let bizcardImages = { front: null, back: null };
@@ -684,8 +668,8 @@ function startBizcardUploadFlow(targetSide = null) {
     };
 
     const showChoice = (side = 'front', isEdit = false) => {
-        const titleText = isEdit ? '再撮影' : '名刺を撮影';
-        const descriptionText = isEdit ? '再撮影する画像の選択方法を選んでください。' : '名刺画像の選択方法を選んでください。';
+        const titleText = isEdit ? t('surveyAnswer.bizcard.retakeTitle') : t('surveyAnswer.bizcard.captureTitle');
+        const descriptionText = isEdit ? t('surveyAnswer.bizcard.chooseRetakeMethod') : t('surveyAnswer.bizcard.chooseMethod');
         
         let stepIndicatorHTML = '';
         if (!isEdit) {
@@ -708,19 +692,19 @@ function startBizcardUploadFlow(targetSide = null) {
                 <!-- ストレージから選択カード -->
                 <div id="upload-storage" class="p-6 border rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all">
                     <span class="material-icons text-4xl text-primary">folder_open</span>
-                    <h3 class="font-semibold mt-2">ストレージから選択</h3>
-                    <p class="text-xs text-gray-500 mt-1">デバイス内の画像ファイルを選びます。</p>
+                    <h3 class="font-semibold mt-2">${t('surveyAnswer.bizcard.fromStorage')}</h3>
+                    <p class="text-xs text-gray-500 mt-1">${t('surveyAnswer.bizcard.fromStorageDesc')}</p>
                 </div>
                 <!-- カメラで撮影カード -->
                 <div id="upload-camera" class="p-6 border rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all">
                     <span class="material-icons text-4xl text-primary">photo_camera</span>
-                    <h3 class="font-semibold mt-2">カメラで撮影</h3>
-                    <p class="text-xs text-gray-500 mt-1">カメラを起動して名刺を撮影します。</p>
+                    <h3 class="font-semibold mt-2">${t('surveyAnswer.bizcard.useCamera')}</h3>
+                    <p class="text-xs text-gray-500 mt-1">${t('surveyAnswer.bizcard.useCameraDesc')}</p>
                 </div>
             </div>
         `;
         showModal(DOMElements.bizcardUploadModal, titleText, body, { 
-            cancelText: isEdit ? '戻る' : '閉じる',
+            cancelText: isEdit ? t('surveyAnswer.bizcard.backButton') : t('surveyAnswer.bizcard.closeButton'),
             onCancel: isEdit ? showBizcardEditModal : undefined
         });
 
@@ -731,19 +715,19 @@ function startBizcardUploadFlow(targetSide = null) {
     const showFrontPreview = () => {
         if (isEditingSide) {
             const body = `
-                <p class="text-center text-sm text-gray-600 mb-4">表面のプレビュー</p>
+                <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.frontPreview')}</p>
                 <div class="bg-gray-100 p-4 rounded-lg">
-                    <img src="${localImages.front}" alt="名刺 表面" class="max-w-full mx-auto rounded-md shadow-md">
+                    <img src="${localImages.front}" alt="${t('surveyAnswer.front')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
                 </div>
             `;
-            showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
-                saveText: '決定',
-                cancelText: '撮り直す',
+            showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.confirmTitle'), body, {
+                saveText: t('surveyAnswer.bizcard.decide'),
+                cancelText: t('surveyAnswer.bizcard.retake'),
                 onSave: () => {
                     if (!state.answers.bizcardImages) state.answers.bizcardImages = {};
                     state.answers.bizcardImages.front = localImages.front;
                     state.hasUnsavedChanges = true;
-                    showToast('表面画像を更新しました。');
+                    showToast(t('surveyAnswer.bizcard.frontUpdated'));
                     DOMElements.bizcardUploadModal.style.display = 'none';
                     updateBizcardButtonState();
                     updateBizcardPreview();
@@ -762,15 +746,15 @@ function startBizcardUploadFlow(targetSide = null) {
                 <span class="flex-auto border-t-2 border-gray-200 mx-2"></span>
                 <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">3</span>
             </div>
-            <p class="text-center text-sm text-gray-600 mb-4">表面のプレビュー</p>
+            <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.frontPreview')}</p>
             <div class="bg-gray-100 p-4 rounded-lg">
-                <img src="${localImages.front}" alt="名刺 表面" class="max-w-full mx-auto rounded-md shadow-md">
+                <img src="${localImages.front}" alt="${t('surveyAnswer.front')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
             </div>
-            <p class="text-center text-sm mt-2 text-gray-500">OCR言語: 日本語 (ダミー)</p>
+            <p class="text-center text-sm mt-2 text-gray-500">${t('surveyAnswer.bizcard.ocrLanguage')}</p>
         `;
-        showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
-            saveText: '裏面を追加する',
-            cancelText: '撮り直す',
+        showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.confirmTitle'), body, {
+            saveText: t('surveyAnswer.bizcard.addBack'),
+            cancelText: t('surveyAnswer.bizcard.retake'),
             onSave: () => showBackChoice(),
             onCancel: () => showChoice('front')
         });
@@ -788,7 +772,7 @@ function startBizcardUploadFlow(targetSide = null) {
             // 3. 「撮り直す」ボタンを作成して追加 (左側)
             const retakeButton = document.createElement('button');
             retakeButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
-            retakeButton.textContent = '撮り直す';
+            retakeButton.textContent = t('surveyAnswer.bizcard.retake');
             retakeButton.onclick = () => showChoice('front');
             footer.appendChild(retakeButton);
 
@@ -799,14 +783,14 @@ function startBizcardUploadFlow(targetSide = null) {
             // 5. 「裏面をスキップ」ボタンを作成して追加
             const skipButton = document.createElement('button');
             skipButton.className = 'text-sm font-medium text-primary hover:underline';
-            skipButton.textContent = '裏面をスキップ';
+            skipButton.textContent = t('surveyAnswer.bizcard.skipBack');
             skipButton.onclick = showFinalConfirmation;
             rightContainer.appendChild(skipButton);
 
             // 6. 「裏面を追加する」ボタンを作成して追加
             const addBackButton = document.createElement('button');
             addBackButton.className = 'px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark';
-            addBackButton.textContent = '裏面を追加する';
+            addBackButton.textContent = t('surveyAnswer.bizcard.addBack');
             addBackButton.onclick = showBackChoice;
             rightContainer.appendChild(addBackButton);
 
@@ -824,19 +808,19 @@ function startBizcardUploadFlow(targetSide = null) {
                 <span class="flex-auto border-t-2 border-gray-200 mx-2"></span>
                 <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">3</span>
             </div>
-            <p class="text-center text-sm text-gray-600 mb-6">裏面のアップロード方法を選択してください。</p>
+            <p class="text-center text-sm text-gray-600 mb-6">${t('surveyAnswer.bizcard.backChooseMethod')}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div id="upload-storage-back" class="p-6 border rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all">
                     <span class="material-icons text-4xl text-primary">folder_open</span>
-                    <h3 class="font-semibold mt-2">ストレージから選択</h3>
+                    <h3 class="font-semibold mt-2">${t('surveyAnswer.bizcard.fromStorage')}</h3>
                 </div>
                 <div id="upload-camera-back" class="p-6 border rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all">
                     <span class="material-icons text-4xl text-primary">photo_camera</span>
-                    <h3 class="font-semibold mt-2">カメラで撮影</h3>
+                    <h3 class="font-semibold mt-2">${t('surveyAnswer.bizcard.useCamera')}</h3>
                 </div>
             </div>
         `;
-        showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
+        showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.backChoiceTitle'), body, { cancelText: t('surveyAnswer.bizcard.backButton'), onCancel: showFrontPreview });
         
         // フッターのボタンレイアウトを調整し、スキップボタンを追加
         const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
@@ -849,14 +833,14 @@ function startBizcardUploadFlow(targetSide = null) {
 
             const backButton = document.createElement('button');
             backButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
-            backButton.textContent = '戻る';
+            backButton.textContent = t('surveyAnswer.bizcard.backButton');
             backButton.onclick = showFrontPreview;
             footer.appendChild(backButton);
 
             const skipButtonContainer = document.createElement('div');
             const skipButton = document.createElement('button');
             skipButton.className = 'text-sm font-medium text-primary hover:underline px-4 py-2';
-            skipButton.textContent = '裏面をスキップして確認へ';
+            skipButton.textContent = t('surveyAnswer.bizcard.skipBackToConfirm');
             skipButton.onclick = showFinalConfirmation;
             skipButtonContainer.appendChild(skipButton);
             footer.appendChild(skipButtonContainer);
@@ -876,19 +860,19 @@ function startBizcardUploadFlow(targetSide = null) {
     const showBackPreview = () => {
         if (isEditingSide) {
             const body = `
-                <p class="text-center text-sm text-gray-600 mb-4">裏面のプレビュー</p>
+                <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.backPreview')}</p>
                 <div class="bg-gray-100 p-4 rounded-lg">
-                    <img src="${localImages.back}" alt="名刺 裏面" class="max-w-full mx-auto rounded-md shadow-md">
+                    <img src="${localImages.back}" alt="${t('surveyAnswer.back')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
                 </div>
             `;
-            showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
-                saveText: '決定',
-                cancelText: '撮り直す',
+            showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.confirmTitle'), body, {
+                saveText: t('surveyAnswer.bizcard.decide'),
+                cancelText: t('surveyAnswer.bizcard.retake'),
                 onSave: () => {
                     if (!state.answers.bizcardImages) state.answers.bizcardImages = {};
                     state.answers.bizcardImages.back = localImages.back;
                     state.hasUnsavedChanges = true;
-                    showToast('裏面画像を更新しました。');
+                    showToast(t('surveyAnswer.bizcard.backUpdated'));
                     DOMElements.bizcardUploadModal.style.display = 'none';
                     updateBizcardButtonState();
                     updateBizcardPreview();
@@ -906,22 +890,25 @@ function startBizcardUploadFlow(targetSide = null) {
                 <span class="flex-auto border-t-2 border-gray-200 mx-2"></span>
                 <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">3</span>
             </div>
-            <p class="text-center text-sm text-gray-600 mb-4">裏面のプレビュー</p>
+            <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.backPreview')}</p>
             <div class="bg-gray-100 p-4 rounded-lg">
-                <img src="${localImages.back}" alt="名刺 裏面" class="max-w-full mx-auto rounded-md shadow-md">
+                <img src="${localImages.back}" alt="${t('surveyAnswer.back')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
             </div>
         `;
-        showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
-            saveText: '最終確認へ進む',
-            cancelText: '撮り直す',
+        showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.confirmTitle'), body, {
+            saveText: t('surveyAnswer.bizcard.toFinalConfirm'),
+            cancelText: t('surveyAnswer.bizcard.retake'),
             onSave: showFinalConfirmation,
             onCancel: showBackChoice
         });
     };
 
     const showFinalConfirmation = () => {
-        const frontImageHTML = `<img src="${localImages.front}" alt="名刺 表面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">`;
-        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="名刺 裏面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">` : '<div class="h-full flex items-center justify-center bg-gray-100 rounded-md border border-dashed border-gray-300"><p class="text-sm text-gray-500">裏面なし</p></div>';
+        const buildSideHTML = (src, altText) => src
+            ? `<div class="${BIZCARD_FRAME_CLASS}"><img src="${src}" alt="${altText}" class="max-w-full max-h-full object-contain cursor-pointer bizcard-confirm-image"></div>`
+            : `<div class="${BIZCARD_FRAME_CLASS} border-dashed border-gray-300"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noBack')}</p></div>`;
+        const frontImageHTML = buildSideHTML(localImages.front, t('surveyAnswer.front'));
+        const backImageHTML = buildSideHTML(localImages.back, t('surveyAnswer.back'));
         const body = `
             <div class="flex items-center justify-center mb-4">
                 <span class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center"><span class="material-icons text-primary">check</span></span>
@@ -930,25 +917,25 @@ function startBizcardUploadFlow(targetSide = null) {
                 <span class="flex-auto border-t-2 border-primary mx-2"></span>
                 <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">3</span>
             </div>
-            <p class="text-center text-sm text-gray-600 mb-4">以下の内容で保存します。</p>
+            <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.finalDescription')}</p>
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <p class="font-bold text-center mb-2">表面</p>
+                <div class="flex flex-col">
+                    <p class="font-bold text-center mb-2">${t('surveyAnswer.front')}</p>
                     ${frontImageHTML}
                 </div>
-                <div>
-                    <p class="font-bold text-center mb-2">裏面</p>
+                <div class="flex flex-col">
+                    <p class="font-bold text-center mb-2">${t('surveyAnswer.back')}</p>
                     ${backImageHTML}
                 </div>
             </div>
         `;
-        showModal(DOMElements.bizcardUploadModal, '最終確認', body, {
-            saveText: '保存して回答に戻る',
-            cancelText: '戻る',
+        showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.finalTitle'), body, {
+            saveText: t('surveyAnswer.bizcard.saveAndReturn'),
+            cancelText: t('surveyAnswer.bizcard.backButton'),
             onSave: () => {
                 state.answers.bizcardImages = { ...localImages };
                 state.hasUnsavedChanges = true;
-                showToast('名刺画像を保存しました。');
+                showToast(t('surveyAnswer.bizcard.saved'));
                 DOMElements.bizcardUploadModal.style.display = 'none';
                 updateBizcardButtonState();
                 updateBizcardPreview();
@@ -974,42 +961,40 @@ function startBizcardUploadFlow(targetSide = null) {
             const el = document.getElementById('bizcard-edit-instruction');
             if (!el) return;
             if (editMode === 'retake') {
-                el.textContent = '再撮影する画像をクリックしてください。';
+                el.textContent = t('surveyAnswer.bizcard.editRetakeHint');
                 el.className = 'text-center text-sm text-blue-600 font-bold mb-4';
             } else if (editMode === 'delete') {
-                el.textContent = '削除する画像をクリックしてください。';
+                el.textContent = t('surveyAnswer.bizcard.editDeleteHint');
                 el.className = 'text-center text-sm text-red-600 font-bold mb-4';
             } else {
-                el.textContent = 'アップロード済みの名刺画像です。';
+                el.textContent = t('surveyAnswer.bizcard.editDefault');
                 el.className = 'text-center text-sm text-gray-600 mb-4';
             }
         };
 
         const createSideHTML = (side, title) => {
             const hasImage = !!localImages[side];
-            const imageHTML = hasImage 
-                ? `<img src="${localImages[side]}" alt="名刺 ${title}" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image mb-2 hover:opacity-80 transition-opacity" data-side="${side}">`
-                : `<div class="w-full h-32 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md mb-2 cursor-pointer bizcard-confirm-image hover:bg-gray-200 transition-colors" data-side="${side}"><p class="text-sm text-gray-500">画像なし（タップで撮影）</p></div>`;
-            
+            const imageHTML = hasImage
+                ? `<div class="${BIZCARD_FRAME_CLASS}"><img src="${localImages[side]}" alt="${title}" class="max-w-full max-h-full object-contain cursor-pointer bizcard-confirm-image hover:opacity-80 transition-opacity" data-side="${side}"></div>`
+                : `<div class="${BIZCARD_FRAME_CLASS} border-dashed border-gray-300 cursor-pointer bizcard-confirm-image hover:bg-gray-200 transition-colors" data-side="${side}"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noImageTapToCapture')}</p></div>`;
+
             return `
-                <div class="flex flex-col items-center h-full">
+                <div class="flex flex-col items-center">
                     <p class="font-bold text-center mb-2 text-gray-700">${title}</p>
-                    <div class="flex-grow w-full flex items-center justify-center">
-                        ${imageHTML}
-                    </div>
+                    ${imageHTML}
                 </div>
             `;
         };
 
         const body = `
-            <p id="bizcard-edit-instruction" class="text-center text-sm text-gray-600 mb-4">アップロード済みの名刺画像です。</p>
+            <p id="bizcard-edit-instruction" class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.editDefault')}</p>
             <div class="grid grid-cols-2 gap-4">
-                ${createSideHTML('front', '表面')}
-                ${createSideHTML('back', '裏面')}
+                ${createSideHTML('front', t('surveyAnswer.front'))}
+                ${createSideHTML('back', t('surveyAnswer.back'))}
             </div>
         `;
 
-        showModal(DOMElements.bizcardUploadModal, '名刺画像の確認・編集', body, {});
+        showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.editTitle'), body, {});
 
         // フッターのボタンレイアウトを調整
         const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
@@ -1020,7 +1005,7 @@ function startBizcardUploadFlow(targetSide = null) {
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors';
-            deleteBtn.textContent = '削除';
+            deleteBtn.textContent = t('surveyAnswer.bizcard.deleteButton');
             deleteBtn.onclick = () => {
                 editMode = editMode === 'delete' ? null : 'delete';
                 updateInstructionText();
@@ -1037,7 +1022,7 @@ function startBizcardUploadFlow(targetSide = null) {
 
             const retakeBtn = document.createElement('button');
             retakeBtn.className = 'btn-retake-mode px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors';
-            retakeBtn.textContent = '再撮影';
+            retakeBtn.textContent = t('surveyAnswer.bizcard.retakeTitle');
             retakeBtn.onclick = () => {
                 editMode = editMode === 'retake' ? null : 'retake';
                 updateInstructionText();
@@ -1062,7 +1047,7 @@ function startBizcardUploadFlow(targetSide = null) {
                     showChoice(side, true); // true = isEdit
                 } else if (editMode === 'delete') {
                     if (!localImages[side]) {
-                        showToast('削除する画像がありません。');
+                        showToast(t('surveyAnswer.bizcard.nothingToDelete'));
                         return;
                     }
                     localImages[side] = null;
@@ -1072,15 +1057,17 @@ function startBizcardUploadFlow(targetSide = null) {
                     // 両方削除されたら
                     if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
                         state.answers.bizcardImages = null; // 完全にクリア
-                        showToast('名刺画像をすべて削除しました。');
+                        showToast(t('surveyAnswer.bizcard.allDeleted'));
                         DOMElements.bizcardUploadModal.style.display = 'none';
                         updateBizcardButtonState();
+                        updateBizcardPreview();
                         return;
                     }
-                    
-                    showToast(`${side === 'front' ? '表面' : '裏面'}の画像を削除しました。`);
+
+                    showToast(t('surveyAnswer.bizcard.sideDeleted', { side: side === 'front' ? t('surveyAnswer.front') : t('surveyAnswer.back') }));
                     showBizcardEditModal(); // 再描画してモードをリセット
                     updateBizcardButtonState();
+                    updateBizcardPreview();
                 } else {
                     // 通常時: 画像があれば拡大、なければ再撮影モード
                     if (target.tagName.toLowerCase() === 'img') {
@@ -1108,13 +1095,13 @@ function startBizcardUploadFlow(targetSide = null) {
 
 // --- モーダル制御 ---
 function showModal(modalElement, title, body, options = {}) {
-    const { onSave, onCancel, saveText = '保存', cancelText = 'キャンセル' } = options;
+    const { onSave, onCancel, saveText = t('surveyAnswer.modalSave'), cancelText = t('surveyAnswer.modalCancel') } = options;
 
     const saveButtonHTML = onSave ? `<button id="modal-save-button" class="px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark">${saveText}</button>` : '';
     const cancelButtonHTML = onCancel ? `<button id="modal-cancel-button" class="px-4 py-2 text-sm font-medium rounded-md border border-outline-variant hover:bg-surface-container-high">${cancelText}</button>` : '';
 
     modalElement.innerHTML = `
-        <div class="bg-surface rounded-lg shadow-xl max-w-lg w-full my-4 mx-4 max-h-[calc(100dvh-2rem)] flex flex-col">
+        <div class="bg-surface rounded-lg shadow-xl max-w-lg md:max-w-2xl w-full my-4 mx-4 max-h-[calc(100dvh-2rem)] flex flex-col">
             <div class="flex justify-between items-center p-4 border-b border-outline-variant shrink-0">
                 <h3 class="text-lg font-bold">${title}</h3>
                 <button class="close-modal-button text-on-surface-variant hover:text-on-surface">&times;</button>
@@ -1127,8 +1114,8 @@ function showModal(modalElement, title, body, options = {}) {
         </div>
     `;
     modalElement.style.display = 'flex';
-    // 小型端末で縦にはみ出しても下部ボタンへ到達できるよう上寄せ＋モーダル全体をスクロール可に
-    modalElement.style.alignItems = 'flex-start';
+    // 通常は縦中央。縦にはみ出す場合のみ上寄せに切り替わり（safe center）、下部ボタンへスクロールで到達できる
+    modalElement.style.alignItems = 'safe center';
     modalElement.style.overflowY = 'auto';
 
     if (onSave) {
@@ -1199,14 +1186,14 @@ async function checkForDraft() {
     const draftKey = `survey_draft_${state.surveyId}_${state.sessionId}`;
     const draftData = localStorage.getItem(draftKey);
     if (draftData) {
-        showModal(DOMElements.draftRestoreModal, '回答の復元', '未送信の回答がありますが、復元しますか？', {
-            saveText: '復元する',
-            cancelText: '新しく始める',
+        showModal(DOMElements.draftRestoreModal, t('surveyAnswer.draftRestore.title'), t('surveyAnswer.draftRestore.body'), {
+            saveText: t('surveyAnswer.draftRestore.restore'),
+            cancelText: t('surveyAnswer.draftRestore.startFresh'),
             onSave: () => {
                 try {
                     state.answers = JSON.parse(draftData);
                     state.draftToRestore = true;
-                    showToast('下書きを復元しました。');
+                    showToast(t('surveyAnswer.draftRestore.restored'));
                     updateBizcardButtonState();
                 } catch (e) {
                     console.error('ドラフトの解析に失敗しました:', e);
@@ -1596,37 +1583,37 @@ function createQuestionElement(question, index) {
                 <div class="handwriting-container">
                     <div class="toolbox">
                         <div class="tool-group">
-                            <button type="button" id="${question.id}-pen-tool" class="tool-button" title="ペンモードをオンにする">
+                            <button type="button" id="${question.id}-pen-tool" class="tool-button" title="${t('surveyAnswer.handwriting.penOn')}">
                                 <span class="material-icons">edit</span>
                             </button>
-                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="消しゴム" disabled>
+                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="${t('surveyAnswer.handwriting.eraser')}" disabled>
                                 <span class="material-icons">layers_clear</span>
                             </button>
                         </div>
                         <div class="tool-group">
-                            <input type="color" id="${question.id}-color-picker" class="color-palette" title="カラーパレット" value="#000000">
-                            <input type="range" id="${question.id}-thickness-slider" class="thickness-slider" min="1" max="20" value="5" title="ペンの太さ">
+                            <input type="color" id="${question.id}-color-picker" class="color-palette" title="${t('surveyAnswer.handwriting.colorPalette')}" value="#000000">
+                            <input type="range" id="${question.id}-thickness-slider" class="thickness-slider" min="1" max="20" value="5" title="${t('surveyAnswer.handwriting.penThickness')}">
                         </div>
                         <div class="tool-group">
-                            <button type="button" id="${question.id}-undo-btn" class="tool-button" title="戻る">
+                            <button type="button" id="${question.id}-undo-btn" class="tool-button" title="${t('surveyAnswer.handwriting.undo')}">
                                 <span class="material-icons">undo</span>
                             </button>
-                            <button type="button" id="${question.id}-redo-btn" class="tool-button" title="進む">
+                            <button type="button" id="${question.id}-redo-btn" class="tool-button" title="${t('surveyAnswer.handwriting.redo')}">
                                 <span class="material-icons">redo</span>
                             </button>
                         </div>
                          <div class="tool-group">
-                            <button type="button" id="${question.id}-clear-btn" class="tool-button" title="リセット">
+                            <button type="button" id="${question.id}-clear-btn" class="tool-button" title="${t('surveyAnswer.handwriting.reset')}">
                                 <span class="material-icons">delete</span>
                             </button>
                         </div>
                     </div>
                     <div class="relative">
                         <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}"></canvas>
-                        <div id="${question.id}-canvas-overlay" class="absolute inset-0 flex items-center justify-center bg-gray-50/80 rounded-md cursor-pointer" title="タップしてペンモードをオン">
+                        <div id="${question.id}-canvas-overlay" class="absolute inset-0 flex items-center justify-center bg-gray-50/80 rounded-md cursor-pointer" title="${t('surveyAnswer.handwriting.tapToEnablePen')}">
                             <div class="flex flex-col items-center gap-1 text-gray-400 pointer-events-none">
                                 <span class="material-icons text-3xl">edit_off</span>
-                                <span class="text-xs font-medium">ペンモードがオフです</span>
+                                <span class="text-xs font-medium">${t('surveyAnswer.handwriting.penModeOff')}</span>
                             </div>
                         </div>
                     </div>
@@ -1874,7 +1861,7 @@ function createQuestionElement(question, index) {
             break;
         }
         default:
-            controlArea.innerHTML = `<p class="text-sm text-error">未対応の設問タイプです: ${question.type}</p>`;
+            controlArea.innerHTML = `<p class="text-sm text-error">${t('surveyAnswer.unsupportedQuestionType', { type: question.type })}</p>`;
     }
     
     fieldset.addEventListener('change', (e) => {
@@ -2045,16 +2032,16 @@ function hasBizcardImage() {
 }
 
 // 「名刺が手元に無い方」モーダルの基本4項目のうち、未入力の項目を返す
-const CONTACT_FIELD_LABELS = {
-    name: '氏名',
-    email: 'メールアドレス',
-    company: '会社名',
-    phone: '電話番号',
+const CONTACT_FIELD_KEYS = {
+    name: 'surveyAnswer.manualInput.fullName',
+    email: 'surveyAnswer.manualInput.email',
+    company: 'surveyAnswer.manualInput.company',
+    phone: 'surveyAnswer.manualInput.phone',
 };
 
 function getMissingContactFields() {
     const info = state.answers.manualBizcardInfo || {};
-    return Object.keys(CONTACT_FIELD_LABELS)
+    return Object.keys(CONTACT_FIELD_KEYS)
         .filter((key) => String(info[key] || '').trim() === '');
 }
 
@@ -2071,27 +2058,26 @@ function showContactRequiredModal() {
     const listHTML = missing.map((key) => `
         <li class="flex items-center gap-2 text-sm text-red-700">
             <span class="material-icons text-[18px]">error_outline</span>
-            <span>${CONTACT_FIELD_LABELS[key]}</span>
+            <span>${t(CONTACT_FIELD_KEYS[key])}</span>
         </li>
     `).join('');
 
     const body = `
         <div class="space-y-4">
             <p class="text-sm text-gray-700 leading-relaxed">
-                回答を送信するには、<span class="font-bold">名刺画像の撮影</span>、または
-                <span class="font-bold">「名刺が手元に無い方」からの基本情報の入力</span>が必要です。
+                ${t('surveyAnswer.contactRequired.descriptionHtml')}
             </p>
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p class="text-xs font-bold text-red-700 mb-2">入力が必要な項目</p>
+                <p class="text-xs font-bold text-red-700 mb-2">${t('surveyAnswer.contactRequired.missingHeader')}</p>
                 <ul class="space-y-1.5">${listHTML}</ul>
             </div>
-            <p class="text-xs text-gray-500">いずれかの方法でご登録のうえ、再度送信してください。</p>
+            <p class="text-xs text-gray-500">${t('surveyAnswer.contactRequired.note')}</p>
         </div>
     `;
 
-    showModal(DOMElements.contactRequiredModal, '送信に必要な情報が不足しています', body, {
-        saveText: '基本情報を入力する',
-        cancelText: '閉じる',
+    showModal(DOMElements.contactRequiredModal, t('surveyAnswer.contactRequired.title'), body, {
+        saveText: t('surveyAnswer.contactRequired.openManualInput'),
+        cancelText: t('surveyAnswer.contactRequired.close'),
         onSave: () => {
             DOMElements.contactRequiredModal.style.display = 'none';
             openManualInputModal();
@@ -2160,9 +2146,9 @@ async function handleSubmit() {
   <svg class="mx-auto w-16 h-16 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
   </svg>
-  <h2 class="text-2xl font-extrabold text-gray-900">回答完了</h2>
+  <h2 class="text-2xl font-extrabold text-gray-900">${t('surveyAnswer.previewCompletedTitle')}</h2>
   <p class="text-sm text-gray-600">${thankYouMessage}</p>
-  <p class="text-xs text-amber-600 font-bold mt-4">※ プレビューモードのため回答データは送信されていません</p>
+  <p class="text-xs text-amber-600 font-bold mt-4">${t('surveyAnswer.previewCompletedNote')}</p>
 </div>
 </body></html>`);
             document.close();
@@ -2252,9 +2238,9 @@ function setupLeaveConfirmation() {
     window.addEventListener('popstate', (e) => {
         console.log('popstate event fired. hasUnsavedChanges:', state.hasUnsavedChanges); // <-- Add this line
         if (state.hasUnsavedChanges) {
-            showModal(DOMElements.leaveConfirmModal, 'ページを離れますか？', '変更が保存されていません。このページを離れてもよろしいですか？', {
-                saveText: '離れる',
-                cancelText: '留まる',
+            showModal(DOMElements.leaveConfirmModal, t('surveyAnswer.leaveConfirm.title'), t('surveyAnswer.leaveConfirm.body'), {
+                saveText: t('surveyAnswer.leaveConfirm.leave'),
+                cancelText: t('surveyAnswer.leaveConfirm.stay'),
                 onSave: () => {
                     state.hasUnsavedChanges = false; // 離脱を許可
                     DOMElements.leaveConfirmModal.style.display = 'none'; // <-- Add this line
@@ -2280,9 +2266,9 @@ function setupLeaveConfirmation() {
         if (anchor && anchor.href && anchor.target !== '_blank') {
             if (location.origin !== anchor.origin || !anchor.hash) {
                  e.preventDefault();
-                 showModal(DOMElements.leaveConfirmModal, 'ページを離れますか？', '変更が保存されていません。このページを離れてもよろしいですか？', {
-                    saveText: '離れる',
-                    cancelText: '留まる',
+                 showModal(DOMElements.leaveConfirmModal, t('surveyAnswer.leaveConfirm.title'), t('surveyAnswer.leaveConfirm.body'), {
+                    saveText: t('surveyAnswer.leaveConfirm.leave'),
+                    cancelText: t('surveyAnswer.leaveConfirm.stay'),
                     onSave: () => {
                         state.hasUnsavedChanges = false; // 離脱を許可
                         window.location.href = anchor.href;

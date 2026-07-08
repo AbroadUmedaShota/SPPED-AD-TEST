@@ -366,10 +366,12 @@ function handleLangTabKeydown(e, langCode) {
 
 function updateMultiLangVisibility() {
   // 言語タブのスタイル更新（roving tabindex: activeLang のチップのみ tabindex="0"）
+  // 役割は role="group" 内のトグルボタン群。編集中の言語を aria-current で示す。
   document.querySelectorAll('.lang-chip').forEach(tab => {
     const isActive = tab.dataset.lang === activeLang;
     tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    if (isActive) tab.setAttribute('aria-current', 'true');
+    else tab.removeAttribute('aria-current');
     tab.setAttribute('tabindex', isActive ? '0' : '-1');
   });
 
@@ -442,27 +444,19 @@ function renderLangSelectionAndTabs() {
   const canReorder = currentLangs.length > 1;
 
   tabsContainer.className = 'lang-tabbar__row';
-  tabsContainer.setAttribute('role', 'tablist');
+  // role="group": 編集言語の選択ボタン群＋「?」説明ボタンを束ねる。
+  // （tablist にすると tab 以外の子=「?」ボタンが混在しセマンティクス違反になるため group を採用）
+  tabsContainer.setAttribute('role', 'group');
+  tabsContainer.setAttribute('aria-label', '編集言語');
   tabsContainer.innerHTML = '';
 
-  // 第一言語の囲み枠。role="presentation" で tablist の直下は tab のみが意味を持つようにする
-  const fieldset = el('div', { class: 'lang-fieldset', role: 'presentation' });
+  // 第一言語の囲み枠
+  const fieldset = el('div', { class: 'lang-fieldset' });
 
-  // 凡例（「第一言語」ラベル ＋ ? 説明ボタン ＋ クリック開閉ツールチップ）
+  // 凡例（「第一言語」ラベルのみ。説明の「?」は多言語カードの見出し側に配置）
   const legend = el('div', { class: 'lang-legend' });
-  const helpWrap = el('span', { class: 'lang-help-wrap' });  // ツールチップの位置基準（? ボタンの直下に出す）
-  const helpBtn = el('button', {
-    id: 'langHelpBtn', class: 'lang-help', type: 'button',
-    'aria-expanded': 'false', 'aria-describedby': 'langPrimaryTip', 'aria-label': '第一言語について',
-    onclick: toggleLangTip
-  }, '?');
-  const tip = el('div', {
-    id: 'langPrimaryTip', class: 'lang-tip', role: 'tooltip', hidden: true
-  }, LANG_PRIMARY_TIP);
-  helpWrap.append(helpBtn, tip);
-  legend.append(el('span', { class: 'lang-legend__text' }, '第一言語'), helpWrap);
+  legend.append(el('span', { class: 'lang-legend__text' }, '第一言語'));
   fieldset.appendChild(legend);
-  ensureLangTipDismissers();
 
   // 第一言語チップ（枠の中・ドラッグ不可）
   fieldset.appendChild(makeLangChip(currentLangs[0], true, canReorder));
@@ -478,11 +472,12 @@ function renderLangSelectionAndTabs() {
   overlay.addEventListener('dragleave', () => { if (langOverId === 'slot') { langOverId = null; updateLangDnd(); } });
   overlay.addEventListener('drop', (e) => { e.preventDefault(); if (langDragId) promoteLang(langDragId); });
   fieldset.appendChild(overlay);
+
   tabsContainer.appendChild(fieldset);
 
-  // 仕切り + その他言語（ラッパは role="presentation"、tab の意味は各チップに閉じる）
+  // 仕切り + その他言語
   const divider = el('div', { class: 'lang-divider', 'aria-hidden': 'true' });
-  const others = el('div', { class: 'lang-others', role: 'presentation' });
+  const others = el('div', { class: 'lang-others' });
   currentLangs.slice(1).forEach(code => others.appendChild(makeLangChip(code, false, canReorder)));
   if (!canReorder) {
     // インライン display:none で確実に隠す（.lang-* の display 宣言に負けないため）
@@ -490,6 +485,21 @@ function renderLangSelectionAndTabs() {
     others.style.display = 'none';
   }
   tabsContainer.append(divider, others);
+
+  // 説明ヘルプ「?」はタブ帯の右端（第一言語ボックスから離れた位置）に置く。
+  // sticky で帯が上部に貼り付いた状態でも見えるので発見性も確保できる。
+  const helpSlot = el('div', { class: 'lang-help-slot' });
+  const helpBtn = el('button', {
+    id: 'langHelpBtn', class: 'lang-help', type: 'button',
+    'aria-expanded': 'false', 'aria-describedby': 'langPrimaryTip', 'aria-label': '第一言語について',
+    onclick: toggleLangTip
+  }, '?');
+  const tip = el('div', {
+    id: 'langPrimaryTip', class: 'lang-tip', 'aria-live': 'polite', hidden: true
+  }, LANG_PRIMARY_TIP);
+  helpSlot.append(helpBtn, tip);
+  tabsContainer.append(helpSlot);
+  ensureLangTipDismissers();
 
   updateLangDnd();
   onLangsChanged();
@@ -526,23 +536,20 @@ function makeLangChip(langCode, isPrimary, canReorder) {
   // aria-label はチップ内の全テキストを上書きするため、後から付く「未入力 N」バッジは
   // updateTranslationBadges() がこの基本ラベルに件数を連結して同期する
   const baseLabel = isPrimary ? `${langName}（第一言語）` : langName;
-  let title;
-  if (!canReorder) title = 'クリックまたはEnter/Spaceで編集対象に';
-  else if (isPrimary) title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印で並べ替え';
-  else title = 'クリック/Enter/Spaceで編集対象に、矢印キーで移動、Ctrl+矢印またはドラッグで並べ替え';
+  // 操作説明は per-chip の title には持たせない（矢印移動のたびに accessible description として
+  // 冗長に読み上げられるため）。操作方法は多言語カードの「?」ツールチップに集約している。
 
   const chip = el('div', {
     class: `lang-chip${isPrimary ? ' lang-chip--primary' : ''}${isActive ? ' active' : ''}`,
     'data-lang': langCode,
-    role: 'tab',
-    'aria-selected': isActive ? 'true' : 'false',
+    role: 'button',
     tabindex: isActive ? '0' : '-1',
-    title,
     'aria-label': baseLabel,
     'data-base-label': baseLabel,
     onclick: () => activateLangTab(langCode),
     onkeydown: (e) => handleLangTabKeydown(e, langCode)
   });
+  if (isActive) chip.setAttribute('aria-current', 'true');  // 編集中の言語
   chip.draggable = draggable;
 
   if (draggable) {
@@ -643,7 +650,7 @@ function updateLangDnd() {
 // ─────────────────────────────────────────
 // 第一言語の説明ツールチップ（? ボタンでクリック開閉・Esc/外側クリックで閉じる）
 // ─────────────────────────────────────────
-const LANG_PRIMARY_TIP = '回答画面で最初に表示される言語です。ほかの言語タブをこの枠へドラッグ、またはキーボードの Ctrl+左右キーで第一言語を入れ替えられます。';
+const LANG_PRIMARY_TIP = '『第一言語』は回答画面で最初に表示される言語です。言語タブで、他の言語を第一言語の枠へドラッグするか、Ctrl+左右キーで入れ替えられます。';
 let langTipDismissersBound = false;
 
 function closeLangTip() {
@@ -651,6 +658,23 @@ function closeLangTip() {
   const btn = document.getElementById('langHelpBtn');
   if (tip) tip.hidden = true;
   if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+// ツールチップは position:fixed。祖先の overflow:hidden にクリップされないよう
+// ビューポート基準でボタンの直下に配置する（開くたびに再計算）
+function positionLangTip() {
+  const tip = document.getElementById('langPrimaryTip');
+  const btn = document.getElementById('langHelpBtn');
+  if (!tip || !btn) return;
+  const r = btn.getBoundingClientRect();
+  tip.style.top = `${Math.round(r.bottom + 8)}px`;
+  const w = tip.offsetWidth || 252;
+  let left = r.left - 14;
+  left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+  tip.style.left = `${Math.round(left)}px`;
+  // 三角（::before）がボタンを指すよう、実際の左位置に応じて水平オフセットを補正
+  const arrowLeft = Math.max(10, Math.min(r.left + r.width / 2 - left - 4, w - 20));
+  tip.style.setProperty('--lang-tip-arrow-left', `${Math.round(arrowLeft)}px`);
 }
 
 function toggleLangTip(e) {
@@ -661,9 +685,10 @@ function toggleLangTip(e) {
   const willOpen = tip.hidden;
   tip.hidden = !willOpen;
   btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  if (willOpen) positionLangTip();
 }
 
-// 外側クリック・Esc でツールチップを閉じるハンドラを一度だけ document に取り付ける
+// 外側クリック・Esc・スクロールでツールチップを閉じる/追従するハンドラを一度だけ取り付ける
 function ensureLangTipDismissers() {
   if (langTipDismissersBound) return;
   langTipDismissersBound = true;
@@ -677,6 +702,15 @@ function ensureLangTipDismissers() {
     if (e.key !== 'Escape') return;
     const tip = document.getElementById('langPrimaryTip');
     if (tip && !tip.hidden) { closeLangTip(); document.getElementById('langHelpBtn')?.focus(); }
+  });
+  // スクロール/リサイズ時は位置がずれるので閉じる（fixed 配置のため）
+  window.addEventListener('scroll', () => {
+    const tip = document.getElementById('langPrimaryTip');
+    if (tip && !tip.hidden) closeLangTip();
+  }, true);
+  window.addEventListener('resize', () => {
+    const tip = document.getElementById('langPrimaryTip');
+    if (tip && !tip.hidden) closeLangTip();
   });
 }
 
@@ -1159,6 +1193,18 @@ function checkValidationForSection(idOrFn) {
   return false;
 }
 
+// 設問見出し・ナビ用の表示テキスト。第一言語が未入力なら他の入力済み言語へフォールバックする。
+// （第一言語を未翻訳の言語に入れ替えた直後、見出しが一斉にプレースホルダー化して
+//   「データが消えた」ように見える問題を防ぐ。翻訳が必要なことは未入力バッジ側で示す）
+function questionDisplayText(q) {
+  const t = (q && q.text) || {};
+  if (t[currentLangs[0]]) return t[currentLangs[0]];
+  for (const lang of currentLangs) {
+    if (t[lang]) return t[lang];
+  }
+  return '設問文を入力してください';
+}
+
 function updateOutline() {
   const outlineList = document.getElementById('outline-questions-list');
   if (!outlineList) return;
@@ -1179,7 +1225,7 @@ function updateOutline() {
   outlineList.innerHTML = '';
   cards.forEach((card, i) => {
     const q = questions.find(q => q.id === card.dataset.questionId);
-    const textStr = q.text?.[currentLangs[0]] || '設問文を入力してください';
+    const textStr = questionDisplayText(q);
     
     // Validate choice length
     let hasError = CHOICE_TYPES.has(q.type) && (!q.options || q.options.length < 2);
@@ -1397,7 +1443,7 @@ function buildQuestionCard(q, index) {
     'anim-ms': '200',
   });
 
-  const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, q.text[currentLangs[0]] || '設問文を入力してください');
+  const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, questionDisplayText(q));
 
   const actionGroup = el('div', { class: 'flex items-center gap-1 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity' });
 
@@ -1469,7 +1515,7 @@ function buildBasicSection(q, cardNode, requiredBadge) {
         q.text[lang] = e.target.value;
         if (isFirst) {
           const sum = cardNode.querySelector('[data-question-summary-text]');
-          if (sum) sum.textContent = e.target.value || '設問文を入力してください';
+          if (sum) sum.textContent = questionDisplayText(q);
           section.querySelectorAll('[data-ref-hint]').forEach(hint => {
             hint.textContent = e.target.value || '';
             hint.classList.toggle('hidden', !e.target.value);
@@ -3187,22 +3233,27 @@ async function loadSurveyData(surveyId) {
       'image_upload': 'image'
     };
     
+    // 多言語形式（{ja, en, ...}）と文字列の両方を編集用の言語オブジェクトへ揃える
+    const toLangObject = (value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) return { ...value };
+      return { ja: value || '' };
+    };
     questions = (json.details || []).map(q => {
       const type = typeMap[q.type] || q.type;
       const base = {
         id: generateId(),
         type: type,
-        text: { ja: q.text || '' },
+        text: toLangObject(q.text),
         required: q.required || false
       };
-      
+
       if (CHOICE_TYPES.has(type)) {
-        base.options = (q.options || []).map(o => ({ ja: typeof o === 'string' ? o : (o.text || '') }));
+        base.options = (q.options || []).map(o => toLangObject(typeof o === 'string' ? o : o.text));
         if(base.options.length === 0) base.options = [{ja:'選択肢1'}];
       }
       if (MATRIX_TYPES.has(type)) {
-        base.matrixRows = (q.rows || []).map(r => ({ ja: r.text || '' }));
-        base.matrixCols = (q.options || []).map(c => ({ ja: c.text || '' }));
+        base.matrixRows = (q.rows || []).map(r => toLangObject(r.text));
+        base.matrixCols = (q.options || []).map(c => toLangObject(c.text));
       }
       if (type === 'date_time') {
         // 保存済みの入力モードから日付/時刻トグルを復元（無ければ旧typeで判定、既定は日付・時刻の両方）
@@ -3211,6 +3262,26 @@ async function loadSurveyData(surveyId) {
         base.config = mode === 'datetime' ? { showDate: true, showTime: true }
           : mode === 'time' ? { showDate: false, showTime: true }
           : { showDate: true, showTime: false };
+      }
+      if (type === 'rating_scale') {
+        // 保存済みの段階数・両端/中間ラベルを復元（無ければ既定値）
+        const rs = q.meta?.ratingScaleConfig || q.config || {};
+        base.config = {
+          points: rs.points || 5,
+          minLabel: toLangObject(rs.minLabel),
+          maxLabel: toLangObject(rs.maxLabel),
+          showMidLabel: !!rs.showMidLabel,
+          midLabel: toLangObject(rs.midLabel),
+        };
+      }
+      if (type === 'free_answer') {
+        // 保存済みの改行可否・文字数制限を復元（無ければ既定値）
+        const v = q.meta?.validation?.text || q.config || {};
+        base.config = {
+          multiline: v.multiline !== false,
+          minLength: v.minLength || '',
+          maxLength: v.maxLength || '',
+        };
       }
       return enforceRequiredRules(base);
     });

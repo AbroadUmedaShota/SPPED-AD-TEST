@@ -91,7 +91,11 @@
       "PowerShell(\"----- INSTALL -----\")",
       "PowerShell(claude plugin marketplace add openai/codex-plugin-cc 2>&1)",
       "PowerShell(claude plugin install codex@openai-codex 2>&1)",
-      "PowerShell(claude plugin list 2>&1)"
+      "PowerShell(claude plugin list 2>&1)",
+      "mcp__google-sheets__get_sheet_data",
+      "mcp__google-sheets__list_sheets",
+      "mcp__google-sheets__create_sheet",
+      "mcp__google-sheets__update_cells"
     ]
   },
   "enableAllProjectMcpServers": true,

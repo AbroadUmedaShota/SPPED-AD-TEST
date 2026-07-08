@@ -5019,8 +5019,8 @@
     "id": "sv_0003_26010",
     "groupId": "group_marketing",
     "name": {
-      "ja": "SPEED AD サンプルアンケート（標準機能確認用）",
-      "en": "SPEED AD Sample Survey (Standard Feature Demo)"
+      "ja": "SPEED ADアンケートサンプル",
+      "en": "SPEED AD Survey Sample"
     },
     "status": "完了",
     "answerCount": 10,
@@ -5030,51 +5030,140 @@
     "details": [
       {
         "id": "Q1",
-        "text": "展示会を知ったきっかけ (SA)",
+        "text": {
+          "ja": "展示会を知ったきっかけ (SA)",
+          "en": "How did you hear about the exhibition? (SA)"
+        },
         "type": "single_choice",
         "options": [
-          "招待状",
-          "Webサイト",
-          "SNS",
-          "知人の紹介",
-          "その他"
+          {
+            "value": "招待状",
+            "text": {
+              "ja": "招待状",
+              "en": "Invitation"
+            }
+          },
+          {
+            "value": "Webサイト",
+            "text": {
+              "ja": "Webサイト",
+              "en": "Website"
+            }
+          },
+          {
+            "value": "SNS",
+            "text": {
+              "ja": "SNS",
+              "en": "Social media"
+            }
+          },
+          {
+            "value": "知人の紹介",
+            "text": {
+              "ja": "知人の紹介",
+              "en": "Referral"
+            }
+          },
+          {
+            "value": "その他",
+            "text": {
+              "ja": "その他",
+              "en": "Other"
+            }
+          }
         ]
       },
       {
         "id": "Q2",
-        "text": "興味のある分野 (MA)",
+        "text": {
+          "ja": "興味のある分野 (MA)",
+          "en": "Fields of interest (MA)"
+        },
         "type": "multi_choice",
         "options": [
-          "AI・機械学習",
-          "クラウドサービス",
-          "セキュリティ",
-          "IoT",
-          "VR/AR"
+          {
+            "value": "AI・機械学習",
+            "text": {
+              "ja": "AI・機械学習",
+              "en": "AI & machine learning"
+            }
+          },
+          {
+            "value": "クラウドサービス",
+            "text": {
+              "ja": "クラウドサービス",
+              "en": "Cloud services"
+            }
+          },
+          {
+            "value": "セキュリティ",
+            "text": {
+              "ja": "セキュリティ",
+              "en": "Security"
+            }
+          },
+          {
+            "value": "IoT",
+            "text": {
+              "ja": "IoT",
+              "en": "IoT"
+            }
+          },
+          {
+            "value": "VR/AR",
+            "text": {
+              "ja": "VR/AR",
+              "en": "VR/AR"
+            }
+          }
         ]
       },
       {
         "id": "Q3",
-        "text": "担当者名 (Text)",
-        "type": "text"
+        "text": {
+          "ja": "担当者名 (Text)",
+          "en": "Contact person (Text)"
+        },
+        "type": "text",
+        "meta": {
+          "validation": {
+            "text": {
+              "multiline": false,
+              "maxLength": 50
+            }
+          }
+        }
       },
       {
         "id": "Q4",
-        "text": "ご意見・ご要望 (Free Text)",
+        "text": {
+          "ja": "ご意見・ご要望 (Free Text)",
+          "en": "Comments and requests (Free Text)"
+        },
         "type": "free_text"
       },
       {
         "id": "Q5",
-        "text": "導入予定時期 (Date)",
+        "text": {
+          "ja": "導入予定時期 (Date)",
+          "en": "Planned adoption date (Date)"
+        },
         "type": "date"
       },
       {
         "id": "Q6",
-        "text": "希望連絡時間 (Time)",
+        "text": {
+          "ja": "希望連絡時間 (Time)",
+          "en": "Preferred contact time (Time)"
+        },
         "type": "time"
       },
       {
         "id": "Q7",
-        "text": "導入予定台数 (Number)",
+        "text": {
+          "ja": "導入予定台数 (Number)",
+          "en": "Planned number of units (Number)"
+        },
         "type": "number",
         "min": 0,
         "max": 1000,
@@ -5082,101 +5171,220 @@
       },
       {
         "id": "Q8",
-        "text": "サービス満足度 (Matrix SA)",
+        "text": {
+          "ja": "サービス満足度 (Matrix SA)",
+          "en": "Service satisfaction (Matrix SA)"
+        },
         "type": "matrix_sa",
         "rows": [
           {
             "id": "r1",
-            "text": "機能性"
+            "text": {
+              "ja": "機能性",
+              "en": "Functionality"
+            }
           },
           {
             "id": "r2",
-            "text": "使いやすさ"
+            "text": {
+              "ja": "使いやすさ",
+              "en": "Ease of use"
+            }
           },
           {
             "id": "r3",
-            "text": "サポート"
+            "text": {
+              "ja": "サポート",
+              "en": "Support"
+            }
           },
           {
             "id": "r4",
-            "text": "価格"
+            "text": {
+              "ja": "価格",
+              "en": "Pricing"
+            }
           }
         ],
         "options": [
           {
             "value": "5",
-            "text": "満足"
+            "text": {
+              "ja": "満足",
+              "en": "Satisfied"
+            }
           },
           {
             "value": "4",
-            "text": "やや満足"
+            "text": {
+              "ja": "やや満足",
+              "en": "Somewhat satisfied"
+            }
           },
           {
             "value": "3",
-            "text": "普通"
+            "text": {
+              "ja": "普通",
+              "en": "Neutral"
+            }
           },
           {
             "value": "2",
-            "text": "やや不満"
+            "text": {
+              "ja": "やや不満",
+              "en": "Somewhat dissatisfied"
+            }
           },
           {
             "value": "1",
-            "text": "不満"
+            "text": {
+              "ja": "不満",
+              "en": "Dissatisfied"
+            }
           }
         ]
       },
       {
         "id": "Q9",
-        "text": "導入検討項目 (Matrix MA)",
+        "text": {
+          "ja": "導入検討項目 (Matrix MA)",
+          "en": "Deployment targets (Matrix MA)"
+        },
         "type": "matrix_ma",
         "rows": [
           {
             "id": "r1",
-            "text": "本社"
+            "text": {
+              "ja": "本社",
+              "en": "Head office"
+            }
           },
           {
             "id": "r2",
-            "text": "支社"
+            "text": {
+              "ja": "支社",
+              "en": "Branch office"
+            }
           }
         ],
         "options": [
           {
             "value": "a",
-            "text": "PC"
+            "text": {
+              "ja": "PC",
+              "en": "PC"
+            }
           },
           {
             "value": "b",
-            "text": "タブレット"
+            "text": {
+              "ja": "タブレット",
+              "en": "Tablet"
+            }
           },
           {
             "value": "c",
-            "text": "スマホ"
+            "text": {
+              "ja": "スマホ",
+              "en": "Smartphone"
+            }
           },
           {
             "value": "d",
-            "text": "サーバー"
+            "text": {
+              "ja": "サーバー",
+              "en": "Server"
+            }
           }
         ]
       },
       {
         "id": "Q10",
-        "text": "電子署名 (Handwriting)",
+        "text": {
+          "ja": "電子署名 (Handwriting)",
+          "en": "Electronic signature (Handwriting)"
+        },
         "type": "handwriting"
       },
       {
         "id": "Q11",
-        "text": "現場写真 (Image)",
-        "type": "image"
+        "text": {
+          "ja": "従業員規模 (Dropdown)",
+          "en": "Company size (Dropdown)"
+        },
+        "type": "dropdown",
+        "options": [
+          {
+            "value": "1〜9名",
+            "text": {
+              "ja": "1〜9名",
+              "en": "1-9 employees"
+            }
+          },
+          {
+            "value": "10〜49名",
+            "text": {
+              "ja": "10〜49名",
+              "en": "10-49 employees"
+            }
+          },
+          {
+            "value": "50〜99名",
+            "text": {
+              "ja": "50〜99名",
+              "en": "50-99 employees"
+            }
+          },
+          {
+            "value": "100〜299名",
+            "text": {
+              "ja": "100〜299名",
+              "en": "100-299 employees"
+            }
+          },
+          {
+            "value": "300名以上",
+            "text": {
+              "ja": "300名以上",
+              "en": "300+ employees"
+            }
+          }
+        ]
       },
       {
         "id": "Q12",
-        "text": "※アンケートにご協力いただきありがとうございました。",
+        "text": {
+          "ja": "SPEED ADの推奨度 (Rating Scale)",
+          "en": "Likelihood to recommend SPEED AD (Rating Scale)"
+        },
+        "type": "rating_scale",
+        "meta": {
+          "ratingScaleConfig": {
+            "points": 5,
+            "minLabel": {
+              "ja": "全く薦めない",
+              "en": "Not at all likely"
+            },
+            "maxLabel": {
+              "ja": "強く薦める",
+              "en": "Very likely"
+            },
+            "showMidLabel": false
+          }
+        }
+      },
+      {
+        "id": "Q13",
+        "text": {
+          "ja": "※アンケートにご協力いただきありがとうございました。",
+          "en": "Thank you for taking part in this survey."
+        },
         "type": "explanation"
       }
     ],
     "displayTitle": {
-      "ja": "SPEED AD サンプルアンケート",
-      "en": "SPEED AD Sample Survey"
+      "ja": "SPEED ADアンケートサンプル",
+      "en": "SPEED AD Survey Sample"
     },
     "description": {
       "ja": "標準機能の確認用サンプルです。回答、名刺データ化、SPEEDレビュー、ダウンロード確認の流れを確認できます。",

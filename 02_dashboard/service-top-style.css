@@ -2927,11 +2927,12 @@ body.dark-mode .outline-highlight {
     border-radius: 11px;
     background: #f7faff;
 }
-/* 枠の上辺左に乗る凡例（ラベル＋?）。折り返させない */
+/* 枠の上辺中央に乗る凡例。折り返させない */
 .lang-legend {
     position: absolute;
     top: -9px;
-    left: 13px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 6;
     display: inline-flex;
     align-items: center;
@@ -2945,12 +2946,6 @@ body.dark-mode .outline-highlight {
     font-weight: 800;
     letter-spacing: 0.02em;
     color: #1d4ed8;            /* on #fff ≈ 6.7:1 */
-}
-/* ? ボタン＋ツールチップのラッパ（ツールチップの位置基準） */
-.lang-help-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
 }
 /* 「?」説明ボタン（クリック開閉。WCAG 1.4.11: 枠線 #2563eb ≈ 5.2:1） */
 .lang-help {
@@ -2971,13 +2966,23 @@ body.dark-mode .outline-highlight {
     padding: 0;
 }
 .lang-help:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; }
-/* 説明ツールチップ（下方向・クリックで開閉・Esc/外側クリックで閉じる） */
-.lang-tip {
+/* タップ領域を約28pxに拡張（見た目は16pxのまま。タッチ操作の当てやすさ確保） */
+.lang-help::after {
+    content: '';
     position: absolute;
-    top: calc(100% + 9px);
-    left: -14px;
-    z-index: 50;
+    inset: -6px;
+}
+/* 説明ツールチップ。多言語カード見出しの「?」直下に position:fixed で配置する
+   （祖先の overflow:hidden にクリップされないよう位置は JS が計算）。
+   クリックで開閉・Esc/外側クリック/スクロールで閉じる */
+.lang-tip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
     width: 252px;
+    max-width: calc(100vw - 16px);   /* 狭い画面でビューポート外へはみ出さない */
+    box-sizing: border-box;
     padding: 10px 12px;
     background: #1f2937;       /* 白文字 ≈ 14.6:1 */
     color: #ffffff;
@@ -2985,16 +2990,17 @@ body.dark-mode .outline-highlight {
     line-height: 1.65;
     font-weight: 500;
     text-align: left;
-    white-space: normal;       /* 親 .lang-legend の nowrap を打ち消し、252px 内で折り返す */
+    white-space: normal;
     border-radius: 8px;
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
 }
 .lang-tip[hidden] { display: none; }
+/* 「?」ボタンを指す上向きの三角（水平位置は JS が --lang-tip-arrow-left で補正） */
 .lang-tip::before {
     content: '';
     position: absolute;
     top: -4px;
-    left: 17px;
+    left: var(--lang-tip-arrow-left, 20px);
     width: 9px;
     height: 9px;
     background: #1f2937;
@@ -3060,14 +3066,19 @@ body.dark-mode .outline-highlight {
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
 }
 /* 第一言語チップ（枠の中・グリップ無し・ドラッグ不可・透明背景）
-   min-width で枠を凡例「第一言語 ?」より広く保ち、ラベルの折り返しを防ぐ */
+   どの言語を選んでも枠幅が変わらないよう固定幅にし、言語名を中央寄せする
+   （最長 "Tiếng Việt"=66px + 左右パディング/枠が収まる幅） */
 .lang-chip--primary {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    padding: 7px 14px;
-    min-width: 96px;
+    box-sizing: border-box;
+    width: 106px;
+    padding: 7px 12px;
+    justify-content: center;
+    text-align: center;
 }
+.lang-chip--primary .lang-chip__name { text-align: center; }
 .lang-chip--primary:hover { background: #eef6ff; }
 /* 編集中（アクティブ）の言語を示す控えめな強調 */
 .lang-chip.active {
@@ -3140,6 +3151,14 @@ body.dark-mode .outline-highlight {
     padding: 3px 2px;   /* アクティブ/ドロップ受けリング(2px)がスクロールでクリップされないための余白 */
 }
 .lang-others::-webkit-scrollbar { display: none; }
+/* 「?」説明ヘルプをタブ帯の右端に固定（第一言語ボックスから離す。横スクロールしても常時見える） */
+.lang-help-slot {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+}
 /* レスポンシブ: 狭い幅では余白を詰めて、その他言語だけ横スクロールさせる（縦書き化を防ぐ） */
 @media (max-width: 900px) {
     .lang-tabbar__row { gap: 10px; padding: 14px; }

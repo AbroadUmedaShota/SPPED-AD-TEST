@@ -22,7 +22,7 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
   test('新規作成モーダルの初期値だけで作成画面に進み、サンプル設問が入る', async ({ page }) => {
     const today = new Date();
     const expectedStart = formatDate(addDays(today, 1));
-    const expectedEnd = formatDate(addDays(today, 7));
+    const expectedEnd = formatDate(addDays(today, 3));
 
     await page.goto('/02_dashboard/index.html');
     await page.waitForFunction(() => typeof window.openNewSurveyModalWithSetup === 'function');
@@ -51,7 +51,7 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
   });
 
   test('共通サンプルは各アカウントで表示され、編集不可の完了サンプルとして扱われる', async ({ page }) => {
-    const sampleName = 'SPEED AD サンプルアンケート（標準機能確認用）';
+    const sampleName = 'SPEED ADアンケートサンプル';
     const groups = ['personal', 'group_sales', 'group_marketing', 'group_bpo'];
 
     await page.goto('/02_dashboard/index.html');
@@ -78,7 +78,7 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
   });
 
   test('共通サンプルは通常一覧の最後に表示される', async ({ page }) => {
-    const sampleName = 'SPEED AD サンプルアンケート（標準機能確認用）';
+    const sampleName = 'SPEED ADアンケートサンプル';
 
     await page.goto('/02_dashboard/index.html');
     await page.waitForFunction(() => document.querySelector('#user_select')?.options.length >= 4);
@@ -92,7 +92,7 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
   });
 
   test('共通サンプルは複製して通常アンケートとして追加できる', async ({ page }) => {
-    const sampleName = 'SPEED AD サンプルアンケート（標準機能確認用）';
+    const sampleName = 'SPEED ADアンケートサンプル';
     const copiedName = `${sampleName} のコピー`;
     const copyStart = formatDate(addDays(new Date(), 1));
     const copyEnd = formatDate(addDays(new Date(), 7));
@@ -167,7 +167,7 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
     });
     await page.goto('/02_dashboard/speed-review.html?surveyId=sv_0003_26010');
 
-    await expect(page.locator('#review-survey-name')).toContainText('SPEED AD サンプルアンケート（標準機能確認用）');
+    await expect(page.locator('#review-survey-name')).toContainText('SPEED ADアンケートサンプル');
     await expect(page.locator('#kpi-total-answers')).toHaveText('10件');
     await expect(page.locator('#pageInfo')).toContainText('全 10件');
     await expect(page.locator('#dayFilterSelect')).toHaveValue('all');
@@ -184,12 +184,12 @@ test.describe('新規アンケート初期値と共通サンプルアンケー�
   test('共通サンプルのグラフ分析で10件の回答を集計できる', async ({ page }) => {
     await page.goto('/02_dashboard/graph-page.html?surveyId=sv_0003_26010');
 
-    await expect(page.locator('#survey-title')).toContainText('SPEED AD サンプルアンケート（標準機能確認用）');
+    await expect(page.locator('#survey-title')).toContainText('SPEED ADアンケートサンプル');
     await expect(page.locator('#charts-container [data-role="valid-answers"]').first()).toContainText('有効回答: 10件');
   });
 
   test('共通サンプルのダウンロード確認で回答・名刺・画像が利用可能になる', async ({ page }) => {
-    const sampleName = 'SPEED AD サンプルアンケート（標準機能確認用）';
+    const sampleName = 'SPEED ADアンケートサンプル';
 
     await page.goto('/02_dashboard/index.html');
     await page.waitForFunction(() => document.querySelector('#user_select')?.options.length >= 4);
