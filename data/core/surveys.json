@@ -5124,7 +5124,15 @@
           "ja": "担当者名 (Text)",
           "en": "Contact person (Text)"
         },
-        "type": "text"
+        "type": "text",
+        "meta": {
+          "validation": {
+            "text": {
+              "multiline": false,
+              "maxLength": 50
+            }
+          }
+        }
       },
       {
         "id": "Q4",

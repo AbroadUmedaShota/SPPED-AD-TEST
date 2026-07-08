@@ -3274,6 +3274,15 @@ async function loadSurveyData(surveyId) {
           midLabel: toLangObject(rs.midLabel),
         };
       }
+      if (type === 'free_answer') {
+        // 保存済みの改行可否・文字数制限を復元（無ければ既定値）
+        const v = q.meta?.validation?.text || q.config || {};
+        base.config = {
+          multiline: v.multiline !== false,
+          minLength: v.minLength || '',
+          maxLength: v.maxLength || '',
+        };
+      }
       return enforceRequiredRules(base);
     });
     
