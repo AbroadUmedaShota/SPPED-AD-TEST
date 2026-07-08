@@ -501,7 +501,7 @@ last_reviewed: 2026-04-24
 
 `#bizcard-manual-button` click ハンドラ内にインラインで定義（[survey-answer.js:356-460](../../../02_dashboard/src/survey-answer.js#L356)）。
 
-**入力項目**（全 9 欄、すべて任意、形式バリデーション無し）:
+**入力項目**（全 13 欄、すべて任意、形式バリデーション無し。名刺データ化の納品フォーマットに整合）:
 
 | 論理名 | DOM id / name | type |
 |--------|---------------|------|
@@ -512,9 +512,12 @@ last_reviewed: 2026-04-24
 | 部署名 | `manual-department` / `department` | text |
 | 役職名 | `manual-title` / `title` | text |
 | 電話番号 | `manual-phone` / `phone` | tel |
+| 携帯番号 | `manual-mobile` / `mobile` | tel |
+| FAX番号 | `manual-fax` / `fax` | tel |
 | 郵便番号 | `manual-postal-code` / `postalCode` | text |
 | 住所 | `manual-address` / `address` | text |
 | 建物名 | `manual-building` / `building` | text |
+| URL | `manual-url` / `url` | url |
 
 **2 段階保存**:
 

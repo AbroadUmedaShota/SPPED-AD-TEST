@@ -404,6 +404,14 @@ function openManualInputModal() {
                     <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
+                    <label for="manual-mobile" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.mobile')}</label>
+                    <input type="tel" id="manual-mobile" name="mobile" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-fax" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.fax')}</label>
+                    <input type="tel" id="manual-fax" name="fax" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
                     <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.postalCode')}</label>
                     <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
@@ -414,6 +422,10 @@ function openManualInputModal() {
                 <div>
                     <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.building')}</label>
                     <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-url" class="block text-sm font-medium text-on-surface-variant">${t('surveyAnswer.manualInput.url')}</label>
+                    <input type="url" id="manual-url" name="url" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
             </form>
         `;
@@ -439,9 +451,12 @@ function openManualInputModal() {
                                 [t('surveyAnswer.manualInput.department')]: manualInfo.department,
                                 [t('surveyAnswer.manualInput.jobTitle')]: manualInfo.title,
                                 [t('surveyAnswer.manualInput.phone')]: manualInfo.phone,
+                                [t('surveyAnswer.manualInput.mobile')]: manualInfo.mobile,
+                                [t('surveyAnswer.manualInput.fax')]: manualInfo.fax,
                                 [t('surveyAnswer.manualInput.postalCode')]: manualInfo.postalCode,
                                 [t('surveyAnswer.manualInput.address')]: manualInfo.address,
-                                [t('surveyAnswer.manualInput.building')]: manualInfo.building
+                                [t('surveyAnswer.manualInput.building')]: manualInfo.building,
+                                [t('surveyAnswer.manualInput.url')]: manualInfo.url
                             }).map(([label, value]) => `<p><span class="font-semibold text-on-surface">${label}:</span> ${value || ''}</p>`).join('')}
                         </div>
                         <p class="mt-6 text-on-surface">${t('surveyAnswer.manualInput.confirmBody')}</p>
