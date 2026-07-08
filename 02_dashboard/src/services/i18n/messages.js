@@ -223,7 +223,7 @@ export const messages = {
       submitButton: 'Submit',
       bizcardCameraButton: 'Scan business card',
       bizcardChangeButton: 'Change business card',
-      bizcardManualButton: 'I do not have a business card',
+      bizcardManualButton: 'No business card?',
       submitting: 'Submitting...',
       previewFeatureDisabled: 'This feature is not available in preview mode.',
       front: 'Front',
@@ -258,7 +258,7 @@ export const messages = {
         ocrLanguage: 'OCR language: Japanese (dummy)',
         addBack: 'Add back side',
         skipBack: 'Skip back side',
-        skipBackToConfirm: 'Skip back side and continue',
+        skipBackToConfirm: 'Skip back side',
         backChoiceTitle: 'Add back side',
         backChooseMethod: 'Choose how to upload the back side.',
         toFinalConfirm: 'Continue',
@@ -315,7 +315,7 @@ export const messages = {
       },
       contactRequired: {
         title: 'Information required before submitting',
-        descriptionHtml: 'To submit your response, please <span class="font-bold">capture your business card</span> or <span class="font-bold">enter your basic details via "I do not have a business card"</span>.',
+        descriptionHtml: 'To submit your response, please <span class="font-bold">capture your business card</span> or <span class="font-bold">enter your basic details via "No business card?"</span>.',
         missingHeader: 'Required fields',
         note: 'Please complete one of the options above and submit again.',
         openManualInput: 'Enter basic details',
@@ -337,7 +337,7 @@ export const messages = {
       documentTitle: 'SpeedAd - Survey Completed',
       title: 'Thank you for completing the survey!',
       body: 'Your feedback will help us improve our service.',
-      continuousAnswerButton: 'Submit another response'
+      continuousAnswerButton: 'Answer again'
     },
     thankYouSettings: {
       pageTitleFallback: 'Thank-you Screen Settings',
