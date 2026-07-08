@@ -499,6 +499,9 @@ function autoResizeTextarea(element) {
 }
 
 // --- 名刺アップロードフロー ---
+// 表裏サムネイル共通の固定枠。画像サイズに関わらず枠が先にあり、画像は枠内に収める
+const BIZCARD_FRAME_CLASS = 'w-full h-36 sm:h-48 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center overflow-hidden';
+
 // ボタン状態更新関数を追加
 function updateBizcardButtonState() {
     if (!DOMElements.bizcardCameraButton) return;
@@ -901,8 +904,11 @@ function startBizcardUploadFlow(targetSide = null) {
     };
 
     const showFinalConfirmation = () => {
-        const frontImageHTML = `<img src="${localImages.front}" alt="${t('surveyAnswer.front')}" class="w-full max-h-[max(160px,calc(100dvh_-_340px))] object-contain rounded-md shadow-sm cursor-pointer bizcard-confirm-image">`;
-        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="${t('surveyAnswer.back')}" class="w-full max-h-[max(160px,calc(100dvh_-_340px))] object-contain rounded-md shadow-sm cursor-pointer bizcard-confirm-image">` : `<div class="grow flex items-center justify-center bg-gray-100 rounded-md border border-dashed border-gray-300"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noBack')}</p></div>`;
+        const buildSideHTML = (src, altText) => src
+            ? `<div class="${BIZCARD_FRAME_CLASS}"><img src="${src}" alt="${altText}" class="max-w-full max-h-full object-contain cursor-pointer bizcard-confirm-image"></div>`
+            : `<div class="${BIZCARD_FRAME_CLASS} border-dashed border-gray-300"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noBack')}</p></div>`;
+        const frontImageHTML = buildSideHTML(localImages.front, t('surveyAnswer.front'));
+        const backImageHTML = buildSideHTML(localImages.back, t('surveyAnswer.back'));
         const body = `
             <div class="flex items-center justify-center mb-4">
                 <span class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center"><span class="material-icons text-primary">check</span></span>
@@ -968,16 +974,14 @@ function startBizcardUploadFlow(targetSide = null) {
 
         const createSideHTML = (side, title) => {
             const hasImage = !!localImages[side];
-            const imageHTML = hasImage 
-                ? `<img src="${localImages[side]}" alt="${title}" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image mb-2 hover:opacity-80 transition-opacity" data-side="${side}">`
-                : `<div class="w-full h-32 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md mb-2 cursor-pointer bizcard-confirm-image hover:bg-gray-200 transition-colors" data-side="${side}"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noImageTapToCapture')}</p></div>`;
-            
+            const imageHTML = hasImage
+                ? `<div class="${BIZCARD_FRAME_CLASS}"><img src="${localImages[side]}" alt="${title}" class="max-w-full max-h-full object-contain cursor-pointer bizcard-confirm-image hover:opacity-80 transition-opacity" data-side="${side}"></div>`
+                : `<div class="${BIZCARD_FRAME_CLASS} border-dashed border-gray-300 cursor-pointer bizcard-confirm-image hover:bg-gray-200 transition-colors" data-side="${side}"><p class="text-sm text-gray-500">${t('surveyAnswer.bizcard.noImageTapToCapture')}</p></div>`;
+
             return `
-                <div class="flex flex-col items-center h-full">
+                <div class="flex flex-col items-center">
                     <p class="font-bold text-center mb-2 text-gray-700">${title}</p>
-                    <div class="flex-grow w-full flex items-center justify-center">
-                        ${imageHTML}
-                    </div>
+                    ${imageHTML}
                 </div>
             `;
         };
