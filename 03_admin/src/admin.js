@@ -212,24 +212,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { initDataEntryPage } = await import('./data_entry.js');
             initDataEntryPage();
             break;
-        case 'calendar-management.html':
-            const { initCalendarManagementPage } = await import('./calendar-management.js');
-            initCalendarManagementPage();
-            break;
-        case 'operator-management.html':
-            const { initOperatorManagementPage } = await import('./operator-management.js');
-            initOperatorManagementPage();
-            break;
-        case 'coupon-management.html':
-            const { initCouponManagementPage } = await import('./coupon-management.js');
-            initCouponManagementPage();
-            const { initCouponBulkCreate } = await import('./couponBulkCreate.js');
-            initCouponBulkCreate();
-            break;
-        case 'performance-management.html':
-            const { initPerformanceManagementPage } = await import('./performance-management.js');
-            initPerformanceManagementPage();
-            break;
+        // calendar-management / operator-management / coupon-management / performance-management は
+        // リファクタリング版(静的モック・prototype.dc.html 準拠)に置き換えたため旧初期化を外している
         // Add other admin pages here
         // case 'some_other_page.html':
         //     const { initSomeOtherPage } = await import('./some_other_page.js');

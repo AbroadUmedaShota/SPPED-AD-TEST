@@ -6,349 +6,250 @@
     <title>SpeedAd - ユーザー管理</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
-    <div class="flex flex-1 pt-16 bg-background">
+    <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">利用者アカウント管理</h1>
-                    <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-4 py-2 text-sm font-semibold"><span class="material-icons text-base">person_add</span>新規ユーザー招待</button>
+        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+          <div style="padding:18px 24px 40px">
+            <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">ユーザー管理</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+              <h2 style="margin:0;font-size:20px;font-weight:700">ユーザー管理</h2>
+              <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mInviteUser')">＋ 利用者を招待</button>
+            </div>
+            <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <input placeholder="ユーザーID" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
+              <input placeholder="会社名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:170px;font-family:inherit">
+              <input placeholder="氏名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
+              <input placeholder="メールアドレス" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:190px;font-family:inherit">
+              <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>アカウント状態: すべて</option><option>有効</option><option>停止</option><option>招待中</option><option>本登録未了</option></select>
+              <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
+              <button style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
+            </div>
+            <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+                <span>ユーザーID</span><span>会社名</span><span>氏名</span><span>メールアドレス</span><span>プレミアム</span><span>状態</span><span style="color:#3467d6">登録日時 ▼</span><span style="padding-left:12px">操作</span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1052</span><span>(株)マーケットビジョン</span><span>岡田 健一</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">k.okada@market-v.co.jp</span><span><span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700">プレミアム</span></span><span><span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">有効</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center"><a href="#u" onclick="pOpen('mUserDetail')">詳細</a><button style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmStopUser')">停止</button></span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1051</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">info@newcorp.example.jp</span><span style="color:#8a93a5">—</span><span><span style="background:#eef2fb;color:#3467d6;border:1px solid #b9caee;border-radius:4px;padding:1px 7px;font-size:11.5px;font-weight:700">招待中</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/28 11:02</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center;font-size:12px"><a href="#u" onclick="pOpen('mConfirmResendInvite')">再送</a><a href="#u" style="color:#c23934" onclick="pOpen('mConfirmCancelInvite')">キャンセル</a><span style="font-size:11px;color:#8a93a5">期限 07/31 11:02</span></span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1050</span><span>(株)イベントプラス</span><span>中山 亮</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">r.nakayama@eventplus.co.jp</span><span style="color:#8a93a5">—</span><span><span style="background:#fdf6ec;color:#8a6414;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700">本登録未了</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/27 16:48</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center"><a href="#u" onclick="pOpen('mUserDetail')">詳細</a><button style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmStopUser')">停止</button></span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1049</span><span>グロースパートナーズ(株)</span><span>三浦 沙織</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">s.miura@growthp.co.jp</span><span style="color:#8a93a5">—</span><span><span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">有効</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/27 09:15</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center"><a href="#u" onclick="pOpen('mUserDetail')">詳細</a><button style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmStopUser')">停止</button></span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1038</span><span>(株)テックブリッジ</span><span>森田 优子</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">y.morita@techbridge.co.jp</span><span><span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700">プレミアム</span></span><span><span style="background:#f0f1f4;color:#5b6577;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">停止</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/02 10:40</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center"><a href="#u" onclick="pOpen('mUserDetail')">詳細</a><button style="background:#fff;color:#237a52;border:1px solid #9fceb6;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmRestoreUser')">有効へ戻す</button></span>
+              </div>
+              <div style="display:grid;grid-template-columns:90px 210px 110px minmax(200px,1fr) 100px 110px 150px 200px;align-items:center;padding:6px 16px;min-height:52px;font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">U-1035</span><span>地方創生機構</span><span>川口 誠</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">m.kawaguchi@chihososei.or.jp</span><span style="color:#8a93a5">—</span><span><span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">有効</span></span><span style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/06/28 13:33</span>
+                <span style="padding-left:12px;display:flex;gap:10px;align-items:center"><a href="#u" onclick="pOpen('mUserDetail')">詳細</a><button style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmStopUser')">停止</button></span>
+              </div>
+            </div>
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
+              <span style="font-variant-numeric:tabular-nums">全 128 件中 1〜10 件を表示</span>
+              <div style="display:flex;align-items:center;gap:16px">
+                <label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
+                <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums">
+                  <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span>
+                  <span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">2</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">3</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">›</span>
                 </div>
-                <section class="space-y-6">
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <h2 class="text-title-large font-semibold text-on-surface">検索条件</h2>
-            <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface">
-                <span class="material-icons text-base">bookmark_border</span>
-                保存済み条件
-            </button>
-        </div>
-        <form class="grid gap-4 md:grid-cols-3" aria-label="利用者アカウントの検索フォーム">
-            <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
-                <span>キーワード</span>
-                <input type="search" class="form-input" placeholder="氏名・メール・アカウントID" />
-            </label>
-            <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
-                <span>会社名</span>
-                <input type="text" class="form-input" placeholder="企業名" />
-            </label>
-            <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
-                <span>契約ステータス</span>
-                <select class="form-select">
-                    <option value="">すべて</option>
-                    <option value="active">有効</option>
-                    <option value="paused">一時停止</option>
-                    <option value="locked">強制ロック</option>
-                    <option value="closed">解約</option>
-                </select>
-            </label>
-            <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
-                <span>プラン</span>
-                <select class="form-select">
-                    <option value="">指定なし</option>
-                    <option value="basic">Basic</option>
-                    <option value="pro">Pro</option>
-                    <option value="enterprise">Enterprise</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </label>
-            <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
-                <span>管理フラグ</span>
-                <select class="form-select">
-                    <option value="">すべて</option>
-                    <option value="important">重要</option>
-                    <option value="attention">要注意</option>
-                    <option value="stakeholder">関係者</option>
-                </select>
-            </label>
-            <div class="flex items-end gap-3">
-                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-medium">
-                    <span class="material-icons text-base">search</span>
-                    検索
-                </button>
-                <button type="reset" class="inline-flex items-center justify-center rounded-lg border border-outline px-4 py-2 text-sm text-on-surface">
-                    <span class="material-icons text-base">restart_alt</span>
-                    リセット
-                </button>
+              </div>
             </div>
-        </form>
-        <details class="mt-4 rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-4 text-sm text-on-surface-variant">
-            <summary class="flex cursor-pointer items-center gap-2 text-on-surface font-medium">
-                <span class="material-icons text-base">tune</span>
-                詳細フィルタ
-            </summary>
-            <div class="mt-3 grid gap-3 md:grid-cols-2">
-                <label class="flex flex-col gap-1">
-                    <span>部署</span>
-                    <input type="text" class="form-input" placeholder="部署名" />
-                </label>
-                <label class="flex flex-col gap-1">
-                    <span>役職</span>
-                    <input type="text" class="form-input" placeholder="役職名" />
-                </label>
-                <label class="flex flex-col gap-1">
-                    <span>作成日 (開始〜終了)</span>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="date" class="form-input" />
-                        <input type="date" class="form-input" />
-                    </div>
-                </label>
-                <label class="flex flex-col gap-1">
-                    <span>最終ログイン</span>
-                    <select class="form-select">
-                        <option value="">条件なし</option>
-                        <option value="7">7日以内</option>
-                        <option value="30">30日以内</option>
-                        <option value="90">90日以上未ログイン</option>
-                    </select>
-                </label>
-            </div>
-        </details>
-    </div>
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <h2 class="text-title-large font-semibold text-on-surface">利用者一覧</h2>
-            <div class="flex items-center gap-2 text-sm">
-                <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-on-surface">
-                    <span class="material-icons text-base">file_download</span>
-                    CSVエクスポート
-                </button>
-                <button type="button" class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 font-semibold">
-                    <span class="material-icons text-base">person_add_alt</span>
-                    新規アカウント作成
-                </button>
-            </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="利用者一覧テーブル">
-                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase tracking-wider">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 text-left">アカウントID</th>
-                        <th scope="col" class="px-4 py-3 text-left">会社名</th>
-                        <th scope="col" class="px-4 py-3 text-left">部署・役職</th>
-                        <th scope="col" class="px-4 py-3 text-left">氏名</th>
-                        <th scope="col" class="px-4 py-3 text-left">メールアドレス</th>
-                        <th scope="col" class="px-4 py-3 text-left">停止フラグ</th>
-                        <th scope="col" class="px-4 py-3 text-left">管理フラグ</th>
-                        <th scope="col" class="px-4 py-3 text-left">契約プラン</th>
-                        <th scope="col" class="px-4 py-3 text-left">最終ログイン日</th>
-                        <th scope="col" class="px-4 py-3 text-right">操作</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-outline-variant">
-                    <tr class="hover:bg-surface-variant/60 transition-colors">
-                        <td class="px-4 py-3 font-mono text-on-surface">USR-0001284</td>
-                        <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
-                        <td class="px-4 py-3 text-on-surface-variant">マーケティング部 / マネージャー</td>
-                        <td class="px-4 py-3 text-on-surface font-medium">田中 太郎</td>
-                        <td class="px-4 py-3 text-on-surface-variant">t.tanaka@example.com</td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">有効</span></td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">要注意</span></td>
-                        <td class="px-4 py-3 text-on-surface-variant">Pro (年間)</td>
-                        <td class="px-4 py-3 text-on-surface-variant">2025/09/30 11:32</td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <a class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs" href="user-detail.html">詳細</a>
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">停止</button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-surface-variant/60 transition-colors">
-                        <td class="px-4 py-3 font-mono text-on-surface">USR-0001120</td>
-                        <td class="px-4 py-3 text-on-surface-variant">Sato Marketing LLC</td>
-                        <td class="px-4 py-3 text-on-surface-variant">営業推進室 / ディレクター</td>
-                        <td class="px-4 py-3 text-on-surface font-medium">佐藤 花子</td>
-                        <td class="px-4 py-3 text-on-surface-variant">h.sato@example.com</td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">一時停止</span></td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-secondary/20 text-secondary px-2.5 py-1 text-xs">関係者</span></td>
-                        <td class="px-4 py-3 text-on-surface-variant">Enterprise</td>
-                        <td class="px-4 py-3 text-on-surface-variant">2025/08/18 09:05</td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <a class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs" href="user-detail.html">詳細</a>
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">再開</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="flex justify-between items-center mt-4 text-sm text-on-surface-variant">
-            <p>1,284件中 1〜50件を表示</p>
-            <div class="flex items-center gap-1">
-                <button class="px-3 py-1 rounded border border-outline">前へ</button>
-                <button class="px-3 py-1 rounded bg-primary text-primary-on">1</button>
-                <button class="px-3 py-1 rounded border border-outline">2</button>
-                <button class="px-3 py-1 rounded border border-outline">3</button>
-                <button class="px-3 py-1 rounded border border-outline">次へ</button>
-            </div>
-        </div>
-    </div>
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="利用者詳細">
-            <header class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                <div>
-                    <h2 class="text-title-large font-semibold text-on-surface">選択中の利用者</h2>
-                    <p class="text-sm text-on-surface-variant">アカウントID: USR-0001284</p>
-                </div>
-                <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">運用管理者</span>
-            </header>
-            <dl class="grid gap-x-6 gap-y-3 md:grid-cols-2 text-sm text-on-surface-variant">
-                <div><dt class="font-medium text-on-surface">氏名</dt><dd>田中 太郎</dd></div>
-                <div><dt class="font-medium text-on-surface">契約ステータス</dt><dd><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2 py-0.5 text-xs">有効</span></dd></div>
-                <div><dt class="font-medium text-on-surface">会社</dt><dd>株式会社アブロード</dd></div>
-                <div><dt class="font-medium text-on-surface">部署・役職</dt><dd>マーケティング部 / マネージャー</dd></div>
-                <div><dt class="font-medium text-on-surface">メール</dt><dd>t.tanaka@example.com</dd></div>
-                <div><dt class="font-medium text-on-surface">最終ログイン</dt><dd>2025/09/30 11:32</dd></div>
-            </dl>
-            <details class="mt-4 rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-4">
-                <summary class="flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface">
-                    <span class="material-icons text-base">expand_more</span>
-                    連絡先・請求情報を表示
-                </summary>
-                <dl class="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-2 text-sm text-on-surface-variant">
-                    <div><dt class="font-medium text-on-surface">電話番号</dt><dd>03-1234-5678</dd></div>
-                    <div><dt class="font-medium text-on-surface">郵便番号</dt><dd>150-0001</dd></div>
-                    <div class="md:col-span-2"><dt class="font-medium text-on-surface">住所</dt><dd>東京都渋谷区神宮前1-1-1</dd></div>
-                    <div><dt class="font-medium text-on-surface">請求書宛名</dt><dd>株式会社アブロード 御中</dd></div>
-                    <div><dt class="font-medium text-on-surface">請求先メール</dt><dd>billing@example.com</dd></div>
-                    <div><dt class="font-medium text-on-surface">請求グループ</dt><dd>ABROAD-001</dd></div>
-                </dl>
-            </details>
-            <details class="mt-4 rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-4">
-                <summary class="flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface">
-                    <span class="material-icons text-base">expand_more</span>
-                    サービス設定を表示
-                </summary>
-                <dl class="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-2 text-sm text-on-surface-variant">
-                    <div><dt class="font-medium text-on-surface">契約プラン</dt><dd>Pro (年間) + 名刺自動化オプション</dd></div>
-                    <div><dt class="font-medium text-on-surface">利用モジュール</dt><dd>アンケート作成 / データ化 / ダッシュボード</dd></div>
-                    <div><dt class="font-medium text-on-surface">権限ロール</dt><dd>運用管理者</dd></div>
-                    <div><dt class="font-medium text-on-surface">通知設定</dt><dd>メール・Slack (marketing-channel)</dd></div>
-                    <div><dt class="font-medium text-on-surface">ログイン制御</dt><dd>MFA必須 / IP制限 (社内VPN)</dd></div>
-                    <div><dt class="font-medium text-on-surface">管理フラグ</dt><dd><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2 py-0.5 text-xs">要注意</span> 内部メモあり</dd></div>
-                </dl>
-            </details>
-            <div class="mt-6 flex flex-wrap gap-2 text-sm">
-                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-4 py-2"><span class="material-icons text-base">save</span>保存</button>
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2"><span class="material-icons text-base">block</span>アカウント停止</button>
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2"><span class="material-icons text-base">mail</span>初期化メール再送</button>
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2"><span class="material-icons text-base">sync_alt</span>プラン／オプション変更</button>
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2"><span class="material-icons text-base">flag</span>管理フラグ更新</button>
-            </div>
-        </section>
-        <aside class="space-y-6" aria-label="補足情報">
-            <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="内部メモ">
-                <h2 class="text-title-large font-semibold text-on-surface mb-4">内部メモ</h2>
-                <ul class="space-y-2 text-sm text-on-surface-variant">
-                    <li class="flex items-start gap-3">
-                        <span class="material-icons text-warning text-base">priority_high</span>
-                        <div>
-                            <p class="text-on-surface">2025/09/15 佐藤花子</p>
-                            <p>定期的に請求先の担当者変更があるため、更新通知を忘れずに。</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <span class="material-icons text-primary text-base">info</span>
-                        <div>
-                            <p class="text-on-surface">2025/08/30 内田亮</p>
-                            <p>Slack通知連携機能の検討中。</p>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-            <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="変更履歴">
-                <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                    <h2 class="text-title-large font-semibold text-on-surface">変更履歴</h2>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs text-on-surface">
-                        <span class="material-icons text-base">filter_list</span>
-                        種別フィルタ
-                    </button>
-                </div>
-                <ul class="space-y-3 text-sm text-on-surface-variant" aria-label="最新の変更履歴一覧">
-                    <li class="rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-3">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="text-on-surface font-medium">2025/09/30 10:05</p>
-                            <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">通知設定</span>
-                        </div>
-                        <p class="mt-1">田中 太郎 が Slack 通知チャンネルを <strong class="text-on-surface">marketing-channel</strong> に更新。</p>
-                    </li>
-                    <li class="rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-3">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="text-on-surface font-medium">2025/09/18 15:40</p>
-                            <span class="inline-flex items-center gap-1 rounded-full bg-secondary/10 px-2 py-0.5 text-xs text-secondary">プラン変更</span>
-                        </div>
-                        <p class="mt-1">システムが契約プランを <strong class="text-on-surface">Pro</strong> から <strong class="text-on-surface">Pro (年間)</strong> に自動反映。</p>
-                    </li>
-                    <li class="rounded-lg border border-outline-variant/60 bg-surface-variant/40 p-3">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="text-on-surface font-medium">2025/08/25 11:22</p>
-                            <span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2 py-0.5 text-xs">管理フラグ</span>
-                        </div>
-                        <p class="mt-1">佐藤 花子 が 管理フラグを <strong class="text-on-surface">要注意</strong> に更新。理由: 契約更新交渉中。</p>
-                    </li>
-                </ul>
-                <button class="mt-4 inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs text-on-surface">
-                    <span class="material-icons text-base">history</span>
-                    すべての履歴を見る
-                </button>
-            </section>
-        </aside>
-    </div>
-</section>
-        <aside class="space-y-6" aria-label="補足情報">
-            <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="内部メモ">
-                <h2 class="text-title-large font-semibold text-on-surface mb-4">内部メモ</h2>
-                <ul class="space-y-2 text-sm text-on-surface-variant">
-                    <li class="flex items-start gap-3">
-                        <span class="material-icons text-warning text-base">priority_high</span>
-                        <div>
-                            <p class="text-on-surface">2025/09/15 佐藤花子</p>
-                            <p>定期的に請求先の担当者変更があるため、更新通知を忘れずに。</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <span class="material-icons text-primary text-base">info</span>
-                        <div>
-                            <p class="text-on-surface">2025/08/30 内田亮</p>
-                            <p>Slack通知連携機能の検討中。</p>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-            <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="変更履歴">
-                <h2 class="text-title-large font-semibold text-on-surface mb-4">変更履歴</h2>
-                <ol class="space-y-3 text-sm text-on-surface-variant">
-                    <li>
-                        <p class="text-on-surface font-medium">2025/09/30 10:05</p>
-                        <p>田中 太郎 → 通知設定（Slackチャンネル）を marketing-channel に更新。</p>
-                    </li>
-                    <li>
-                        <p class="text-on-surface font-medium">2025/09/18 15:40</p>
-                        <p>システムがプラン更新 Pro → Pro (年間) を反映。</p>
-                    </li>
-                    <li>
-                        <p class="text-on-surface font-medium">2025/08/25 11:22</p>
-                        <p>佐藤 花子 → 管理フラグを「要注意」に設定。理由: 契約更新交渉中。</p>
-                    </li>
-                </ol>
-            </section>
-        </aside>
-    </div>
-</section>
-
-            </div>
+          </div>
         </main>
     </div>
-    <div id="footer-placeholder"></div>
 </div>
+
+<div id="mInviteUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:520px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">利用者を招待</span>
+      <span onclick="pClose('mInviteUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メールアドレス <span style="color:#c23934">必須</span></span><input placeholder="user@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会社名(任意)</span><input style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">氏名(任意)</span><input style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">招待リンクの有効期限は送信から72時間です。期限切れ・未達の場合は一覧から再送できます。招待時に入力した会社名・氏名と本登録時の本人入力値の優先関係は※要確定です。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mInviteUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mInviteUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待を送信</button>
+    </div>
+  </div>
+</div>
+
+<div id="mUserDetail" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:680px;max-height:86vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:16px;font-weight:700">岡田 健一</span>
+        <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">U-1052</span>
+        <span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700">プレミアム</span>
+        <span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">有効</span>
+      </div>
+      <span onclick="pClose('mUserDetail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">アカウント情報 <span style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
+          <span style="color:#6b7484">会社名</span><input value="(株)マーケットビジョン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+          <span style="color:#6b7484">氏名</span><input value="岡田 健一" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+          <span style="color:#6b7484">メール</span><input value="k.okada@market-v.co.jp" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+          <span style="color:#6b7484">登録日時</span><span style="font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
+          <span style="color:#6b7484">最終ログイン</span><span style="font-variant-numeric:tabular-nums">2026/08/01 18:22</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">契約(プレミアム関連)</div>
+        <div style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
+          <span style="color:#6b7484">プラン</span><select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>プレミアム(月額 50,000円)</option><option>通常</option></select>
+          <span style="color:#6b7484">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px">
+          <button onclick="pOpen('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作</div>
+        <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="pOpen('mConfirmStopUser')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">アカウントを停止</button>
+          <button onclick="location.href='survey-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">このユーザーのアンケート一覧 →</button>
+          <button onclick="location.href='billing-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
+        </div>
+        <div style="margin-top:8px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます(§3)。</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
+        <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
+          <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
+          <span style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(現在Lv3のため非表示・§4.6)</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 <span style="font-weight:400;font-size:11px;color:#8a6414">※あったほうが良い・実現方式は要確定</span></div>
+        <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;gap:10px"><span>招待メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/28 10:02</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
+          <div style="display:flex;justify-content:space-between;gap:10px"><span>本登録完了メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/29 14:20</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
+          <div style="font-size:11px;color:#8a93a5;line-height:1.6">※到達確認は「正しく実装できない」との報告があり、表示内容・精度は開発側との擦り合わせ待ち。</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">利用状況</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px">
+          <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">アンケート数</div><div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">24</div></div>
+          <div onclick="location.href='billing-management.html'" style="background:#f7f8fb;border-radius:6px;padding:10px 14px;cursor:pointer"><div style="font-size:11.5px;color:#6b7484">未入金の請求 <span style="color:#3467d6">→</span></div><div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:#6b7484">0</div></div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+        <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
+          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/29 14:20</span><span>招待から本登録が完了<br><span style="color:#8a93a5">実行者: 本人</span></span></div>
+          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 10:02</span><span>招待を実行<br><span style="color:#8a93a5">実行者: admin@abroad-o.com</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmStopUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">アカウントを停止しますか?</span>
+      <span onclick="pClose('mConfirmStopUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)を停止します。停止中は本人のログインとメール配信などの自動処理が止まります。操作は監査ログに記録されます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmStopUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmStopUser')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">停止する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmRestoreUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">アカウントを有効へ戻しますか?</span>
+      <span onclick="pClose('mConfirmRestoreUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1038 森田 优子((株)テックブリッジ)を有効化します。ログインと自動処理が再開されます。操作は監査ログに記録されます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmRestoreUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmRestoreUser')" style="background:#237a52;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">有効へ戻す</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmCancelInvite" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">招待をキャンセルしますか?</span>
+      <span onclick="pClose('mConfirmCancelInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">info@newcorp.example.jp への招待リンクを無効化します。この操作は取り消せません(再度招待は可能です)。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmCancelInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmCancelInvite')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセルする</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmResendInvite" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">招待メールを再送しますか?</span>
+      <span onclick="pClose('mConfirmResendInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">info@newcorp.example.jp へ招待メールを再送します。有効期限は再送時点から72時間です。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmResendInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmResendInvite')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">再送する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmSaveUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
+      <span onclick="pClose('mConfirmSaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmSaveUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmResetPwUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">初期化メールを送信しますか?</span>
+      <span onclick="pClose('mConfirmResetPwUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">k.okada@market-v.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button onclick="pClose('mConfirmResetPwUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmResetPwUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
+<script src="src/proto-ui.js"></script>
 </body>
 </html>

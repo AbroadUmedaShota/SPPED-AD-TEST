@@ -1,282 +1,129 @@
 /* admin-style.css */
+/* 管理画面リファクタリング版デザイン(design_handoff_admin_ui/prototype.dc.html 準拠) */
 
-/* 管理者画面のサイドバーの背景色と文字色を明確に設定し、他のCSSファイルによる上書きを防ぐ */
+/* デザイントークン上書き(service-top-style.css の CSS変数を管理画面用に差し替え) */
+:root {
+    --color-primary: #3467D6;
+    --color-brand-base-primary: #3467D6;
+    --color-base-background-main: #F4F6F9;
+    --color-base-background-sub: #F7F8FB;
+    --color-base-card: #FFFFFF;
+    --color-base-border-divider: #E2E6ED;
+    --color-text-main: #1F2733;
+    --color-text-sub: #5B6577;
+    --color-state-error: #C23934;
+    --color-state-success: #237A52;
+    --color-state-warning: #8A6414;
+    --color-button-primary-bg: #3467D6;
+    --color-button-primary-hover-bg: #2B57B8;
+    --color-button-danger-bg: #C23934;
+    --color-button-danger-hover-bg: #A93029;
+}
+
+body {
+    font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    background-color: #F4F6F9;
+    color: #1F2733;
+}
+
+a { color: #3467D6; }
+a:hover { color: #2B57B8; }
+
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid #3467D6;
+    outline-offset: 2px;
+}
+
+/* サイドバー(232px・#1D2634・現在地 #2E4370) */
 .admin-sidebar {
-    background-color: #374151; /* gray-700 */
+    background-color: #1D2634;
+    width: 232px;
+    color: #C3CCDB;
+}
+
+.admin-sidebar .profile-block {
+    border-bottom: 1px solid #2A3750;
 }
 
 .admin-sidebar nav a.nav-link {
-    color: #e5e7eb; /* gray-200 */
+    display: block;
+    color: #C3CCDB;
+    font-size: 13.5px;
+    border-radius: 6px;
+    padding: 9px 14px;
+    text-decoration: none;
+    transition: background-color .15s ease, color .15s ease;
 }
 
 .admin-sidebar nav a.nav-link:hover {
-    background-color: #4b5563; /* gray-600 */
-    color: #ffffff;
+    background-color: #26324A;
+    color: #FFFFFF;
 }
 
-/* スタイルがservice-top-style.cssの汎用ルールに上書きされないよう、詳細度を高く設定 */
 .admin-sidebar nav a.nav-link.active {
-    background-color: #EF4444; /* red-500 */
+    background-color: #2E4370;
     color: #FFFFFF;
-    font-weight: 600; /* semibold */
+    font-weight: 700;
 }
 
-.admin-sidebar nav a.nav-link.active .material-icons {
+.admin-sidebar #logoutButton:hover {
     color: #FFFFFF;
 }
 
-/* 通常時のアイコンの色がサイドバーの背景に負けないように調整 */
-.admin-sidebar nav a.nav-link .material-icons {
-    color: #e5e7eb; /* gray-200 */
-}
-
-.admin-sidebar nav a.nav-link:hover .material-icons {
-    color: #FFFFFF;
-}
 body.sidebar-locked {
     overflow: hidden;
 }
 
-/* Dark mode fix for floating elements */
-body.dark-mode .kpi-card,
-body.dark-mode .bg-surface.shadow-sm {
-    background-color: var(--color-base-card) !important;
-    border-color: var(--color-base-border-divider) !important;
-}
-
-body.dark-mode #graphModal > div {
-    background-color: var(--color-base-card);
-    color: var(--color-text-main);
-}
-
-body.dark-mode #graphModal #closeGraphModal {
-    color: var(--color-text-sub);
-}
-
-body.dark-mode #graphModal #closeGraphModal:hover {
-    color: var(--color-text-main);
-}
-
-body.dark-mode #graphModal #modalCloseBtn {
-    background-color: var(--color-button-primary-bg);
-    color: var(--color-button-primary-text);
-}
-
-body.dark-mode #graphModal #modalCloseBtn:hover {
-    background-color: var(--color-button-primary-hover-bg);
-}
-
-/* Dark Mode Calendar Colors */
-.dark-mode .bg-yellow-200 {
-    background-color: #713f12; /* amber-800 */
-}
-.dark-mode .bg-blue-200 {
-    background-color: #1e3a8a; /* blue-900 */
-}
-.dark-mode .bg-red-200 {
-    background-color: #7f1d1d; /* red-900 */
-}
-
-/* Adjust text color for readability on the new dark backgrounds */
-.dark-mode .bg-yellow-200 .text-on-surface-variant,
-.dark-mode .bg-blue-200 .text-on-surface-variant,
-.dark-mode .bg-red-200 .text-on-surface-variant {
-    color: #d1d5db; /* gray-300 */
-}
-
-#calendar-tooltip {
-    position: absolute;
-    display: none;
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 1000;
-    pointer-events: none; /* So it doesn't interfere with other mouse events */
-    white-space: pre-wrap; /* To respect newlines in the tooltip */
-    max-width: 300px;
-}
-
-/* Calendar View Switcher */
-.calendar-view-button.active {
-    background-color: var(--color-primary, #006878);
-    color: var(--color-on-primary, #ffffff);
-}
-
-/* Yearly View */
-#yearly-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-.year-month-container {
-    padding: 1rem;
-    border: 1px solid var(--color-outline-variant, #ccc);
-    border-radius: 0.5rem;
-}
-.year-month-header {
-    font-size: 1.125rem;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-.year-day-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    text-align: center;
-}
-.year-day-cell {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 2rem;
-    width: 2rem;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-.year-day-cell:hover {
-    background-color: var(--color-surface-variant, #eee);
-}
-.year-day-cell.has-survey {
-    background-color: #fce7f3; /* pink-100 */
-}
-.year-day-cell.is-assigned {
-    background-color: #dcfce7; /* green-100 */
-}
-.year-day-cell.saturday {
-    color: #2563eb; /* blue-600 */
-}
-.year-day-cell.sunday, .year-day-cell.holiday {
-    color: #dc2626; /* red-600 */
-}
-
-/* Vertical View */
-#vertical-view {
-    max-height: 800px; /* or other appropriate height */
-    overflow-y: auto;
-    /* Ensure scroll chaining is enabled, allowing the main page to scroll
-       when the user reaches the top or bottom of this scrollable area. */
-    overscroll-behavior-y: auto;
-}
-.vertical-day-row {
-    display: flex;
-    border-bottom: 1px solid var(--color-outline-variant, #ccc);
-    padding: 1rem 0.5rem;
-}
-.vertical-day-date {
-    flex: 0 0 100px;
-    font-weight: 500;
-}
-.vertical-day-content {
-    flex: 1;
-}
-
-.toolbox-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 2px solid transparent;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-on-surface-variant);
-    transition: all 0.2s ease-in-out;
-}
-
-.toolbox-tab:hover {
-    color: var(--color-on-surface);
-    background-color: var(--color-surface-container-hover);
-}
-
-.toolbox-tab.active {
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-.button-danger {
-    background-color: var(--color-button-danger-bg);
-    color: var(--color-button-danger-text);
-}
-
-.button-danger:hover {
-    background-color: var(--color-button-danger-hover-bg);
-}
-
-/* Coupon Management Status Badges */
+/* ステータスバッジ(prototype 配色) */
 .status-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
 }
 
-.status-active {
-    background-color: #dcfce7; /* green-100 */
-    color: #166534; /* green-800 */
-}
+.status-active { background-color: #E5F3EC; color: #237A52; }
+.status-inactive { background-color: #F0F1F4; color: #5B6577; }
+.status-expired { background-color: #FDF0EF; color: #C23934; }
+.status-limit_reached { background-color: #FDF6EC; color: #8A6414; border: 1px solid #E8CF9E; }
+.status-info { background-color: #EEF2FB; color: #3467D6; border: 1px solid #B9CAEE; }
 
-.status-limit_reached {
-    background-color: #ffedd5; /* orange-100 */
-    color: #9a3412; /* orange-800 */
-}
-
-.status-inactive {
-    background-color: #e5e7eb; /* gray-200 */
-    color: #374151; /* gray-700 */
-}
-
-.status-expired {
-    background-color: #fee2e2; /* red-100 */
-    color: #991b1b; /* red-800 */
-
-/* Custom Tab Component Styles (Chrome-like) */
-.tab-nav-container {
+/* モーダル(prototype 様式・src/proto-ui.js と対) */
+.proto-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 26, 38, .55);
     display: flex;
-    border-bottom: 1px solid var(--color-base-border-divider);
-    margin-bottom: -1px; /* Overlap with the content border */
-}
-
-.tab-btn {
-    background: none;
-    border: 1px solid var(--color-base-border-divider); /* Visible border for all tabs */
-    border-bottom: none;
-    padding: 0.75rem 1.25rem;
-    cursor: pointer;
-    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-sub);
-    font-weight: 500;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-    position: relative;
-    z-index: 1;
+    justify-content: center;
+    z-index: 60;
 }
 
-.tab-btn:hover {
-    color: var(--color-text-main);
-    background-color: var(--color-base-background-sub);
+.proto-modal[hidden] { display: none; }
+
+.proto-dialog {
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(12, 18, 30, .4);
 }
 
-.tab-btn.active {
-    background-color: var(--color-base-card);
-    color: var(--color-primary);
-    font-weight: 600;
-    border-color: var(--color-base-border-divider);
-    border-bottom-color: transparent; /* Make it visually connect */
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.05); /* Subtle shadow to lift it */
-    z-index: 2;
-}
+/* 一覧行ホバー(prototype 準拠) */
+.proto-row-hover:hover { background-color: #F7F9FD; }
 
-.tab-panel-content {
-    border-top: 1px solid var(--color-base-border-divider);
-    padding-top: 1rem;
+/* 旧ダッシュボード用CSS(service-top-style.css)のレイアウト干渉リセット */
+/* .sidebar の折りたたみ(4rem)+hover展開、body/main-contentの4remパディングを管理画面では無効化する */
+@media (min-width: 1024px) {
+    body { padding-left: 0 !important; }
+    .admin-sidebar,
+    .admin-sidebar:hover { width: 232px !important; }
+    .admin-sidebar .profile-block {
+        display: block !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
 }
-
-/* Responsive table styles */
-}
+#main-content { padding-left: 0 !important; }
+.admin-sidebar { transition: none !important; }

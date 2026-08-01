@@ -6,307 +6,197 @@
     <title>SpeedAd - 営業日カレンダー管理</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
-<div id="focus-area-overlay" class="fixed inset-0 z-40 bg-black bg-opacity-0 hidden"></div>
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
-    <div class="flex flex-1 pt-16 bg-background">
+    <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">営業日カレンダー管理</h1>
-                    <div class="flex items-center gap-2">
-                        <button id="export-csv-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm"><span class="material-icons text-base">download</span>カレンダーCSV出力</button>
-                        <button id="import-csv-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm"><span class="material-icons text-base">upload_file</span>休業日CSV取込</button>
-                    </div>
-                </div>
-                <section class="space-y-6">
-                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-                        <div class="flex flex-wrap justify-between items-center gap-4">
-                            <div>
-                                <h2 class="text-title-large font-semibold text-on-surface">営業日ルール</h2>
-                                <p class="text-sm text-on-surface-variant">祝日APIで取得した休日 + 個別設定の休業日を管理します。</p>
-                            </div>
-                            <div class="flex items-center gap-2 text-sm">
-                                <button id="sync-holidays-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
-                                    <span class="material-icons text-base">cloud_sync</span>
-                                    祝日API同期
-                                </button>
-
-                            </div>
-                        </div>
-                        <div id="kpi-summary-container" class="mt-6 grid gap-4 sm:grid-cols-3">
-                            <div class="rounded-lg bg-surface-container-low p-4">
-                                <p class="text-on-surface-variant text-sm">休業日数 (今月)</p>
-                                <p id="kpi-holidays" class="text-title-large font-semibold text-on-surface">-</p>
-                            </div>
-                            <div class="rounded-lg bg-surface-container-low p-4">
-                                <p class="text-on-surface-variant text-sm">振替営業日</p>
-                                <p id="kpi-substitute-workdays" class="text-title-large font-semibold text-on-surface">-</p>
-                            </div>
-                            <div class="rounded-lg bg-surface-container-low p-4">
-                                <p class="text-on-surface-variant text-sm">SLA期限間近の案件数</p>
-                                <p id="kpi-sla-alerts" class="text-title-large font-semibold text-warning">-</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-                        <div class="flex justify-center mb-4">
-                            <div class="inline-flex rounded-md shadow-sm" role="group">
-                                <button id="view-monthly-button" type="button" class="calendar-view-button active py-2 px-4 text-sm font-medium rounded-l-lg border border-outline hover:bg-surface-container focus:z-10 focus:ring-2 focus:ring-primary" aria-label="月表示">
-                                    <span class="material-icons text-base">calendar_month</span>
-                                </button>
-                                <button id="view-vertical-button" type="button" class="calendar-view-button py-2 px-4 text-sm font-medium border-t border-b border-outline hover:bg-surface-container focus:z-10 focus:ring-2 focus:ring-primary" aria-label="縦表示">
-                                    <span class="material-icons text-base">view_day</span>
-                                </button>
-                                <button id="view-yearly-button" type="button" class="calendar-view-button py-2 px-4 text-sm font-medium rounded-r-md border border-outline hover:bg-surface-container focus:z-10 focus:ring-2 focus:ring-primary" aria-label="年表示">
-                                    <span class="material-icons text-base">calendar_today</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                            <div class="flex items-center gap-2">
-                                <button id="prev-month-button" class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="前月へ">
-                                    <span class="material-icons">chevron_left</span>
-                                </button>
-                                <h2 id="calendar-title" class="text-title-large font-semibold text-on-surface w-32 text-center">-</h2>
-                                <button id="next-month-button" class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="翌月へ">
-                                    <span class="material-icons">chevron_right</span>
-                                </button>
-                            </div>
-                                                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-on-surface-variant">
-                                <span class="inline-flex items-center gap-1">⚡: オンデマンド</span>
-                                <span class="inline-flex items-center gap-1">⭐: 通常</span>
-                                <span class="inline-flex items-center gap-1">📌: メモあり</span>
-                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-pink-100 border border-pink-300"></span>: アサイン未</span>
-                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-green-100 border border-green-300"></span>: アサイン済</span>
-                            </div>
-                        </div>
-                        <div id="monthly-view">
-                            <div class="grid grid-cols-7 text-sm text-center font-medium text-on-surface-variant">
-                                <div class="py-2">日</div>
-                                <div class="py-2">月</div>
-                                <div class="py-2">火</div>
-                                <div class="py-2">水</div>
-                                <div class="py-2">木</div>
-                                <div class="py-2">金</div>
-                                <div class="py-2">土</div>
-                            </div>
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-sm text-on-surface-variant">
-                                <!-- Calendar days will be injected here by JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Yearly View -->
-                        <div id="yearly-view" class="hidden">
-                            <!-- Yearly calendar will be injected here -->
-                        </div>
-
-                        <!-- Vertical View -->
-                        <div id="vertical-view" class="hidden">
-                            <!-- Vertical calendar will be injected here -->
-                        </div>
-                    </div>
-                    <section class="grid gap-6 md:grid-cols-2">
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col min-h-[300px] overflow-y-auto h-full" aria-label="休業日一覧">
-                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                                <h2 class="text-title-large font-semibold text-on-surface">休業日の個別設定</h2>
-                            </div>
-                            <div class="overflow-x-auto flex-grow">
-                                <table class="min-w-full divide-y divide-outline-variant">
-                                    <thead class="bg-surface-container-low">
-                                        <tr>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">日付</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">種別</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">理由</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">操作</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="manual-settings-table-body" class="divide-y divide-outline-variant text-sm text-on-surface-variant">
-                                        <!-- Manual settings will be injected here by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="flex justify-end items-center gap-2 mt-4">
-                                <button id="setting-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
-                                <span id="setting-page-info" class="text-sm">-</span>
-                                <button id="setting-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
-                            </div>
-                        </div>
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col min-h-[300px] overflow-y-auto h-full" aria-label="操作ログ">
-                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                                <h2 class="text-title-large font-semibold text-on-surface">更新ログ</h2>
-                            </div>
-                            <div class="overflow-x-auto flex-grow">
-                                <table class="min-w-full divide-y divide-outline-variant">
-                                    <thead class="bg-surface-container-low">
-                                        <tr>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">日時</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">ユーザー</th>
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">操作内容</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="update-log-table-body" class="divide-y divide-outline-variant text-sm text-on-surface-variant">
-                                        <!-- Update logs will be injected here by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="flex justify-end items-center gap-2 mt-4">
-                                <button id="log-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
-                                <span id="log-page-info" class="text-sm">-</span>
-                                <button id="log-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
-                            </div>
-                        </div>
-                    </section>
-                </section>
+        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+          <div style="padding:18px 24px 40px">
+            <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">営業日カレンダー管理</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+              <h2 style="margin:0;font-size:20px;font-weight:700">営業日カレンダー管理</h2>
+              <div style="display:flex;gap:10px">
+                <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mRegularHoliday')">定休日設定</button>
+                <button title="祝日・稼働可能日等をCSVから一括登録" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSVインポート</button>
+                <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mHoliday')">休業日・振替を追加</button>
+              </div>
             </div>
+            <div style="margin-top:10px;font-size:11.5px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:6px 12px;display:inline-block">この画面はLv1には表示しません(Lv2以上・アサイン運用画面)。休業日・振替営業日の設定変更はLv3〜4のみ。</div>
+            <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff">‹ 前月</span>
+                <span style="font-size:17px;font-weight:700">2026年 8月</span>
+                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff">翌月 ›</span>
+                <div style="margin-left:12px;display:flex;border:1px solid #c8cdd8;border-radius:6px;overflow:hidden;font-size:12.5px">
+                  <span style="padding:6px 16px;background:#3467d6;color:#fff;font-weight:700">アンケート</span>
+                  <span style="padding:6px 16px;background:#fff;color:#5b6577;cursor:pointer">アサイン</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;font-size:11.5px;color:#5b6577;align-items:center">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#fff;border:1px solid #c8cdd8"></span>営業日</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#f0f1f4"></span>休業日</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#eef2fb;border:1px solid #b9caee"></span>振替営業日</span>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:16px;align-items:flex-start">
+              <div style="flex:1;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577;text-align:center">
+                  <span style="padding:8px 0;color:#c23934">日</span><span style="padding:8px 0">月</span><span style="padding:8px 0">火</span><span style="padding:8px 0">水</span><span style="padding:8px 0">木</span><span style="padding:8px 0">金</span><span style="padding:8px 0;color:#3467d6">土</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">7/26</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">27</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">28</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">29</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">30</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">31</div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">8/1</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">2</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">3</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">4</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 4件<br>アサイン 6人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">5</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 4件<br>アサイン 6人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer;background:#eef2fb;box-shadow:inset 0 0 0 1px #3467d6"><span style="font-weight:700">6</span><div style="margin-top:4px;font-size:10.5px;color:#2b57b8;font-weight:700">会期 3件<br>アサイン 4人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">7</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 3人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#eef2fb;font-size:12px;cursor:pointer"><span style="font-weight:700;color:#2b57b8">8</span><div style="margin-top:4px;font-size:10.5px;color:#2b57b8">振替営業日<br>アサイン 2人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">9</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">10</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 5件<br>アサイン 7人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">11</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(山の日)</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">12</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">13</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(夏季休業)</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">14</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(夏季休業)</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">15</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">16</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">17</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">18</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">19</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">20</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">21</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">22</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">23</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">24</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">25</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">26</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">27</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">28</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 3人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">29</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">30</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">31</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">9/1</div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">2</div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">3</div>
+                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">4</div>
+                  <div style="min-height:86px;padding:6px 8px;background:#fafbfd;color:#c3c9d4;font-size:12px">5</div>
+                </div>
+                <div style="padding:8px 12px;border-top:1px solid #eef0f5;font-size:11px;color:#8a93a5">日付を選択すると右に詳細を表示します(選択中: 8/6)。</div>
+              </div>
+              <div style="width:320px;flex:none;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 18px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #e2e6ed">
+                  <span style="font-size:14px;font-weight:700">8/6(木)の詳細</span>
+                  <span style="font-size:11.5px;color:#237a52;font-weight:700">営業日</span>
+                </div>
+                <div style="margin-top:12px;font-size:12px;font-weight:700;color:#5b6577">会期中のアンケート(3件)</div>
+                <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px">
+                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10259</span> ITインフラEXPO 2026<div style="color:#6b7484;margin-top:2px">納期 08/11 18:00</div></div>
+                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10262</span> 人事・労務フォーラム<div style="color:#6b7484;margin-top:2px">納期 —(会期前)</div></div>
+                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10266</span> 観光DXカンファレンス<div style="color:#6b7484;margin-top:2px">納期 08/14 12:00</div></div>
+                </div>
+                <div style="margin-top:16px;font-size:12px;font-weight:700;color:#5b6577">アサイン済み(4人)</div>
+                <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">
+                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">佐藤 由紀</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">王 麗華</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">田中 大輔</span>
+                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">山本 彩</span>
+                </div>
+                <button style="margin-top:14px;width:100%;background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 0;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mAssign')">この日にアサインを追加</button>
+                <div style="margin-top:10px;font-size:11px;color:#8a93a5">確定するとオペレーターへ割当通知が送信されます(§5)。</div>
+              </div>
+            </div>
+          </div>
         </main>
-
-        <!-- Focus Area -->
-        <aside id="focus-area" class="fixed top-0 right-0 z-50 h-screen w-full max-w-md transform translate-x-full transition-transform duration-300 ease-in-out bg-surface border-l border-outline-variant shadow-2xl flex flex-col" aria-labelledby="focus-area-title">
-            <!-- Close Tab Button -->
-            <button id="focus-area-close-tab" class="absolute -left-12 top-5 bg-surface border border-r-0 border-outline-variant rounded-l-lg p-2 shadow-lg hover:bg-surface-variant focus:outline-none ring-2 ring-primary focus:ring-offset-2 hidden">
-                <span class="material-icons">chevron_right</span>
-            </button>
-
-            <!-- Focus Area Header -->
-            <div class="flex items-center justify-between p-4 border-b border-outline-variant flex-shrink-0">
-                <div id="focus-area-header">
-                    <h2 id="focus-area-title" class="text-title-large font-semibold text-on-surface">詳細</h2>
-                    <p id="focus-area-date" class="text-sm text-on-surface-variant"></p>
-                </div>
-                <button id="focus-area-close-button" class="p-2 rounded-full hover:bg-surface-container lg:hidden">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-
-            <!-- Focus Area Content -->
-            <div class="flex-grow flex flex-col">
-                <!-- Tab Headers -->
-                <div class="border-b border-outline-variant flex-shrink-0">
-                    <nav class="-mb-px flex space-x-4 px-6" aria-label="Tabs">
-                        <button data-tab="details" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-primary text-primary">
-                            アンケート詳細
-                        </button>
-                        <button data-tab="assign" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline">
-                            アサイン
-                        </button>
-                        <button data-tab="settings" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline">
-                            営業日設定
-                        </button>
-                    </nav>
-                </div>
-
-                <!-- Tab Panels -->
-                <div class="flex-grow overflow-y-auto">
-                    <!-- Details & Memo Panel -->
-                    <div id="tab-panel-details" class="tab-panel p-6 space-y-6">
-                        <section aria-labelledby="focus-details-title">
-                            <h3 id="focus-details-title" class="text-title-medium font-semibold text-on-surface mb-3">アンケート詳細</h3>
-                            <div id="focus-details-content" class="space-y-2">
-                                <!-- Survey details will be injected here -->
-                            </div>
-                        </section>
-                        <section aria-labelledby="focus-memo-title">
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="material-icons text-on-surface-variant">edit_note</span>
-                                <h3 id="focus-memo-title" class="text-title-medium font-semibold text-on-surface">メモ</h3>
-                            </div>
-                            <div id="focus-memo-content">
-                                <textarea id="memo-textarea" rows="4" class="w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" placeholder="この日のメモを入力..."></textarea>
-                                <div class="text-right mt-2">
-                                    <button id="save-memo-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">メモを保存</button>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <!-- Assign Panel -->
-                    <div id="tab-panel-assign" class="tab-panel p-6 hidden">
-                        <section aria-labelledby="focus-assign-title">
-                            <h3 id="focus-assign-title" class="text-title-medium font-semibold text-on-surface mb-3">アサイン</h3>
-                            <div id="focus-assign-content" class="space-y-2">
-                                <!-- Assignment content will be injected here -->
-                            </div>
-                        </section>
-                    </div>
-
-                    <!-- Settings Panel -->
-                    <div id="tab-panel-settings" class="tab-panel p-6 hidden">
-                        <section aria-labelledby="focus-settings-title">
-                            <h3 id="focus-settings-title" class="text-title-medium font-semibold text-on-surface mb-3">営業日設定</h3>
-                            <div id="focus-settings-content" class="space-y-4">
-                                <div>
-                                    <label class="text-sm font-medium text-on-surface-variant">種別</label>
-                                    <div class="flex gap-4 mt-2">
-                                        <label class="flex items-center gap-2">
-                                            <input type="radio" name="focus_event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
-                                            <span>特別休業日</span>
-                                        </label>
-                                        <label class="flex items-center gap-2">
-                                            <input type="radio" name="focus_event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
-                                            <span>振替営業日</span>
-                                        </label>
-                                        <label class="flex items-center gap-2">
-                                            <input type="radio" name="focus_event_type" value="WORKDAY" class="form-radio text-primary focus:ring-primary">
-                                            <span>設定解除</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="focus-reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
-                                    <textarea id="focus-reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" placeholder="理由を入力 (例: 社内研修)"></textarea>
-                                </div>
-                                <div class="text-right mt-2">
-                                    <button id="save-day-setting-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">この日の設定を保存</button>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </aside>
     </div>
-    <div id="footer-placeholder"></div>
-    <div id="calendar-tooltip" class="hidden"></div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="delete-confirm-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div id="delete-confirm-modal-container" class="transform opacity-0 translate-y-4 transition-all sm:max-w-lg sm:w-full bg-surface rounded-xl shadow-xl">
-        <div class="bg-surface px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-t-xl">
-            <div class="sm:flex sm:items-start">
-                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-error-container sm:mx-0 sm:h-10 sm:w-10">
-                    <span class="material-icons text-error">warning</span>
-                </div>
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-on-surface" id="modal-title">設定を削除</h3>
-                    <div class="mt-2">
-                        <p class="text-sm text-on-surface-variant">この設定を本当に削除しますか？この操作は元に戻せません。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="bg-surface-container-lowest px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-xl">
-            <button id="confirm-delete-button" type="button" class="w-full inline-flex justify-center rounded-full border border-transparent shadow-sm px-4 py-2 bg-error text-on-error text-base font-medium hover:bg-error/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error sm:ml-3 sm:w-auto sm:text-sm">
-                削除
-            </button>
-            <button id="cancel-delete-button" type="button" class="mt-3 w-full inline-flex justify-center rounded-full border border-outline shadow-sm px-4 py-2 bg-surface text-on-surface text-base font-medium hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
-                キャンセル
-            </button>
-        </div>
+<div id="mHoliday" class="proto-modal" hidden>
+  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">休業日・振替営業日を追加</span>
+      <span onclick="pClose('mHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">日付</span><input type="date" value="2026-08-13" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">区分</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>休業日</option><option>振替営業日</option></select></label>
+      </div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input placeholder="例: 夏季休業" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">追加は以後の納期計算に反映されます。既存案件の確定済み納期へ自動反映するか(再計算の要否)は※要確定です(§4)。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mHoliday')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mHoliday')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">追加する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mRegularHoliday" class="proto-modal" hidden>
+  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">定休日を設定</span>
+      <span onclick="pClose('mRegularHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">毎週の定休日</span>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">月</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">火</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">水</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">木</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">金</span>
+          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;cursor:pointer">土 ✓</span>
+          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;cursor:pointer">日 ✓</span>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">定休日は毎週の休業日として納期計算から除外されます。祝日・臨時休業は「休業日・振替を追加」から個別に登録してください。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mRegularHoliday')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mRegularHoliday')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mAssign" class="proto-modal" hidden>
+  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:520px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">アサインを追加<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">2026/08/06(木)</span></span>
+      <span onclick="pClose('mAssign')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">オペレーターを選択(複数可)</span>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">佐藤 由紀 ✓</span>
+          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">王 麗華 ✓</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">田中 大輔</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">山本 彩</span>
+          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">高橋 直樹</span>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">確定すると選択したオペレーターへ割当通知(メール)が送信されます(§5)。無効・招待中のアカウントは選択できません(※暫定)。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mAssign')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mAssign')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">アサインを確定</button>
+    </div>
+  </div>
 </div>
 
 <script type="module" src="src/admin.js"></script>
+<script src="src/proto-ui.js"></script>
 </body>
 </html>

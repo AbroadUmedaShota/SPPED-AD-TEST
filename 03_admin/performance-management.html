@@ -6,463 +6,94 @@
     <title>SpeedAd - 実績管理</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- flatpickr -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-    
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
-    <style>
-        .custom-select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem !important;
-        }
-        .pagination-select {
-            padding-right: 1.5rem !important;
-            background-size: 1em 1em;
-            background-position: right 0.2rem center;
-            min-width: 60px;
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .animate-scale-in {
-            animation: scaleIn 0.2s ease-out forwards;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
-    <div class="flex flex-1 pt-16 bg-background">
+    <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">実績管理</h1>
-                    <div class="flex items-center gap-2">
-                        <button id="csv-export-btn" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm hover:bg-surface-variant transition-colors">
-                            <span class="material-icons text-base">download</span>CSV出力
-                        </button>
-                        <button id="parameter-settings-btn" class="inline-flex items-center gap-1 rounded-lg bg-primary text-on-primary px-3 py-2 text-sm hover:bg-primary-hover transition-colors">
-                            <span class="material-icons text-base">settings</span>指標設定
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Summary Section -->
-                <div id="summary-container" class="mb-8">
-                    <div class="animate-pulse bg-surface-variant h-24 rounded-xl mb-6"></div>
-                </div>
-
-                <!-- Filters Area (Accordion) -->
-                <div class="bg-surface rounded-xl border border-outline-variant mb-6 shadow-sm overflow-hidden text-sm">
-                    <div class="w-full flex items-center justify-between p-4 bg-surface hover:bg-surface-variant/20 transition-colors cursor-pointer" onclick="document.getElementById('filter-content').classList.toggle('hidden'); document.getElementById('filter-icon').textContent = document.getElementById('filter-content').classList.contains('hidden') ? 'expand_more' : 'expand_less'">
-                        <div class="flex items-center gap-2 text-primary font-bold">
-                            <span class="material-icons text-xl">filter_list</span>
-                            <span>絞り込み条件</span>
-                        </div>
-                        <span id="filter-icon" class="material-icons text-on-surface-variant">expand_less</span>
-                    </div>
-                    
-                    <div id="filter-content" class="p-4 pt-0 border-t border-outline-variant/50">
-                        <!-- Individual Tab Filters -->
-                        <div id="filters-individual" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                            <!-- ... (filters content remains same) ... -->
-                            <div class="flex flex-col gap-1 lg:col-span-2">
-                                <label class="text-[11px] font-bold text-on-surface-variant">キーワード検索</label>
-                                <div class="relative">
-                                    <input type="text" id="filter-keyword-ind" placeholder="名前、ID、所属グループなどで検索" class="text-sm bg-surface rounded-lg border border-outline pl-9 pr-3 py-2 w-full focus:ring-primary focus:border-primary">
-                                    <span class="material-icons absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">対象期間</label>
-                                <div class="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
-                                    <span class="material-icons text-sm text-on-surface-variant">calendar_today</span>
-                                    <input type="text" id="date-range-filter-ind" class="text-sm bg-transparent border-none p-0 focus:ring-0 w-full" value="2025/09/01 - 2025/09/30" readonly>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">稼働状態</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-activity-ind">
-                                    <option value="all">すべて</option>
-                                    <option value="active">稼働あり</option>
-                                    <option value="inactive">未稼働</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">展示会・案件</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-exhibition-ind">
-                                    <option value="all">すべての展示会</option>
-                                    <option value="ex_a">展示会A 2025</option>
-                                    <option value="sem_b">セミナーB 2025</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">グループ</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-group-ind">
-                                    <option value="all">すべてのグループ</option>
-                                    <option value="gr_a">展示会Aチーム</option>
-                                    <option value="gr_b">セミナーBチーム</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">達成状況</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-status-ind">
-                                    <option value="all">すべて</option>
-                                    <option value="achieved">達成</option>
-                                    <option value="failed">未達</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">品質レベル (正確さ)</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-quality-ind">
-                                    <option value="all">すべて</option>
-                                    <option value="high">高品質 (99%以上)</option>
-                                    <option value="low">要注意 (95%未満)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Group Tab Filters (Hidden by default) -->
-                        <div id="filters-group" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                            <!-- ... -->
-                            <div class="flex flex-col gap-1 lg:col-span-2">
-                                <label class="text-[11px] font-bold text-on-surface-variant">グループ名検索</label>
-                                <div class="relative">
-                                    <input type="text" id="filter-keyword-grp" placeholder="グループ名で検索" class="text-sm bg-surface rounded-lg border border-outline pl-9 pr-3 py-2 w-full focus:ring-primary focus:border-primary">
-                                    <span class="material-icons absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">対象期間</label>
-                                <div class="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
-                                    <span class="material-icons text-sm text-on-surface-variant">calendar_today</span>
-                                    <input type="text" id="date-range-filter-grp" class="text-sm bg-transparent border-none p-0 focus:ring-0 w-full" value="2025/09/01 - 2025/09/30" readonly>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">パフォーマンス</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-status-grp">
-                                    <option value="all">すべて</option>
-                                    <option value="high">優秀層 (Star)</option>
-                                    <option value="low">要改善 (Critical)</option>
-                                </select>
-                            </div>
-                             <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">グループ規模</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-scale-grp">
-                                    <option value="all">すべて</option>
-                                    <option value="large">大規模</option>
-                                    <option value="medium">中規模</option>
-                                    <option value="small">小規模</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">コスパ (CPY)</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-cost-grp">
-                                    <option value="all">すべて</option>
-                                    <option value="good">良い (1.0以上)</option>
-                                    <option value="normal">普通</option>
-                                    <option value="bad">悪い (0.8未満)</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-on-surface-variant">納期遵守率</label>
-                                <select class="custom-select text-sm bg-surface rounded-lg border border-outline px-3 py-2 w-full focus:ring-primary focus:border-primary" id="filter-ontime-grp">
-                                    <option value="all">すべて</option>
-                                    <option value="perfect">100%</option>
-                                    <option value="low">98%未満</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Reset Button Row -->
-                        <div class="flex justify-end mt-4 pt-4 border-t border-outline-variant/30">
-                            <button id="reset-filters-btn" class="flex items-center gap-1 text-xs text-on-surface-variant hover:text-error transition-colors font-medium" onclick="window.resetFilters()">
-                                <span class="material-icons text-sm">restart_alt</span> 条件をリセット
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
-                <div class="flex flex-col gap-0">
-                    <div class="flex border-b border-outline-variant">
-                        <button id="tab-individual" class="px-6 py-3 border-b-2 border-primary text-primary font-bold text-sm">個人単位</button>
-                        <button id="tab-group" class="px-6 py-3 border-b-2 border-transparent text-on-surface-variant font-medium text-sm hover:text-on-surface">グループ単位</button>
-                    </div>
-
-                    <!-- Main Table -->
-                    <div class="bg-surface rounded-b-xl border-x border-b border-outline-variant overflow-hidden shadow-sm">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-outline-variant text-sm">
-                                <thead id="performance-table-header" class="bg-surface-variant/30 text-on-surface-variant text-[11px] uppercase font-bold">
-                                    <!-- Dynamic Header -->
-                                </thead>
-                                <tbody id="performance-table-body" class="divide-y divide-outline-variant bg-surface">
-                                    <!-- Dynamic Content -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Pagination -->
-                        <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t border-outline-variant bg-surface gap-4">
-                            <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                                <span>表示件数:</span>
-                                <select id="items-per-page" class="pagination-select custom-select bg-surface border border-outline rounded px-2 py-1 text-xs focus:ring-primary focus:border-primary">
-                                    <option value="25" selected>25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            <div class="flex gap-1 justify-center flex-1" id="pagination-controls"></div>
-                            <div class="text-xs text-on-surface-variant w-auto text-right" id="pagination-info"></div>
-                        </div>
-                    </div>
-                </div>
+        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+          <div style="padding:18px 24px 40px">
+            <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">実績管理</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+              <h2 style="margin:0;font-size:20px;font-weight:700">実績管理</h2>
+              <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
+            <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5b6577">対象期間
+                <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>2026/07(当月)</option><option>2026/06</option><option>2026/05</option></select>
+              </label>
+              <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
+              <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">表示</button>
+            </div>
+            <div style="margin-top:18px;font-size:13px;font-weight:700;color:#374151">グループ別集計</div>
+            <div style="margin-top:10px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+              <div style="display:grid;grid-template-columns:minmax(240px,1fr) 160px 160px 120px 160px 160px;align-items:center;padding:0 18px;height:42px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+                <span>グループ名</span><span style="text-align:right">合計作業件数</span><span style="text-align:right">合計正解件数</span><span style="text-align:right">平均正答率</span><span style="text-align:right">合計スキップ回数</span><span style="text-align:right">合計報酬金額※</span>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(240px,1fr) 160px 160px 120px 160px 160px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+                <span style="font-weight:500">アブロード本体</span><span style="text-align:right">12,480</span><span style="text-align:right">12,104</span><span style="text-align:right;font-weight:700">97%</span><span style="text-align:right">312</span><span style="text-align:right">624,000 円</span>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(240px,1fr) 160px 160px 120px 160px 160px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+                <span style="font-weight:500">オフィスワークス株式会社</span><span style="text-align:right">8,940</span><span style="text-align:right">8,492</span><span style="text-align:right;font-weight:700">95%</span><span style="text-align:right">486</span><span style="text-align:right">447,000 円</span>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(240px,1fr) 160px 160px 120px 160px 160px;align-items:center;padding:0 18px;height:46px;font-size:13px;font-variant-numeric:tabular-nums">
+                <span style="font-weight:500">データパートナーズ株式会社</span><span style="text-align:right">6,210</span><span style="text-align:right">5,776</span><span style="text-align:right;font-weight:700;color:#8a6414">93%</span><span style="text-align:right">528</span><span style="text-align:right">310,500 円</span>
+              </div>
+            </div>
+            <div style="margin-top:22px;font-size:13px;font-weight:700;color:#374151">オペレーター別集計 <span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:8px">行選択で作業グループ①〜⑧・入力項目別へ展開</span></div>
+            <div style="margin-top:10px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:42px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+                <span>ID</span><span>氏名</span><span>所属グループ</span><span style="text-align:right;color:#3467d6">作業件数 ▼</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額※</span>
+              </div>
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <span style="font-weight:500">OP-0058</span><span>王 麗華</span><span style="font-size:12px">オフィスワークス株式会社</span><span style="text-align:right">3,214</span><span style="text-align:right">3,085</span><span style="text-align:right;font-weight:700">96%</span><span style="text-align:right">88</span><span style="text-align:right">160,700 円</span>
+              </div>
+              <div style="padding:10px 18px 14px;background:#f7f9fd;border-bottom:1px solid #eef0f5">
+                <div style="font-size:11.5px;font-weight:700;color:#5b6577">OP-0058 王 麗華 — 作業グループ・入力項目別の内訳(行選択で展開・サンプル)</div>
+                <div style="margin-top:8px;background:#fff;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
+                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:32px;background:#f7f8fb;border-bottom:1px solid #eef0f5;font-size:11px;font-weight:700;color:#5b6577"><span>作業グループ / 入力項目</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額※</span></div>
+                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;border-bottom:1px solid #eef0f5;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ① メールアドレス</span><span style="text-align:right">1,120</span><span style="text-align:right">1,092</span><span style="text-align:right;font-weight:700">98%</span><span style="text-align:right">21</span><span style="text-align:right">56,000 円</span></div>
+                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;border-bottom:1px solid #eef0f5;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ② 氏名(姓・名)</span><span style="text-align:right">986</span><span style="text-align:right">948</span><span style="text-align:right;font-weight:700">96%</span><span style="text-align:right">34</span><span style="text-align:right">49,300 円</span></div>
+                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ③ 会社・部署・役職</span><span style="text-align:right">1,108</span><span style="text-align:right">1,045</span><span style="text-align:right;font-weight:700;color:#8a6414">94%</span><span style="text-align:right">33</span><span style="text-align:right">55,400 円</span></div>
+                </div>
+                <div style="margin-top:6px;font-size:11px;color:#8a93a5">グループ④〜⑧は当月の担当なし(0件)。</div>
+              </div>
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <span style="font-weight:500">OP-0012</span><span>佐藤 由紀</span><span style="font-size:12px">アブロード本体</span><span style="text-align:right">2,980</span><span style="text-align:right">2,927</span><span style="text-align:right;font-weight:700">98%</span><span style="text-align:right">42</span><span style="text-align:right">149,000 円</span>
+              </div>
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <span style="font-weight:500">OP-0077</span><span>山本 彩</span><span style="font-size:12px">アブロード本体</span><span style="text-align:right">2,742</span><span style="text-align:right">2,606</span><span style="text-align:right;font-weight:700">95%</span><span style="text-align:right">104</span><span style="text-align:right">137,100 円</span>
+              </div>
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <span style="font-weight:500">OP-0081</span><span>陳 志明</span><span style="font-size:12px">オフィスワークス株式会社</span><span style="text-align:right">2,188</span><span style="text-align:right">2,014</span><span style="text-align:right;font-weight:700;color:#8a6414">92%</span><span style="text-align:right">196</span><span style="text-align:right">109,400 円</span>
+              </div>
+              <div style="display:grid;grid-template-columns:110px 140px minmax(200px,1fr) 130px 120px 100px 130px 130px;align-items:center;padding:0 18px;height:46px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <span style="font-weight:500">OP-0061</span><span>鈴木 恵
+</span><span style="font-size:12px">データパートナーズ株式会社</span><span style="text-align:right">1,926</span><span style="text-align:right">1,772</span><span style="text-align:right;font-weight:700;color:#8a6414">92%</span><span style="text-align:right">210</span><span style="text-align:right">96,300 円</span>
+              </div>
+            </div>
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 32 名中 1〜10 名を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums">
+                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span>
+                <span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span>
+                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">2</span>
+                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">›</span>
+              </div>
+            </div>
+            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">正解件数・正答率の判定定義は§11で要確定。※報酬金額は「含めるか自体が要確定」のまま暫定掲載(不要なら削る)。チーム単位の集計はグループ(会社単位)との関係整理が必要なため未掲載(シートへの要確定転記候補)。</div>
+          </div>
         </main>
-    </div>
-    <div id="footer-placeholder"></div>
-</div>
-
-<!-- Parameter Settings Modal -->
-<div id="parameter-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-scrim/60 p-4 backdrop-blur-sm">
-    <div class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
-        <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-variant/20">
-            <h3 class="text-xl font-bold text-on-surface">指標・パラメータ設定</h3>
-            <button onclick="window.closeParameterModal()" class="p-1 hover:bg-surface-variant rounded-full transition-colors">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-        <div class="p-6 overflow-y-auto space-y-6">
-            <div>
-                <h4 class="text-sm font-bold text-primary mb-3">目標KPI</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-on-surface-variant">目標入力数 (枚/月)</label>
-                        <input type="number" id="param-target-processed" class="w-full rounded-md border-outline focus:border-primary focus:ring-primary text-right">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-on-surface-variant">許容エラー率 (%)</label>
-                        <input type="number" step="0.1" id="param-target-error" class="w-full rounded-md border-outline focus:border-primary focus:ring-primary text-right">
-                    </div>
-                    <div class="space-y-1 col-span-2">
-                        <label class="text-xs font-bold text-on-surface-variant">目標平均処理時間 (秒/枚)</label>
-                        <input type="number" id="param-target-time" class="w-full rounded-md border-outline focus:border-primary focus:ring-primary text-right">
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-outline-variant pt-6">
-                <h4 class="text-sm font-bold text-primary mb-3">計算用単価</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-on-surface-variant">有効作業単価 (円/枚)</label>
-                        <input type="number" id="param-unit-price" class="w-full rounded-md border-outline focus:border-primary focus:ring-primary text-right">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-on-surface-variant">管理者修正単価 (円/枚)</label>
-                        <input type="number" id="param-correction-cost" class="w-full rounded-md border-outline focus:border-primary focus:ring-primary text-right">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="p-6 border-t border-outline-variant flex justify-end gap-3 bg-surface-variant/20">
-            <button onclick="window.closeParameterModal()" class="px-4 py-2 text-sm font-medium hover:bg-surface-variant rounded-lg transition-colors">キャンセル</button>
-            <button onclick="window.saveParameters()" class="px-6 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg hover:bg-primary-hover shadow-md transition-all">設定を保存</button>
-        </div>
-    </div>
-</div>
-
-<!-- Operator Detail Modal -->
-<div id="operator-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-scrim/60 p-4 backdrop-blur-sm">
-    <div class="bg-surface w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
-        <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-variant/20">
-            <div class="flex items-center gap-4">
-                <h3 class="text-xl font-bold text-on-surface" id="op-detail-name">オペレーター名</h3>
-                <span class="px-3 py-1 bg-surface border border-outline-variant text-on-surface-variant text-xs font-medium rounded-full flex items-center gap-1" id="op-detail-group">
-                    <span class="material-icons text-[14px]">group</span> 所属グループ
-                </span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="window.downloadOperatorCSV()" class="p-1 hover:bg-surface-variant rounded-full transition-colors text-primary" title="このオペレーターのデータをCSV出力">
-                    <span class="material-icons">download</span>
-                </button>
-                <button onclick="window.closeOperatorDetailModal()" class="p-1 hover:bg-surface-variant rounded-full transition-colors text-on-surface-variant">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-        </div>
-        <div class="p-6 overflow-y-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center">
-                    <div class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">有効作業数</div>
-                    <div class="text-2xl font-bold text-primary" id="op-detail-valid">0</div>
-                </div>
-                <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center">
-                    <div class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">エラー率</div>
-                    <div class="text-2xl font-bold text-error" id="op-detail-error-rate">0.00%</div>
-                </div>
-                <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center">
-                    <div class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">推定報酬額</div>
-                    <div class="text-2xl font-bold text-on-surface" id="op-detail-payment">¥0</div>
-                </div>
-                <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center">
-                    <div class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">納期遵守率</div>
-                    <div class="text-2xl font-bold text-success" id="op-detail-ontime">0%</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-sm font-bold mb-4 flex items-center gap-2">
-                        <span class="material-icons text-primary text-base">show_chart</span> 処理枚数 & エラー率推移
-                    </h4>
-                    <div class="h-72 bg-surface p-4 border border-outline-variant rounded-xl shadow-sm">
-                        <canvas id="op-combo-chart"></canvas>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-sm font-bold mb-4 flex items-center gap-2">
-                        <span class="material-icons text-primary text-base">radar</span> 項目別エラー傾向
-                    </h4>
-                    <div class="h-72 bg-surface p-4 border border-outline-variant rounded-xl shadow-sm relative">
-                        <canvas id="op-radar-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-8">
-                <h4 class="text-sm font-bold mb-3 text-on-surface">詳細分析</h4>
-                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm bg-surface p-4 border border-outline-variant rounded-xl">
-                    <div class="flex justify-between border-b border-outline-variant/50 pb-2">
-                        <span class="text-on-surface-variant">総入力数</span>
-                        <span class="font-medium" id="op-detail-processed">0</span>
-                    </div>
-                    <div class="flex justify-between border-b border-outline-variant/50 pb-2">
-                        <span class="text-on-surface-variant">平均処理時間</span>
-                        <div class="text-right">
-                            <span class="font-medium" id="op-detail-avg-time">0s</span>
-                            <span class="text-[10px] ml-2" id="op-detail-avg-diff"></span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between border-b border-outline-variant/50 pb-2">
-                        <span class="text-on-surface-variant">修正発生コスト (推定)</span>
-                        <span class="font-medium text-error" id="op-detail-correction-cost">¥0</span>
-                    </div>
-                    <div class="flex justify-between border-b border-outline-variant/50 pb-2">
-                        <span class="text-on-surface-variant">最終稼働日</span>
-                        <span class="font-medium" id="op-detail-last-active">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Group Detail Modal -->
-<div id="group-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-scrim/60 p-4 backdrop-blur-sm">
-    <div class="bg-surface w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
-        <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-variant/20">
-            <h3 class="text-xl font-bold text-on-surface" id="group-detail-name">グループ名</h3>
-            <div class="flex items-center gap-2">
-                <button onclick="window.downloadGroupCSV()" class="p-1 hover:bg-surface-variant rounded-full transition-colors text-primary" title="このグループのデータをCSV出力">
-                    <span class="material-icons">download</span>
-                </button>
-                <button onclick="window.closeGroupDetailModal()" class="p-1 hover:bg-surface-variant rounded-full transition-colors text-on-surface-variant">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-        </div>
-        <div class="p-6 overflow-y-auto">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20 text-center">
-                    <div class="text-[11px] text-primary uppercase font-bold tracking-wider mb-1">稼働人数</div>
-                    <div class="text-xl font-bold text-primary" id="group-detail-active">0</div>
-                </div>
-                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20 text-center">
-                    <div class="text-[11px] text-primary uppercase font-bold tracking-wider mb-1">最大処理能力</div>
-                    <div class="text-xl font-bold text-primary" id="group-detail-capacity">0</div>
-                </div>
-                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20 text-center">
-                    <div class="text-[11px] text-primary uppercase font-bold tracking-wider mb-1">平均品質 (時間)</div>
-                    <div class="text-xl font-bold text-primary" id="group-detail-avg-time">0s</div>
-                </div>
-                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20 text-center">
-                    <div class="text-[11px] text-primary uppercase font-bold tracking-wider mb-1">コスパ (CPY)</div>
-                    <div class="text-xl font-bold text-primary" id="group-detail-cpy">0</div>
-                </div>
-                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20 text-center">
-                    <div class="text-[11px] text-primary uppercase font-bold tracking-wider mb-1">合計報酬額</div>
-                    <div class="text-xl font-bold text-primary" id="group-detail-total-payment">¥0</div>
-                </div>
-            </div>
-
-            <div class="mb-8">
-                <h4 class="text-sm font-bold mb-4 flex items-center gap-2">
-                    <span class="material-icons text-primary text-base">show_chart</span> 日次処理数の推移 (グループ合計)
-                </h4>
-                <div class="h-48 bg-surface p-4 border border-outline-variant rounded-xl shadow-sm">
-                    <canvas id="group-trend-chart"></canvas>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-sm font-bold mb-4 flex items-center gap-2">
-                        <span class="material-icons text-primary text-base">scatter_plot</span> パフォーマンス分布
-                    </h4>
-                    <div class="h-80 bg-surface border border-outline-variant rounded-xl relative p-2 shadow-sm">
-                        <canvas id="group-scatter-chart"></canvas>
-                        <div class="absolute bottom-16 right-6 text-[10px] text-error font-bold bg-white px-3 py-1.5 rounded shadow border border-error/20 z-10 flex items-center gap-1 pointer-events-none">
-                            <span class="material-icons text-[12px]">warning</span> 要改善 (Critical)
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col h-full">
-                    <h4 class="text-sm font-bold mb-4 text-on-surface flex items-center justify-between">
-                        <span>所属オペレーター</span>
-                        <span class="text-[10px] font-normal text-on-surface-variant bg-surface-variant/50 px-2 py-1 rounded">課題対象順</span>
-                    </h4>
-                    <div class="border border-outline-variant rounded-xl overflow-hidden flex-1 shadow-sm">
-                        <div class="overflow-y-auto max-h-[300px]">
-                            <table class="min-w-full divide-y divide-outline-variant">
-                                <thead class="bg-surface text-[10px] font-bold text-on-surface-variant sticky top-0 z-10 shadow-sm">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left">氏名</th>
-                                        <th class="px-3 py-2 text-center">完了数</th>
-                                        <th class="px-3 py-2 text-center">Avg Time</th>
-                                        <th class="px-3 py-2 text-center">正確さ</th>
-                                        <th class="px-3 py-2 text-center">報酬額</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="group-op-list" class="divide-y divide-outline-variant bg-surface"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
 <script type="module" src="src/admin.js"></script>
+<script src="src/proto-ui.js"></script>
 </body>
 </html>

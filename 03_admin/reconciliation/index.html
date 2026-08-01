@@ -3,200 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedAd - 照合管理</title>
+    <title>SpeedAd - 照合管理一覧</title>
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="../src/admin-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
-    <style>
-        .sortable-header {
-            cursor: pointer;
-        }
-        .sortable-header .sort-icon {
-            vertical-align: middle;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
-    <div class="flex flex-1 pt-16 bg-background">
+    <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">照合管理</h1>
-                    <div class="flex items-center gap-2"><span class="text-sm text-on-surface-variant">最終更新 2025/09/30 12:05</span><button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">rule</span>一致判定ルール</button></div>
-                </div>
-                <section class="space-y-6">
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">進行中のアンケート数</p>
-            <p id="in-progress-surveys" class="text-display-small font-bold text-on-surface">0</p>
-            <p class="text-xs text-on-surface-variant mt-2">現在アクティブなアンケート</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">総名刺数</p>
-            <p id="total-items" class="text-display-small font-bold text-on-surface">0</p>
-            <p class="text-xs text-on-surface-variant mt-2">データ入力が必要な総名刺数</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">エスカレーション</p>
-            <p id="escalation-items" class="text-display-small font-bold text-error">0</p>
-            <p class="text-xs text-on-surface-variant mt-2">要管理者対応</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">ロック中</p>
-            <p id="locked-items" class="text-display-small font-bold text-warning">0</p>
-            <p class="text-xs text-on-surface-variant mt-2">タイムアウト監視中</p>
-        </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <h2 class="text-title-large font-semibold text-on-surface">進捗サマリー</h2>
-            <div class="flex items-center gap-2 text-sm">
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
-                    <span class="material-icons text-base">refresh</span>
-                    最新化
-                </button>
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
-                    <span class="material-icons text-base">download</span>
-                    CSV出力
-                </button>
+        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+        <div style="padding:18px 24px 40px">
+          <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">照合管理一覧</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+            <h2 style="margin:0;font-size:20px;font-weight:700">照合管理一覧</h2>
+            <span style="font-size:12px;color:#6b7484">照合の進捗と納期をアンケート単位で確認します</span>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:16px;align-items:stretch">
+            <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;min-width:260px">
+              <div style="font-size:12px;color:#5b6577;font-weight:500">進行中の作業対象アンケート数</div>
+              <div style="font-size:32px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums">12<span style="font-size:14px;font-weight:500;color:#5b6577;margin-left:4px">件</span></div>
             </div>
+            <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:6px">
+              <span style="font-size:12px;color:#6b7484">集計最終更新 2026/07/31 09:45(最大5分の遅延・※暫定)</span>
+              <button style="align-self:flex-start;background:#fff;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12.5px;color:#374151;cursor:pointer;font-family:inherit">↻ 再取得</button>
+            </div>
+          </div>
+          <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <input placeholder="アンケートID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
+            <input placeholder="ユーザーID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5b6577">作業ステータス
+              <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>すべて</option><option>会期前</option><option>会期中</option><option>データ化中</option><option>データ化完了</option></select>
+            </label>
+            <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
+            <button style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
+            <span style="width:1px;height:26px;background:#e2e6ed"></span>
+            <input placeholder="名刺IDを指定して照合(例: BC-58102)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:230px;font-family:inherit">
+            <button onclick="location.href='detail.html'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">指定して照合開始</button>
+          </div>
+          <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+              <span>アンケートID</span><span>タイトル</span><span>会期</span>
+              <span style="text-align:right">総件数</span><span style="text-align:right">未入力</span><span style="text-align:right">一致</span><span style="text-align:right">不一致</span>
+              <span style="text-align:right;padding-right:10px">進捗</span><span style="color:#3467d6">納期日時 ▲</span><span style="padding-left:12px">操作</span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;background:#fdf0ef;border-bottom:1px solid #e2e6ed;font-size:13px;font-variant-numeric:tabular-nums">
+              <span style="font-weight:500">SV-10241</span><span style="padding-right:12px">製造業DXセミナー2026 参加者アンケート</span>
+              <span style="font-size:12px;color:#5b6577;line-height:1.5">07/13 10:00<br>〜07/15 17:00</span>
+              <span style="text-align:right">2,180</span><span style="text-align:right">46</span><span style="text-align:right">1,872</span><span style="text-align:right;font-weight:700">262</span>
+              <span style="text-align:right;padding-right:10px">2,134 / 2,180 <span style="color:#5b6577;font-size:12px">(98%)</span></span>
+              <span style="color:#c23934;font-weight:700;font-size:12.5px">07/30 15:00<br><span style="display:inline-block;margin-top:2px;background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">納期超過</span></span>
+              <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+              <span style="font-weight:500">SV-10238</span><span style="padding-right:12px">BtoB EXPO 東京 2026 来場者アンケート</span>
+              <span style="font-size:12px;color:#5b6577;line-height:1.5">07/21 10:00<br>〜07/23 17:00</span>
+              <span style="text-align:right">3,420</span><span style="text-align:right">182</span><span style="text-align:right">2,865</span><span style="text-align:right;font-weight:700">373</span>
+              <span style="text-align:right;padding-right:10px">3,238 / 3,420 <span style="color:#5b6577;font-size:12px">(95%)</span></span>
+              <span style="font-size:12.5px;font-weight:500">07/31 18:00</span>
+              <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+              <span style="font-weight:500">SV-10252</span><span style="padding-right:12px">SaaS導入事例セミナー 満足度アンケート</span>
+              <span style="font-size:12px;color:#5b6577;line-height:1.5">07/27 13:00<br>〜07/27 18:00</span>
+              <span style="text-align:right">486</span><span style="text-align:right">121</span><span style="text-align:right">340</span><span style="text-align:right;font-weight:700">25</span>
+              <span style="text-align:right;padding-right:10px">365 / 486 <span style="color:#5b6577;font-size:12px">(75%)</span></span>
+              <span style="font-size:12.5px;font-weight:500">08/03 12:00</span>
+              <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+              <span style="font-weight:500">SV-10244</span><span style="padding-right:12px">マーケティングサミット2026 来場者アンケート</span>
+              <span style="font-size:12px;color:#5b6577;line-height:1.5">07/22 09:30<br>〜07/24 18:00</span>
+              <span style="text-align:right">1,208</span><span style="text-align:right">954</span><span style="text-align:right">201</span><span style="text-align:right;font-weight:700">53</span>
+              <span style="text-align:right;padding-right:10px">254 / 1,208 <span style="color:#5b6577;font-size:12px">(21%)</span></span>
+              <span style="font-size:12.5px;font-weight:500">08/04 18:00</span>
+              <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+              <span style="font-weight:500">SV-10250</span><span style="padding-right:12px">食品・飲料展 出展者アンケート <span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">データ化完了</span></span>
+              <span style="font-size:12px;color:#5b6577;line-height:1.5">07/24 10:00<br>〜07/26 17:00</span>
+              <span style="text-align:right">2,150</span><span style="text-align:right;color:#6b7484">0</span><span style="text-align:right">2,061</span><span style="text-align:right">89</span>
+              <span style="text-align:right;padding-right:10px">2,150 / 2,150 <span style="color:#237a52;font-size:12px;font-weight:700">(100%)</span></span>
+              <span style="font-size:12.5px;font-weight:500">08/05 15:00</span>
+              <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button style="background:#fff;color:#237a52;border:1px solid #237a52;border-radius:6px;padding:7px 10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="event.stopPropagation();pOpen('mDl')">完成データ確認</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データDL</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;font-size:13px;font-variant-numeric:tabular-nums;color:#6b7484">
+              <span style="font-weight:500">SV-10262</span><span style="padding-right:12px;color:#1f2733">人事・労務フォーラム 来場者アンケート <span style="background:#f0f1f4;color:#5b6577;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">会期前</span></span>
+              <span style="font-size:12px;line-height:1.5">08/03 10:00<br>〜08/05 17:00</span>
+              <span style="text-align:right">0</span><span style="text-align:right">—</span><span style="text-align:right">—</span><span style="text-align:right">—</span>
+              <span style="text-align:right;padding-right:10px">—</span>
+              <span style="font-size:12.5px">—</span>
+              <span style="padding-left:12px"><button disabled style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:default;font-family:inherit">照合開始</button></span>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 12 件中 1〜10 件を表示</span><span style="font-size:11.5px;color:#8a93a5">アンケートID・ユーザーID・作業ステータスでも並び替え可(モックでは納期日時のみ表現)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+            <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums">
+              <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span>
+              <span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span>
+              <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">2</span>
+              <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;cursor:pointer">›</span>
+            </div>
+          </div>
         </div>
-        <div class="grid gap-4 md:grid-cols-2">
-            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4 max-h-80 overflow-y-auto" aria-label="言語別進捗リスト">
-                <h3 class="text-title-medium font-semibold text-on-surface mb-3">言語別進捗</h3>
-                <ul id="language-progress-list" class="space-y-4 text-sm text-on-surface-variant">
-                    <!-- JSで動的に挿入 -->
-                </ul>
-            </section>
-            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4 max-h-80 overflow-y-auto" aria-label="グループ別進捗リスト">
-                <h3 class="text-title-medium font-semibold text-on-surface mb-3">グループ別進捗</h3>
-                <ul id="group-progress-list" class="space-y-4 text-sm text-on-surface-variant">
-                    <!-- JSで動的に挿入 -->
-                </ul>
-            </section>
-        </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <h2 class="text-title-large font-semibold text-on-surface mb-4">アンケート一覧</h2>
-
-        <!-- 絞り込み機能 -->
-        <div class="bg-surface p-4 rounded-xl mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-                <!-- キーワード検索 -->
-                <div class="input-group lg:col-span-1 relative">
-                    <input type="search" id="keyword-search" placeholder="アンケート名, ID, 会社名" class="input-field pl-10 pr-4 w-full">
-                    <label for="keyword-search" class="input-label">キーワードで検索</label>
-                    <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
-                </div>
-
-                <!-- ステータスフィルター -->
-                <div class="input-group lg:col-span-1">
-                    <select id="status-filter" class="input-field w-full">
-                        <option>すべて</option>
-                        <option>会期前</option>
-                        <option>会期中</option>
-                        <option>会期中オンデマンド</option>
-                        <option>会期終了（データ化無し）</option>
-                        <option>会期終了（データ化中）</option>
-                        <option>会期終了（照合待ち）</option>
-                        <option>エスカレ</option>
-                    </select>
-                    <label for="status-filter" class="input-label">ステータス</label>
-                </div>
-
-                <!-- 期間フィルター -->
-                <div class="flex items-center gap-2 lg:col-span-1">
-                    <div id="startDatePickerWrapper" class="input-group flex-1 relative">
-                        <input type="text" id="start-date-filter" class="input-field pr-10" placeholder=" " readonly data-input>
-                        <label for="start-date-filter" class="input-label">開始日</label>
-                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                            <span class="material-icons text-xl">calendar_today</span>
-                        </button>
-                    </div>
-                    <span class="text-on-surface-variant">～</span>
-                    <div id="endDatePickerWrapper" class="input-group flex-1 relative">
-                        <input type="text" id="end-date-filter" class="input-field pr-10" placeholder=" " readonly data-input>
-                        <label for="end-date-filter" class="input-label">終了日</label>
-                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                            <span class="material-icons text-xl">calendar_today</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button id="resetFiltersButton" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-normal text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="フィルターをリセット">
-                    フィルターをリセット
-                </button>
-            </div>
-        </div>
-
-        <!-- レコードテーブル -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-outline-variant text-sm">
-                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
-                    <tr>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="name">アンケート名<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="status">ステータス<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="periodEnd">納品期日<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="option">オプション<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left">総件数</th>
-                        <th class="px-4 py-3 text-left">一致</th>
-                        <th class="px-4 py-3 text-left">不一致</th>
-                        <th class="px-4 py-3 text-left">進捗</th>
-                        <th class="px-4 py-3 text-left">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="reconciliation-table-body" class="divide-y divide-outline-variant">
-                    <!-- JSで動的に挿入 -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- ページネーション -->
-        <div class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
-            <div class="flex items-center gap-2">
-                <label for="rows-per-page" class="whitespace-nowrap">表示件数:</label>
-                <select id="rows-per-page" class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none" aria-label="1ページあたりの表示件数">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-            <div id="reconciliation-pagination" class="flex items-center gap-2">
-                <button class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="前へ" id="prevPageBtn" aria-label="前のページへ"><span class="material-icons text-lg">chevron_left</span></button>
-                <div id="pagination-numbers" class="flex items-center gap-1">
-                    <!-- JSで動的に挿入 -->
-                </div>
-                <button class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="次へ" id="nextPageBtn" aria-label="次のページへ"><span class="material-icons text-lg">chevron_right</span></button>
-            </div>
-            <div id="pageInfo" class="font-medium min-w-[120px] text-right">
-                <!-- JSで動的に挿入 -->
-            </div>
-        </div>
-    </div>
-
-
-</section>
-
-            </div>
         </main>
     </div>
-    <div id="footer-placeholder"></div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+<div id="mDl" class="proto-modal" hidden>
+          <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:480px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+              <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10250 食品・飲料展</span></span>
+              <span onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+            </div>
+            <div style="padding:16px 22px;display:flex;flex-direction:column;gap:10px">
+              <button onclick="pClose('mDl')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
+                <span><strong style="font-weight:700">完成データCSV</strong><br><span style="font-size:11.5px;color:#6b7484">照合確定済みのレコードのみ(納品用)</span></span><span style="color:#3467d6;font-weight:700">↓</span>
+              </button>
+              <button onclick="pClose('mDl')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
+                <span><strong style="font-weight:700">全レコードCSV</strong><br><span style="font-size:11.5px;color:#6b7484">未確定を含む全レコード(作業確認用)</span></span><span style="color:#3467d6;font-weight:700">↓</span>
+              </button>
+              <div style="font-size:11.5px;color:#6b7484;line-height:1.7">ダウンロードは「データ持ち出し」として監査ログに記録されます(§3)。</div>
+            </div>
+          </div>
+</div>
 <script type="module" src="../src/admin.js"></script>
-<script type="module" src="../src/data-entry-management.js"></script>
-<div id="detail-modal-placeholder"></div>
+<script src="../src/proto-ui.js"></script>
 </body>
 </html>

@@ -3,134 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedAd - 照合詳細</title>
+    <title>SpeedAd - 照合個票</title>
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
-    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
     <div id="header-placeholder"></div>
-    <div class="flex flex-1 pt-16 bg-background">
-        <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">照合詳細</h1>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">description</span>証跡ログ</button>
-                </div>
-                <section class="space-y-6">
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-        <section class="rounded-xl border border-outline-variant bg-surface p-4 shadow-sm" aria-label="名刺画像ビューア">
-            <header class="flex justify-between items-center mb-4">
-                <h2 class="text-title-medium font-semibold text-on-surface">名刺画像</h2>
-                <div class="flex items-center gap-2 text-sm">
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">zoom_in</span>拡大</button>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">rotate_left</span>左回転</button>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">rotate_right</span>右回転</button>
-                </div>
-            </header>
-            <div class="relative aspect-[3/2] rounded-lg border border-outline-variant/60 bg-surface-variant/30 flex items-center justify-center overflow-hidden">
-                <span class="text-on-surface-variant">名刺画像プレビュー（モック）</span>
+    <div class="flex flex-1" style="padding-top:56px">
+        <aside style="width:56px;flex:none;background:#1d2634;color:#c3ccdb;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px">
+            <a href="index.html" title="メニュー(モックでは一覧へ戻る・正本はサイドバー展開)" style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:#c3ccdb;font-size:16px;text-decoration:none">☰</a>
+            <span style="font-size:10.5px;color:#98a3b8;letter-spacing:2px;writing-mode:vertical-rl">集中モード — 作業画面</span>
+        </aside>
+        <main class="flex-1 min-w-0" id="main-content">
+        <div style="padding:14px 20px 28px;display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+              <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+              <h2 style="margin:0;font-size:18px;font-weight:700">照合個票</h2>
+              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums">名刺ID BC-58102</span>
+              <span style="font-size:12px;color:#5b6577">SV-10241 製造業DXセミナー2026</span>
+              <span style="font-size:12px;color:#c23934;font-weight:700">納期 2026/07/30 15:00 <span style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span>
             </div>
-            <div class="mt-4 flex justify-between text-sm text-on-surface-variant">
-                <span>案件ID: #1241</span>
-                <span>OCRスコア: 0.87</span>
+            <div style="display:flex;align-items:center;gap:14px;font-size:12px">
+              <span style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで 182秒)</span>
+              <span style="color:#8a93a5">確定 Ctrl+Enter ・ 候補クリックで複写</span>
             </div>
-        </section>
-        <section class="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm" aria-label="照合比較テーブル">
-            <header class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                <div>
-                    <h2 class="text-title-large font-semibold text-on-surface">項目比較</h2>
-                    <p class="text-sm text-on-surface-variant">OCRと最大3名の入力結果を比較して確定値を選択します。</p>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:minmax(360px,36%) 1fr;gap:16px;align-items:stretch">
+            <div style="background:#1f2733;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #303c4f">
+                <div style="display:flex;gap:6px">
+                  <span style="background:#3467d6;color:#fff;border-radius:5px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">表</span>
+                  <span style="color:#98a3b8;border:1px solid #3c4a61;border-radius:5px;padding:4px 14px;font-size:12px;cursor:pointer">裏 (F)</span>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1">一致候補</button>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1">差分ハイライト</button>
+                <div style="display:flex;gap:6px">
+                  <span title="拡大 (+)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
+                  <span title="縮小 (−)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
+                  <span title="回転 (R)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
-            </header>
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm border border-outline-variant/60" aria-label="項目比較テーブル">
-                    <thead class="bg-surface-variant text-on-surface-variant">
-                        <tr>
-                            <th class="px-4 py-3 text-left">項目</th>
-                            <th class="px-4 py-3 text-left">OCR</th>
-                            <th class="px-4 py-3 text-left">オペレーター1</th>
-                            <th class="px-4 py-3 text-left">オペレーター2</th>
-                            <th class="px-4 py-3 text-left">オペレーター3</th>
-                            <th class="px-4 py-3 text-left">確定値</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-outline-variant">
-                        <tr>
-                            <th class="px-4 py-3 text-left font-medium text-on-surface">氏名</th>
-                            <td class="px-4 py-3 text-on-surface-variant">Yamada Taro</td>
-                            <td class="px-4 py-3 text-on-surface-variant">山田 太郎</td>
-                            <td class="px-4 py-3 text-on-surface-variant">山田 太郎</td>
-                            <td class="px-4 py-3 text-on-surface-variant">山田 太朗</td>
-                            <td class="px-4 py-3">
-                                <select class="form-select text-sm">
-                                    <option selected>山田 太郎</option>
-                                    <option>山田 太朗</option>
-                                    <option>カスタム入力</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="px-4 py-3 text-left font-medium text-on-surface">会社名</th>
-                            <td class="px-4 py-3 text-on-surface-variant">Abroad Inc.</td>
-                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
-                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
-                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
-                            <td class="px-4 py-3">
-                                <select class="form-select text-sm">
-                                    <option selected>株式会社アブロード</option>
-                                    <option>カスタム入力</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="px-4 py-3 text-left font-medium text-on-surface">メール</th>
-                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
-                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
-                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
-                            <td class="px-4 py-3 text-on-surface-variant">t-yamada@example.com</td>
-                            <td class="px-4 py-3">
-                                <select class="form-select text-sm">
-                                    <option selected>t.yamada@example.com</option>
-                                    <option>カスタム入力</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+                <div style="width:90%;aspect-ratio:91/55;background:repeating-linear-gradient(45deg,#f4f6f9,#f4f6f9 12px,#e6eaf1 12px,#e6eaf1 24px);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:ui-monospace,monospace;font-size:12px;color:#5b6577;background:#fff;border:1px dashed #c8cdd8;border-radius:4px;padding:4px 10px">名刺画像(表) — サンプル</span>
+                </div>
+              </div>
             </div>
-        </section>
-    </div>
-    <footer class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface p-4 shadow-sm">
-        <div class="flex items-center gap-3 text-sm text-on-surface-variant">
-            <span>差分: 氏名 (要確認)</span>
-            <span>エスカレーション履歴: 1件</span>
+            <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:1;overflow-x:auto">
+                <div style="min-width:980px">
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:0 14px;height:40px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577">
+                    <span>項目</span><span>OCR結果</span><span>DB値</span><span>入力1</span><span>入力2</span><span>入力3</span><span>修正入力</span><span>完成内容</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px">
+                    <span style="font-weight:700">姓 <span style="color:#237a52;font-size:11px;font-weight:700">✓一致</span></span><span>山田</span><span>山田</span><span>山田</span><span>山田</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700">山田</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px">
+                    <span style="font-weight:700">名 <span style="color:#237a52;font-size:11px;font-weight:700">✓一致</span></span><span>太郎</span><span>太郎</span><span>太郎</span><span>太郎</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700">太郎</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                    <span style="font-weight:700">会社名 <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixCompany','アブロ一ド株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロ一ド株式会社</span>
+                    <span style="color:#8a93a5">—</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード(株)</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
+                    <span style="padding-right:10px"><input id="fixCompany" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;outline:2px solid #3467d6;outline-offset:1px"></span>
+                    <span style="font-weight:700">アブロード株式会社</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px">
+                    <span style="font-weight:700">部署名 <span style="color:#237a52;font-size:11px;font-weight:700">✓一致</span></span><span>営業部</span><span style="color:#8a93a5">—</span><span>営業部</span><span>営業部</span><span>営業部</span><span style="color:#8a93a5">—</span><span style="font-weight:700">営業部</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                    <span style="font-weight:700">役職名 <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span style="color:#8a93a5">—</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixRole','部長')" style="cursor:pointer;text-decoration:underline dotted">部長</span>
+                    <span title="クリックで修正入力へ複写" onclick="pSet('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span style="padding-right:10px"><input id="fixRole" placeholder="正しい値を入力" style="width:100%;box-sizing:border-box;border:1px solid #c99b3f;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;background:#fff"></span>
+                    <span style="color:#8a93a5">未確定</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px">
+                    <span style="font-weight:700">メール <span style="color:#237a52;font-size:11px;font-weight:700">✓一致</span></span><span title="t.yamada@abroad.co.jp" style="font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">t.yamada@abroad.co.jp</span><span title="t.yamada@abroad.co.jp" style="font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">t.yamada@abroad.co.jp</span><span title="t.yamada@abroad.co.jp" style="font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">t.yamada@abroad.co.jp</span><span title="t.yamada@abroad.co.jp" style="font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">t.yamada@abroad.co.jp</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span title="t.yamada@abroad.co.jp" style="font-weight:700;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">t.yamada@abroad.co.jp</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:44px;font-size:12.5px">
+                    <span style="font-weight:700">電話番号1 <span style="color:#237a52;font-size:11px;font-weight:700">✓一致</span></span><span>03-1234-5678</span><span>03-1234-5678</span><span>03-1234-5678</span><span>03-1234-5678</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700">03-1234-5678</span>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
+                <span style="font-size:11.5px;color:#5b6577">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span>
+                <div style="display:flex;gap:10px">
+                  <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">スキップ</button>
+                  <button disabled style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11.5px;color:#8a93a5">ロックは無操作で自動解除(現行約200秒・§11#4 要確定)。解除後に確定した場合も修正入力は破棄されず、対象を再取得して再確定できます(§7.3)。OCR・入力1〜3の値はクリックで修正入力へ複写(§4.7)。</div>
         </div>
-        <div class="flex flex-wrap gap-2 text-sm">
-            <button class="inline-flex items-center gap-1 rounded border border-outline px-4 py-2">エスカレ登録</button>
-            <button class="inline-flex items-center gap-1 rounded border border-outline px-4 py-2">キャンセル</button>
-            <button class="inline-flex items-center gap-1 rounded bg-primary text-primary-on px-4 py-2">次へ</button>
-        </div>
-    </footer>
-</section>
-
-            </div>
         </main>
     </div>
-    <div id="footer-placeholder"></div>
 </div>
 <script type="module" src="../src/admin.js"></script>
+<script src="../src/proto-ui.js"></script>
 </body>
 </html>
