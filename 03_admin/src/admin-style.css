@@ -127,3 +127,13 @@ body.sidebar-locked {
 }
 #main-content { padding-left: 0 !important; }
 .admin-sidebar { transition: none !important; }
+
+/* Tailwind CDN の preflight(a{color:inherit}) がリンク色を打ち消すため詳細度を上げて再指定 */
+main a, .proto-modal a { color: #3467D6; }
+main a:hover, .proto-modal a:hover { color: #2B57B8; }
+
+/* ページャの表示件数セレクトが幅不足で数字が欠けるのを防止 */
+main select { min-width: 60px; }
+
+/* style-hover(独自ランタイム)削除の代替: ボタンの押下可能感 */
+main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { filter: brightness(0.95); }

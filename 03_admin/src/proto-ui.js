@@ -8,7 +8,7 @@
         // 正本(prototype)は常に単一モーダル表示のため、開く前に他をすべて閉じる
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
         var m = document.getElementById(id);
-        if (m) { m.hidden = false; }
+        if (m) { m.hidden = false; document.body.style.overflow = 'hidden'; }
     };
 
     // 候補値・定型チップの複写用: 対象inputへ値を設定
@@ -26,10 +26,12 @@
     window.pClose = function (id) {
         var m = document.getElementById(id);
         if (m) { m.hidden = true; }
+        document.body.style.overflow = '';
     };
 
     window.pCloseAll = function () {
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
+        document.body.style.overflow = '';
     };
 
     document.addEventListener('keydown', function (e) {

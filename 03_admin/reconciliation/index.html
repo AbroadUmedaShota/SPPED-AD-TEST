@@ -43,16 +43,18 @@
             <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
             <button style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
             <span style="width:1px;height:26px;background:#e2e6ed"></span>
-            <input placeholder="名刺IDを指定して照合(例: BC-58102)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:230px;font-family:inherit">
-            <button onclick="location.href='detail.html'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">指定して照合開始</button>
+            <span style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap">
+              <input placeholder="名刺IDを指定して照合(例: BC-58102)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:230px;font-family:inherit">
+              <button onclick="location.href='detail.html'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">指定して照合開始</button>
+            </span>
           </div>
           <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
               <span>アンケートID</span><span>タイトル</span><span>会期</span>
               <span style="text-align:right">総件数</span><span style="text-align:right">未入力</span><span style="text-align:right">一致</span><span style="text-align:right">不一致</span>
               <span style="text-align:right;padding-right:10px">進捗</span><span style="color:#3467d6">納期日時 ▲</span><span style="padding-left:12px">操作</span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;background:#fdf0ef;border-bottom:1px solid #e2e6ed;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;background:#fdf0ef;border-bottom:1px solid #e2e6ed;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10241</span><span style="padding-right:12px">製造業DXセミナー2026 参加者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/13 10:00<br>〜07/15 17:00</span>
               <span style="text-align:right">2,180</span><span style="text-align:right">46</span><span style="text-align:right">1,872</span><span style="text-align:right;font-weight:700">262</span>
@@ -60,7 +62,7 @@
               <span style="color:#c23934;font-weight:700;font-size:12.5px">07/30 15:00<br><span style="display:inline-block;margin-top:2px;background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">納期超過</span></span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10238</span><span style="padding-right:12px">BtoB EXPO 東京 2026 来場者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/21 10:00<br>〜07/23 17:00</span>
               <span style="text-align:right">3,420</span><span style="text-align:right">182</span><span style="text-align:right">2,865</span><span style="text-align:right;font-weight:700">373</span>
@@ -68,7 +70,7 @@
               <span style="font-size:12.5px;font-weight:500">07/31 18:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10252</span><span style="padding-right:12px">SaaS導入事例セミナー 満足度アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/27 13:00<br>〜07/27 18:00</span>
               <span style="text-align:right">486</span><span style="text-align:right">121</span><span style="text-align:right">340</span><span style="text-align:right;font-weight:700">25</span>
@@ -76,7 +78,7 @@
               <span style="font-size:12.5px;font-weight:500">08/03 12:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10244</span><span style="padding-right:12px">マーケティングサミット2026 来場者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/22 09:30<br>〜07/24 18:00</span>
               <span style="text-align:right">1,208</span><span style="text-align:right">954</span><span style="text-align:right">201</span><span style="text-align:right;font-weight:700">53</span>
@@ -84,7 +86,7 @@
               <span style="font-size:12.5px;font-weight:500">08/04 18:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データ</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10250</span><span style="padding-right:12px">食品・飲料展 出展者アンケート <span style="background:#e5f3ec;color:#237a52;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">データ化完了</span></span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/24 10:00<br>〜07/26 17:00</span>
               <span style="text-align:right">2,150</span><span style="text-align:right;color:#6b7484">0</span><span style="text-align:right">2,061</span><span style="text-align:right">89</span>
@@ -92,7 +94,7 @@
               <span style="font-size:12.5px;font-weight:500">08/05 15:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button style="background:#fff;color:#237a52;border:1px solid #237a52;border-radius:6px;padding:7px 10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="event.stopPropagation();pOpen('mDl')">完成データ確認</button><span style="display:flex;flex-direction:column;gap:2px;font-size:11.5px"><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">完成データDL</a><a href="#m" onclick="event.stopPropagation();pOpen('mDl')">全レコードDL</a></span></span>
             </div>
-            <div style="display:grid;grid-template-columns:100px minmax(200px,1fr) 168px 82px 78px 82px 78px 148px 128px 216px;align-items:center;padding:8px 16px;min-height:52px;font-size:13px;font-variant-numeric:tabular-nums;color:#6b7484">
+            <div style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;font-size:13px;font-variant-numeric:tabular-nums;color:#6b7484">
               <span style="font-weight:500">SV-10262</span><span style="padding-right:12px;color:#1f2733">人事・労務フォーラム 来場者アンケート <span style="background:#f0f1f4;color:#5b6577;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">会期前</span></span>
               <span style="font-size:12px;line-height:1.5">08/03 10:00<br>〜08/05 17:00</span>
               <span style="text-align:right">0</span><span style="text-align:right">—</span><span style="text-align:right">—</span><span style="text-align:right">—</span>
