@@ -26,19 +26,20 @@
               <span style="font-size:12px;color:#6b7484">集計最終更新 2026/07/31 09:45(最大5分の遅延・※暫定)</span>
             </div>
           </div>
-          <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:18px 22px;display:flex;align-items:center;gap:24px">
+          <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:18px 22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
             <div>
               <div style="font-size:12px;color:#5b6577;font-weight:500">あなたの作業可能件数</div>
               <div style="font-size:36px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums">1,284<span style="font-size:14px;font-weight:500;color:#5b6577;margin-left:4px">件</span></div>
             </div>
             <div style="width:1px;height:52px;background:#e2e6ed"></div>
-            <div style="font-size:12px;color:#6b7484;line-height:1.7;flex:1">全体キューから算出した現在着手できる件数です。<br>他のオペレーターの作業進行によって変動します。スキップした名刺は全体キューへ戻ります。</div>
+            <div style="flex:1"></div>
             <label style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:#5b6577;font-weight:700">入力する名刺の言語
               <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733;font-weight:400"><option>自動(あなたの対応可能言語)</option><option>日本語</option><option>英語</option><option>中国語簡体字</option><option>中国語繁体字</option></select>
-              <span style="font-size:10.5px;font-weight:400;color:#8a93a5">※未選択時は対応可能言語で出題。言語判定仕様は決着待ち(検討中の先行表示)</span>
+              <span style="font-size:10.5px;font-weight:400;color:#8a93a5;max-width:240px;line-height:1.5">※未選択時は対応可能言語で出題。言語判定仕様は決着待ち(検討中の先行表示)</span>
             </label>
             <button onclick="location.href='form.html?g=1'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">グループ①から入力を開始</button>
             <button data-min-lv="2" title="モック未配線(Lv2以上の別機能)" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">グループ一括入力<span style="font-weight:400;font-size:11px;margin-left:4px">Lv2以上</span></button>
+            <div style="flex-basis:100%;font-size:12px;color:#6b7484;line-height:1.7">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。スキップした名刺は全体キューへ戻ります。</div>
           </div>
           <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
             <div style="display:grid;grid-template-columns:150px 120px 120px 120px 1fr 150px;align-items:center;padding:0 20px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
