@@ -23,6 +23,38 @@
         if (el) { el.value += value; el.focus(); }
     };
 
+    // 一覧のページネーション(モック): 行に data-pg="n"、リスト容器に id、
+    // ページャ容器に id="{listId}-pager"、件数表示に id="{listId}-range" を付けて使う
+    window.pPage = function (listId, n) {
+        var list = document.getElementById(listId);
+        if (!list) { return; }
+        list.querySelectorAll('[data-pg]').forEach(function (r) {
+            // 行はインラインstyleに display:grid を持つため、''でのクリアだと
+            // 非表示指定ごとgridも消えてblockに落ちる。gridを明示して復元する
+            r.style.display = (r.getAttribute('data-pg') === String(n)) ? 'grid' : 'none';
+        });
+        var pager = document.getElementById(listId + '-pager');
+        if (!pager) { return; }
+        pager.setAttribute('data-current', String(n));
+        pager.querySelectorAll('button[data-page]').forEach(function (b) {
+            var on = (b.getAttribute('data-page') === String(n));
+            b.style.background = on ? '#3467d6' : '#fff';
+            b.style.color = on ? '#fff' : '#374151';
+            b.style.border = '1px solid ' + (on ? '#3467d6' : '#c8cdd8');
+            b.style.fontWeight = on ? '700' : '400';
+        });
+        var act = pager.querySelector('button[data-page="' + n + '"]');
+        var lbl = document.getElementById(listId + '-range');
+        if (act && lbl) { lbl.textContent = act.getAttribute('data-range') || ''; }
+    };
+
+    window.pPageStep = function (listId, delta) {
+        var pager = document.getElementById(listId + '-pager');
+        if (!pager) { return; }
+        var next = (parseInt(pager.getAttribute('data-current') || '1', 10)) + delta;
+        if (pager.querySelector('button[data-page="' + next + '"]')) { window.pPage(listId, next); }
+    };
+
     window.pClose = function (id) {
         var m = document.getElementById(id);
         if (m) { m.hidden = true; }
