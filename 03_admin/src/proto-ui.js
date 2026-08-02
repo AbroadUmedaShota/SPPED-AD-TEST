@@ -6,6 +6,15 @@
 
     var lastFocused = null;
 
+    // モーダル表示中は背面(ヘッダー・サイドバー・メイン)を inert 化し、Tab移動もクリックも遮断する
+    function setBackgroundInert(on) {
+        ['header-placeholder', 'sidebar-placeholder', 'main-content'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) { return; }
+            if (on) { el.setAttribute('inert', ''); } else { el.removeAttribute('inert'); }
+        });
+    }
+
     window.pOpen = function (id) {
         // 正本(prototype)は常に単一モーダル表示のため、開く前に他をすべて閉じる
         var wasOpen = document.querySelector('.proto-modal:not([hidden])');
@@ -15,9 +24,14 @@
         if (!wasOpen) { lastFocused = document.activeElement; }
         m.hidden = false;
         document.body.style.overflow = 'hidden';
-        // 初期フォーカスは主ボタン(最後のbutton)。無ければその他のフォーカス可能要素
-        var btns = m.querySelectorAll('button');
-        var first = btns.length ? btns[btns.length - 1] : m.querySelector('[href], input, textarea, select, [tabindex]');
+        setBackgroundInert(true);
+        // 初期フォーカス: data-initial-focus 指定を最優先(破壊的な既定アクションを避けたいモーダル用)。
+        // 無ければ主ボタン(最後のbutton)、それも無ければその他のフォーカス可能要素
+        var first = m.querySelector('[data-initial-focus]');
+        if (!first) {
+            var btns = m.querySelectorAll('button');
+            first = btns.length ? btns[btns.length - 1] : m.querySelector('[href], input, textarea, select, [tabindex]');
+        }
         if (first) { first.focus(); }
     };
 
@@ -55,7 +69,7 @@
 
     // Ctrl+Z: 複写・チップ由来の変更を直前の値と入れ替える(もう一度でやり直し)
     document.addEventListener('keydown', function (e) {
-        if (!(e.ctrlKey && (e.key === 'z' || e.key === 'Z'))) { return; }
+        if (!(e.ctrlKey && !e.shiftKey && (e.key === 'z' || e.key === 'Z'))) { return; }
         var el = e.target;
         if (!el || el.dataset === undefined || el.dataset.prevUndo === undefined) { return; }
         e.preventDefault();
@@ -223,6 +237,7 @@
         var m = document.getElementById(id);
         if (m) { m.hidden = true; }
         document.body.style.overflow = '';
+        setBackgroundInert(false);
         restoreFocus();
     };
 
@@ -230,6 +245,7 @@
         var had = document.querySelector('.proto-modal:not([hidden])');
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
         document.body.style.overflow = '';
+        setBackgroundInert(false);
         if (had) { restoreFocus(); }
     };
 

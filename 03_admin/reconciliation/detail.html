@@ -204,7 +204,7 @@
         if (prev && prev !== value) {
             el.title = 'クリック前の値: ' + prev;
             el.style.transition = 'background .15s';
-            el.style.background = '#fdf6ec';
+            el.style.background = '#fff7d6';
             setTimeout(function () { el.style.background = '#fff'; }, 650);
         }
         window.pApplyValue(el, value);
@@ -227,7 +227,11 @@
             if (el) {
                 el.style.borderColor = val ? '#b9caee' : '#c99b3f';
                 var row = el.closest('div[style*="grid-template-columns"]');
-                if (row) { row.style.background = val ? '#eef2fb' : '#fdf6ec'; }
+                if (row) {
+                    row.style.background = val ? '#eef2fb' : '#fdf6ec';
+                    var badge = Array.prototype.find.call(row.querySelectorAll('span'), function (b) { return b.textContent.trim() === '!不一致'; });
+                    if (badge) { badge.style.color = val ? '#2b57b8' : '#8a6414'; }
+                }
             }
         });
         setState(unresolved
@@ -245,7 +249,12 @@
     }
     FIX.forEach(function (fx) {
         var el = document.getElementById(fx.fix);
-        if (el) { el.addEventListener('input', refreshState); }
+        if (el) {
+            el.addEventListener('input', function (e) {
+                if (e.isTrusted) { el.title = ''; }
+                refreshState();
+            });
+        }
     });
     refreshState();
 
@@ -307,11 +316,13 @@
             }
             return;
         }
-        if (modalOpen) { return; }
         if (e.key === '?' && !inField) {
-            window.pOpen('mShortcuts');
+            var ms = document.getElementById('mShortcuts');
+            if (ms && !ms.hidden) { e.preventDefault(); window.pClose('mShortcuts'); return; }
+            if (!modalOpen) { e.preventDefault(); window.pOpen('mShortcuts'); }
             return;
         }
+        if (modalOpen) { return; }
         // 仮割当: Alt+1〜3でフォーカス中の修正入力へ入力1〜3を複写
         if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0 && fixIds.indexOf(activeId) >= 0) {
             e.preventDefault();
@@ -378,6 +389,7 @@
         });
     });
     window.pRelock = function () { resetLock(); };
+    applyTarget();  // ヘッダーをTARGETS[0]で初期化(HTML側リテラルとの二重管理を避ける)
     resetLock();
 })();
 </script>
