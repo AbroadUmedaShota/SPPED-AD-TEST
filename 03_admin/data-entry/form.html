@@ -185,16 +185,13 @@
         if (bf) { bf.style.display = c.back ? 'flex' : 'none'; }
         if (bk && c.back) { bk.src = c.back; }
         renderFields();
-    (function () {
-        var rc = document.getElementById('remainCount');
-        if (rc) { rc.textContent = GROUP_REMAIN[groupNo].toLocaleString('en-US'); }
-    })();
         var st = document.getElementById('skipReasonText');
         if (st) { st.value = ''; }
         var rc = document.getElementById('remainCount');
         if (rc) {
-            var n = parseInt(rc.textContent.replace(/,/g, ''), 10) - 1;
+            var n = Math.max(0, parseInt(rc.textContent.replace(/,/g, ''), 10) - 1);
             rc.textContent = n.toLocaleString('en-US');
+            if (n === 0) { disableWork(); }
         }
         var first = document.getElementById(order[0]);
         if (first) { first.focus(); }
@@ -280,23 +277,41 @@
         if (badge) { badge.textContent = '作業中: ' + def.label.replace('グループ', 'グループ'); }
     }
     renderFields();
+    function disableWork() {
+        var bc = document.getElementById('btnConfirm');
+        if (bc) { bc.disabled = true; bc.style.background = '#eceef3'; bc.style.color = '#8a93a5'; bc.style.cursor = 'default'; bc.title = '出題できる名刺がありません'; }
+        document.querySelectorAll('button').forEach(function (btn) {
+            if (btn.textContent.indexOf('スキップ') >= 0) {
+                btn.disabled = true; btn.style.color = '#8a93a5'; btn.style.cursor = 'default'; btn.title = '出題できる名刺がありません';
+            }
+        });
+    }
     (function () {
         var rc = document.getElementById('remainCount');
         if (rc) { rc.textContent = GROUP_REMAIN[groupNo].toLocaleString('en-US'); }
+        if (GROUP_REMAIN[groupNo] === 0) { disableWork(); }
     })();
 
+    // Escはproto-ui(モーダルclose)が先に処理するため、押下時点の開閉状態をcaptureで記録する
+    var escHadModal = false;
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { escHadModal = !!document.querySelector('.proto-modal:not([hidden])'); }
+    }, true);
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }  // IME変換中のEnter/Escを無視
         var inInput = e.target && e.target.tagName === 'INPUT';
         if (e.key === 'Enter' && e.ctrlKey) {
             e.preventDefault();
+            if (document.querySelector('.proto-modal:not([hidden])')) { return; }
+            if (document.getElementById('btnConfirm') && document.getElementById('btnConfirm').disabled) { return; }
             var b = document.getElementById('btnConfirm');
             if (b) { b.style.filter = 'brightness(0.85)'; setTimeout(function () { b.style.filter = ''; }, 180); }
             window.pNextCard();
             return;
         }
-        if (e.key === 'Escape' && !document.querySelector('.proto-modal:not([hidden])')) {
-            window.pOpen('mSkip');
+        if (e.key === 'Escape') {
+            var sk = document.getElementById('btnConfirm');
+            if (!escHadModal && !(sk && sk.disabled)) { window.pOpen('mSkip'); }
             return;
         }
         if (e.key === 'F2' && inInput) {

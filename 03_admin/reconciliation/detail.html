@@ -267,13 +267,27 @@
     window.pMatchConfirm = function () {
         var btn = document.getElementById('btnMatchConfirm');
         if (btn && btn.disabled) { return; }
+        if (lockExpired) {
+            var st = document.getElementById('matchState');
+            if (st) {
+                st.textContent = 'ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています・§7.3)。';
+                st.style.color = '#c23934';
+                st.style.fontWeight = '700';
+                setTimeout(refreshState, 2200);
+            }
+            return;
+        }
         window.pOpen('mConfirmMatch');
     };
 
     // 確定後: 次の対象を取得した体でリセット(モックは同一サンプルを再表示)
     window.pMatchDone = function () {
+        FIX_IDS.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.title = ''; }
+        });
         var role = document.getElementById('fixRole');
-        if (role) { role.value = ''; role.title = ''; }
+        if (role) { role.value = ''; }
         resetLock();
         refreshState();
         var st = document.getElementById('matchState');
@@ -305,7 +319,9 @@
 
     // B4: 照合ロックのカウントダウン。0で解除状態を表示し、再取得でロックし直す
     var lockTimer = null;
+    var lockExpired = false;
     function resetLock() {
+        lockExpired = false;
         var badge = document.getElementById('lockBadge');
         if (!badge) { return; }
         if (lockTimer) { clearInterval(lockTimer); }
@@ -322,6 +338,7 @@
                 if (sec <= 30 && el) { badge.style.color = '#8a6414'; badge.style.background = '#fdf6ec'; badge.style.borderColor = '#e8cf9e'; }
             } else {
                 clearInterval(lockTimer);
+                lockExpired = true;
                 badge.innerHTML = 'ロック解除済み — <a href="#m" onclick="pRelock();return false" style="font-weight:700">対象を再取得</a>(入力内容は保持されます・§7.3)';
                 badge.style.color = '#c23934';
                 badge.style.background = '#fdf6f5';
