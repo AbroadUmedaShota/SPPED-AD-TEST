@@ -31,25 +31,31 @@
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
               <span>残りの作業可能件数 <strong style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
-              <span style="color:#8a93a5">確定 Ctrl+Enter ・ スキップ Esc ・ 画像 +/−/R/F</span>
+              <span style="color:#8a93a5">確定 Ctrl+Enter ・ スキップ Esc ・ 画像 +/−/R</span>
             </div>
           </div>
           <div style="flex:1;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
             <div style="background:#1f2733;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #303c4f">
-                <div style="display:flex;gap:6px">
-                  <span style="background:#3467d6;color:#fff;border-radius:5px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">表</span>
-                  <span style="color:#98a3b8;border:1px solid #3c4a61;border-radius:5px;padding:4px 14px;font-size:12px;cursor:pointer">裏 (F)</span>
-                </div>
+                <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
                 <div style="display:flex;gap:6px">
                   <span title="拡大 (+)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
                   <span title="縮小 (−)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
                   <span title="回転 (R)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
-              <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
-                <div style="width:88%;aspect-ratio:91/55;background:repeating-linear-gradient(45deg,#f4f6f9,#f4f6f9 12px,#e6eaf1 12px,#e6eaf1 24px);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <span style="font-family:ui-monospace,monospace;font-size:12px;color:#5b6577;background:#fff;border:1px dashed #c8cdd8;border-radius:4px;padding:4px 10px">名刺画像(表) — サンプル</span>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px 24px;overflow-y:auto">
+                <div style="width:80%">
+                  <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">表</div>
+                  <div style="aspect-ratio:91/55;background:repeating-linear-gradient(45deg,#f4f6f9,#f4f6f9 12px,#e6eaf1 12px,#e6eaf1 24px);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                    <span style="font-family:ui-monospace,monospace;font-size:12px;color:#5b6577;background:#fff;border:1px dashed #c8cdd8;border-radius:4px;padding:4px 10px">名刺画像(表) — サンプル</span>
+                  </div>
+                </div>
+                <div style="width:80%">
+                  <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">裏</div>
+                  <div style="aspect-ratio:91/55;background:repeating-linear-gradient(45deg,#f4f6f9,#f4f6f9 12px,#e6eaf1 12px,#e6eaf1 24px);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                    <span style="font-family:ui-monospace,monospace;font-size:12px;color:#5b6577;background:#fff;border:1px dashed #c8cdd8;border-radius:4px;padding:4px 10px">名刺画像(裏) — サンプル</span>
+                  </div>
                 </div>
               </div>
             </div>
