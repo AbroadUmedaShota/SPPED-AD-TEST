@@ -21,13 +21,13 @@
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
               <h2 style="margin:0;font-size:18px;font-weight:700">照合個票</h2>
-              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums">アンケートID SV-10241</span>
-              <span style="font-size:12px;color:#5b6577">製造業DXセミナー2026</span>
-              <span style="font-size:12px;color:#c23934;font-weight:700">納期 2026/07/30 15:00 <span style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span>
+              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums"><span id="svBadgeM">アンケートID SV-10241</span></span>
+              <span style="font-size:12px;color:#5b6577"><span id="titleM">製造業DXセミナー2026</span></span>
+              <span style="font-size:12px;color:#c23934;font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px">
               <span id="lockBadge" style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで <span id="lockSec">182</span>秒)</span>
-              <span title="照合個票の共通ショートカット&#10;Ctrl+Enter: 確定して次へ(全項目確定時)&#10;候補クリック: 修正入力へ複写(既入力は置き換え・元の値はツールチップに保持)&#10;Alt+1〜3: 修正入力欄にフォーカスがある時、その行の入力1〜3を複写(※暫定割当)&#10;Enter: 次の未確定の修正入力へ(すべて確定済みなら確定ボタンへ)&#10;Ctrl+Z: 複写を直前の値に戻す&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" onclick="pOpen('mShortcuts')" style="color:#8a93a5;cursor:pointer;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
+              <span tabindex="0" role="button" title="クリックまたは?キーでショートカット一覧を表示" onclick="pOpen('mShortcuts')" style="color:#8a93a5;cursor:pointer;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px">
@@ -75,7 +75,7 @@
                     <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
                     <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード(株)</span>
                     <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
-                    <span style="padding-right:10px"><input id="fixCompany" spellcheck="false" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;outline-offset:1px"></span>
+                    <span style="padding-right:10px"><input id="fixCompany" spellcheck="false" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit"></span>
                     <span id="doneCompany" style="font-weight:700">アブロード株式会社</span>
                   </div>
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
@@ -100,7 +100,7 @@
                 </div>
               </div>
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
-                <span style="font-size:11.5px;color:#5b6577"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
+                <span style="font-size:11.5px;color:#5b6577"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#eef2fb;border:1px solid #b9caee;border-radius:3px"></span>不一致(確定済み)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
                 <div style="display:flex;gap:10px">
                   <button id="btnMatchConfirm" disabled onclick="pMatchConfirm()" style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
@@ -169,6 +169,24 @@
     ];
     var stateTimer = null;
 
+    // 照合対象(モック2件)。確定すると次の対象へヘッダーを切り替える(照合内容は同一サンプル)
+    var TARGETS = [
+        { sv: 'SV-10241', title: '製造業DXセミナー2026', due: '2026/07/30 15:00', overdue: true },
+        { sv: 'SV-10238', title: 'BtoB EXPO 東京 2026', due: '2026/07/31 18:00', overdue: false }
+    ];
+    var targetIdx = 0;
+    function applyTarget() {
+        var t = TARGETS[targetIdx];
+        var sv = document.getElementById('svBadgeM');
+        if (sv) { sv.textContent = 'アンケートID ' + t.sv; }
+        var ti = document.getElementById('titleM');
+        if (ti) { ti.textContent = t.title; }
+        var du = document.getElementById('dueM');
+        if (du) { du.textContent = t.due; }
+        var ov = document.getElementById('overdueM');
+        if (ov) { ov.style.display = t.overdue ? '' : 'none'; }
+    }
+
     function setState(text, color, weight) {
         var st = document.getElementById('matchState');
         if (!st) { return; }
@@ -207,9 +225,9 @@
                 done.style.fontWeight = val ? '700' : '400';
             }
             if (el) {
-                el.style.borderColor = val ? '#9fceb6' : '#c99b3f';
+                el.style.borderColor = val ? '#b9caee' : '#c99b3f';
                 var row = el.closest('div[style*="grid-template-columns"]');
-                if (row) { row.style.background = val ? '#edf7f1' : '#fdf6ec'; }
+                if (row) { row.style.background = val ? '#eef2fb' : '#fdf6ec'; }
             }
         });
         setState(unresolved
@@ -244,13 +262,20 @@
 
     // 確定後: 次の対象を取得した体で初期状態へ戻す(モックは同一サンプルを再表示)
     window.pMatchDone = function () {
+        if (lockExpired) {
+            setState('ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています・§7.3)。', '#c23934', '700');
+            stateTimer = setTimeout(refreshState, 2200);
+            return;
+        }
         FIX.forEach(function (fx) {
             var el = document.getElementById(fx.fix);
             if (el) { el.value = fx.initial; el.title = ''; delete el.dataset.prevUndo; }
         });
+        targetIdx = (targetIdx + 1) % TARGETS.length;
+        applyTarget();
         resetLock();
         refreshState();
-        setState('確定しました。次の照合対象を取得しました(モックでは同一サンプルを表示)。', '#237a52', '700');
+        setState('確定しました。次の照合対象を取得しました(モックでは照合内容は同一サンプル)。', '#237a52', '700');
         stateTimer = setTimeout(refreshState, 2200);
     };
 
@@ -274,8 +299,11 @@
             if (btn && !btn.disabled) {
                 window.pMatchConfirm();
             } else {
-                setState(document.getElementById('matchState').textContent, '#c23934', '700');
-                stateTimer = setTimeout(refreshState, 900);
+                var stEl = document.getElementById('matchState');
+                if (stEl) {
+                    setState(stEl.textContent, '#c23934', '700');
+                    stateTimer = setTimeout(refreshState, 900);
+                }
             }
             return;
         }
@@ -292,9 +320,9 @@
             return;
         }
         // Enter: 次の未確定の修正入力へ。すべて確定済みなら確定ボタンへ
-        if (e.key === 'Enter' && fixIds.indexOf(activeId) >= 0) {
+        if (e.key === 'Enter' && fixIds.indexOf(e.target && e.target.id) >= 0) {
             e.preventDefault();
-            var idx = fixIds.indexOf(activeId);
+            var idx = fixIds.indexOf(e.target.id);
             for (var k = 1; k <= fixIds.length; k++) {
                 var cand = document.getElementById(fixIds[(idx + k) % fixIds.length]);
                 if (cand && !cand.value.trim()) { cand.focus(); return; }

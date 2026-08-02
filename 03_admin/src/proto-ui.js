@@ -4,12 +4,29 @@
 (function () {
     'use strict';
 
+    var lastFocused = null;
+
     window.pOpen = function (id) {
         // 正本(prototype)は常に単一モーダル表示のため、開く前に他をすべて閉じる
+        var wasOpen = document.querySelector('.proto-modal:not([hidden])');
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
         var m = document.getElementById(id);
-        if (m) { m.hidden = false; document.body.style.overflow = 'hidden'; }
+        if (!m) { return; }
+        if (!wasOpen) { lastFocused = document.activeElement; }
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+        // 初期フォーカスは主ボタン(最後のbutton)。無ければその他のフォーカス可能要素
+        var btns = m.querySelectorAll('button');
+        var first = btns.length ? btns[btns.length - 1] : m.querySelector('[href], input, textarea, select, [tabindex]');
+        if (first) { first.focus(); }
     };
+
+    function restoreFocus() {
+        if (lastFocused && document.body.contains(lastFocused) && lastFocused.focus) {
+            lastFocused.focus();
+        }
+        lastFocused = null;
+    }
 
     // 値の設定(1段Undo付き)。複写・チップ由来の変更は Ctrl+Z で直前の値に戻せる
     window.pApplyValue = function (el, value) {
@@ -28,6 +45,14 @@
         if (el.setSelectionRange) { el.setSelectionRange(0, el.value.length); }
     };
 
+    // 手入力が入ったら複写Undoは破棄し、ブラウザ標準のUndoへ返す
+    document.addEventListener('input', function (e) {
+        var el = e.target;
+        if (e.isTrusted && el && el.dataset && el.dataset.prevUndo !== undefined) {
+            delete el.dataset.prevUndo;
+        }
+    });
+
     // Ctrl+Z: 複写・チップ由来の変更を直前の値と入れ替える(もう一度でやり直し)
     document.addEventListener('keydown', function (e) {
         if (!(e.ctrlKey && (e.key === 'z' || e.key === 'Z'))) { return; }
@@ -43,6 +68,7 @@
     // tabindex付きのクリック要素(候補・チップ・×ボタン)を Enter / Space でも発火させる
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }
+        if (e.ctrlKey || e.metaKey || e.altKey) { return; }  // 修飾キー付きはショートカット側に譲る
         if (e.key !== 'Enter' && e.key !== ' ') { return; }
         var t = e.target;
         if (t && t.tagName === 'SPAN' && t.hasAttribute('tabindex') && (t.hasAttribute('onclick') || t.onclick)) {
@@ -67,6 +93,7 @@
             el.value += value;
             el.focus();
         }
+        el.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     // 一覧のページネーション(モック): 行に data-pg="n"、リスト容器に id、
@@ -105,6 +132,8 @@
     // 名刺画像エンジン: ホバー追従拡大・クリック固定・90度回転(回転時は収まるよう自動縮小)
     // 入力個票・照合個票の共用。+/− と R はキーボードから、入力欄フォーカス中は Alt を併用する
     window.pInitCardZoom = function () {
+        if (window.__cardZoomInit) { return; }
+        window.__cardZoomInit = true;
         var zoom = 2;
         var current = null;
         function fitScale(img) {
@@ -115,6 +144,7 @@
             return Math.min(w / h, h / w);
         }
         function apply(img, scaled) {
+            if (!scaled) { img.style.transformOrigin = 'center center'; }
             var sc = (scaled ? zoom : 1) * fitScale(img);
             img.style.transform = (sc !== 1 ? 'scale(' + sc + ') ' : '') + 'rotate(' + (img.dataset.rot || 0) + 'deg)';
         }
@@ -177,6 +207,8 @@
         });
         document.addEventListener('keydown', function (e) {
             if (e.isComposing || e.keyCode === 229) { return; }
+            if (e.ctrlKey || e.metaKey) { return; }  // Ctrl+R(リロード)等のブラウザ操作は奪わない
+            if (document.querySelector('.proto-modal:not([hidden])')) { return; }
             var t = e.target;
             var inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
             if (inField && !e.altKey) { return; }
@@ -191,11 +223,14 @@
         var m = document.getElementById(id);
         if (m) { m.hidden = true; }
         document.body.style.overflow = '';
+        restoreFocus();
     };
 
     window.pCloseAll = function () {
+        var had = document.querySelector('.proto-modal:not([hidden])');
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
         document.body.style.overflow = '';
+        if (had) { restoreFocus(); }
     };
 
     document.addEventListener('keydown', function (e) {
