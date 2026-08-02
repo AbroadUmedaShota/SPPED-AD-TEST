@@ -27,7 +27,7 @@
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px">
               <span id="lockBadge" style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで <span id="lockSec">182</span>秒)</span>
-              <span title="照合個票の共通ショートカット&#10;Ctrl+Enter: 確定して次へ(全項目確定時)&#10;候補クリック: 修正入力へ複写(既入力は置き換え・元の値はツールチップに保持)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <span title="照合個票の共通ショートカット&#10;Ctrl+Enter: 確定して次へ(全項目確定時)&#10;候補クリック: 修正入力へ複写(既入力は置き換え・元の値はツールチップに保持)&#10;Alt+1〜3: フォーカス中の行の入力1〜3を修正入力へ複写(※暫定割当)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px">
@@ -247,6 +247,22 @@
         if (el) { el.addEventListener('input', refreshState); }
     });
     refreshState();
+
+    // 仮割当: Alt+1〜3でフォーカス中の行の入力1〜3を修正入力へ複写
+    var CAND = {
+        fixCompany: ['アブロード株式会社', 'アブロード(株)', 'アブロード株式会社'],
+        fixRole: ['課長', '部長', '課長']
+    };
+    document.addEventListener('keydown', function (e) {
+        if (e.isComposing || e.keyCode === 229) { return; }
+        if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0) {
+            var id = document.activeElement && document.activeElement.id;
+            if (CAND[id]) {
+                e.preventDefault();
+                window.pFix(id, CAND[id][parseInt(e.key, 10) - 1]);
+            }
+        }
+    });
 
     window.pMatchConfirm = function () {
         var btn = document.getElementById('btnMatchConfirm');

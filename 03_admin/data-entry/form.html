@@ -27,7 +27,7 @@
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
               <span>残りの作業可能件数 <strong id="remainCount" style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
-              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動(最終欄では確定ボタンへ)&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動(最終欄では確定ボタンへ)&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;F2: フォーカス中の欄へOCR候補を複写(※暫定割当)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
@@ -297,6 +297,14 @@
         }
         if (e.key === 'Escape' && !document.querySelector('.proto-modal:not([hidden])')) {
             window.pOpen('mSkip');
+            return;
+        }
+        if (e.key === 'F2' && inInput) {
+            // 仮割当: フォーカス中の欄へOCR候補を複写(割当の確定は仕様書20 §11 #8)
+            e.preventDefault();
+            var fdef = GROUP_DEFS[groupNo].fields.filter(function (fd) { return fd.id === e.target.id; })[0];
+            var cand = fdef && fdef.ocr && fdef.ocr[cardIdx];
+            if (cand) { e.target.value = cand; }
             return;
         }
         if (e.key === 'Enter' && inInput) {
