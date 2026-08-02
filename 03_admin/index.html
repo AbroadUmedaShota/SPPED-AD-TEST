@@ -43,7 +43,7 @@
             </div>
             <div data-min-lv="2">
             <div style="margin-top:14px;font-size:13px;font-weight:700;color:#374151">運用状況サマリ <span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:8px">カード押下で絞り込み済みの一覧へ遷移します</span></div>
-            <div style="margin-top:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
+            <div style="margin-top:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
               <div data-min-lv="3" onclick="location.href='survey-management.html'" style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 18px;cursor:pointer">
                 <div style="font-size:12px;color:#5b6577;font-weight:500;min-height:34px">会期中の<br>アンケート数</div>
                 <div style="font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2">8<span style="font-size:13px;font-weight:500;color:#5b6577;margin-left:3px">件</span></div>
@@ -63,11 +63,6 @@
                 <div style="font-size:12px;color:#8a6414;font-weight:700;min-height:34px">納期が迫っている<br>アンケート数</div>
                 <div style="font-size:30px;font-weight:700;color:#8a6414;font-variant-numeric:tabular-nums;line-height:1.2">2<span style="font-size:13px;font-weight:500;margin-left:3px">件</span></div>
                 <div style="margin-top:6px;font-size:11.5px;color:#8a6414">照合管理一覧 →</div>
-              </div>
-              <div data-min-lv="3" onclick="location.href='billing-management.html'" style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 18px;cursor:pointer">
-                <div style="font-size:12px;color:#5b6577;font-weight:500;min-height:34px">未入金の<br>請求件数</div>
-                <div style="font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2">1<span style="font-size:13px;font-weight:500;color:#5b6577;margin-left:3px">件</span></div>
-                <div style="margin-top:6px;font-size:11.5px;color:#3467d6">請求管理 →</div>
               </div>
             </div>
             <div style="margin-top:24px;font-size:13px;font-weight:700;color:#374151">納期が迫っている・超過のアンケート <span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:8px">残り時間の基準は暫定24h(§11#4 要確定)・行押下で照合管理一覧へ</span></div>
@@ -105,7 +100,7 @@
                     <span>納期区分</span><span style="text-align:right">申込アンケート数</span><span style="text-align:right">データ化対象名刺件数</span><span></span>
                   </div>
                   <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                    <span style="font-weight:700;color:#8a5a10">プレミアム</span><span style="text-align:right">2 件</span><span style="text-align:right">1,860 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
+                    <span style="font-weight:700;color:#8a5a10">オンデマンド</span><span style="text-align:right">2 件</span><span style="text-align:right">1,860 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
                   </div>
                   <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                     <span style="font-weight:500">超特急</span><span style="text-align:right">1 件</span><span style="text-align:right">486 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
@@ -113,13 +108,16 @@
                   <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                     <span style="font-weight:500">特急</span><span style="text-align:right">4 件</span><span style="text-align:right">3,204 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
                   </div>
-                  <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                  <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                     <span style="font-weight:500">通常</span><span style="text-align:right">9 件</span><span style="text-align:right">6,912 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
+                  </div>
+                  <div onclick="location.href='survey-management.html'" style="display:grid;grid-template-columns:1fr 170px 210px 110px;align-items:center;padding:0 18px;height:44px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                    <span style="font-weight:500">お試し</span><span style="text-align:right">1 件</span><span style="text-align:right">128 件</span><span style="text-align:right;font-size:11.5px;color:#3467d6">一覧で表示 →</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div style="margin-top:16px;font-size:11.5px;color:#8a93a5">注記中の§番号は管理画面仕様書ドラフト(作成中)の節番号です。「納期が迫っている・超過」「未入金の請求件数」はたたき台E列に未反映の拡張(方針B列「今日対応すべきことがわかるハブ」準拠)・シートへの追記候補。</div>
+            <div style="margin-top:16px;font-size:11.5px;color:#8a93a5">注記中の§番号は管理画面仕様書ドラフト(作成中)の節番号です。「納期が迫っている・超過」はたたき台E列に未反映の拡張(方針B列「今日対応すべきことがわかるハブ」準拠)・シートへの追記候補。振込前提のため入金状況はダッシュボードに反映しない(請求管理で確認)。納期区分の呼称はユーザー画面に合わせ「オンデマンド」(シートC列の「プレミアム」表記は要整理)。</div>
             </div>
           </div>
         </main>

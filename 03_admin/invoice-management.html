@@ -22,7 +22,7 @@
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">請求書管理</span></div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">請求書管理</h2>
-              <span style="font-size:12px;color:#6b7484">1行 = 1通(会社 × 月)・既定の並び順: 請求月の降順</span>
+              <span style="font-size:12px;color:#6b7484">1行 = 1通(アカウント × 発行月)・既定の並び順: 請求月の降順</span>
             </div>
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <input placeholder="会社名(部分一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
@@ -32,22 +32,22 @@
             </div>
             <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
               <div style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
-                <span style="color:#3467d6">請求月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">メール配信超過分</span><span style="text-align:right">請求合計</span><span></span>
+                <span style="color:#3467d6">請求月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">お礼メール送信費用</span><span style="text-align:right">請求合計</span><span></span>
               </div>
               <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">2026/07</span><span>(株)マーケットビジョン</span><span style="text-align:right">50,000 円</span><span style="text-align:right">12,400 円</span><span style="text-align:right;font-weight:700">62,400 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
+                <span style="font-weight:500">2026/07</span><span>(株)マーケットビジョン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">1,140 円</span><span style="text-align:right;font-weight:700">11,140 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
               <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">2026/07</span><span>(株)テックブリッジ</span><span style="text-align:right">50,000 円</span><span style="text-align:right">8,200 円</span><span style="text-align:right;font-weight:700">58,200 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
+                <span style="font-weight:500">2026/07</span><span>(株)テックブリッジ</span><span style="text-align:right">10,000 円</span><span style="text-align:right">820 円</span><span style="text-align:right;font-weight:700">10,820 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
               <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">2026/07</span><span>グロースパートナーズ(株)</span><span style="text-align:right">30,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">30,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
+                <span style="font-weight:500">2026/07</span><span>グロースパートナーズ(株)</span><span style="text-align:right">10,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">10,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
               <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">2026/06</span><span>(株)マーケットビジョン</span><span style="text-align:right">50,000 円</span><span style="text-align:right">6,800 円</span><span style="text-align:right;font-weight:700">56,800 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
+                <span style="font-weight:500">2026/06</span><span>(株)マーケットビジョン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">580 円</span><span style="text-align:right;font-weight:700">10,580 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
               <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">2026/06</span><span>(株)イベントプラス</span><span style="text-align:right">30,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">30,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
+                <span style="font-weight:500">2026/06</span><span>(株)イベントプラス</span><span style="text-align:right">10,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">10,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
@@ -73,10 +73,10 @@
       <span onclick="pClose('mInvoiceDetail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px">
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>月額利用料(プレミアムプラン)</span><span>50,000 円</span></div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>メール配信超過分<span style="color:#6b7484;font-size:12px;margin-left:8px">1,240通 × 10円</span></span><span>12,400 円</span></div>
-      <div style="display:flex;justify-content:space-between;padding:12px 0 2px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums"><span>請求合計(税抜)</span><span style="font-size:17px">62,400 円</span></div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">金額・単価はダミー値です(プラン月額・メール超過単価は※要確定)。名刺データ化(アンケート単位)の請求は「請求管理」で管理します。請求書PDFの発行機能は§11で要確定のため未掲載です。</div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>月額利用料(プレミアムプラン)</span><span>10,000 円</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>お礼メール送信費用<span style="color:#6b7484;font-size:12px;margin-left:8px">送信対象1,240件・無料100件控除 → 1,140通 × 1円</span></span><span>1,140 円</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0 2px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums"><span>請求合計(税抜)</span><span style="font-size:17px">11,140 円</span></div>
+      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">金額はユーザー画面正本に整合(プレミアム月額10,000円税別・お礼メール1通1円/無料100件控除)。名刺データ化(アンケート単位)の請求は「請求管理」で管理します。請求書PDFの発行機能は§11で要確定のため未掲載です。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button onclick="pClose('mInvoiceDetail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
