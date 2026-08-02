@@ -70,22 +70,23 @@
 <div id="mBillingEdit" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">請求を編集<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">(株)テックブリッジ・SV-10238分</span></span>
+      <span style="font-size:15px;font-weight:700">入金情報の編集<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">(株)テックブリッジ・SV-10238分</span></span>
       <span onclick="pClose('mBillingEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実件数</span><input value="1,660" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right;background:#f7f8fb" readonly></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">単価(円)</span><input value="200" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">請求金額(円)</span><input value="332,000" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right;font-weight:700"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">単価(円)</span><input value="200" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right;background:#f7f8fb" readonly></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">請求金額(円)</span><input value="332,000" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right;font-weight:700;background:#f7f8fb" readonly></label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">請求日</span><input type="date" value="2026-07-10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">支払期日</span><input type="date" value="2026-07-25" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">入金確認日</span><input type="date" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">変更理由 <span style="color:#c23934">必須</span></span><input placeholder="例: 単価改定の反映漏れ補正" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">金額・期日の変更は理由の入力が必要で、監査ログに記録されます。入金確認日と請求ステータスの連動は※要確定です(§4)。</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">請求ステータス</span><select style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>未入金</option><option>入金済</option><option>延滞</option><option>取消</option></select></label><div></div></div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">変更理由 <span style="color:#c23934">必須</span></span><input placeholder="例: 入金の消込漏れを補正" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">件数・単価・請求金額は自動計算(データ化件数×プラン単価)のため編集不可。金額の調整はクーポン適用から行います。期日・入金情報の変更は理由の入力が必要で、監査ログに記録されます。入金確認日と請求ステータスの連動は※要確定です(§4)。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mBillingEdit')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
