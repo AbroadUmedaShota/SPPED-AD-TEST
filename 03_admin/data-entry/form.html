@@ -13,13 +13,11 @@
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
-        <aside style="width:56px;flex:none;background:#1d2634;color:#c3ccdb;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:14px">
-            <a href="index.html" title="メニュー(モックでは一覧へ戻る・正本はサイドバー展開)" style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:#c3ccdb;font-size:16px;text-decoration:none">☰</a>
-            <span style="font-size:10.5px;color:#98a3b8;letter-spacing:2px;writing-mode:vertical-rl">集中モード — 作業画面</span>
-        </aside>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1" style="margin-left:232px">
         <div style="padding:14px 20px 28px;display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
             <div style="display:flex;align-items:center;gap:14px">
