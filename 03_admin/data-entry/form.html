@@ -23,7 +23,7 @@
               <h2 style="margin:0;font-size:18px;font-weight:700;white-space:nowrap">入力個票</h2>
               <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums;white-space:nowrap" title="入力対象が属するアンケート(オペレーターへ見せる情報はIDのみ)">アンケートID SV-10238</span>
               <span style="font-size:11px;font-weight:700;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:2px 8px;background:#fdf6ec;white-space:nowrap">オンデマンド</span>
-              <span style="font-size:11px;font-weight:700;color:#2b57b8;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">作業中: グループ③ 会社・部署・役職</span>
+              <span id="groupBadge" style="font-size:11px;font-weight:700;color:#2b57b8;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">作業中: グループ③ 会社・部署・役職</span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
               <span>残りの作業可能件数 <strong id="remainCount" style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
@@ -59,16 +59,7 @@
             <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
               <div style="flex:1;overflow-y:auto;padding:16px 20px">
                 <div style="font-size:11.5px;color:#8a93a5">この個票では担当グループの項目のみを入力します。グループ横断の一括入力はLv2以上の「グループ一括入力」で行います。</div>
-                <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">会社名</div>
-                <input id="inCompany" title="Enterで次の欄へ / 読み取れない場合は「〓」" placeholder="◯◯株式会社" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit;outline:2px solid #3467d6;outline-offset:1px">
-                <div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: <span id="ocrChip" title="クリックで入力欄へ複写" onclick="pSet('inCompany', this.textContent)" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">アブロード株式会社</span><span style="color:#8a93a5">(クリックで複写・※あったほうが良い)</span></div>
-                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span onclick="pChipEx('inCompany','株式会社',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">株式会社</span><span onclick="pChipEx('inCompany','(株)',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">(株)</span><span onclick="pChipEx('inCompany','有限会社',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">有限会社</span><span onclick="pChipEx('inCompany','(有)',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">(有)</span><span onclick="pSet('inCompany','〓')" title="読み取れない場合" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">〓</span></div>
-                <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:16px">部署名</div>
-                <input id="inDept" placeholder="◯◯部" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit">
-                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span onclick="pChipEx('inDept','営業部',['営業部','総務部','人事部','経理部','企画部'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">営業部</span><span onclick="pChipEx('inDept','総務部',['営業部','総務部','人事部','経理部','企画部'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">総務部</span><span onclick="pChipEx('inDept','人事部',['営業部','総務部','人事部','経理部','企画部'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">人事部</span><span onclick="pSet('inDept','〓')" title="読み取れない場合" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">〓</span></div>
-                <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:16px">役職名</div>
-                <input id="inRole" placeholder="◯◯部長" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit">
-                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span onclick="pChipEx('inRole','代表取締役',['代表取締役','部長','課長','係長','主任'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">代表取締役</span><span onclick="pChipEx('inRole','部長',['代表取締役','部長','課長','係長','主任'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">部長</span><span onclick="pChipEx('inRole','課長',['代表取締役','部長','課長','係長','主任'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">課長</span><span onclick="pSet('inRole','〓')" title="読み取れない場合" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">〓</span></div>
+                <div id="fieldsArea" style="margin-top:14px"></div>
                 <div style="margin-top:18px;font-size:11.5px;color:#8a93a5;line-height:1.7">定型チップはクリックで入力し、同じ括り(法人格・部署・役職)の語が既にある場合は置換されるため二重入力になりません(もう一度クリックで解除)。入力項目の補完情報の表示(例: グループ④での郵便番号→住所補完)、QRコード・バーコード等の特殊入力は【あったほうが良い】として検討中(本モックでは注記のみ)。</div>
               </div>
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
@@ -194,12 +185,7 @@
         if (fr) { fr.src = c.front; }
         if (bf) { bf.style.display = c.back ? 'flex' : 'none'; }
         if (bk && c.back) { bk.src = c.back; }
-        var ocr = document.getElementById('ocrChip');
-        if (ocr) { ocr.textContent = c.ocr; }
-        ['inCompany', 'inDept', 'inRole'].forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) { el.value = ''; }
-        });
+        renderFields();
         var st = document.getElementById('skipReasonText');
         if (st) { st.value = ''; }
         var rc = document.getElementById('remainCount');
@@ -207,11 +193,81 @@
             var n = parseInt(rc.textContent.replace(/,/g, ''), 10) - 1;
             rc.textContent = n.toLocaleString('en-US');
         }
-        var first = document.getElementById('inCompany');
+        var first = document.getElementById(order[0]);
         if (first) { first.focus(); }
     };
 
-    var order = ['inCompany', 'inDept', 'inRole'];
+    // 作業グループ①〜⑧の項目定義(ocrは[1枚目,2枚目]のサンプル値)
+    var CORP = ['株式会社', '(株)', '㈱', '有限会社', '(有)', '合同会社'];
+    var DEPT = ['営業部', '総務部', '人事部', '経理部', '企画部', '営業企画部'];
+    var ROLE = ['代表取締役', '部長', '課長', '係長', '主任'];
+    var GROUP_DEFS = {
+        1: { label: 'グループ① メールアドレス', fields: [
+            { id: 'f1', label: 'メールアドレス', ph: 'xxx@example.co.jp', ocr: ['mano@repinc.co.jp', 'taro.yamada@example.com'], chips: ['@', '.co.jp', '.com'] }] },
+        2: { label: 'グループ② 姓・名', fields: [
+            { id: 'f1', label: '姓', ph: '山田', ocr: ['間野', '山田'] },
+            { id: 'f2', label: '名', ph: '太郎', ocr: ['健介', '太郎'] }] },
+        3: { label: 'グループ③ 会社・部署・役職', fields: [
+            { id: 'f1', label: '会社名', ph: '◯◯株式会社', ocr: ['レップ株式会社', '株式会社サンプル商事'], chips: ['株式会社', '(株)', '有限会社', '(有)'], ex: CORP },
+            { id: 'f2', label: '部署名', ph: '◯◯部', ocr: [null, '営業企画部'], chips: ['営業部', '総務部', '人事部'], ex: DEPT },
+            { id: 'f3', label: '役職名', ph: '◯◯部長', ocr: ['代表取締役', '課長'], chips: ['代表取締役', '部長', '課長'], ex: ROLE }] },
+        4: { label: 'グループ④ 郵便番号・住所', fields: [
+            { id: 'f1', label: '郵便番号', ph: '100-0001', ocr: ['101-0052', '100-0001'] },
+            { id: 'f2', label: '住所1', ph: '東京都◯◯区…', ocr: ['東京都千代田区神田小川町3-7-5', '東京都千代田区千代田1-2-3'], chips: ['東京都'] },
+            { id: 'f3', label: '住所2(建物名)', ph: '◯◯ビル◯F', ocr: ['VORT神保町3F', 'サンプルビル5F'] }] },
+        5: { label: 'グループ⑤ 電話番号・FAX', fields: [
+            { id: 'f1', label: '電話番号1', ph: '03-xxxx-xxxx', ocr: ['03-6895-3811', '03-1234-5678'], chips: ['03-'] },
+            { id: 'f2', label: '電話番号2', ph: '', ocr: [null, null] },
+            { id: 'f3', label: '携帯電話', ph: '090-xxxx-xxxx', ocr: [null, '090-1234-5678'], chips: ['090-', '080-'] },
+            { id: 'f4', label: 'FAX', ph: '', ocr: [null, '03-1234-5679'] }] },
+        6: { label: 'グループ⑥ URL', fields: [
+            { id: 'f1', label: 'URL', ph: 'https://…', ocr: ['https://www.repinc.co.jp/', 'https://www.example.co.jp'], chips: ['https://', 'www.'] }] },
+        7: { label: 'グループ⑦ その他メモ', fields: [
+            { id: 'f1', label: 'その他メモ', ph: '名刺記載のメモ・肩書補足など', ocr: [null, null] }] },
+        8: { label: 'グループ⑧ フリー入力', fields: [
+            { id: 'f1', label: 'フリー入力', ph: '', ocr: [null, 'STG TEST CARD - DUMMY DATA'] }] }
+    };
+    var groupNo = (function () {
+        var g = parseInt(new URLSearchParams(location.search).get('g') || '3', 10);
+        return GROUP_DEFS[g] ? g : 3;
+    })();
+    var order = [];
+    var INPUT_STYLE = 'margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit';
+    var CHIP_STYLE = 'border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer';
+    function esc(t) { return String(t).replace(/'/g, "\\'"); }
+    function renderFields() {
+        var def = GROUP_DEFS[groupNo];
+        var html = '';
+        def.fields.forEach(function (fd, i) {
+            html += '<div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:' + (i ? '16px' : '0') + '">' + fd.label + '</div>';
+            html += '<input id="' + fd.id + '" placeholder="' + (fd.ph || '') + '" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="' + INPUT_STYLE + '">';
+            var ocr = fd.ocr && fd.ocr[cardIdx];
+            html += '<div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: ';
+            if (ocr) {
+                html += '<span title="クリックで入力欄へ複写" onclick="pSet(\'' + fd.id + '\', this.textContent)" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">' + ocr + '</span>';
+            } else {
+                html += '<span style="color:#8a93a5">—(読み取りなし)</span>';
+            }
+            if (i === 0) { html += '<span style="color:#8a93a5">(クリックで複写・※あったほうが良い)</span>'; }
+            html += '</div>';
+            var chips = '';
+            (fd.chips || []).forEach(function (c) {
+                if (fd.ex) {
+                    chips += '<span onclick="pChipEx(\'' + fd.id + '\',\'' + esc(c) + '\',' + JSON.stringify(fd.ex).replace(/"/g, "'") + ')" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="' + CHIP_STYLE + '">' + c + '</span>';
+                } else {
+                    chips += '<span onclick="pAppend(\'' + fd.id + '\',\'' + esc(c) + '\')" title="クリックでカーソル位置へ挿入" style="' + CHIP_STYLE + '">' + c + '</span>';
+                }
+            });
+            chips += '<span onclick="pSet(\'' + fd.id + '\',\'〓\')" title="読み取れない場合" style="' + CHIP_STYLE + '">〓</span>';
+            html += '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' + chips + '</div>';
+        });
+        document.getElementById('fieldsArea').innerHTML = html;
+        order = def.fields.map(function (fd) { return fd.id; });
+        var badge = document.getElementById('groupBadge');
+        if (badge) { badge.textContent = '作業中: ' + def.label.replace('グループ', 'グループ'); }
+    }
+    renderFields();
+
     document.addEventListener('keydown', function (e) {
         var inInput = e.target && e.target.tagName === 'INPUT';
         if (e.key === 'Enter' && e.ctrlKey) {
