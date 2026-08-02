@@ -17,10 +17,21 @@
         if (el) { el.value = value; el.focus(); }
     };
 
-    // よく使う入力チップ用: 対象inputの末尾へ追記
+    // よく使う入力チップ用: 対象inputのカーソル位置へ挿入(選択範囲は置換)
     window.pAppend = function (inputId, value) {
         var el = document.getElementById(inputId);
-        if (el) { el.value += value; el.focus(); }
+        if (!el) { return; }
+        var st = el.selectionStart;
+        var en = el.selectionEnd;
+        if (typeof st === 'number') {
+            el.value = el.value.slice(0, st) + value + el.value.slice(en);
+            el.focus();
+            var pos = st + value.length;
+            el.setSelectionRange(pos, pos);
+        } else {
+            el.value += value;
+            el.focus();
+        }
     };
 
     // 一覧のページネーション(モック): 行に data-pg="n"、リスト容器に id、

@@ -27,7 +27,7 @@
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
               <span>残りの作業可能件数 <strong id="remainCount" style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
-              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動(最終欄では確定ボタンへ)&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
@@ -88,7 +88,7 @@
       <label style="display:flex;align-items:center;gap:10px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer"><input type="radio" name="skipReason" checked>名刺ではない</label>
       <label style="display:flex;align-items:center;gap:10px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer"><input type="radio" name="skipReason">読み取れない(不鮮明・破損など)</label>
       <label style="display:flex;flex-direction:column;gap:8px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer">
-        <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="skipReason">その他</span>
+        <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="skipReason" id="skipReasonOther">その他</span>
         <input id="skipReasonText" placeholder="理由を入力(その他を選択した場合は必須)" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:inherit">
       </label>
       <div style="font-size:11.5px;color:#8a93a5;line-height:1.7">スキップした名刺は全体キューへ戻り、他のオペレーターへ出題されます。同一名刺が3回スキップされると出題対象から除外されます。理由の記録先(監査ログの記録対象とするか)は※要確定です。</div>
@@ -159,8 +159,7 @@
                 el.value = v.replace(group[i], token); el.focus(); return;
             }
         }
-        el.value = v + token;
-        el.focus();
+        window.pAppend(inputId, token);  // 未該当時はカーソル位置へ挿入(前株にも対応)
     };
     // 出題カード(モック2枚)。確定・スキップで次のカードへ送る
     var CARDS = [
@@ -186,6 +185,10 @@
         if (bf) { bf.style.display = c.back ? 'flex' : 'none'; }
         if (bk && c.back) { bk.src = c.back; }
         renderFields();
+    (function () {
+        var rc = document.getElementById('remainCount');
+        if (rc) { rc.textContent = GROUP_REMAIN[groupNo].toLocaleString('en-US'); }
+    })();
         var st = document.getElementById('skipReasonText');
         if (st) { st.value = ''; }
         var rc = document.getElementById('remainCount');
@@ -227,11 +230,21 @@
         8: { label: 'グループ⑧ フリー入力', fields: [
             { id: 'f1', label: 'フリー入力', ph: '', ocr: [null, 'STG TEST CARD - DUMMY DATA'] }] }
     };
+    var GROUP_REMAIN = { 1: 547, 2: 298, 3: 1914, 4: 114, 5: 1078, 6: 182, 7: 0, 8: 86 };
     var groupNo = (function () {
         var g = parseInt(new URLSearchParams(location.search).get('g') || '3', 10);
         return GROUP_DEFS[g] ? g : 3;
     })();
     var order = [];
+    (function () {
+        var st = document.getElementById('skipReasonText');
+        if (st) {
+            st.addEventListener('focus', function () {
+                var r = document.getElementById('skipReasonOther');
+                if (r) { r.checked = true; }
+            });
+        }
+    })();
     var INPUT_STYLE = 'margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit';
     var CHIP_STYLE = 'border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer';
     function esc(t) { return String(t).replace(/'/g, "\\'"); }
@@ -267,8 +280,13 @@
         if (badge) { badge.textContent = '作業中: ' + def.label.replace('グループ', 'グループ'); }
     }
     renderFields();
+    (function () {
+        var rc = document.getElementById('remainCount');
+        if (rc) { rc.textContent = GROUP_REMAIN[groupNo].toLocaleString('en-US'); }
+    })();
 
     document.addEventListener('keydown', function (e) {
+        if (e.isComposing || e.keyCode === 229) { return; }  // IME変換中のEnter/Escを無視
         var inInput = e.target && e.target.tagName === 'INPUT';
         if (e.key === 'Enter' && e.ctrlKey) {
             e.preventDefault();
@@ -285,8 +303,13 @@
             var i = order.indexOf(e.target.id);
             if (i < 0) { return; }
             e.preventDefault();
-            var next = document.getElementById(order[(i + 1) % order.length]);
-            if (next) { next.focus(); }
+            if (i === order.length - 1) {
+                var btn = document.getElementById('btnConfirm');
+                if (btn) { btn.focus(); }
+            } else {
+                var next = document.getElementById(order[i + 1]);
+                if (next) { next.focus(); }
+            }
             return;
         }
         if (!inInput) {
