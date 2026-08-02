@@ -12,13 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
-    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+<div class="relative flex flex-col overflow-x-hidden" style="min-width:1280px;height:100vh;overflow:hidden">
     <div id="header-placeholder"></div>
-    <div class="flex flex-1" style="padding-top:56px">
-        <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:232px">
-        <div style="padding:14px 20px 28px;display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box">
+    <div class="flex flex-1" style="min-height:0">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:0;min-height:0;display:flex;flex-direction:column">
+        <div style="flex:1;min-height:0;padding:12px 20px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
@@ -32,7 +30,7 @@
               <span style="color:#8a93a5">確定 Ctrl+Enter ・ 候補クリックで複写</span>
             </div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:16px">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px">
             <div style="background:#1f2733;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #303c4f">
                 <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
@@ -42,23 +40,23 @@
                   <span title="回転 (R)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
-              <div style="display:flex;gap:24px;justify-content:center;padding:16px 24px">
+              <div style="display:flex;gap:24px;justify-content:center;padding:10px 24px">
                 <div style="width:40%;max-width:480px">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">表</div>
                   <div style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:230px;border-radius:4px;display:block">
+                    <img src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:168px;border-radius:4px;display:block">
                   </div>
                 </div>
                 <div style="width:40%;max-width:480px">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">裏</div>
                   <div style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:230px;border-radius:4px;display:block">
+                    <img src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:168px;border-radius:4px;display:block">
                   </div>
                 </div>
               </div>
             </div>
-            <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
-              <div style="flex:1;overflow-x:auto">
+            <div style="flex:1;min-height:0;background:#fff;border:1px solid #e2e6ed;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:1;min-height:0;overflow-x:auto;overflow-y:auto">
                 <div style="min-width:840px">
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:0 14px;height:40px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577">
                     <span>項目</span><span>OCR結果</span><span>DB値</span><span>入力1</span><span>入力2</span><span>入力3</span><span>修正入力</span><span>完成内容</span>

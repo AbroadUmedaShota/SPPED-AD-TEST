@@ -12,13 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
-    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+<div class="relative flex flex-col overflow-x-hidden" style="min-width:1280px;height:100vh;overflow:hidden">
     <div id="header-placeholder"></div>
-    <div class="flex flex-1" style="padding-top:56px">
-        <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1" style="margin-left:232px">
-        <div style="padding:14px 20px 28px;display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box">
+    <div class="flex flex-1" style="min-height:0">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1" style="margin-left:0;min-height:0;display:flex;flex-direction:column">
+        <div style="flex:1;min-height:0;padding:12px 20px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
             <div style="display:flex;align-items:center;gap:14px">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">‹ 一覧へ戻る</button>
@@ -32,7 +30,7 @@
               <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
             </div>
           </div>
-          <div style="flex:1;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
+          <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
             <div style="background:#1f2733;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #303c4f">
                 <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
@@ -43,17 +41,17 @@
                   <span title="回転 (R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px 24px;overflow-y:auto">
-                <div style="width:80%">
+              <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:14px 20px">
+                <div style="flex:1;min-height:0;display:flex;flex-direction:column">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">表</div>
-                  <div class="card-zoom" style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden">
-                    <img id="imgFront" src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+                  <div class="card-zoom" style="flex:1;min-height:0;background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden">
+                    <img id="imgFront" src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
-                <div id="backFace" style="width:80%">
+                <div id="backFace" style="flex:1;min-height:0;display:flex;flex-direction:column">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">裏</div>
-                  <div class="card-zoom" style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden">
-                    <img id="imgBack" src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+                  <div class="card-zoom" style="flex:1;min-height:0;background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden">
+                    <img id="imgBack" src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
               </div>
@@ -194,7 +192,7 @@
             img.style.cursor = 'zoom-in';
         });
         if (fr) { fr.src = c.front; }
-        if (bf) { bf.style.display = c.back ? '' : 'none'; }
+        if (bf) { bf.style.display = c.back ? 'flex' : 'none'; }
         if (bk && c.back) { bk.src = c.back; }
         var ocr = document.getElementById('ocrChip');
         if (ocr) { ocr.textContent = c.ocr; }
