@@ -111,7 +111,9 @@ body.sidebar-locked {
 }
 
 /* 一覧行ホバー(prototype 準拠) */
-.proto-row-hover:hover { background-color: #F7F9FD; }
+.proto-row-hover.is-tinted:hover { filter: brightness(0.97); }
+
+.proto-row-hover:not(.is-tinted):hover { background-color: #F7F9FD; }
 
 /* 旧ダッシュボード用CSS(service-top-style.css)のレイアウト干渉リセット */
 /* .sidebar の折りたたみ(4rem)+hover展開、body/main-contentの4remパディングを管理画面では無効化する */
