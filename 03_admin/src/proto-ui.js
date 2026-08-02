@@ -33,7 +33,7 @@
         // 無ければ主ボタン(最後のbutton)、それも無ければその他のフォーカス可能要素
         var first = m.querySelector('[data-initial-focus]');
         if (!first) {
-            var btns = m.querySelectorAll('button');
+            var btns = Array.prototype.filter.call(m.querySelectorAll('button'), function (b) { return !b.disabled; });
             first = btns.length ? btns[btns.length - 1] : m.querySelector('[href], input, textarea, select, [tabindex]');
         }
         if (first) { first.focus(); }
@@ -137,6 +137,13 @@
         var act = pager.querySelector('button[data-page="' + n + '"]');
         var lbl = document.getElementById(listId + '-range');
         if (act && lbl && act.getAttribute('data-range')) { lbl.textContent = act.getAttribute('data-range'); }
+        // 端に達したページ送り矢印は淡色化(動作は元々no-op)
+        var nums = Array.prototype.map.call(pager.querySelectorAll('button[data-page]'), function (b) { return parseInt(b.getAttribute('data-page'), 10); });
+        var steppers = Array.prototype.filter.call(pager.querySelectorAll('button'), function (b) { return !b.hasAttribute('data-page'); });
+        if (steppers.length === 2 && nums.length) {
+            steppers[0].style.color = (n <= Math.min.apply(null, nums)) ? '#c3c9d4' : '#374151';
+            steppers[1].style.color = (n >= Math.max.apply(null, nums)) ? '#c3c9d4' : '#374151';
+        }
     };
 
     window.pPageStep = function (listId, delta) {
@@ -262,5 +269,25 @@
     document.addEventListener('click', function (e) {
         var t = e.target;
         if (t && t.classList && t.classList.contains('proto-modal')) { window.pCloseAll(); }
+    });
+
+    // 初期化: ページャの初期状態適用と、理由必須ボタン(data-requires)の非活性制御
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[id$="-pager"]').forEach(function (pager) {
+            var listId = pager.id.slice(0, -6);
+            if (document.getElementById(listId)) { window.pPage(listId, parseInt(pager.getAttribute('data-current') || '1', 10)); }
+        });
+        document.querySelectorAll('button[data-requires]').forEach(function (btn) {
+            var inp = document.getElementById(btn.getAttribute('data-requires'));
+            if (!inp) { return; }
+            function sync() {
+                var ok = !!inp.value.trim();
+                btn.disabled = !ok;
+                btn.style.opacity = ok ? '' : '0.55';
+                btn.style.cursor = ok ? 'pointer' : 'default';
+            }
+            inp.addEventListener('input', sync);
+            sync();
+        });
     });
 })();

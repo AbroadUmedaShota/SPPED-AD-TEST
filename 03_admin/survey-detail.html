@@ -27,7 +27,7 @@
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <span style="font-size:16px;font-weight:700">人事・労務フォーラム 来場者アンケート</span>
               <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">SV-10262</span>
-              <span style="background:#f0f1f4;color:#5b6577;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:700">会期前</span>
+              <span class="status-badge status-inactive">会期前</span>
               <span style="font-size:12px;color:#5b6577">申込プラン: 通常</span>
               <span style="font-size:12px;color:#5b6577">対象ユーザー: <a href="user-detail.html">U-1049 グロースパートナーズ(株)</a></span>
             </div>
@@ -71,7 +71,7 @@
           <button onclick="pOpen('mDangerEdit')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">公開後のアンケート変更</button>
           <button onclick="pOpen('mDangerDeleteAnswer')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">個別回答の削除</button>
           <button onclick="pOpen('mConfirmForceStop')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">強制停止</button>
-          <button onclick="pOpen('mDangerUpload')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">完了データの手動アップロード</button>
+          <button onclick="pOpen('mDangerUpload')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">完了データの手動アップロード</button>
         </div>
                 <div style="margin-top:8px;font-size:11px;color:#8a6414;line-height:1.7">各操作は専用の確認画面で実行理由の入力が必須となり、監査ログに記録されます。</div>
       </div>
@@ -94,7 +94,7 @@
 <div id="mDl" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:480px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10250 食品・飲料展</span></span>
+      <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム</span></span>
       <span onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px;display:flex;flex-direction:column;gap:10px">
@@ -109,20 +109,23 @@
       </button>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">ダウンロードは「データ持ち出し」として監査ログに記録されます(§3)。</div>
     </div>
+    <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
+      <button data-initial-focus onclick="pClose('mDl')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+    </div>
   </div>
 </div>
 
 <div id="mThanksMail" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">お礼メールの内容確認<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10259 ITインフラEXPO 2026</span></span>
+      <span style="font-size:15px;font-weight:700">お礼メールの内容確認<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
       <span onclick="pClose('mThanksMail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px">
       <div style="font-size:11.5px;font-weight:700;color:#5b6577">件名</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px">【ITインフラEXPO 2026】ご来場ありがとうございました</div>
+      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px">【人事・労務フォーラム】ご来場ありがとうございました</div>
       <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">本文</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>ITインフラEXPO 2026 出展事務局</div>
+      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
       <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。管理者側での内容編集の可否は§11で要確定。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
@@ -147,12 +150,12 @@
           <label style="display:flex;align-items:center;gap:8px"><input type="checkbox">お礼メール設定</label>
         </div>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rEdit" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">実行するとこの画面の基本設定が編集可能になります(通常編集とは別の「公開後変更」として監査ログに記録)。モックでは演出のみです。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mDangerEdit')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mDangerEdit')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
+      <button data-initial-focus onclick="pClose('mDangerEdit')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rEdit" onclick="pClose('mDangerEdit')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
     </div>
   </div>
 </div>
@@ -166,19 +169,19 @@
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;gap:8px;align-items:flex-end">
         <label style="display:block;flex:1"><span style="font-size:11.5px;font-weight:700;color:#5b6577">回答ID</span><input value="#8821" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:9px 16px" title="モック: 検索結果は下に固定表示">検索</button>
+        <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="モック: 検索結果は下に固定表示">検索</button>
       </div>
       <div style="border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.9;background:#f7f8fb">
         <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">回答日時</span><span style="font-variant-numeric:tabular-nums">2026/08/03 14:02</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">名刺</span><span>山田 太郎((株)サンプル商事・営業部)</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">データ化</span><span>完了(照合済み)</span></div>
       </div>
-      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">名刺データの削除依頼対応を想定した操作です。過去DB・名刺画像への波及削除の要否と方式は開発へ要確認(シートI列)。削除した回答は復元できません。</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">名刺データの削除依頼対応を想定した操作です(この検索結果は会期後アンケートの場合の表示例)。過去DB・名刺画像への波及削除の要否と方式は開発へ要確認(シートI列)。削除した回答は復元できません。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rDel" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mDangerDeleteAnswer')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mDangerDeleteAnswer')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答を削除する</button>
+      <button data-initial-focus onclick="pClose('mDangerDeleteAnswer')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rDel" onclick="pClose('mDangerDeleteAnswer')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答を削除する</button>
     </div>
   </div>
 </div>
@@ -191,29 +194,29 @@
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="font-size:12.5px;color:#5b6577;line-height:1.8">入力画面が使えない等の不具合時に、Excel等で直接作成した完成データを取り込む非常口です。通常は照合完了で自動反映されるため、平常時は使用しません。</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">完成データファイル(CSV)</span><input type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;padding:8px 12px"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">完成データファイル(CSV)</span><input type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit"></label>
       <label style="display:block;max-width:260px"><span style="font-size:11.5px;font-weight:700;color:#5b6577">取込モード</span><select style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;padding:9px 10px;color:#1f2733"><option>全件置換</option><option>差分追記</option></select><span style="font-size:11px;color:#8a93a5">取込モードの既定・許可範囲は※要確定</span></label>
       <div style="border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:12px;color:#5b6577;background:#f7f8fb">取込プレビュー(モック): 412件を検出・ヘッダー整合OK・重複0件</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rUp" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mDangerUpload')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mDangerUpload')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取込を実行する</button>
+      <button data-initial-focus onclick="pClose('mDangerUpload')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rUp" onclick="pClose('mDangerUpload')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取込を実行する</button>
     </div>
   </div>
 </div>
 
 <div id="mConfirmForceStop" class="proto-modal" hidden>
-  <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
-      <span style="font-size:15px;font-weight:700">アンケートを強制停止しますか?</span>
+  <div class="proto-dialog" style="width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">アンケートを強制停止しますか?<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
       <span onclick="pClose('mConfirmForceStop')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">対象アンケートの回答受付を即時停止します。トラブル時の緊急措置です。再開には管理者の操作が必要で、操作は理由とあわせて監査ログに記録されます。</div>
-    <div style="padding:14px 22px 0"><label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label></div>
+    <div style="padding:14px 22px 0"><label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rStop" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label></div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button onclick="pClose('mConfirmForceStop')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmForceStop')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">強制停止する</button>
+      <button data-initial-focus onclick="pClose('mConfirmForceStop')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rStop" onclick="pClose('mConfirmForceStop')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">強制停止する</button>
     </div>
   </div>
 </div>
@@ -225,7 +228,7 @@
       <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
       <span onclick="pClose('mConfirmSaveSurvey')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートの基本設定(タイトル・会期・納期区分)を更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button onclick="pClose('mConfirmSaveSurvey')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
       <button onclick="pClose('mConfirmSaveSurvey')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>

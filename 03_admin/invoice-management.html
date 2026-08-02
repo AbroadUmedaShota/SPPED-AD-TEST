@@ -22,36 +22,36 @@
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">請求書管理</span></div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">請求書管理</h2>
-              <span style="font-size:12px;color:#6b7484">1行 = 1通(アカウント × 発行月)・既定の並び順: 請求月の降順</span>
+              <span style="font-size:12px;color:#6b7484">1行 = 1通(アカウント × 発行月)・既定の並び順: 発行月の降順</span>
             </div>
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <input placeholder="会社名(部分一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
-              <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>請求月: すべて</option><option>2026/07</option><option>2026/06</option><option>2026/05</option></select>
+              <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>発行月: すべて</option><option>2026/07</option><option>2026/06</option><option>2026/05</option></select>
               <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
               <button style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
             </div>
             <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
-              <div style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
-                <span style="color:#3467d6">請求月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">お礼メール送信費用</span><span style="text-align:right">請求合計</span><span></span>
+              <div style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+                <span title="既定の並び順(ソートはモック未配線)" style="color:#5b6577">発行月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">お礼メール送信費用</span><span style="text-align:right">請求合計</span><span></span>
               </div>
-              <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+              <div class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/07</span><span>(株)マーケットビジョン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">1,140 円</span><span style="text-align:right;font-weight:700">11,140 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
-              <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+              <div class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/07</span><span>(株)テックブリッジ</span><span style="text-align:right">10,000 円</span><span style="text-align:right">820 円</span><span style="text-align:right;font-weight:700">10,820 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
-              <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+              <div class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/07</span><span>グロースパートナーズ(株)</span><span style="text-align:right">10,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">10,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
-              <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+              <div class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/06</span><span>(株)マーケットビジョン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">580 円</span><span style="text-align:right;font-weight:700">10,580 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
-              <div onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:140px minmax(260px,1fr) 200px 220px 200px 140px;align-items:center;padding:0 16px;height:50px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+              <div class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/06</span><span>(株)イベントプラス</span><span style="text-align:right">10,000 円</span><span style="text-align:right">0 円</span><span style="text-align:right;font-weight:700">10,000 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
               </div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 5 件中 1〜5 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 5 件中 1〜5 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select title="表示件数の切替はモック未配線" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span><span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">›</span></div>
             </div>
             <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">アンケート単位の請求との対応関係、請求管理との1本化は§11で要確定。</div>
