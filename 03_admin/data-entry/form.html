@@ -28,8 +28,8 @@
               <span style="font-size:11px;font-weight:700;color:#2b57b8;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">作業中: グループ③ 会社・部署・役職</span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
-              <span>残りの作業可能件数 <strong style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
-              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <span>残りの作業可能件数 <strong id="remainCount" style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
+              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
             </div>
           </div>
           <div style="flex:1;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
@@ -47,13 +47,13 @@
                 <div style="width:80%">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">表</div>
                   <div class="card-zoom" style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+                    <img id="imgFront" src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
-                <div style="width:80%">
+                <div id="backFace" style="width:80%">
                   <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">裏</div>
                   <div class="card-zoom" style="background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+                    <img id="imgBack" src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:270px;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
               </div>
@@ -63,7 +63,7 @@
                 <div style="font-size:11.5px;color:#8a93a5">この個票では担当グループの項目のみを入力します。グループ横断の一括入力はLv2以上の「グループ一括入力」で行います。</div>
                 <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">会社名</div>
                 <input id="inCompany" title="Enterで次の欄へ / 読み取れない場合は「〓」" placeholder="◯◯株式会社" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit;outline:2px solid #3467d6;outline-offset:1px">
-                <div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: <span title="クリックで入力欄へ複写" onclick="pSet('inCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">アブロード株式会社</span><span style="color:#8a93a5">(クリックで複写・※あったほうが良い)</span></div>
+                <div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: <span id="ocrChip" title="クリックで入力欄へ複写" onclick="pSet('inCompany', this.textContent)" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">アブロード株式会社</span><span style="color:#8a93a5">(クリックで複写・※あったほうが良い)</span></div>
                 <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span onclick="pChipEx('inCompany','株式会社',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">株式会社</span><span onclick="pChipEx('inCompany','(株)',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">(株)</span><span onclick="pChipEx('inCompany','有限会社',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">有限会社</span><span onclick="pChipEx('inCompany','(有)',['株式会社','(株)','㈱','有限会社','(有)','合同会社'])" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">(有)</span><span onclick="pSet('inCompany','〓')" title="読み取れない場合" style="border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer">〓</span></div>
                 <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:16px">部署名</div>
                 <input id="inDept" placeholder="◯◯部" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit">
@@ -76,8 +76,8 @@
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
                 <span style="font-size:11.5px;color:#5b6577">読み取れない項目は「〓」を入力(空欄では確定できない仕様は※暫定)</span>
                 <div style="display:flex;gap:10px">
-                  <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="ショートカット: Esc">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
-                  <button id="btnConfirm" title="ショートカット: Ctrl+Enter" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
+                  <button onclick="pOpen('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="ショートカット: Esc(理由を選択してスキップ)">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
+                  <button id="btnConfirm" onclick="pNextCard()" title="ショートカット: Ctrl+Enter" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
               </div>
             </div>
@@ -87,6 +87,30 @@
         </main>
     </div>
 </div>
+
+<!-- スキップ理由 -->
+<div id="mSkip" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">スキップの理由<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">選択して次の名刺へ進みます</span></span>
+      <span onclick="pClose('mSkip')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:10px">
+      <label style="display:flex;align-items:center;gap:10px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer"><input type="radio" name="skipReason" checked>名刺ではない</label>
+      <label style="display:flex;align-items:center;gap:10px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer"><input type="radio" name="skipReason">読み取れない(不鮮明・破損など)</label>
+      <label style="display:flex;flex-direction:column;gap:8px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer">
+        <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="skipReason">その他</span>
+        <input id="skipReasonText" placeholder="理由を入力(その他を選択した場合は必須)" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:inherit">
+      </label>
+      <div style="font-size:11.5px;color:#8a93a5;line-height:1.7">スキップした名刺は全体キューへ戻り、他のオペレーターへ出題されます。同一名刺が3回スキップされると出題対象から除外されます。理由は監査ログに記録されます。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mSkip');pNextCard()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">スキップして次へ</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
@@ -149,6 +173,46 @@
         el.value = v + token;
         el.focus();
     };
+    // 出題カード(モック2枚)。確定・スキップで次のカードへ送る
+    var CARDS = [
+        { front: '../BY-221_照合画面/BY-223/dummy_card_front.png', back: '../BY-221_照合画面/BY-223/dummy_card_back.png', ocr: 'アブロード株式会社' },
+        { front: '../assets/meishi_sample2.png', back: null, ocr: '株式会社サンプル商事' }
+    ];
+    var cardIdx = 0;
+    window.pNextCard = function () {
+        cardIdx = (cardIdx + 1) % CARDS.length;
+        var c = CARDS[cardIdx];
+        var fr = document.getElementById('imgFront');
+        var bk = document.getElementById('imgBack');
+        var bf = document.getElementById('backFace');
+        [fr, bk].forEach(function (img) {
+            if (!img) { return; }
+            img.dataset.rot = '0';
+            img.dataset.pinned = '';
+            img.style.transform = '';
+            img.style.outline = '';
+            img.style.cursor = 'zoom-in';
+        });
+        if (fr) { fr.src = c.front; }
+        if (bf) { bf.style.display = c.back ? '' : 'none'; }
+        if (bk && c.back) { bk.src = c.back; }
+        var ocr = document.getElementById('ocrChip');
+        if (ocr) { ocr.textContent = c.ocr; }
+        ['inCompany', 'inDept', 'inRole'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.value = ''; }
+        });
+        var st = document.getElementById('skipReasonText');
+        if (st) { st.value = ''; }
+        var rc = document.getElementById('remainCount');
+        if (rc) {
+            var n = parseInt(rc.textContent.replace(/,/g, ''), 10) - 1;
+            rc.textContent = n.toLocaleString('en-US');
+        }
+        var first = document.getElementById('inCompany');
+        if (first) { first.focus(); }
+    };
+
     var order = ['inCompany', 'inDept', 'inRole'];
     document.addEventListener('keydown', function (e) {
         var inInput = e.target && e.target.tagName === 'INPUT';
@@ -156,6 +220,11 @@
             e.preventDefault();
             var b = document.getElementById('btnConfirm');
             if (b) { b.style.filter = 'brightness(0.85)'; setTimeout(function () { b.style.filter = ''; }, 180); }
+            window.pNextCard();
+            return;
+        }
+        if (e.key === 'Escape' && !document.querySelector('.proto-modal:not([hidden])')) {
+            window.pOpen('mSkip');
             return;
         }
         if (e.key === 'Enter' && inInput) {
