@@ -316,7 +316,7 @@
             }
             return;
         }
-        if (e.key === '?' && !inField) {
+        if (e.key === '?' && !inField && !e.ctrlKey && !e.metaKey && !e.altKey) {
             var ms = document.getElementById('mShortcuts');
             if (ms && !ms.hidden) { e.preventDefault(); window.pClose('mShortcuts'); return; }
             if (!modalOpen) { e.preventDefault(); window.pOpen('mShortcuts'); }

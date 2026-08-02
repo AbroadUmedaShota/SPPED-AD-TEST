@@ -20,7 +20,11 @@
         var wasOpen = document.querySelector('.proto-modal:not([hidden])');
         document.querySelectorAll('.proto-modal').forEach(function (m) { m.hidden = true; });
         var m = document.getElementById(id);
-        if (!m) { return; }
+        if (!m) {
+            document.body.style.overflow = '';
+            setBackgroundInert(false);
+            return;
+        }
         if (!wasOpen) { lastFocused = document.activeElement; }
         m.hidden = false;
         document.body.style.overflow = 'hidden';
