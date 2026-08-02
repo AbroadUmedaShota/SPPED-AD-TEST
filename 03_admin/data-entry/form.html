@@ -21,13 +21,14 @@
             <div style="display:flex;align-items:center;gap:14px">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">‹ 一覧へ戻る</button>
               <h2 style="margin:0;font-size:18px;font-weight:700;white-space:nowrap">入力個票</h2>
-              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums;white-space:nowrap" title="入力対象が属するアンケート(オペレーターへ見せる情報はIDのみ)">アンケートID SV-10238</span>
-              <span style="font-size:11px;font-weight:700;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:2px 8px;background:#fdf6ec;white-space:nowrap">オンデマンド</span>
+              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums;white-space:nowrap" title="入力対象が属するアンケート(オペレーターへ見せる情報はIDのみ)"><span id="svBadge">アンケートID SV-10238</span></span>
+              <span style="font-size:11px;font-weight:700;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:2px 8px;background:#fdf6ec;white-space:nowrap"><span id="planBadge">オンデマンド</span></span>
               <span id="groupBadge" style="font-size:11px;font-weight:700;color:#2b57b8;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">作業中: グループ③ 会社・部署・役職</span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:#5b6577">
               <span>残りの作業可能件数 <strong id="remainCount" style="font-size:15px;font-variant-numeric:tabular-nums">1,283</strong> 件</span>
-              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動(最終欄では確定ボタンへ)&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;F2: フォーカス中の欄へOCR候補を複写(※暫定割当)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <a id="undoLink" hidden href="#u" onclick="pUndoLast();return false" style="font-size:11.5px;color:#c23934;font-weight:700;white-space:nowrap">↩ 直前の操作を取り消す</a>
+              <span title="入力個票の共通ショートカット(全グループ共通)&#10;Enter: 次の欄へ移動(最終欄では確定ボタンへ)&#10;Ctrl+Enter: 確定して次の名刺&#10;Esc: スキップ(理由を選択して次へ)&#10;F2: フォーカス中の欄へOCR候補を複写(※暫定割当)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" onclick="pOpen('mShortcuts')" style="color:#8a93a5;cursor:pointer;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(400px,44%) 1fr;gap:16px;align-items:stretch">
@@ -36,9 +37,9 @@
                 <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
                 <div style="display:flex;gap:6px;align-items:center">
                   <span id="zoomLabel" style="color:#98a3b8;font-size:11px;margin-right:4px">ホバー拡大・クリック固定 ×2.0</span>
-                  <span title="拡大率を上げる (+)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
-                  <span title="拡大率を下げる (−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
-                  <span title="回転 (R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
+                  <span title="拡大率を上げる (+ / 入力中は Alt++)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
+                  <span title="拡大率を下げる (− / 入力中は Alt+−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
+                  <span title="回転 (R / 入力中は Alt+R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
               <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:14px 20px">
@@ -65,7 +66,7 @@
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
                 <span style="font-size:11.5px;color:#5b6577">読み取れない項目は「〓」を入力(空欄では確定できない仕様は※暫定)</span>
                 <div style="display:flex;gap:10px">
-                  <button onclick="pOpen('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="ショートカット: Esc(理由を選択してスキップ)">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
+                  <button id="btnSkip" onclick="pOpen('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="ショートカット: Esc(理由を選択してスキップ)">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
                   <button id="btnConfirm" onclick="pNextCard()" title="ショートカット: Ctrl+Enter" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
               </div>
@@ -89,13 +90,38 @@
       <label style="display:flex;align-items:center;gap:10px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer"><input type="radio" name="skipReason">読み取れない(不鮮明・破損など)</label>
       <label style="display:flex;flex-direction:column;gap:8px;border:1px solid #c8cdd8;border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer">
         <span style="display:flex;align-items:center;gap:10px"><input type="radio" name="skipReason" id="skipReasonOther">その他</span>
-        <input id="skipReasonText" placeholder="理由を入力(その他を選択した場合は必須)" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:inherit">
+        <input id="skipReasonText" placeholder="理由を入力(その他を選択した場合は必須)" spellcheck="false" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:inherit">
       </label>
       <div style="font-size:11.5px;color:#8a93a5;line-height:1.7">スキップした名刺は全体キューへ戻り、他のオペレーターへ出題されます。同一名刺が3回スキップされると出題対象から除外されます。理由の記録先(監査ログの記録対象とするか)は※要確定です。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mSkip');pNextCard()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">スキップして次へ</button>
+      <button onclick="pSkipConfirm()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">スキップして次へ</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ショートカット一覧 -->
+<div id="mShortcuts" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">ショートカット一覧<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">全グループ共通</span></span>
+      <span onclick="pClose('mShortcuts')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:16px 22px;display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:12.5px;align-items:center">
+      <span style="font-weight:700">Enter</span><span>次の欄へ移動(最終欄では確定ボタンへ)</span>
+      <span style="font-weight:700">Ctrl + Enter</span><span>確定して次の名刺へ</span>
+      <span style="font-weight:700">Esc</span><span>スキップ(理由を選択)</span>
+      <span style="font-weight:700">F2</span><span>フォーカス中の欄へOCR候補を複写(※暫定割当)</span>
+      <span style="font-weight:700">Ctrl + Z</span><span>複写・チップ入力を直前の値に戻す</span>
+      <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
+      <span style="font-weight:700">R</span><span>画像を90度回転(入力中は Alt+R)</span>
+      <span style="font-weight:700">画像ホバー / クリック</span><span>カーソル位置を拡大 / その位置で固定(再クリックで解除)</span>
+      <span style="font-weight:700">?</span><span>この一覧を表示</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
+      <button onclick="pClose('mShortcuts')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
     </div>
   </div>
 </div>
@@ -104,97 +130,131 @@
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
 <script>
-// 入力個票の作業補助(モック): ホバー追従拡大・定型チップの排他入力・キーボードナビ
+// 入力個票の作業補助(モック): グループ別レンダリング・カード送り・キーボードナビ
+// 画像操作(ホバー拡大・クリック固定・回転)は proto-ui.js の pInitCardZoom を使用
 (function () {
     'use strict';
-    var zoom = 2, current = null;
-    function refreshLabel() {
-        var el = document.getElementById('zoomLabel');
-        if (el) { el.textContent = 'ホバー拡大・クリック固定 ×' + zoom.toFixed(1); }
-    }
-    window.pZoomDelta = function (d) {
-        zoom = Math.min(4, Math.max(1.5, Math.round((zoom + d) * 10) / 10));
-        refreshLabel();
-    };
-    window.pRotate = function () {
-        var img = current || document.querySelector('.card-zoom img');
-        if (!img) { return; }
-        var r = (parseInt(img.dataset.rot || '0', 10) + 90) % 360;
-        img.dataset.rot = String(r);
-        img.style.transform = 'rotate(' + r + 'deg)';
-    };
-    document.querySelectorAll('.card-zoom img').forEach(function (img) {
-        img.addEventListener('mouseenter', function () { current = img; });
-        img.addEventListener('mousemove', function (e) {
-            if (img.dataset.pinned === '1') { return; }
-            var rc = img.getBoundingClientRect();
-            img.style.transformOrigin = ((e.clientX - rc.left) / rc.width * 100) + '% ' + ((e.clientY - rc.top) / rc.height * 100) + '%';
-            img.style.transform = 'scale(' + zoom + ') rotate(' + (img.dataset.rot || 0) + 'deg)';
-        });
-        img.addEventListener('mouseleave', function () {
-            if (img.dataset.pinned === '1') { return; }
-            img.style.transform = 'rotate(' + (img.dataset.rot || 0) + 'deg)';
-        });
-        // クリックでその位置・倍率のまま固定。再クリックで解除しホバー追従へ戻る
-        img.addEventListener('click', function () {
-            if (img.dataset.pinned === '1') {
-                img.dataset.pinned = '';
-                img.style.outline = '';
-                img.style.cursor = 'zoom-in';
-            } else {
-                img.dataset.pinned = '1';
-                img.style.outline = '2px solid #3467d6';
-                img.style.cursor = 'zoom-out';
-            }
-        });
-    });
-    // 同じ括り(group)の語は置換して二重入力を防ぐ。同語の再クリックは解除
-    window.pChipEx = function (inputId, token, group) {
+    window.pInitCardZoom();
+
+    // 同じ括り(group)の語の排他入力。exact=trueは欄全体が対象(役職・部署)、falseは部分置換(法人格)
+    window.pChipEx = function (inputId, token, group, exact) {
         var el = document.getElementById(inputId);
         if (!el) { return; }
         var v = el.value;
-        if (v.indexOf(token) >= 0) { el.value = v.replace(token, ''); el.focus(); return; }
-        for (var i = 0; i < group.length; i++) {
-            if (group[i] !== token && v.indexOf(group[i]) >= 0) {
-                el.value = v.replace(group[i], token); el.focus(); return;
+        if (exact) {
+            var t = v.trim();
+            if (t === token) { window.pApplyValue(el, ''); el.focus(); return; }
+            if (group.indexOf(t) >= 0) { window.pApplyValue(el, token); el.focus(); return; }
+            window.pAppend(inputId, token);  // 欄全体が既知の語でない場合はカーソル位置へ挿入(複合役職を壊さない)
+            return;
+        }
+        if (v.indexOf(token) >= 0) {
+            var at = v.indexOf(token);
+            window.pApplyValue(el, v.slice(0, at) + v.slice(at + token.length));
+            el.focus();
+            if (el.setSelectionRange) { el.setSelectionRange(at, at); }
+            return;
+        }
+        var sorted = group.slice().sort(function (a, b) { return b.length - a.length; });
+        for (var i = 0; i < sorted.length; i++) {
+            var g = sorted[i];
+            if (g !== token && v.indexOf(g) >= 0) {
+                var idx = v.indexOf(g);
+                window.pApplyValue(el, v.slice(0, idx) + token + v.slice(idx + g.length));
+                el.focus();
+                if (el.setSelectionRange) { el.setSelectionRange(idx + token.length, idx + token.length); }
+                return;
             }
         }
-        window.pAppend(inputId, token);  // 未該当時はカーソル位置へ挿入(前株にも対応)
+        window.pAppend(inputId, token);
     };
+
     // 出題カード(モック2枚)。確定・スキップで次のカードへ送る
     var CARDS = [
-        { front: '../BY-221_照合画面/BY-223/dummy_card_front.png', back: '../BY-221_照合画面/BY-223/dummy_card_back.png', ocr: 'アブロード株式会社' },
-        { front: '../assets/meishi_sample2.png', back: null, ocr: '株式会社サンプル商事' }
+        { front: '../BY-221_照合画面/BY-223/dummy_card_front.png', back: '../BY-221_照合画面/BY-223/dummy_card_back.png', sv: 'SV-10238', plan: 'オンデマンド' },
+        { front: '../assets/meishi_sample2.png', back: null, sv: 'SV-10236', plan: '特急' }
     ];
     var cardIdx = 0;
-    window.pNextCard = function () {
-        cardIdx = (cardIdx + 1) % CARDS.length;
+    var lastSnapshot = null;
+    var undoTimer = null;
+
+    function applyCard() {
         var c = CARDS[cardIdx];
         var fr = document.getElementById('imgFront');
         var bk = document.getElementById('imgBack');
         var bf = document.getElementById('backFace');
-        [fr, bk].forEach(function (img) {
-            if (!img) { return; }
-            img.dataset.rot = '0';
-            img.dataset.pinned = '';
-            img.style.transform = '';
-            img.style.outline = '';
-            img.style.cursor = 'zoom-in';
-        });
+        window.pResetCardZoom();
         if (fr) { fr.src = c.front; }
         if (bf) { bf.style.display = c.back ? 'flex' : 'none'; }
         if (bk && c.back) { bk.src = c.back; }
+        var sv = document.getElementById('svBadge');
+        if (sv) { sv.textContent = 'アンケートID ' + c.sv; }
+        var pl = document.getElementById('planBadge');
+        if (pl) { pl.textContent = c.plan; }
+    }
+
+    function showUndoLink() {
+        var a = document.getElementById('undoLink');
+        if (!a) { return; }
+        a.hidden = false;
+        if (undoTimer) { clearTimeout(undoTimer); }
+        undoTimer = setTimeout(function () { a.hidden = true; }, 6000);
+    }
+
+    window.pNextCard = function () {
+        lastSnapshot = {
+            cardIdx: cardIdx,
+            remain: document.getElementById('remainCount') ? document.getElementById('remainCount').textContent : '',
+            values: order.map(function (id) { var el = document.getElementById(id); return el ? el.value : ''; })
+        };
+        window.pCloseAll();
+        cardIdx = (cardIdx + 1) % CARDS.length;
+        applyCard();
         renderFields();
         var st = document.getElementById('skipReasonText');
-        if (st) { st.value = ''; }
+        if (st) { st.value = ''; st.style.border = ''; }
         var rc = document.getElementById('remainCount');
         if (rc) {
             var n = Math.max(0, parseInt(rc.textContent.replace(/,/g, ''), 10) - 1);
             rc.textContent = n.toLocaleString('en-US');
             if (n === 0) { disableWork(); }
         }
+        showUndoLink();
         var first = document.getElementById(order[0]);
         if (first) { first.focus(); }
+    };
+
+    // 直前の確定・スキップを取り消して前の名刺と入力内容を復元する
+    window.pUndoLast = function () {
+        if (!lastSnapshot) { return; }
+        cardIdx = lastSnapshot.cardIdx;
+        applyCard();
+        enableWork();
+        renderFields();
+        order.forEach(function (id, i) {
+            var el = document.getElementById(id);
+            if (el) { el.value = lastSnapshot.values[i] || ''; }
+        });
+        var rc = document.getElementById('remainCount');
+        if (rc) { rc.textContent = lastSnapshot.remain; }
+        lastSnapshot = null;
+        var a = document.getElementById('undoLink');
+        if (a) { a.hidden = true; }
+        var first = document.getElementById(order[0]);
+        if (first) { first.focus(); }
+    };
+
+    // スキップ実行(その他選択時は理由必須)
+    window.pSkipConfirm = function () {
+        var other = document.getElementById('skipReasonOther');
+        var text = document.getElementById('skipReasonText');
+        if (other && other.checked && text && !text.value.trim()) {
+            text.style.border = '1px solid #c23934';
+            text.focus();
+            return;
+        }
+        window.pClose('mSkip');
+        window.pNextCard();
     };
 
     // 作業グループ①〜⑧の項目定義(ocrは[1枚目,2枚目]のサンプル値)
@@ -208,9 +268,9 @@
             { id: 'f1', label: '姓', ph: '山田', ocr: ['間野', '山田'] },
             { id: 'f2', label: '名', ph: '太郎', ocr: ['健介', '太郎'] }] },
         3: { label: 'グループ③ 会社・部署・役職', fields: [
-            { id: 'f1', label: '会社名', ph: '◯◯株式会社', ocr: ['レップ株式会社', '株式会社サンプル商事'], chips: ['株式会社', '(株)', '有限会社', '(有)'], ex: CORP },
-            { id: 'f2', label: '部署名', ph: '◯◯部', ocr: [null, '営業企画部'], chips: ['営業部', '総務部', '人事部'], ex: DEPT },
-            { id: 'f3', label: '役職名', ph: '◯◯部長', ocr: ['代表取締役', '課長'], chips: ['代表取締役', '部長', '課長'], ex: ROLE }] },
+            { id: 'f1', label: '会社名', ph: '◯◯株式会社', ocr: ['レップ株式会社', '株式会社サンプル商事'], chips: ['株式会社', '(株)', '有限会社', '(有)'], ex: CORP, exMode: 'sub' },
+            { id: 'f2', label: '部署名', ph: '◯◯部', ocr: [null, '営業企画部'], chips: ['営業部', '総務部', '人事部'], ex: DEPT, exMode: 'exact' },
+            { id: 'f3', label: '役職名', ph: '◯◯部長', ocr: ['代表取締役', '課長'], chips: ['代表取締役', '部長', '課長'], ex: ROLE, exMode: 'exact' }] },
         4: { label: 'グループ④ 郵便番号・住所', fields: [
             { id: 'f1', label: '郵便番号', ph: '100-0001', ocr: ['101-0052', '100-0001'] },
             { id: 'f2', label: '住所1', ph: '東京都◯◯区…', ocr: ['東京都千代田区神田小川町3-7-5', '東京都千代田区千代田1-2-3'], chips: ['東京都'] },
@@ -223,9 +283,9 @@
         6: { label: 'グループ⑥ URL', fields: [
             { id: 'f1', label: 'URL', ph: 'https://…', ocr: ['https://www.repinc.co.jp/', 'https://www.example.co.jp'], chips: ['https://', 'www.'] }] },
         7: { label: 'グループ⑦ その他メモ', fields: [
-            { id: 'f1', label: 'その他メモ', ph: '名刺記載のメモ・肩書補足など', ocr: [null, null] }] },
+            { id: 'f1', label: 'その他メモ', ph: '名刺記載のメモ・肩書補足など', ocr: [null, null], multiline: true }] },
         8: { label: 'グループ⑧ フリー入力', fields: [
-            { id: 'f1', label: 'フリー入力', ph: '', ocr: [null, 'STG TEST CARD - DUMMY DATA'] }] }
+            { id: 'f1', label: 'フリー入力', ph: '', ocr: [null, 'STG TEST CARD - DUMMY DATA'], multiline: true }] }
     };
     var GROUP_REMAIN = { 1: 547, 2: 298, 3: 1914, 4: 114, 5: 1078, 6: 182, 7: 0, 8: 86 };
     var groupNo = (function () {
@@ -233,6 +293,7 @@
         return GROUP_DEFS[g] ? g : 3;
     })();
     var order = [];
+
     (function () {
         var st = document.getElementById('skipReasonText');
         if (st) {
@@ -240,8 +301,10 @@
                 var r = document.getElementById('skipReasonOther');
                 if (r) { r.checked = true; }
             });
+            st.addEventListener('input', function () { st.style.border = ''; });
         }
     })();
+
     var INPUT_STYLE = 'margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit';
     var CHIP_STYLE = 'border:1px solid #c8cdd8;color:#374151;border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer';
     function esc(t) { return String(t).replace(/'/g, "\\'"); }
@@ -250,11 +313,15 @@
         var html = '';
         def.fields.forEach(function (fd, i) {
             html += '<div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:' + (i ? '16px' : '0') + '">' + fd.label + '</div>';
-            html += '<input id="' + fd.id + '" placeholder="' + (fd.ph || '') + '" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="' + INPUT_STYLE + '">';
+            if (fd.multiline) {
+                html += '<textarea id="' + fd.id + '" rows="4" placeholder="' + (fd.ph || '') + '" spellcheck="false" title="Enterで改行 / 確定は Ctrl+Enter / 読み取れない場合は「〓」" style="' + INPUT_STYLE + ';resize:vertical"></textarea>';
+            } else {
+                html += '<input id="' + fd.id + '" placeholder="' + (fd.ph || '') + '" spellcheck="false" title="Enterで次の欄へ / 読み取れない場合は「〓」" style="' + INPUT_STYLE + '">';
+            }
             var ocr = fd.ocr && fd.ocr[cardIdx];
             html += '<div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: ';
             if (ocr) {
-                html += '<span title="クリックで入力欄へ複写" onclick="pSet(\'' + fd.id + '\', this.textContent)" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">' + ocr + '</span>';
+                html += '<span tabindex="0" role="button" title="クリック(またはEnter)で入力欄へ複写" onclick="pSet(\'' + fd.id + '\', this.textContent)" style="cursor:pointer;text-decoration:underline dotted;color:#2b57b8">' + ocr + '</span>';
             } else {
                 html += '<span style="color:#8a93a5">—(読み取りなし)</span>';
             }
@@ -263,28 +330,52 @@
             var chips = '';
             (fd.chips || []).forEach(function (c) {
                 if (fd.ex) {
-                    chips += '<span onclick="pChipEx(\'' + fd.id + '\',\'' + esc(c) + '\',' + JSON.stringify(fd.ex).replace(/"/g, "'") + ')" title="クリックで入力(同じ括りの語は置換・再クリックで解除)" style="' + CHIP_STYLE + '">' + c + '</span>';
+                    var exact = fd.exMode === 'exact';
+                    var tip = exact ? 'クリックで入力(欄全体が同じ括りの語のときは置換・再クリックで解除)' : 'クリックで入力(同じ括りの語は置換・再クリックで解除)';
+                    chips += '<span tabindex="0" role="button" onclick="pChipEx(\'' + fd.id + '\',\'' + esc(c) + '\',' + JSON.stringify(fd.ex).replace(/"/g, "'") + ',' + exact + ')" title="' + tip + '" style="' + CHIP_STYLE + '">' + c + '</span>';
                 } else {
-                    chips += '<span onclick="pAppend(\'' + fd.id + '\',\'' + esc(c) + '\')" title="クリックでカーソル位置へ挿入" style="' + CHIP_STYLE + '">' + c + '</span>';
+                    chips += '<span tabindex="0" role="button" onclick="pAppend(\'' + fd.id + '\',\'' + esc(c) + '\')" title="クリックでカーソル位置へ挿入" style="' + CHIP_STYLE + '">' + c + '</span>';
                 }
             });
-            chips += '<span onclick="pSet(\'' + fd.id + '\',\'〓\')" title="読み取れない場合" style="' + CHIP_STYLE + '">〓</span>';
+            chips += '<span tabindex="0" role="button" onclick="pSet(\'' + fd.id + '\',\'〓\')" title="読み取れない場合(欄全体を〓にする)" style="' + CHIP_STYLE + '">〓</span>';
             html += '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' + chips + '</div>';
         });
         document.getElementById('fieldsArea').innerHTML = html;
         order = def.fields.map(function (fd) { return fd.id; });
         var badge = document.getElementById('groupBadge');
-        if (badge) { badge.textContent = '作業中: ' + def.label.replace('グループ', 'グループ'); }
+        if (badge) { badge.textContent = '作業中: ' + def.label; }
     }
     renderFields();
-    function disableWork() {
+
+    function setButtonState(disabled) {
         var bc = document.getElementById('btnConfirm');
-        if (bc) { bc.disabled = true; bc.style.background = '#eceef3'; bc.style.color = '#8a93a5'; bc.style.cursor = 'default'; bc.title = '出題できる名刺がありません'; }
-        document.querySelectorAll('button').forEach(function (btn) {
-            if (btn.textContent.indexOf('スキップ') >= 0) {
-                btn.disabled = true; btn.style.color = '#8a93a5'; btn.style.cursor = 'default'; btn.title = '出題できる名刺がありません';
-            }
-        });
+        if (bc) {
+            bc.disabled = disabled;
+            bc.style.background = disabled ? '#eceef3' : '#3467d6';
+            bc.style.color = disabled ? '#8a93a5' : '#fff';
+            bc.style.cursor = disabled ? 'default' : 'pointer';
+            bc.title = disabled ? '出題できる名刺がありません' : 'ショートカット: Ctrl+Enter';
+        }
+        var bs = document.getElementById('btnSkip');
+        if (bs) {
+            bs.disabled = disabled;
+            bs.style.background = disabled ? '#eceef3' : '#fff';
+            bs.style.color = disabled ? '#8a93a5' : '#374151';
+            bs.style.cursor = disabled ? 'default' : 'pointer';
+            bs.title = disabled ? '出題できる名刺がありません' : 'ショートカット: Esc(理由を選択してスキップ)';
+        }
+    }
+    function disableWork() {
+        setButtonState(true);
+        var area = document.getElementById('fieldsArea');
+        if (area) {
+            area.innerHTML = '<div style="border:1px dashed #c8cdd8;border-radius:8px;padding:26px 20px;text-align:center;color:#6b7484;font-size:13px;line-height:1.9">このグループに出題できる名刺はありません。<br><a href="index.html" style="font-weight:700">名刺入力一覧へ戻る</a></div>';
+        }
+        document.querySelectorAll('.card-zoom').forEach(function (el) { el.style.opacity = '0.45'; });
+    }
+    function enableWork() {
+        setButtonState(false);
+        document.querySelectorAll('.card-zoom').forEach(function (el) { el.style.opacity = ''; });
     }
     (function () {
         var rc = document.getElementById('remainCount');
@@ -299,30 +390,36 @@
     }, true);
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }  // IME変換中のEnter/Escを無視
+        var modalOpen = !!document.querySelector('.proto-modal:not([hidden])');
         var inInput = e.target && e.target.tagName === 'INPUT';
         if (e.key === 'Enter' && e.ctrlKey) {
             e.preventDefault();
-            if (document.querySelector('.proto-modal:not([hidden])')) { return; }
-            if (document.getElementById('btnConfirm') && document.getElementById('btnConfirm').disabled) { return; }
+            if (modalOpen) { return; }
             var b = document.getElementById('btnConfirm');
+            if (b && b.disabled) { return; }
             if (b) { b.style.filter = 'brightness(0.85)'; setTimeout(function () { b.style.filter = ''; }, 180); }
             window.pNextCard();
             return;
         }
         if (e.key === 'Escape') {
-            var sk = document.getElementById('btnConfirm');
-            if (!escHadModal && !(sk && sk.disabled)) { window.pOpen('mSkip'); }
+            var bs = document.getElementById('btnSkip');
+            if (!escHadModal && !(bs && bs.disabled)) { window.pOpen('mSkip'); }
             return;
         }
+        if (e.key === '?' && !inInput && !modalOpen) {
+            window.pOpen('mShortcuts');
+            return;
+        }
+        if (modalOpen) { return; }  // 以降のナビ系はモーダル表示中は無効(背面操作の防止)
         if (e.key === 'F2' && inInput) {
             // 仮割当: フォーカス中の欄へOCR候補を複写(割当の確定は仕様書20 §11 #8)
             e.preventDefault();
             var fdef = GROUP_DEFS[groupNo].fields.filter(function (fd) { return fd.id === e.target.id; })[0];
             var cand = fdef && fdef.ocr && fdef.ocr[cardIdx];
-            if (cand) { e.target.value = cand; }
+            if (cand) { window.pApplyValue(e.target, cand); e.target.setSelectionRange(0, cand.length); }
             return;
         }
-        if (e.key === 'Enter' && inInput) {
+        if (e.key === 'Enter' && inInput && !e.shiftKey && !e.altKey) {
             var i = order.indexOf(e.target.id);
             if (i < 0) { return; }
             e.preventDefault();
@@ -334,11 +431,6 @@
                 if (next) { next.focus(); }
             }
             return;
-        }
-        if (!inInput) {
-            if (e.key === '+' || e.key === '=') { window.pZoomDelta(0.5); }
-            else if (e.key === '-') { window.pZoomDelta(-0.5); }
-            else if (e.key === 'r' || e.key === 'R') { window.pRotate(); }
         }
     });
 })();

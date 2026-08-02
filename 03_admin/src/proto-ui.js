@@ -11,16 +11,51 @@
         if (m) { m.hidden = false; document.body.style.overflow = 'hidden'; }
     };
 
-    // 候補値・定型チップの複写用: 対象inputへ値を設定
+    // 値の設定(1段Undo付き)。複写・チップ由来の変更は Ctrl+Z で直前の値に戻せる
+    window.pApplyValue = function (el, value) {
+        if (!el) { return; }
+        el.dataset.prevUndo = el.value;
+        el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    // 候補値の複写用: 対象inputへ値を設定し全選択(そのまま打ち直せる)
     window.pSet = function (inputId, value) {
         var el = document.getElementById(inputId);
-        if (el) { el.value = value; el.focus(); }
+        if (!el) { return; }
+        window.pApplyValue(el, value);
+        el.focus();
+        if (el.setSelectionRange) { el.setSelectionRange(0, el.value.length); }
     };
+
+    // Ctrl+Z: 複写・チップ由来の変更を直前の値と入れ替える(もう一度でやり直し)
+    document.addEventListener('keydown', function (e) {
+        if (!(e.ctrlKey && (e.key === 'z' || e.key === 'Z'))) { return; }
+        var el = e.target;
+        if (!el || el.dataset === undefined || el.dataset.prevUndo === undefined) { return; }
+        e.preventDefault();
+        var cur = el.value;
+        el.value = el.dataset.prevUndo;
+        el.dataset.prevUndo = cur;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // tabindex付きのクリック要素(候補・チップ・×ボタン)を Enter / Space でも発火させる
+    document.addEventListener('keydown', function (e) {
+        if (e.isComposing || e.keyCode === 229) { return; }
+        if (e.key !== 'Enter' && e.key !== ' ') { return; }
+        var t = e.target;
+        if (t && t.tagName === 'SPAN' && t.hasAttribute('tabindex') && (t.hasAttribute('onclick') || t.onclick)) {
+            e.preventDefault();
+            t.click();
+        }
+    });
 
     // よく使う入力チップ用: 対象inputのカーソル位置へ挿入(選択範囲は置換)
     window.pAppend = function (inputId, value) {
         var el = document.getElementById(inputId);
         if (!el) { return; }
+        el.dataset.prevUndo = el.value;
         var st = el.selectionStart;
         var en = el.selectionEnd;
         if (typeof st === 'number') {
@@ -56,7 +91,7 @@
         });
         var act = pager.querySelector('button[data-page="' + n + '"]');
         var lbl = document.getElementById(listId + '-range');
-        if (act && lbl) { lbl.textContent = act.getAttribute('data-range') || ''; }
+        if (act && lbl && act.getAttribute('data-range')) { lbl.textContent = act.getAttribute('data-range'); }
     };
 
     window.pPageStep = function (listId, delta) {
@@ -64,6 +99,92 @@
         if (!pager) { return; }
         var next = (parseInt(pager.getAttribute('data-current') || '1', 10)) + delta;
         if (pager.querySelector('button[data-page="' + next + '"]')) { window.pPage(listId, next); }
+    };
+
+
+    // 名刺画像エンジン: ホバー追従拡大・クリック固定・90度回転(回転時は収まるよう自動縮小)
+    // 入力個票・照合個票の共用。+/− と R はキーボードから、入力欄フォーカス中は Alt を併用する
+    window.pInitCardZoom = function () {
+        var zoom = 2;
+        var current = null;
+        function fitScale(img) {
+            if (parseInt(img.dataset.rot || '0', 10) % 180 === 0) { return 1; }
+            var w = img.offsetWidth;
+            var h = img.offsetHeight;
+            if (!w || !h) { return 1; }
+            return Math.min(w / h, h / w);
+        }
+        function apply(img, scaled) {
+            var sc = (scaled ? zoom : 1) * fitScale(img);
+            img.style.transform = (sc !== 1 ? 'scale(' + sc + ') ' : '') + 'rotate(' + (img.dataset.rot || 0) + 'deg)';
+        }
+        function refreshLabel() {
+            var el = document.getElementById('zoomLabel');
+            if (el) { el.textContent = 'ホバー拡大・クリック固定 ×' + zoom.toFixed(1); }
+        }
+        window.pZoomDelta = function (d) {
+            zoom = Math.min(4, Math.max(1, Math.round((zoom + d) * 10) / 10));
+            refreshLabel();
+            document.querySelectorAll('.card-zoom img').forEach(function (img) {
+                if (img.dataset.pinned === '1') { apply(img, true); }
+            });
+        };
+        window.pRotate = function () {
+            var img = current;
+            if (!img || !document.body.contains(img) || img.offsetParent === null) {
+                img = document.querySelector('.card-zoom img');
+            }
+            if (!img) { return; }
+            img.dataset.rot = String((parseInt(img.dataset.rot || '0', 10) + 90) % 360);
+            apply(img, img.dataset.pinned === '1');
+        };
+        window.pResetCardZoom = function () {
+            document.querySelectorAll('.card-zoom img').forEach(function (img) {
+                img.dataset.rot = '0';
+                img.dataset.pinned = '';
+                img.style.transform = '';
+                img.style.outline = '';
+                img.style.cursor = 'zoom-in';
+            });
+            current = null;
+            refreshLabel();
+        };
+        document.querySelectorAll('.card-zoom img').forEach(function (img) {
+            img.addEventListener('mouseenter', function () { current = img; });
+            img.addEventListener('mousemove', function (e) {
+                if (img.dataset.pinned === '1') { return; }
+                var rc = img.getBoundingClientRect();
+                img.style.transformOrigin = ((e.clientX - rc.left) / rc.width * 100) + '% ' + ((e.clientY - rc.top) / rc.height * 100) + '%';
+                apply(img, true);
+            });
+            img.addEventListener('mouseleave', function () {
+                if (img.dataset.pinned === '1') { return; }
+                apply(img, false);
+            });
+            img.addEventListener('click', function () {
+                if (img.dataset.pinned === '1') {
+                    img.dataset.pinned = '';
+                    img.style.outline = '';
+                    img.style.cursor = 'zoom-in';
+                    apply(img, false);
+                } else {
+                    img.dataset.pinned = '1';
+                    img.style.outline = '2px solid #3467d6';
+                    img.style.cursor = 'zoom-out';
+                    apply(img, true);
+                }
+            });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.isComposing || e.keyCode === 229) { return; }
+            var t = e.target;
+            var inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+            if (inField && !e.altKey) { return; }
+            if (e.key === '+' || e.key === '=') { e.preventDefault(); window.pZoomDelta(0.5); }
+            else if (e.key === '-') { e.preventDefault(); window.pZoomDelta(-0.5); }
+            else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); window.pRotate(); }
+        });
+        refreshLabel();
     };
 
     window.pClose = function (id) {
@@ -78,12 +199,13 @@
     };
 
     document.addEventListener('keydown', function (e) {
+        if (e.isComposing || e.keyCode === 229) { return; }
         if (e.key === 'Escape') { window.pCloseAll(); }
     });
 
     // オーバーレイ(背景)クリックで閉じる。ダイアログ内クリックは対象外
     document.addEventListener('click', function (e) {
         var t = e.target;
-        if (t && t.classList && t.classList.contains('proto-modal')) { t.hidden = true; }
+        if (t && t.classList && t.classList.contains('proto-modal')) { window.pCloseAll(); }
     });
 })();

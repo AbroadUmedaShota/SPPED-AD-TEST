@@ -27,7 +27,7 @@
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px">
               <span id="lockBadge" style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで <span id="lockSec">182</span>秒)</span>
-              <span title="照合個票の共通ショートカット&#10;Ctrl+Enter: 確定して次へ(全項目確定時)&#10;候補クリック: 修正入力へ複写(既入力は置き換え・元の値はツールチップに保持)&#10;Alt+1〜3: フォーカス中の行の入力1〜3を修正入力へ複写(※暫定割当)&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" style="color:#8a93a5;cursor:help;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(ホバーで表示)</span>
+              <span title="照合個票の共通ショートカット&#10;Ctrl+Enter: 確定して次へ(全項目確定時)&#10;候補クリック: 修正入力へ複写(既入力は置き換え・元の値はツールチップに保持)&#10;Alt+1〜3: 修正入力欄にフォーカスがある時、その行の入力1〜3を複写(※暫定割当)&#10;Enter: 次の未確定の修正入力へ(すべて確定済みなら確定ボタンへ)&#10;Ctrl+Z: 複写を直前の値に戻す&#10;＋ / −: 画像の拡大率を調整&#10;R: 画像を90度回転&#10;画像ホバー: カーソル位置を拡大&#10;画像クリック: 拡大位置を固定(再クリックで解除)" onclick="pOpen('mShortcuts')" style="color:#8a93a5;cursor:pointer;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
             </div>
           </div>
           <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px">
@@ -36,9 +36,9 @@
                 <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
                 <div style="display:flex;gap:6px;align-items:center">
                   <span id="zoomLabel" style="color:#98a3b8;font-size:11px;margin-right:4px">ホバー拡大・クリック固定 ×2.0</span>
-                  <span title="拡大率を上げる (+)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
-                  <span title="拡大率を下げる (−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
-                  <span title="回転 (R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
+                  <span title="拡大率を上げる (+ / 入力中は Alt++)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
+                  <span title="拡大率を下げる (− / 入力中は Alt+−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
+                  <span title="回転 (R / 入力中は Alt+R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
               <div style="flex:1;min-height:0;display:flex;gap:28px;justify-content:center;padding:12px 24px">
@@ -70,25 +70,25 @@
                   </div>
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">会社名 <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixCompany','アブロ一ド株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロ一ド株式会社</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロ一ド株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロ一ド株式会社</span>
                     <span style="color:#8a93a5">—</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード(株)</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
-                    <span style="padding-right:10px"><input id="fixCompany" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;outline:2px solid #3467d6;outline-offset:1px"></span>
-                    <span style="font-weight:700">アブロード株式会社</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード(株)</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px">アブロード株式会社</span>
+                    <span style="padding-right:10px"><input id="fixCompany" spellcheck="false" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;outline-offset:1px"></span>
+                    <span id="doneCompany" style="font-weight:700">アブロード株式会社</span>
                   </div>
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">部署名</span><span>営業部</span><span style="color:#8a93a5">—</span><span>営業部</span><span>営業部</span><span>営業部</span><span style="color:#8a93a5">—</span><span style="font-weight:700">営業部</span>
                   </div>
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">役職名 <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
                     <span style="color:#8a93a5">—</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixRole','部長')" style="cursor:pointer;text-decoration:underline dotted">部長</span>
-                    <span title="クリックで修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
-                    <span style="padding-right:10px"><input id="fixRole" placeholder="正しい値を入力" style="width:100%;box-sizing:border-box;border:1px solid #c99b3f;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;background:#fff"></span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','部長')" style="cursor:pointer;text-decoration:underline dotted">部長</span>
+                    <span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted">課長</span>
+                    <span style="padding-right:10px"><input id="fixRole" spellcheck="false" placeholder="正しい値を入力" style="width:100%;box-sizing:border-box;border:1px solid #c99b3f;border-radius:5px;padding:6px 8px;font-size:12px;font-family:inherit;background:#fff"></span>
                     <span id="doneRole" style="color:#8a93a5">未確定</span>
                   </div>
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
@@ -100,7 +100,7 @@
                 </div>
               </div>
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
-                <span style="font-size:11.5px;color:#5b6577"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:18px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
+                <span style="font-size:11.5px;color:#5b6577"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
                 <div style="display:flex;gap:10px">
                   <button id="btnMatchConfirm" disabled onclick="pMatchConfirm()" style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
@@ -116,7 +116,7 @@
 <!-- 照合確定 -->
 <div id="mConfirmMatch" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
       <span style="font-size:15px;font-weight:700">完成内容で確定しますか?</span>
       <span onclick="pClose('mConfirmMatch')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
@@ -128,69 +128,57 @@
   </div>
 </div>
 
+
+<!-- ショートカット一覧 -->
+<div id="mShortcuts" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">ショートカット一覧</span>
+      <span onclick="pClose('mShortcuts')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:16px 22px;display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:12.5px;align-items:center">
+      <span style="font-weight:700">Ctrl + Enter</span><span>確定して次へ(確認画面ではそのまま実行)</span>
+      <span style="font-weight:700">Enter</span><span>次の未確定の修正入力へ(すべて確定済みなら確定ボタンへ)</span>
+      <span style="font-weight:700">Alt + 1〜3</span><span>フォーカス中の行の入力1〜3を修正入力へ複写(※暫定割当)</span>
+      <span style="font-weight:700">Ctrl + Z</span><span>複写を直前の値に戻す</span>
+      <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
+      <span style="font-weight:700">R</span><span>画像を90度回転(入力中は Alt+R)</span>
+      <span style="font-weight:700">画像ホバー / クリック</span><span>カーソル位置を拡大 / その位置で固定(再クリックで解除)</span>
+      <span style="font-weight:700">?</span><span>この一覧を表示</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
+      <button onclick="pClose('mShortcuts')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
 <script>
-// 照合個票の画像操作(モック): ホバー追従拡大・クリック固定・回転(入力個票と共通ロジック)
+// 照合フロー(モック): 修正入力の監視・確定・候補複写・ロック管理
+// 画像操作(ホバー拡大・クリック固定・回転)は proto-ui.js の pInitCardZoom を使用
 (function () {
     'use strict';
-    var zoom = 2, current = null;
-    function refreshLabel() {
-        var el = document.getElementById('zoomLabel');
-        if (el) { el.textContent = 'ホバー拡大・クリック固定 ×' + zoom.toFixed(1); }
-    }
-    window.pZoomDelta = function (d) {
-        zoom = Math.min(4, Math.max(1.5, Math.round((zoom + d) * 10) / 10));
-        refreshLabel();
-    };
-    window.pRotate = function () {
-        var img = current || document.querySelector('.card-zoom img');
-        if (!img) { return; }
-        var r = (parseInt(img.dataset.rot || '0', 10) + 90) % 360;
-        img.dataset.rot = String(r);
-        img.style.transform = 'rotate(' + r + 'deg)';
-    };
-    document.querySelectorAll('.card-zoom img').forEach(function (img) {
-        img.addEventListener('mouseenter', function () { current = img; });
-        img.addEventListener('mousemove', function (e) {
-            if (img.dataset.pinned === '1') { return; }
-            var rc = img.getBoundingClientRect();
-            img.style.transformOrigin = ((e.clientX - rc.left) / rc.width * 100) + '% ' + ((e.clientY - rc.top) / rc.height * 100) + '%';
-            img.style.transform = 'scale(' + zoom + ') rotate(' + (img.dataset.rot || 0) + 'deg)';
-        });
-        img.addEventListener('mouseleave', function () {
-            if (img.dataset.pinned === '1') { return; }
-            img.style.transform = 'rotate(' + (img.dataset.rot || 0) + 'deg)';
-        });
-        img.addEventListener('click', function () {
-            if (img.dataset.pinned === '1') {
-                img.dataset.pinned = '';
-                img.style.outline = '';
-                img.style.cursor = 'zoom-in';
-            } else {
-                img.dataset.pinned = '1';
-                img.style.outline = '2px solid #3467d6';
-                img.style.cursor = 'zoom-out';
-            }
-        });
-    });
-    document.addEventListener('keydown', function (e) {
-        var inInput = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
-        if (inInput) { return; }
-        if (e.key === '+' || e.key === '=') { window.pZoomDelta(0.5); }
-        else if (e.key === '-') { window.pZoomDelta(-0.5); }
-        else if (e.key === 'r' || e.key === 'R') { window.pRotate(); }
-    });
-})();
-</script>
-<script>
-// 照合フロー(モック): 修正入力の監視・確定ボタン活性・候補上書き保護・ロックカウントダウン
-(function () {
-    'use strict';
-    var FIX_IDS = ['fixCompany', 'fixRole'];
+    window.pInitCardZoom();
 
-    // B3: 候補クリックの複写。既入力を置き換えた場合はハイライトし、元の値をツールチップへ保持
+    // 修正入力の定義: 対応する完成内容セル・確定後の初期値・入力1〜3の候補値
+    var FIX = [
+        { fix: 'fixCompany', done: 'doneCompany', initial: 'アブロード株式会社', cands: ['アブロード株式会社', 'アブロード(株)', 'アブロード株式会社'] },
+        { fix: 'fixRole', done: 'doneRole', initial: '', cands: ['課長', '部長', '課長'] }
+    ];
+    var stateTimer = null;
+
+    function setState(text, color, weight) {
+        var st = document.getElementById('matchState');
+        if (!st) { return; }
+        if (stateTimer) { clearTimeout(stateTimer); stateTimer = null; }
+        st.textContent = text;
+        st.style.color = color || '';
+        st.style.fontWeight = weight || '';
+    }
+
+    // 候補クリックの複写。既入力を置き換えた場合はハイライトし、元の値をツールチップへ保持(Ctrl+Zでも戻せる)
     window.pFix = function (inputId, value) {
         var el = document.getElementById(inputId);
         if (!el) { return; }
@@ -201,151 +189,166 @@
             el.style.background = '#fdf6ec';
             setTimeout(function () { el.style.background = '#fff'; }, 650);
         }
-        el.value = value;
+        window.pApplyValue(el, value);
         el.focus();
-        refreshState();
     };
 
-    // B2: 未確定数に応じてフッター文言・完成内容セル・確定ボタンを連動
+    // 未確定数に応じて、状態文言・完成内容セル・行と入力欄の状態色・確定ボタンを連動させる
     function refreshState() {
         var unresolved = 0;
-        FIX_IDS.forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el && !el.value.trim()) { unresolved += 1; }
-        });
-        var role = document.getElementById('fixRole');
-        var done = document.getElementById('doneRole');
-        if (role && done) {
-            if (role.value.trim()) {
-                done.textContent = role.value.trim();
-                done.style.color = '#1f2733';
-                done.style.fontWeight = '700';
-            } else {
-                done.textContent = '未確定';
-                done.style.color = '#8a93a5';
-                done.style.fontWeight = '400';
+        FIX.forEach(function (fx) {
+            var el = document.getElementById(fx.fix);
+            var done = document.getElementById(fx.done);
+            var val = el ? el.value.trim() : '';
+            if (!val) { unresolved += 1; }
+            if (done) {
+                done.textContent = val || '未確定';
+                done.style.color = val ? '#1f2733' : '#8a93a5';
+                done.style.fontWeight = val ? '700' : '400';
             }
-        }
-        var st = document.getElementById('matchState');
+            if (el) {
+                el.style.borderColor = val ? '#9fceb6' : '#c99b3f';
+                var row = el.closest('div[style*="grid-template-columns"]');
+                if (row) { row.style.background = val ? '#edf7f1' : '#fdf6ec'; }
+            }
+        });
+        setState(unresolved
+            ? '不一致 ' + FIX.length + '項目のうち ' + unresolved + '項目が未確定。全項目の完成内容が決まると確定できます。'
+            : '全項目の完成内容が決まりました。確定できます。',
+            unresolved ? '' : '#237a52', unresolved ? '' : '700');
         var btn = document.getElementById('btnMatchConfirm');
-        if (st) {
-            st.textContent = unresolved
-                ? '不一致 2項目のうち ' + unresolved + '項目が未確定。全項目の完成内容が決まると確定できます。'
-                : '全項目の完成内容が決まりました。確定できます。';
-            st.style.color = unresolved ? '' : '#237a52';
-            st.style.fontWeight = unresolved ? '' : '700';
-        }
         if (btn) {
             btn.disabled = !!unresolved;
             btn.style.background = unresolved ? '#eceef3' : '#3467d6';
             btn.style.color = unresolved ? '#8a93a5' : '#fff';
             btn.style.cursor = unresolved ? 'default' : 'pointer';
         }
+        return unresolved;
     }
-    FIX_IDS.forEach(function (id) {
-        var el = document.getElementById(id);
+    FIX.forEach(function (fx) {
+        var el = document.getElementById(fx.fix);
         if (el) { el.addEventListener('input', refreshState); }
     });
     refreshState();
-
-    // 仮割当: Alt+1〜3でフォーカス中の行の入力1〜3を修正入力へ複写
-    var CAND = {
-        fixCompany: ['アブロード株式会社', 'アブロード(株)', 'アブロード株式会社'],
-        fixRole: ['課長', '部長', '課長']
-    };
-    document.addEventListener('keydown', function (e) {
-        if (e.isComposing || e.keyCode === 229) { return; }
-        if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0) {
-            var id = document.activeElement && document.activeElement.id;
-            if (CAND[id]) {
-                e.preventDefault();
-                window.pFix(id, CAND[id][parseInt(e.key, 10) - 1]);
-            }
-        }
-    });
 
     window.pMatchConfirm = function () {
         var btn = document.getElementById('btnMatchConfirm');
         if (btn && btn.disabled) { return; }
         if (lockExpired) {
-            var st = document.getElementById('matchState');
-            if (st) {
-                st.textContent = 'ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています・§7.3)。';
-                st.style.color = '#c23934';
-                st.style.fontWeight = '700';
-                setTimeout(refreshState, 2200);
-            }
+            setState('ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています・§7.3)。', '#c23934', '700');
+            stateTimer = setTimeout(refreshState, 2200);
             return;
         }
         window.pOpen('mConfirmMatch');
     };
 
-    // 確定後: 次の対象を取得した体でリセット(モックは同一サンプルを再表示)
+    // 確定後: 次の対象を取得した体で初期状態へ戻す(モックは同一サンプルを再表示)
     window.pMatchDone = function () {
-        FIX_IDS.forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) { el.title = ''; }
+        FIX.forEach(function (fx) {
+            var el = document.getElementById(fx.fix);
+            if (el) { el.value = fx.initial; el.title = ''; delete el.dataset.prevUndo; }
         });
-        var role = document.getElementById('fixRole');
-        if (role) { role.value = ''; }
         resetLock();
         refreshState();
-        var st = document.getElementById('matchState');
-        if (st) {
-            st.textContent = '確定しました。次の照合対象を取得しました(モックでは同一サンプルを表示)。';
-            st.style.color = '#237a52';
-            setTimeout(refreshState, 2200);
-        }
+        setState('確定しました。次の照合対象を取得しました(モックでは同一サンプルを表示)。', '#237a52', '700');
+        stateTimer = setTimeout(refreshState, 2200);
     };
 
-    // B1: Ctrl+Enterで確定(未確定時はフッターを点滅させて理由を示す)
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }
+        var modalOpen = document.querySelector('.proto-modal:not([hidden])');
+        var activeId = document.activeElement && document.activeElement.id;
+        var inField = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+        var fixIds = FIX.map(function (fx) { return fx.fix; });
+
         if (e.key === 'Enter' && e.ctrlKey) {
             e.preventDefault();
+            var confirmModal = document.getElementById('mConfirmMatch');
+            if (confirmModal && !confirmModal.hidden) {
+                window.pClose('mConfirmMatch');
+                window.pMatchDone();
+                return;
+            }
+            if (modalOpen) { return; }
             var btn = document.getElementById('btnMatchConfirm');
             if (btn && !btn.disabled) {
                 window.pMatchConfirm();
             } else {
-                var st = document.getElementById('matchState');
-                if (st) {
-                    st.style.color = '#c23934';
-                    st.style.fontWeight = '700';
-                    setTimeout(function () { st.style.color = ''; st.style.fontWeight = ''; refreshState(); }, 900);
-                }
+                setState(document.getElementById('matchState').textContent, '#c23934', '700');
+                stateTimer = setTimeout(refreshState, 900);
             }
+            return;
+        }
+        if (modalOpen) { return; }
+        if (e.key === '?' && !inField) {
+            window.pOpen('mShortcuts');
+            return;
+        }
+        // 仮割当: Alt+1〜3でフォーカス中の修正入力へ入力1〜3を複写
+        if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0 && fixIds.indexOf(activeId) >= 0) {
+            e.preventDefault();
+            var fx = FIX.filter(function (x) { return x.fix === activeId; })[0];
+            window.pFix(activeId, fx.cands[parseInt(e.key, 10) - 1]);
+            return;
+        }
+        // Enter: 次の未確定の修正入力へ。すべて確定済みなら確定ボタンへ
+        if (e.key === 'Enter' && fixIds.indexOf(activeId) >= 0) {
+            e.preventDefault();
+            var idx = fixIds.indexOf(activeId);
+            for (var k = 1; k <= fixIds.length; k++) {
+                var cand = document.getElementById(fixIds[(idx + k) % fixIds.length]);
+                if (cand && !cand.value.trim()) { cand.focus(); return; }
+            }
+            var cbtn = document.getElementById('btnMatchConfirm');
+            if (cbtn) { cbtn.focus(); }
+            return;
         }
     });
 
-    // B4: 照合ロックのカウントダウン。0で解除状態を表示し、再取得でロックし直す
+    // 照合ロック: 無操作で残秒が減り、操作すると182秒へ戻る。0で解除状態を表示し、再取得でロックし直す
     var lockTimer = null;
     var lockExpired = false;
+    var lockSec = 182;
+    function paintLock() {
+        var badge = document.getElementById('lockBadge');
+        var el = document.getElementById('lockSec');
+        if (!badge) { return; }
+        if (el) { el.textContent = String(lockSec); }
+        if (lockSec <= 30) {
+            badge.style.color = '#8a6414'; badge.style.background = '#fdf6ec'; badge.style.borderColor = '#e8cf9e';
+        } else {
+            badge.style.color = '#2b57b8'; badge.style.background = '#eef2fb'; badge.style.borderColor = '#b9caee';
+        }
+    }
     function resetLock() {
         lockExpired = false;
+        lockSec = 182;
         var badge = document.getElementById('lockBadge');
         if (!badge) { return; }
         if (lockTimer) { clearInterval(lockTimer); }
-        var sec = 182;
-        badge.innerHTML = '照合ロック中(自動解除まで <span id="lockSec">' + sec + '</span>秒)';
-        badge.style.color = '#2b57b8';
-        badge.style.background = '#eef2fb';
-        badge.style.borderColor = '#b9caee';
+        badge.innerHTML = '照合ロック中(自動解除まで <span id="lockSec">' + lockSec + '</span>秒)';
+        paintLock();
         lockTimer = setInterval(function () {
-            sec -= 1;
-            var el = document.getElementById('lockSec');
-            if (sec > 0) {
-                if (el) { el.textContent = String(sec); }
-                if (sec <= 30 && el) { badge.style.color = '#8a6414'; badge.style.background = '#fdf6ec'; badge.style.borderColor = '#e8cf9e'; }
+            if (!document.body.contains(badge)) { clearInterval(lockTimer); return; }
+            lockSec -= 1;
+            if (lockSec > 0) {
+                paintLock();
             } else {
                 clearInterval(lockTimer);
                 lockExpired = true;
-                badge.innerHTML = 'ロック解除済み — <a href="#m" onclick="pRelock();return false" style="font-weight:700">対象を再取得</a>(入力内容は保持されます・§7.3)';
+                badge.innerHTML = 'ロック解除済み — <span role="button" tabindex="0" onclick="pRelock()" style="font-weight:700;text-decoration:underline;cursor:pointer">対象を再取得</span>(入力内容は保持されます・§7.3)';
                 badge.style.color = '#c23934';
                 badge.style.background = '#fdf6f5';
                 badge.style.borderColor = '#e3b6b3';
             }
         }, 1000);
     }
+    // 操作があればロックを保持(無操作タイマー)
+    ['keydown', 'input', 'mousedown'].forEach(function (ev) {
+        document.addEventListener(ev, function () {
+            if (!lockExpired && lockTimer) { lockSec = 182; paintLock(); }
+        });
+    });
     window.pRelock = function () { resetLock(); };
     resetLock();
 })();
