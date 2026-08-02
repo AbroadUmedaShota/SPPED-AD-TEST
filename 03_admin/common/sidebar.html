@@ -2,24 +2,24 @@
 <aside class="fixed inset-y-0 left-0 z-40 flex flex-col overflow-y-auto sidebar admin-sidebar" id="sidebar" style="padding-top:56px">
     <!-- プロファイルブロック -->
     <div class="profile-block" style="padding:16px 16px 14px">
-        <div style="font-size:12px;color:#e8ecf4;overflow:hidden;text-overflow:ellipsis">admin@abroad-o.com</div>
-        <span style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#9db8f0;border:1px solid #3c4d70;border-radius:4px;padding:2px 8px">Lv3 Admin</span>
+        <div id="profileMail" style="font-size:12px;color:#e8ecf4;overflow:hidden;text-overflow:ellipsis">master@abroad-o.com</div>
+        <span id="profileLevel" style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#9db8f0;border:1px solid #3c4d70;border-radius:4px;padding:2px 8px">Lv4 MasterAdmin</span>
     </div>
 
-    <!-- ナビゲーション -->
+    <!-- ナビゲーション(data-min-lv=表示可能な最小Lv・スプシG列準拠) -->
     <nav class="flex-1" style="padding:10px 8px;display:flex;flex-direction:column;gap:2px">
-        <a class="nav-link" href="index.html" aria-label="ダッシュボードへ移動">ダッシュボード</a>
-        <a class="nav-link" href="user-management.html" aria-label="ユーザー管理へ移動">ユーザー管理</a>
-        <a class="nav-link" href="survey-management.html" aria-label="アンケート管理へ移動">アンケート管理</a>
-        <a class="nav-link" href="billing-management.html" aria-label="請求管理へ移動">請求管理</a>
-        <a class="nav-link" href="invoice-management.html" aria-label="請求書管理へ移動">請求書管理</a>
-        <a class="nav-link" href="coupon-management.html" aria-label="クーポン管理へ移動">クーポン管理</a>
-        <a class="nav-link" href="calendar-management.html" aria-label="営業日カレンダー管理へ移動">営業日カレンダー管理</a>
-        <a class="nav-link" href="data-entry/index.html" aria-label="名刺入力一覧へ移動">名刺入力一覧</a>
-        <a class="nav-link" href="reconciliation/index.html" aria-label="照合管理一覧へ移動">照合管理一覧</a>
-        <a class="nav-link" href="operator-management.html" aria-label="オペレーター管理へ移動">オペレーター管理</a>
-        <a class="nav-link" href="performance-management.html" aria-label="実績管理へ移動">実績管理</a>
-        <a class="nav-link" href="audit-log.html" aria-label="操作ログへ移動">操作ログ</a>
+        <a class="nav-link" data-min-lv="1" href="index.html" aria-label="ダッシュボードへ移動">ダッシュボード</a>
+        <a class="nav-link" data-min-lv="3" href="user-management.html" aria-label="ユーザー管理へ移動">ユーザー管理</a>
+        <a class="nav-link" data-min-lv="3" href="survey-management.html" aria-label="アンケート管理へ移動">アンケート管理</a>
+        <a class="nav-link" data-min-lv="3" href="billing-management.html" aria-label="請求管理へ移動">請求管理</a>
+        <a class="nav-link" data-min-lv="3" href="invoice-management.html" aria-label="請求書管理へ移動">請求書管理</a>
+        <a class="nav-link" data-min-lv="3" href="coupon-management.html" aria-label="クーポン管理へ移動">クーポン管理</a>
+        <a class="nav-link" data-min-lv="2" href="calendar-management.html" aria-label="営業日カレンダー管理へ移動">営業日カレンダー管理</a>
+        <a class="nav-link" data-min-lv="1" href="data-entry/index.html" aria-label="名刺入力一覧へ移動">名刺入力一覧</a>
+        <a class="nav-link" data-min-lv="2" href="reconciliation/index.html" aria-label="照合管理一覧へ移動">照合管理一覧</a>
+        <a class="nav-link" data-min-lv="2" href="operator-management.html" aria-label="オペレーター管理へ移動">オペレーター管理</a>
+        <a class="nav-link" data-min-lv="2" href="performance-management.html" aria-label="実績管理へ移動">実績管理</a>
+        <a class="nav-link" data-min-lv="3" href="audit-log.html" aria-label="操作ログへ移動">操作ログ</a>
     </nav>
 
     <!-- ログアウト -->

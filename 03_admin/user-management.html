@@ -17,7 +17,7 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" style="margin-left:232px">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">ユーザー管理</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
@@ -142,7 +142,8 @@
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
           <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
-          <span style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(現在Lv3のため非表示・§4.6)</span>
+          <button data-min-lv="4" title="モック未配線" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定 <span style="font-weight:400;font-size:11px">Lv4限定・理由入力+本人通知</span></button>
+          <span data-max-lv="3" style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(§4.6)</span>
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 <span style="font-weight:400;font-size:11px;color:#8a6414">※あったほうが良い・実現方式は要確定</span></div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px">
@@ -251,5 +252,6 @@
 
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
+<script src="src/proto-level.js"></script>
 </body>
 </html>

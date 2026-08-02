@@ -17,13 +17,13 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" style="margin-left:232px">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:232px">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">オペレーター管理</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">オペレーター管理</h2>
               <div style="display:flex;gap:10px">
-                <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mOpGroup')">グループ作成</button>
+                <button data-min-lv="3" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mOpGroup')">グループ作成</button>
                 <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mInviteOp')">＋ 新規招待</button>
               </div>
             </div>
@@ -134,6 +134,7 @@
           <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
           <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">権限レベル<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
           <div style="font-size:11px;color:#8a93a5">Lv3以上の付与はLv4のみ実行可(§6)・Lv4の付与可否と扱いは※要確定</div>
+          <div data-min-lv="4" style="font-size:11px;color:#8a6414">Lv4シナリオ: Lv3(Admin)の付与も選択可(※Lv4の扱い自体は要確定)</div>
           <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;color:#6b7484">対応可能言語
             <span style="display:flex;gap:6px;flex-wrap:wrap">
               <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
@@ -152,7 +153,8 @@
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
           <button style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmResetPwOp')">初期化メールを送信</button>
-          <span style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(現在Lv3のため非表示・§4.6)</span>
+          <button data-min-lv="4" title="モック未配線" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定 <span style="font-weight:400;font-size:11px">Lv4限定・理由入力+本人通知</span></button>
+          <span data-max-lv="3" style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(§4.6)</span>
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
@@ -197,5 +199,6 @@
 
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
+<script src="src/proto-level.js"></script>
 </body>
 </html>
