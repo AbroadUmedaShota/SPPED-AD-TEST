@@ -23,20 +23,19 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">営業日カレンダー管理</h2>
               <div style="display:flex;gap:10px">
-                <button data-min-lv="3" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mRegularHoliday')">定休日設定</button>
-                <button data-min-lv="3" title="祝日・稼働可能日等をCSVから一括登録" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSVインポート</button>
-                <button data-min-lv="3" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mHoliday')">休業日・振替を追加</button>
+                <button data-min-lv="3" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calRegOpen()">定休日設定</button>
+                <button data-min-lv="3" title="祝日・稼働可能日等をCSVから一括登録" onclick="pOpen('mCsvImport')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSVインポート</button>
+                <button data-min-lv="3" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calHolidayOpen()">休業日・振替を追加</button>
               </div>
             </div>
-            <div style="margin-top:10px;font-size:11.5px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:6px 12px;display:inline-block">この画面はLv1には表示しません(Lv2以上・アサイン運用画面)。休業日・振替営業日の設定変更はLv3〜4のみ。</div>
             <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between">
               <div style="display:flex;align-items:center;gap:12px">
-                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff">‹ 前月</span>
-                <span style="font-size:17px;font-weight:700">2026年 8月</span>
-                <span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff">翌月 ›</span>
-                <div style="margin-left:12px;display:flex;border:1px solid #c8cdd8;border-radius:6px;overflow:hidden;font-size:12.5px">
-                  <span style="padding:6px 16px;background:#3467d6;color:#fff;font-weight:700">アンケート</span>
-                  <span style="padding:6px 16px;background:#fff;color:#5b6577;cursor:pointer" >アサイン</span>
+                <button id="calPrev" onclick="calMonth(-1)" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff;color:#374151;font-family:inherit">‹ 前月</button>
+                <span id="calTitle" style="font-size:17px;font-weight:700;min-width:110px;text-align:center">2026年 7月</span>
+                <button id="calNext" onclick="calMonth(1)" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff;color:#374151;font-family:inherit">翌月 ›</button>
+                <div style="margin-left:12px;display:flex;border:1px solid #c8cdd8;border-radius:6px;overflow:hidden">
+                  <button id="calTabSv" onclick="calTab('sv')" style="border:none;padding:6px 16px;background:#3467d6;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px">アンケート</button>
+                  <button id="calTabAs" onclick="calTab('as')" style="border:none;padding:6px 16px;background:#fff;color:#5b6577;cursor:pointer;font-family:inherit;font-size:12.5px">アサイン</button>
                 </div>
               </div>
               <div style="display:flex;gap:14px;font-size:11.5px;color:#5b6577;align-items:center">
@@ -50,73 +49,10 @@
                 <div style="display:grid;grid-template-columns:repeat(7,1fr);background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577;text-align:center">
                   <span style="padding:8px 0;color:#c23934">日</span><span style="padding:8px 0">月</span><span style="padding:8px 0">火</span><span style="padding:8px 0">水</span><span style="padding:8px 0">木</span><span style="padding:8px 0">金</span><span style="padding:8px 0;color:#3467d6">土</span>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr)">
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">7/26</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">27</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">28</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">29</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">30</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">31</div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">8/1</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">2</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">3</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">4</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 4件<br>アサイン 6人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">5</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 4件<br>アサイン 6人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer;background:#fff;box-shadow:inset 0 0 0 2px #3467d6"><span style="font-weight:700">6</span><div style="margin-top:4px;font-size:10.5px;color:#2b57b8;font-weight:700">会期 3件<br>アサイン 4人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">7</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 3人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#eef2fb;font-size:12px;cursor:pointer"><span style="font-weight:700;color:#2b57b8">8</span><div style="margin-top:4px;font-size:10.5px;color:#2b57b8">振替営業日<br>アサイン 2人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">9</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">10</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 5件<br>アサイン 7人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">11</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(山の日)</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">12</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">13</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(夏季休業)</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700">14</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日(夏季休業)</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">15</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">16</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">17</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">18</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">19</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">20</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">21</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">22</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">23</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">24</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">25</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 4人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">26</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">27</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 3件<br>アサイン 5人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">28</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 2件<br>アサイン 3人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-bottom:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#3467d6">29</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#f0f1f4;font-size:12px"><span style="font-weight:700;color:#c23934">30</span><div style="margin-top:4px;font-size:10.5px;color:#6b7484">休業日</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;font-size:12px;cursor:pointer"><span style="font-weight:700">31</span><div style="margin-top:4px;font-size:10.5px;color:#5b6577">会期 1件<br>アサイン 2人</div></div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">9/1</div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">2</div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">3</div>
-                  <div style="min-height:86px;padding:6px 8px;border-right:1px solid #eef0f5;background:#fafbfd;color:#c3c9d4;font-size:12px">4</div>
-                  <div style="min-height:86px;padding:6px 8px;background:#fafbfd;color:#c3c9d4;font-size:12px">5</div>
-                </div>
+                <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
                 <div style="padding:8px 12px;border-top:1px solid #eef0f5;font-size:11px;color:#8a93a5">日付を選択すると右に詳細を表示します。</div>
               </div>
-              <div style="width:320px;flex:none;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 18px">
-                <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #e2e6ed">
-                  <span style="font-size:14px;font-weight:700">8/6(木)の詳細</span>
-                  <span style="font-size:11.5px;color:#237a52;font-weight:700">営業日</span>
-                </div>
-                <div style="margin-top:12px;font-size:12px;font-weight:700;color:#5b6577">会期中のアンケート(3件)</div>
-                <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px">
-                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10259</span> ITインフラEXPO 2026<div style="color:#6b7484;margin-top:2px">納期 08/11 18:00</div></div>
-                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10262</span> 人事・労務フォーラム<div style="color:#6b7484;margin-top:2px">納期 —(会期前)</div></div>
-                  <div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px"><span style="color:#6b7484;font-variant-numeric:tabular-nums">SV-10266</span> 観光DXカンファレンス<div style="color:#6b7484;margin-top:2px">納期 08/14 12:00</div></div>
-                </div>
-                <div style="margin-top:16px;font-size:12px;font-weight:700;color:#5b6577">アサイン済み(4人)</div>
-                <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">
-                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">佐藤 由紀</span>
-                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">王 麗華</span>
-                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">田中 大輔</span>
-                  <span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 10px">山本 彩</span>
-                </div>
-                <button style="margin-top:14px;width:100%;background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 0;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mAssign')">この日にアサインを追加</button>
-                <div style="margin-top:10px;font-size:11px;color:#8a93a5">確定するとオペレーターへ割当通知が送信されます。</div>
-              </div>
+              <div id="calPanel" style="width:320px;flex:none;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 18px"></div>
             </div>
           </div>
         </main>
@@ -124,74 +60,106 @@
 </div>
 
 <div id="mHoliday" class="proto-modal" hidden>
-  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:480px">
+  <div class="proto-dialog" style="width:480px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
       <span style="font-size:15px;font-weight:700">休業日・振替営業日を追加</span>
       <span role="button" onclick="pClose('mHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">日付</span><input type="date" value="2026-08-20" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">区分</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>休業日</option><option>振替営業日</option></select></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">日付</span><input id="calHolDate" type="date" min="2026-06-01" max="2026-08-31" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">区分</span><select id="calHolKind" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="hol">休業日</option><option value="sub">振替営業日</option></select></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input placeholder="例: 夏季休業" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">追加は以後の納期計算に反映されます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input id="calHolMemo" placeholder="例: 夏季休業" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div id="calHolErr" hidden style="font-size:12px;color:#c23934;font-weight:700"></div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">追加は以後の納期計算に反映されます。振替営業日は定休日・祝日にあたる日付にのみ設定できます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mHoliday')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mHoliday')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">追加する</button>
+      <button onclick="calHolidaySave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">追加する</button>
     </div>
   </div>
 </div>
 
 <div id="mRegularHoliday" class="proto-modal" hidden>
-  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:460px">
+  <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
       <span style="font-size:15px;font-weight:700">定休日を設定</span>
       <span role="button" onclick="pClose('mRegularHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">毎週の定休日</span>
-        <div style="margin-top:8px;display:flex;gap:6px">
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">月</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">火</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">水</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">木</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:5px 13px;font-size:12.5px;cursor:pointer">金</span>
-          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;cursor:pointer">土 ✓</span>
-          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:700;cursor:pointer">日 ✓</span>
-        </div>
+        <div id="calRegWeek" style="margin-top:8px;display:flex;gap:6px"></div>
       </div>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">定休日は毎週の休業日として納期計算から除外されます。祝日・臨時休業は「休業日・振替を追加」から個別に登録してください。</div>
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">祝日の扱い</span>
+        <div id="calRegHol" style="margin-top:8px;display:flex;gap:6px"></div>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">定休日・祝日は休業日として納期計算から除外されます。臨時の休業は「休業日・振替を追加」から個別に登録してください。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mRegularHoliday')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mRegularHoliday')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="calRegSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
 
 <div id="mAssign" class="proto-modal" hidden>
-  <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:520px">
+  <div class="proto-dialog" style="width:520px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">アサインを追加<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">2026/08/06(木)</span></span>
+      <span style="font-size:15px;font-weight:700">アサインを追加<span id="calAsgDate" style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px"></span></span>
       <span role="button" onclick="pClose('mAssign')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div id="calAsgStats" style="background:#f7f8fb;border-radius:8px;padding:10px 14px;display:flex;gap:18px;font-size:12px;color:#5b6577"></div>
       <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">オペレーターを選択(複数可)</span>
-        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">佐藤 由紀 ✓</span>
-          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">王 麗華 ✓</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">田中 大輔</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">山本 彩</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">高橋 直樹</span>
-        </div>
+        <div id="calAsgChips" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">確定すると選択したオペレーターへ割当通知(メール)が送信されます。無効・招待中のアカウントは選択できません。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mAssign')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mAssign')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">アサインを確定</button>
+      <button onclick="calAssignCommit()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">アサインを確定</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmDelHoliday" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
+      <span style="font-size:15px;font-weight:700">個別設定を削除しますか?</span>
+      <span role="button" onclick="pClose('mConfirmDelHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div id="calDelText" style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
+      <button data-initial-focus onclick="pClose('mConfirmDelHoliday')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="calDelDo()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">削除する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mCsvImport" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:540px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">CSVインポート<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">祝日・個別設定の一括登録</span></span>
+      <span role="button" onclick="pClose('mCsvImport')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">CSVファイル</span><input type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:12.5px;font-family:inherit;background:#fff"></label>
+      <div style="border:1px solid #e2e6ed;border-radius:8px;overflow:hidden">
+        <div style="padding:8px 14px;background:#f7f8fb;font-size:11.5px;font-weight:700;color:#5b6577">列構成(すべて必須)</div>
+        <div style="padding:10px 14px;font-size:12px;line-height:1.9;font-family:ui-monospace,monospace">date, event_type, reason<br><span style="color:#8a93a5">2026-08-13, HOLIDAY, 夏季休業<br>2026-08-08, SUBSTITUTE_WORKDAY, 振替営業</span></div>
+      </div>
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">既存の設定と重複した場合</span>
+        <div style="margin-top:8px;display:flex;gap:16px;font-size:13px;color:#374151">
+          <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="calCsvDup" checked>上書きする</label>
+          <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="calCsvDup">スキップする</label>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">UTF-8(BOM付き)・CRLF・ヘッダー行あり。エラー行は除外して残りを取り込み、結果は更新ログへ記録されます。<a href="data:text/csv;charset=utf-8,%EF%BB%BFdate,event_type,reason%0D%0A" download="calendar_import_template.csv">テンプレートをダウンロード</a></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mCsvImport')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mCsvImport')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取り込む</button>
     </div>
   </div>
 </div>
@@ -199,5 +167,277 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+
+<script>
+// 営業日カレンダー(モック)。表示範囲は2026年6月〜8月、データはアンケート管理から導出した静的セット。
+// 画面内の操作(選択・アサイン・営業日設定)はページ内の状態にのみ反映され、再読み込みで初期化される
+(function () {
+    'use strict';
+    var CAL = {"surveys": {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "plan": "通常", "status": "会期前", "s": "2026-08-03", "e": "2026-08-05", "st": "10:00", "et": "17:00", "due": "", "ans": 0, "recon": true}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "plan": "特急", "status": "会期中", "s": "2026-07-30", "e": "2026-08-01", "st": "10:00", "et": "17:00", "due": "", "ans": 3842, "recon": false}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "plan": "通常", "status": "会期中", "s": "2026-07-29", "e": "2026-07-31", "st": "10:00", "et": "17:00", "due": "", "ans": 926, "recon": false}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-24", "e": "2026-07-26", "st": "10:00", "et": "17:00", "due": "08/05 15:00", "ans": 2150, "recon": true}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "plan": "超特急", "status": "データ化中", "s": "2026-07-22", "e": "2026-07-24", "st": "09:30", "et": "18:00", "due": "08/04 18:00", "ans": 1208, "recon": true}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "plan": "オンデマンド", "status": "データ化中", "s": "2026-07-21", "e": "2026-07-23", "st": "10:00", "et": "17:00", "due": "07/31 18:00", "ans": 3420, "recon": true}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "plan": "特急", "status": "データ化中", "s": "2026-07-18", "e": "2026-07-20", "st": "10:00", "et": "17:00", "due": "07/30 15:00", "ans": 2864, "recon": true}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "plan": "通常", "status": "データ化中", "s": "2026-07-16", "e": "2026-07-16", "st": "13:00", "et": "18:00", "due": "08/03 12:00", "ans": 412, "recon": true}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "plan": "超特急", "status": "データ化完了", "s": "2026-07-14", "e": "2026-07-16", "st": "10:00", "et": "17:00", "due": "07/21", "ans": 1980, "recon": false}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "plan": "お試し", "status": "データ化完了", "s": "2026-07-10", "e": "2026-07-10", "st": "11:00", "et": "19:00", "due": "07/17", "ans": 356, "recon": false}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "plan": "特急", "status": "データ化完了", "s": "2026-07-07", "e": "2026-07-07", "st": "13:00", "et": "17:30", "due": "07/14", "ans": 288, "recon": false}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-02", "e": "2026-07-04", "st": "10:00", "et": "17:00", "due": "07/09", "ans": 3105, "recon": false}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "plan": "通常", "status": "データ化完了", "s": "2026-06-25", "e": "2026-06-27", "st": "10:00", "et": "17:00", "due": "07/04", "ans": 1472, "recon": false}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "plan": "特急", "status": "データ化完了", "s": "2026-06-19", "e": "2026-06-20", "st": "09:30", "et": "18:00", "due": "06/26", "ans": 926, "recon": false}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "plan": "超特急", "status": "データ化完了", "s": "2026-06-12", "e": "2026-06-14", "st": "10:00", "et": "17:00", "due": "06/19", "ans": 1038, "recon": false}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "plan": "通常", "status": "データ化完了", "s": "2026-06-05", "e": "2026-06-07", "st": "10:00", "et": "17:00", "due": "06/12", "ans": 2214, "recon": false}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "plan": "お試し", "status": "データ化完了", "s": "2026-05-28", "e": "2026-05-30", "st": "10:00", "et": "17:00", "due": "06/07", "ans": 684, "recon": false}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "plan": "通常", "status": "データ化完了", "s": "2026-05-21", "e": "2026-05-23", "st": "10:00", "et": "17:00", "due": "05/28", "ans": 1760, "recon": false}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-05-14", "e": "2026-05-16", "st": "10:00", "et": "17:00", "due": "05/21", "ans": 2530, "recon": false}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "plan": "特急", "status": "データ化完了", "s": "2026-05-08", "e": "2026-05-10", "st": "10:00", "et": "17:00", "due": "05/15", "ans": 1204, "recon": false}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "plan": "通常", "status": "データ化完了", "s": "2026-04-23", "e": "2026-04-25", "st": "10:00", "et": "17:00", "due": "05/02", "ans": 842, "recon": false}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "plan": "超特急", "status": "データ化完了", "s": "2026-04-15", "e": "2026-04-15", "st": "13:00", "et": "18:00", "due": "04/22", "ans": 516, "recon": false}}, "daySv": {"2026-08-03": ["SV-10262"], "2026-08-04": ["SV-10262"], "2026-08-05": ["SV-10262"], "2026-07-30": ["SV-10259", "SV-10257"], "2026-07-31": ["SV-10259", "SV-10257"], "2026-08-01": ["SV-10259"], "2026-07-29": ["SV-10257"], "2026-07-24": ["SV-10250", "SV-10244"], "2026-07-25": ["SV-10250"], "2026-07-26": ["SV-10250"], "2026-07-22": ["SV-10244", "SV-10238"], "2026-07-23": ["SV-10244", "SV-10238"], "2026-07-21": ["SV-10238"], "2026-07-18": ["SV-10236"], "2026-07-19": ["SV-10236"], "2026-07-20": ["SV-10236"], "2026-07-16": ["SV-10233", "SV-10229"], "2026-07-14": ["SV-10229"], "2026-07-15": ["SV-10229"], "2026-07-10": ["SV-10227"], "2026-07-07": ["SV-10221"], "2026-07-02": ["SV-10218"], "2026-07-03": ["SV-10218"], "2026-07-04": ["SV-10218"], "2026-06-25": ["SV-10214"], "2026-06-26": ["SV-10214"], "2026-06-27": ["SV-10214"], "2026-06-19": ["SV-10209"], "2026-06-20": ["SV-10209"], "2026-06-12": ["SV-10205"], "2026-06-13": ["SV-10205"], "2026-06-14": ["SV-10205"], "2026-06-05": ["SV-10201"], "2026-06-06": ["SV-10201"], "2026-06-07": ["SV-10201"]}, "assigns": {"2026-06-05": ["王 麗華", "田中 大輔"], "2026-06-12": ["佐藤 由紀", "王 麗華"], "2026-06-19": ["山本 彩", "佐藤 由紀"], "2026-06-25": ["王 麗華", "田中 大輔"], "2026-06-26": ["田中 大輔", "山本 彩"], "2026-07-02": ["田中 大輔", "山本 彩"], "2026-07-03": ["山本 彩", "佐藤 由紀"], "2026-07-07": ["山本 彩", "佐藤 由紀"], "2026-07-10": ["田中 大輔", "山本 彩"], "2026-07-14": ["田中 大輔", "山本 彩"], "2026-07-15": ["山本 彩", "佐藤 由紀"], "2026-07-16": ["佐藤 由紀", "王 麗華", "田中 大輔"], "2026-07-21": ["王 麗華", "田中 大輔"], "2026-07-22": ["田中 大輔", "山本 彩", "佐藤 由紀"], "2026-07-23": ["山本 彩", "佐藤 由紀", "王 麗華"], "2026-07-24": ["佐藤 由紀", "王 麗華", "田中 大輔"], "2026-07-29": ["王 麗華", "田中 大輔"], "2026-07-30": ["田中 大輔", "山本 彩", "佐藤 由紀"], "2026-07-31": ["山本 彩", "佐藤 由紀", "王 麗華"]}};
+    var HOLI = { '2026-07-20': '海の日', '2026-08-11': '山の日' };
+    var MONTHS = ['2026-06', '2026-07', '2026-08'];
+    var TODAY = '2026-07-31';
+    var POOL = ['佐藤 由紀', '王 麗華', '田中 大輔', '山本 彩'];
+    var WD = ['日', '月', '火', '水', '木', '金', '土'];
+
+    var S = {
+        ym: '2026-07', sel: TODAY, tab: 'sv',
+        reg: { w: { 0: true, 6: true }, hol: true },
+        ind: {
+            '2026-08-08': { t: 'sub', memo: '' },
+            '2026-08-13': { t: 'hol', memo: '夏季休業' },
+            '2026-08-14': { t: 'hol', memo: '夏季休業' }
+        },
+        asg: CAL.assigns
+    };
+
+    function lv() { return parseInt((localStorage.getItem('adminMockLevel') || 'lv4').replace('lv', ''), 10) || 4; }
+    function pad2(n) { return (n < 10 ? '0' : '') + n; }
+    function dow(is) { return new Date(is + 'T00:00:00').getDay(); }
+    function typ(is) {
+        var i = S.ind[is];
+        if (i) { return { t: i.t, memo: i.memo || '', ind: true }; }
+        if (HOLI[is] && S.reg.hol) { return { t: 'hol', memo: HOLI[is] }; }
+        if (S.reg.w[dow(is)]) { return { t: 'hol', memo: '' }; }
+        return { t: 'biz', memo: '' };
+    }
+    // 個別設定を除いた素の区分(振替営業日の妥当性判定に使う)
+    function baseHoliday(is) { return (HOLI[is] && S.reg.hol) || !!S.reg.w[dow(is)]; }
+    function svOf(is) { return CAL.daySv[is] || []; }
+    function asgOf(is) { return S.asg[is] || []; }
+    function short(is) { return svOf(is).length > 0 && asgOf(is).length === 0 && typ(is).t !== 'hol' && is >= TODAY; }
+
+    window.calMonth = function (d) {
+        var i = MONTHS.indexOf(S.ym) + d;
+        if (i < 0 || i >= MONTHS.length) { return; }
+        S.ym = MONTHS[i];
+        calRender();
+    };
+    window.calTab = function (t) { S.tab = t; calRender(); };
+    window.calSelect = function (is) { S.sel = is; calRender(); };
+
+    function cellLines(is, t) {
+        var out = [];
+        var sv = svOf(is).length;
+        var asg = asgOf(is).length;
+        if (t.t === 'hol') { out.push('<span style="color:#6b7484">休業日' + (t.memo ? '(' + t.memo + ')' : '') + '</span>'); }
+        if (t.t === 'sub') { out.push('<span style="color:#2b57b8">振替営業日</span>'); }
+        var svCol = S.tab === 'sv' ? '#5b6577' : '#8a93a5';
+        var asCol = S.tab === 'as' ? '#5b6577' : '#8a93a5';
+        if (sv) { out.push('<span style="color:' + (t.t === 'hol' ? '#8a93a5' : svCol) + (S.tab === 'sv' && t.t !== 'hol' ? ';font-weight:700' : '') + '">会期 ' + sv + '件</span>'); }
+        if (short(is)) {
+            out.push('<span style="color:#c23934;font-weight:700">アサイン 0人</span>');
+        } else if (asg) {
+            out.push('<span style="color:' + asCol + (S.tab === 'as' ? ';font-weight:700' : '') + '">アサイン ' + asg + '人</span>');
+        }
+        return out.join('<br>');
+    }
+
+    function calRender() {
+        // Lv1ではページ本文がガード表示に差し替えられるため描画しない
+        if (!document.getElementById('calTitle')) { return; }
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        document.getElementById('calTitle').textContent = y + '年 ' + m + '月';
+        var pi = MONTHS.indexOf(S.ym);
+        var prev = document.getElementById('calPrev'), next = document.getElementById('calNext');
+        prev.disabled = pi === 0; next.disabled = pi === MONTHS.length - 1;
+        prev.style.color = prev.disabled ? '#c3c9d4' : '#374151';
+        next.style.color = next.disabled ? '#c3c9d4' : '#374151';
+        var sv = document.getElementById('calTabSv'), as = document.getElementById('calTabAs');
+        sv.style.background = S.tab === 'sv' ? '#3467d6' : '#fff';
+        sv.style.color = S.tab === 'sv' ? '#fff' : '#5b6577';
+        sv.style.fontWeight = S.tab === 'sv' ? '700' : '400';
+        as.style.background = S.tab === 'as' ? '#3467d6' : '#fff';
+        as.style.color = S.tab === 'as' ? '#fff' : '#5b6577';
+        as.style.fontWeight = S.tab === 'as' ? '700' : '400';
+
+        var first = new Date(y, m - 1, 1).getDay();
+        var dim = new Date(y, m, 0).getDate();
+        var total = Math.ceil((first + dim) / 7) * 7;
+        var cells = [];
+        for (var i = 0; i < total; i++) {
+            var lastCol = i % 7 === 6;
+            var lastRow = i >= total - 7;
+            var bd = (lastRow ? '' : 'border-bottom:1px solid #eef0f5;') + (lastCol ? '' : 'border-right:1px solid #eef0f5;');
+            var d = i - first + 1;
+            if (d < 1 || d > dim) {
+                var od = new Date(y, m - 1, d);
+                var lab = (d === 1 - first || d === dim + 1) ? (od.getMonth() + 1) + '/' + od.getDate() : String(od.getDate());
+                cells.push('<div style="min-height:86px;padding:6px 8px;' + bd + 'background:#fafbfd;color:#c3c9d4;font-size:12px">' + lab + '</div>');
+                continue;
+            }
+            var is = y + '-' + pad2(m) + '-' + pad2(d);
+            var t = typ(is);
+            var w = dow(is);
+            var numCol = w === 0 ? ';color:#c23934' : (w === 6 ? ';color:#3467d6' : '');
+            if (t.t === 'sub') { numCol = ';color:#2b57b8'; }
+            var bg = t.t === 'hol' ? 'background:#f0f1f4;' : (t.t === 'sub' ? 'background:#eef2fb;' : '');
+            var ring = is === S.sel ? 'box-shadow:inset 0 0 0 2px #3467d6;' : '';
+            var today = is === TODAY ? ' <span style="font-size:10px;color:#3467d6;font-weight:700">本日</span>' : '';
+            var lines = cellLines(is, t);
+            cells.push('<div tabindex="0" role="button" aria-label="' + m + '月' + d + '日" onclick="calSelect(\'' + is + '\')" style="min-height:86px;padding:6px 8px;' + bd + bg + ring + 'font-size:12px;cursor:pointer">'
+                + '<span style="font-weight:700' + numCol + '">' + d + '</span>' + today
+                + (lines ? '<div style="margin-top:4px;font-size:10.5px;line-height:1.6">' + lines + '</div>' : '')
+                + '</div>');
+        }
+        document.getElementById('calGrid').innerHTML = cells.join('');
+        panelRender();
+    }
+
+    function panelRender() {
+        var is = S.sel;
+        var t = typ(is);
+        var d = new Date(is + 'T00:00:00');
+        var head = (d.getMonth() + 1) + '/' + d.getDate() + '(' + WD[d.getDay()] + ')の詳細';
+        var kind = t.t === 'hol' ? '<span style="font-size:11.5px;color:#6b7484;font-weight:700">休業日' + (t.memo ? '(' + t.memo + ')' : '') + '</span>'
+            : t.t === 'sub' ? '<span style="font-size:11.5px;color:#2b57b8;font-weight:700">振替営業日</span>'
+            : '<span style="font-size:11.5px;color:#237a52;font-weight:700">営業日</span>';
+        var ids = svOf(is);
+        var cards = ids.map(function (sid) {
+            var v = CAL.surveys[sid];
+            var links = v.recon
+                ? '<span style="white-space:nowrap"><a href="data-entry/index.html" style="font-size:11px">名刺入力</a> · <a href="reconciliation/index.html?sid=' + sid + '" style="font-size:11px">照合 →</a></span>'
+                : '';
+            return '<div style="border:1px solid #eef0f5;border-radius:6px;padding:8px 10px">'
+                + '<a href="survey-detail.html?id=' + sid + '" style="font-variant-numeric:tabular-nums;font-size:12px">' + sid + '</a> ' + v.title
+                + '<div style="color:#6b7484;margin-top:2px;display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span>納期 ' + (v.due || '—') + '</span>' + links + '</div>'
+                + '</div>';
+        }).join('');
+        if (!cards) { cards = '<div style="color:#8a93a5">この日に会期のあるアンケートはありません。</div>'; }
+        var names = asgOf(is);
+        var chips = names.map(function (n) {
+            return '<span style="border:1px solid #c8cdd8;border-radius:999px;padding:3px 4px 3px 10px;display:inline-flex;align-items:center;gap:2px">' + n
+                + '<button aria-label="' + n + ' のアサインを取り消す" title="取り消す" onclick="calUnassign(\'' + n + '\')" style="border:none;background:none;color:#8a93a5;cursor:pointer;font-size:13px;line-height:1;padding:2px 6px;font-family:inherit">×</button></span>';
+        }).join('');
+        if (!chips) {
+            chips = short(is) ? '<span style="color:#c23934;font-weight:700">未アサイン</span>' : '<span style="color:#8a93a5">未アサイン</span>';
+        }
+        var del = (t.ind && lv() >= 3)
+            ? '<button onclick="calDelAsk()" style="margin-top:12px;width:100%;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">この日の個別設定を削除</button>'
+            : '';
+        document.getElementById('calPanel').innerHTML =
+            '<div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #e2e6ed">'
+            + '<span style="font-size:14px;font-weight:700">' + head + '</span>' + kind + '</div>'
+            + '<div style="margin-top:12px;font-size:12px;font-weight:700;color:#5b6577">会期のあるアンケート(' + ids.length + '件)</div>'
+            + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:280px;overflow-y:auto">' + cards + '</div>'
+            + '<div style="margin-top:16px;font-size:12px;font-weight:700;color:#5b6577">アサイン済み(' + names.length + '人)</div>'
+            + '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">' + chips + '</div>'
+            + '<button onclick="calAssignOpen()" style="margin-top:14px;width:100%;background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 0;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">この日にアサインを追加</button>'
+            + '<div style="margin-top:10px;font-size:11px;color:#8a93a5">確定するとオペレーターへ割当通知が送信されます。</div>'
+            + del;
+    }
+
+    // ---- アサイン ----
+    var tmpAsg = [];
+    window.calAssignOpen = function () {
+        tmpAsg = asgOf(S.sel).slice();
+        var d = new Date(S.sel + 'T00:00:00');
+        document.getElementById('calAsgDate').textContent = d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + '(' + WD[d.getDay()] + ')';
+        var ans = svOf(S.sel).reduce(function (a, sid) { return a + (CAL.surveys[sid].ans || 0); }, 0);
+        document.getElementById('calAsgStats').innerHTML =
+            '<span>会期 <strong style="font-variant-numeric:tabular-nums">' + svOf(S.sel).length + '件</strong></span>'
+            + '<span>回答数計 <strong style="font-variant-numeric:tabular-nums">' + ans.toLocaleString('ja-JP') + '件</strong></span>'
+            + '<span>アサイン済み <strong id="calAsgCount" style="font-variant-numeric:tabular-nums">' + tmpAsg.length + '人</strong></span>';
+        renderAsgChips();
+        window.pOpen('mAssign');
+    };
+    function renderAsgChips() {
+        document.getElementById('calAsgChips').innerHTML = POOL.map(function (n) {
+            var on = tmpAsg.indexOf(n) >= 0;
+            return '<button onclick="calChip(\'' + n + '\')" style="border:1px solid ' + (on ? '#3467d6' : '#c8cdd8') + ';background:' + (on ? '#eef2fb' : '#fff') + ';color:' + (on ? '#3467d6' : '#5b6577') + ';border-radius:999px;padding:4px 14px;font-size:12px;' + (on ? 'font-weight:700;' : '') + 'cursor:pointer;font-family:inherit">' + n + (on ? ' ✓' : '') + '</button>';
+        }).join('');
+        var c = document.getElementById('calAsgCount');
+        if (c) { c.textContent = tmpAsg.length + '人'; }
+    }
+    window.calChip = function (n) {
+        var i = tmpAsg.indexOf(n);
+        if (i >= 0) { tmpAsg.splice(i, 1); } else { tmpAsg.push(n); }
+        renderAsgChips();
+    };
+    window.calAssignCommit = function () {
+        var ordered = POOL.filter(function (n) { return tmpAsg.indexOf(n) >= 0; });
+        if (ordered.length) { S.asg[S.sel] = ordered; } else { delete S.asg[S.sel]; }
+        window.pClose('mAssign');
+        calRender();
+    };
+    window.calUnassign = function (n) {
+        var a = asgOf(S.sel).filter(function (x) { return x !== n; });
+        if (a.length) { S.asg[S.sel] = a; } else { delete S.asg[S.sel]; }
+        calRender();
+    };
+
+    // ---- 休業日・振替 ----
+    var origHolidayOpen = null;
+    window.calHolidayOpen = function () {
+        document.getElementById('calHolDate').value = S.sel;
+        document.getElementById('calHolKind').value = 'hol';
+        document.getElementById('calHolMemo').value = '';
+        var e = document.getElementById('calHolErr');
+        e.hidden = true; e.textContent = '';
+        window.pOpen('mHoliday');
+    };
+    window.calHolidaySave = function () {
+        var is = document.getElementById('calHolDate').value;
+        var kind = document.getElementById('calHolKind').value;
+        var memo = document.getElementById('calHolMemo').value.trim();
+        var err = document.getElementById('calHolErr');
+        function fail(msg) { err.textContent = msg; err.hidden = false; }
+        if (!is) { return fail('日付を指定してください。'); }
+        if (MONTHS.indexOf(is.slice(0, 7)) < 0) { return fail('表示範囲(2026年6月〜8月)内の日付を指定してください。'); }
+        if (S.ind[is]) { return fail('この日には既に個別設定があります。先に削除してください。'); }
+        if (kind === 'sub' && !baseHoliday(is)) { return fail('振替営業日は定休日・祝日にあたる日付にのみ設定できます。'); }
+        S.ind[is] = { t: kind, memo: memo };
+        S.ym = is.slice(0, 7);
+        S.sel = is;
+        window.pClose('mHoliday');
+        calRender();
+    };
+    window.calDelAsk = function () {
+        var t = typ(S.sel);
+        var d = new Date(S.sel + 'T00:00:00');
+        var name = (t.t === 'hol' ? '休業日' : '振替営業日') + (t.memo ? '「' + t.memo + '」' : '');
+        document.getElementById('calDelText').textContent =
+            (d.getMonth() + 1) + '/' + d.getDate() + '(' + WD[d.getDay()] + ')の個別設定(' + name + ')を削除します。以後この日は定休日・祝日の設定に従います。';
+        window.pOpen('mConfirmDelHoliday');
+    };
+    window.calDelDo = function () {
+        delete S.ind[S.sel];
+        window.pClose('mConfirmDelHoliday');
+        calRender();
+    };
+
+    // ---- 定休日 ----
+    var tmpReg = null;
+    window.calRegOpen = function () {
+        tmpReg = { w: {}, hol: S.reg.hol };
+        for (var k in S.reg.w) { tmpReg.w[k] = true; }
+        renderReg();
+        window.pOpen('mRegularHoliday');
+    };
+    function regChip(label, on, onclick) {
+        return '<button onclick="' + onclick + '" style="border:1px solid ' + (on ? '#3467d6' : '#c8cdd8') + ';background:' + (on ? '#eef2fb' : '#fff') + ';color:' + (on ? '#3467d6' : '#5b6577') + ';border-radius:999px;padding:5px 13px;font-size:12.5px;' + (on ? 'font-weight:700;' : '') + 'cursor:pointer;font-family:inherit">' + label + (on ? ' ✓' : '') + '</button>';
+    }
+    function renderReg() {
+        var order = [1, 2, 3, 4, 5, 6, 0];
+        document.getElementById('calRegWeek').innerHTML = order.map(function (w) {
+            return regChip(WD[w], !!tmpReg.w[w], 'calRegToggle(' + w + ')');
+        }).join('');
+        document.getElementById('calRegHol').innerHTML = regChip('祝日を休業日にする', tmpReg.hol, 'calRegToggle(\'hol\')');
+    }
+    window.calRegToggle = function (k) {
+        if (k === 'hol') { tmpReg.hol = !tmpReg.hol; } else if (tmpReg.w[k]) { delete tmpReg.w[k]; } else { tmpReg.w[k] = true; }
+        renderReg();
+    };
+    window.calRegSave = function () {
+        S.reg = tmpReg;
+        window.pClose('mRegularHoliday');
+        calRender();
+    };
+
+    document.addEventListener('DOMContentLoaded', calRender);
+    if (document.readyState !== 'loading') { calRender(); }
+})();
+</script>
+
 </body>
 </html>
