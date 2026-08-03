@@ -29,7 +29,7 @@
               <input data-f-key="company" placeholder="会社名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:170px;font-family:inherit">
               <input data-f-key="name" placeholder="氏名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
               <input data-f-key="mail" placeholder="メールアドレス" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:190px;font-family:inherit">
-              <select data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">アカウント状態: すべて</option><option>有効</option><option>停止</option><option>招待中</option><option>本登録未了</option></select>
+              <select aria-label="アカウント状態" data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">アカウント状態: すべて</option><option>有効</option><option>停止</option><option>招待中</option><option>本登録未了</option></select>
               <button onclick="pSearch('usersList')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
               <button onclick="pClearSearch('usersList')" style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
             </div>
@@ -138,7 +138,7 @@
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
               <span style="font-variant-numeric:tabular-nums">全 <span id="usersList-total">24</span> 件中 <span id="usersList-range">1〜10</span> 件を表示</span>
               <div style="display:flex;align-items:center;gap:16px">
-                <label style="display:flex;align-items:center;gap:6px">表示件数 <select onchange="pPageSize('usersList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
+                <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('usersList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
                 <div id="usersList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('usersList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('usersList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜20" onclick="pPage('usersList',2)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">2</button><button data-page="3" data-range="21〜24" onclick="pPage('usersList',3)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">3</button><button onclick="pPageStep('usersList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
               </div>
             </div>
@@ -156,8 +156,8 @@
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メールアドレス <span style="color:#c23934">必須</span></span><input data-initial-focus placeholder="user@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会社名(任意)</span><input style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">氏名(任意)</span><input style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会社名(任意)</span><input aria-label="会社名(任意)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">氏名(任意)</span><input aria-label="氏名(任意)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       </div>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">招待リンクの有効期限は送信から72時間です。期限切れ・未達の場合は一覧から再送できます。</div>
     </div>

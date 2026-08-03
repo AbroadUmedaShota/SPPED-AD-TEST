@@ -29,7 +29,7 @@
                 <input data-f-key="uid" placeholder="ユーザーID" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
                 <input data-f-key="company" placeholder="会社名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:170px;font-family:inherit">
                 <input data-f-key="name" placeholder="氏名" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
-                <select data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">作業ステータス: すべて</option><option>会期前</option><option>会期中</option><option>データ化中</option><option>データ化完了</option></select>
+                <select aria-label="作業ステータス" data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">作業ステータス: すべて</option><option>会期前</option><option>会期中</option><option>データ化中</option><option>データ化完了</option></select>
                 <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151"><input data-f-key="today" type="checkbox">本日会期のみ</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151"><input data-f-key="isnew" type="checkbox">新着(前日比増)のみ</label>
                 <button onclick="pSearch('surveysList')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
@@ -130,7 +130,7 @@
               <div id="surveysList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
               </div>
               <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-                <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="surveysList-total">22</span> 件中 <span id="surveysList-range">1〜10</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select onchange="pPageSize('surveysList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+                <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="surveysList-total">22</span> 件中 <span id="surveysList-range">1〜10</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('surveysList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
                 <div id="surveysList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('surveysList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('surveysList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜20" onclick="pPage('surveysList',2)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">2</button><button data-page="3" data-range="21〜22" onclick="pPage('surveysList',3)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">3</button><button onclick="pPageStep('surveysList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
               </div>
               <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">作業ステータスの値集合は現行6値(作成中/会期中/データ化中/アップ待ち/アップ完了/データ化なし)を4値へ整理する案。ユーザー画面の表示ステータスは「会期終了（データ化中）」等の括弧付き7値(statusService)であり、内部・管理側の値との対応整理が必要。データ化件数・納品予定日は現行画面の「実際の件数」「データ化完了予定日」に対応。</div>
@@ -149,10 +149,10 @@
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">対象ユーザー <span style="color:#c23934">必須</span></span><input data-initial-focus placeholder="ユーザーID・会社名で検索(モックでは固定候補: U-1049 グロースパートナーズ(株))" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">タイトル <span style="color:#c23934">必須</span></span><input placeholder="例: ◯◯展 来場者アンケート" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期開始</span><input type="datetime-local" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期終了</span><input type="datetime-local" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期開始</span><input aria-label="会期開始" type="datetime-local" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期終了</span><input aria-label="会期終了" type="datetime-local" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
       </div>
-      <label style="display:block;max-width:240px"><span style="font-size:11.5px;font-weight:700;color:#5b6577">データ化の納期区分</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>お試し</option><option>通常</option><option>特急</option><option>超特急</option><option>オンデマンド</option></select></label>
+      <label style="display:block;max-width:240px"><span style="font-size:11.5px;font-weight:700;color:#5b6577">データ化の納期区分</span><select aria-label="データ化の納期区分" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>お試し</option><option>通常</option><option>特急</option><option>超特急</option><option>オンデマンド</option></select></label>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。利用者側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。設問の編集は別画面で提供します(本モック対象外)。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
@@ -182,21 +182,6 @@
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button data-initial-focus onclick="pClose('mDl')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
-    </div>
-  </div>
-</div>
-
-
-<div id="mConfirmDeleteSurvey" class="proto-modal" hidden>
-  <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
-      <span style="font-size:15px;font-weight:700">アンケートを削除しますか?</span>
-      <span role="button" onclick="pClose('mConfirmDeleteSurvey')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
-    </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートを削除します。削除は会期前〜会期中に実行できます。この操作は取り消せません。</div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmDeleteSurvey')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmDeleteSurvey')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">削除する</button>
     </div>
   </div>
 </div>
