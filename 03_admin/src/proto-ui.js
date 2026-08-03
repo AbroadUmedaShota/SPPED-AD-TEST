@@ -205,13 +205,13 @@
     // 行に data-f-<key>、絞り込みUIに data-f-key、一覧容器に data-filter-keys、
     // 絞り込みバーに data-filter-for="{listId}" を付けて使う。
     // 他画面からは同名のクエリ(?uid=U-1052 等)で同じ条件を引き継ぐ
-    var P_EXACT = { status: 1, plan: 1, unpaid: 1, group: 1, lv: 1, lang: 1, month: 1, type: 1, today: 1, isnew: 1, premium: 1 };
+    var P_EXACT = { status: 1, plan: 1, coupon: 1, group: 1, lv: 1, lang: 1, month: 1, type: 1, today: 1, isnew: 1, premium: 1 };
     var P_LABEL = {
         uid: 'ユーザーID', sid: 'アンケートID', oid: 'オペレーターID', cid: 'クーポンID',
         company: '会社名', name: '氏名', mail: 'メールアドレス', code: 'コード', cname: 'クーポン名',
         status: '状態', plan: '納期区分', group: '所属グループ', lv: '権限', lang: '言語',
         month: '発行月', type: '操作種別', target: '対象', actor: '操作者', any: '氏名・メール・ID', from: '開始日', to: '終了日',
-        unpaid: '入金未確認のみ', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム'
+        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム'
     };
 
     function pFilterBar(listId) {
