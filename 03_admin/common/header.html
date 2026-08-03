@@ -2,13 +2,13 @@
 <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5" style="height:56px;background:#ffffff;border-bottom:1px solid #e2e6ed">
     <div class="flex items-center gap-3">
         <button id="mobile-sidebar-toggle" class="lg:hidden p-2 rounded" aria-label="ナビゲーションを開く" style="color:#1f2733;font-size:18px;line-height:1">☰</button>
-        <a href="index.html" class="flex items-center gap-3" aria-label="管理者ダッシュボードへ" style="text-decoration:none">
-            <span style="font-size:17px;font-weight:700;letter-spacing:1.5px;color:#1f2733">SPEED <span style="color:#3467d6">AD</span></span>
-            <span style="font-size:11px;font-weight:700;color:#3467d6;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb">管理画面</span>
+        <a href="index.html" class="flex items-center gap-3" aria-label="管理者ダッシュボードへ" style="text-decoration:none;white-space:nowrap">
+            <span style="font-size:17px;font-weight:700;letter-spacing:1.5px;color:#1f2733;white-space:nowrap">SPEED <span style="color:#3467d6">AD</span></span>
+            <span class="admin-badge" style="font-size:11px;font-weight:700;color:#3467d6;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">管理画面</span>
         </a>
     </div>
     <div class="flex items-center" style="gap:14px">
-        <label title="モックの見せ分け(実際の認可制御ではない)。" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6b7484">表示シナリオ
+        <label title="モックの見せ分け(実際の認可制御ではない)。" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6b7484;white-space:nowrap"><span class="admin-scenario-label">表示シナリオ</span>
             <select id="levelSelect" style="border:1px solid #c8cdd8;border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;color:#1f2733;min-width:160px;background:#fff">
                 <option value="lv1">Lv1 Operator</option>
                 <option value="lv2">Lv2 OperatorAdmin</option>
@@ -16,6 +16,6 @@
                 <option value="lv4" selected>Lv4 MasterAdmin</option>
             </select>
         </label>
-        <span style="font-size:12px;color:#6b7484">2026/07/31(金) 09:45 JST</span>
+        <span class="admin-clock" style="font-size:12px;color:#6b7484;white-space:nowrap">2026/07/31(金) 09:45 JST</span>
     </div>
 </header>

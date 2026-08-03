@@ -74,6 +74,17 @@ body.sidebar-locked {
     overflow: hidden;
 }
 
+/* ヘッダーの狭幅対応: 折返しで縦組みになるのを防ぎ、優先度の低い要素から落とす */
+@media (max-width: 900px) {
+    .admin-clock { display: none; }
+}
+
+@media (max-width: 640px) {
+    .admin-badge { display: none; }
+    .admin-scenario-label { display: none; }
+    header select#levelSelect { min-width: 132px; }
+}
+
 /* ステータスバッジ(prototype 配色) */
 .status-badge {
     display: inline-block;
