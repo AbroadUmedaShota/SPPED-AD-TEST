@@ -12,12 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:232px">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
         <div style="padding:18px 24px 40px">
           <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">照合管理一覧</span></div>
           <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
@@ -54,7 +54,7 @@
               <span style="text-align:right">総件数</span><span style="text-align:right">未入力</span><span style="text-align:right">一致</span><span style="text-align:right">不一致</span>
               <span style="text-align:right;padding-right:10px">進捗</span><span title="既定の並び順" style="color:#5b6577">納期日時 ▲</span><span style="padding-left:12px">操作</span>
             </div>
-            <div data-pg="1" data-f-sid="SV-10236" data-f-uid="U-1033" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10236'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;background:#fdf0ef;border-bottom:1px solid #e2e6ed;font-size:13px;font-variant-numeric:tabular-nums">
+            <div tabindex="0" role="link" data-pg="1" data-f-sid="SV-10236" data-f-uid="U-1033" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10236'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;background:#fdf0ef;border-bottom:1px solid #e2e6ed;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10236</span><span style="padding-right:12px">スマート物流EXPO 来場者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/13 10:00<br>〜07/15 17:00</span>
               <span style="text-align:right">2,180</span><span style="text-align:right">46</span><span style="text-align:right">1,872</span><span style="text-align:right;font-weight:700">262</span>
@@ -62,7 +62,7 @@
               <span style="color:#c23934;font-weight:700;font-size:12.5px">07/30 15:00<br><span style="display:inline-block;margin-top:2px;background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">納期超過</span></span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html?id=SV-10236'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><a href="#m" style="font-size:12px" onclick="event.stopPropagation();pOpen('mDl');return false">データDL ▾</a></span>
             </div>
-            <div data-pg="1" data-f-sid="SV-10238" data-f-uid="U-1038" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10238'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div tabindex="0" role="link" data-pg="1" data-f-sid="SV-10238" data-f-uid="U-1038" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10238'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10238</span><span style="padding-right:12px">BtoB EXPO 東京 2026 来場者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/21 10:00<br>〜07/23 17:00</span>
               <span style="text-align:right">3,420</span><span style="text-align:right">182</span><span style="text-align:right">2,865</span><span style="text-align:right;font-weight:700">373</span>
@@ -70,7 +70,7 @@
               <span style="font-size:12.5px;font-weight:500">07/31 18:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html?id=SV-10238'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><a href="#m" style="font-size:12px" onclick="event.stopPropagation();pOpen('mDl');return false">データDL ▾</a></span>
             </div>
-            <div data-pg="1" data-f-sid="SV-10233" data-f-uid="U-1035" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10233'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div tabindex="0" role="link" data-pg="1" data-f-sid="SV-10233" data-f-uid="U-1035" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10233'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10233</span><span style="padding-right:12px">地方創生フォーラム 参加者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/27 13:00<br>〜07/27 18:00</span>
               <span style="text-align:right">486</span><span style="text-align:right">121</span><span style="text-align:right">340</span><span style="text-align:right;font-weight:700">25</span>
@@ -78,7 +78,7 @@
               <span style="font-size:12.5px;font-weight:500">08/03 12:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html?id=SV-10233'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><a href="#m" style="font-size:12px" onclick="event.stopPropagation();pOpen('mDl');return false">データDL ▾</a></span>
             </div>
-            <div data-pg="1" data-f-sid="SV-10244" data-f-uid="U-1052" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10244'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div tabindex="0" role="link" data-pg="1" data-f-sid="SV-10244" data-f-uid="U-1052" data-f-status="データ化中" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10244'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10244</span><span style="padding-right:12px">マーケティングサミット2026 来場者アンケート</span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/22 09:30<br>〜07/24 18:00</span>
               <span style="text-align:right">1,208</span><span style="text-align:right">954</span><span style="text-align:right">201</span><span style="text-align:right;font-weight:700">53</span>
@@ -86,7 +86,7 @@
               <span style="font-size:12.5px;font-weight:500">08/04 18:00</span>
               <span style="padding-left:12px;display:flex;align-items:center;gap:10px"><button onclick="location.href='detail.html?id=SV-10244'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合開始</button><a href="#m" style="font-size:12px" onclick="event.stopPropagation();pOpen('mDl');return false">データDL ▾</a></span>
             </div>
-            <div data-pg="1" data-f-sid="SV-10250" data-f-uid="U-1050" data-f-status="データ化完了" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10250'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
+            <div tabindex="0" role="link" data-pg="1" data-f-sid="SV-10250" data-f-uid="U-1050" data-f-status="データ化完了" class="proto-row-hover" onclick="location.href='detail.html?id=SV-10250'" style="display:grid;grid-template-columns:92px minmax(150px,1fr) 140px 72px 68px 72px 68px 124px 118px 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
               <span style="font-weight:500">SV-10250</span><span style="padding-right:12px">食品・飲料展 出展者アンケート <span class="status-badge status-active">データ化完了</span></span>
               <span style="font-size:12px;color:#5b6577;line-height:1.5">07/24 10:00<br>〜07/26 17:00</span>
               <span style="text-align:right">2,150</span><span style="text-align:right;color:#6b7484">0</span><span style="text-align:right">2,061</span><span style="text-align:right">89</span>
@@ -116,7 +116,7 @@
           <div class="proto-dialog" style="background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(12,18,30,.4);width:480px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
               <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10250 食品・飲料展</span></span>
-              <span onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+              <span role="button" onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
             </div>
             <div style="padding:16px 22px;display:flex;flex-direction:column;gap:10px">
               <button onclick="pClose('mDl')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">

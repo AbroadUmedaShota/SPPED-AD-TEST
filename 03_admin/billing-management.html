@@ -12,12 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="relative flex min-h-screen flex-col overflow-x-hidden" style="min-width:1280px">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" style="margin-left:232px">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
             <div style="padding:18px 24px 40px">
               <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">請求管理</span></div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
@@ -71,7 +71,7 @@
   <div class="proto-dialog" style="width:560px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
       <span style="font-size:15px;font-weight:700">入金情報の編集<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">(株)テックブリッジ・SV-10244分</span></span>
-      <span onclick="pClose('mBillingEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mBillingEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
@@ -98,7 +98,7 @@
   <div class="proto-dialog" style="width:500px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
       <span style="font-size:15px;font-weight:700">クーポンを適用<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">(株)テックブリッジ・332,000円</span></span>
-      <span onclick="pClose('mCouponApply')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mCouponApply')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">適用するクーポン</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>SUMMER10 — サマーキャンペーン10(10%割引・残り32回)</option><option>EXPOREF5 — 展示会ご紹介割(5%割引・残り59回)</option></select></label>

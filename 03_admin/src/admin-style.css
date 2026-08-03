@@ -139,6 +139,34 @@ body.sidebar-locked {
     }
 }
 #main-content { padding-left: 0 !important; }
+
+/* 本文の左余白 = サイドバー幅。1024px未満ではサイドバーがオーバーレイになるため余白を戻す。
+   サイドバーを持たない作業画面(入力個票・照合個票)は main 側のインライン margin-left:0 が優先される */
+#main-content { margin-left: 232px; }
+
+@media (max-width: 1023px) {
+    #main-content { margin-left: 0; }
+}
+
+/* 入力個票・照合個票の作業画面。
+   既定は1画面に収める固定高(height:100vh + overflow:hidden)だが、
+   幅が足りないと内容が切れて到達できなくなるため、狭幅では縦積み+ページスクロールへ切り替える */
+@media (max-width: 1023px) {
+    .admin-workscreen {
+        height: auto !important;
+        min-height: 100vh;
+        overflow: visible !important;
+    }
+
+    .admin-workscreen .workscreen-body {
+        overflow: visible !important;
+    }
+
+    /* 名刺画像ビューアと入力フォームの2ペインを縦に積む */
+    .admin-workscreen .workscreen-panes {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
 .admin-sidebar { transition: none !important; }
 
 /* Tailwind CDN の preflight(a{color:inherit}) がリンク色を打ち消すため詳細度を上げて再指定 */

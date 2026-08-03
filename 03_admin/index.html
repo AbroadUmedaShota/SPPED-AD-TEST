@@ -15,9 +15,7 @@
        design_handoff_admin_ui/prototype.dc.html 準拠。
        メディアクエリを使うため、この画面だけインラインstyleではなくクラスで組む。 */
 
-    /* 本文オフセット: サイドバーは1024px未満でオーバーレイになるため余白を戻す */
-    #main-content { margin-left: 232px; }
-    @media (max-width: 1023px) { #main-content { margin-left: 0; } }
+    /* 本文の左余白は admin-style.css で全画面共通に定義 */
 
     .dash-wrap { padding: 18px 24px 40px; }
     @media (max-width: 640px) { .dash-wrap { padding: 16px 16px 32px; } }
@@ -277,14 +275,7 @@
 (function () {
     'use strict';
 
-    // カード・一覧行は div のため、Enter / Space でもクリックと同じ遷移を発火させる
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') { return; }
-        var target = e.target.closest && e.target.closest('.dash-card[role], .dash-trow[role]');
-        if (!target) { return; }
-        e.preventDefault();
-        target.click();
-    });
+    // Enter / Space での押下は proto-ui.js の共通ハンドラが処理する
 
     // 再取得: 集計値を取り直す(モックでは再読み込み)
     document.addEventListener('DOMContentLoaded', function () {

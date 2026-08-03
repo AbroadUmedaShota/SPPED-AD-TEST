@@ -83,16 +83,20 @@
         el.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
-    // tabindex付きのクリック要素(候補・チップ・×ボタン)を Enter / Space でも発火させる
+    // tabindex付きのクリック要素(一覧行・カード・候補・チップ・×ボタン)を Enter / Space でも発火させる。
+    // 一覧行は div のため既定のキーボード操作を持たない
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }
         if (e.ctrlKey || e.metaKey || e.altKey) { return; }  // 修飾キー付きはショートカット側に譲る
         if (e.key !== 'Enter' && e.key !== ' ') { return; }
         var t = e.target;
-        if (t && t.tagName === 'SPAN' && t.hasAttribute('tabindex') && (t.hasAttribute('onclick') || t.onclick)) {
-            e.preventDefault();
-            t.click();
-        }
+        if (!t || !t.closest) { return; }
+        // 行内のボタン・リンク・入力欄は各要素の既定動作に委ねる(行の遷移を二重発火させない)
+        if (t.closest('button, a, input, select, textarea')) { return; }
+        var el = t.closest('[tabindex]');
+        if (!el || !(el.hasAttribute('onclick') || el.onclick)) { return; }
+        e.preventDefault();
+        el.click();
     });
 
     // よく使う入力チップ用: 対象inputのカーソル位置へ挿入(選択範囲は置換)
