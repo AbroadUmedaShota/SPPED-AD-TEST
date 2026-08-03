@@ -172,8 +172,7 @@
             btn.onclick = (function (n) { return function () { window.pPage(listId, n); }; })(i);
             pager.insertBefore(btn, steppers[1] || null);
         }
-        // 1ページに収まる場合はページ送り自体を隠す
-        pager.style.visibility = (pages > 1) ? 'visible' : 'hidden';
+        // 1ページに収まる場合もページャは残す(ページ送りは pPage 側で淡色化される)
         window.pPage(listId, 1);
     };
 
