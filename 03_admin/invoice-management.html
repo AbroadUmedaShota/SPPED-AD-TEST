@@ -32,7 +32,7 @@
             </div>
             <div id="invoiceList" data-filter-keys="uid,company,month" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
               <div style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
-                <span title="既定の並び順(ソートはモック未配線)" style="color:#5b6577">発行月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">お礼メール送信費用</span><span style="text-align:right">請求合計</span><span></span>
+                <span title="既定の並び順" style="color:#5b6577">発行月 ▼</span><span>会社名</span><span style="text-align:right">月額利用料</span><span style="text-align:right">お礼メール送信費用</span><span style="text-align:right">請求合計</span>
               </div>
               <div data-pg="1" data-f-month="2026/07" data-f-company="(株)マーケットビジョン" data-f-uid="U-1052" class="proto-row-hover" onclick="pOpen('mInvoiceDetail')" style="display:grid;grid-template-columns:120px minmax(200px,1fr) 150px 170px 150px 130px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                 <span style="font-weight:500">2026/07</span><span>(株)マーケットビジョン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">1,140 円</span><span style="text-align:right;font-weight:700">11,140 円</span><span style="text-align:right;font-size:11.5px;color:#3467d6">内訳を表示 →</span>
@@ -52,10 +52,9 @@
               <div id="invoiceList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="invoiceList-total">5</span> 件中 1〜5 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select title="全 5 件のため、いずれの表示件数でも1ページに収まります" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="invoiceList-total">5</span> 件中 1〜5 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span><span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">›</span></div>
             </div>
-            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">アンケート単位の請求との対応関係、請求管理との1本化は§11で要確定。</div>
           </div>
         </main>
     </div>
@@ -71,7 +70,7 @@
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>月額利用料(プレミアムプラン)</span><span>10,000 円</span></div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums"><span>お礼メール送信費用<span style="color:#6b7484;font-size:12px;margin-left:8px">送信対象1,240件・無料100件控除 → 1,140通 × 1円</span></span><span>1,140 円</span></div>
       <div style="display:flex;justify-content:space-between;padding:12px 0 2px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums"><span>請求合計(税抜)</span><span style="font-size:17px">11,140 円</span></div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">金額はユーザー画面正本に整合(プレミアム月額10,000円税別・お礼メール1通1円/無料100件控除)。名刺データ化(アンケート単位)の請求は「請求管理」で管理します。請求書PDFの発行機能は§11で要確定のため未掲載です。</div>
+      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">金額はユーザー画面正本に整合(プレミアム月額10,000円税別・お礼メール1通1円/無料100件控除)。名刺データ化(アンケート単位)の請求は「請求管理」で管理します。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button onclick="pClose('mInvoiceDetail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>

@@ -27,8 +27,8 @@
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px">
               <span style="font-size:16px;font-weight:700">岡田 健一</span>
               <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">U-1052</span>
-              <span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700">プレミアム</span>
-              <span class="status-badge status-active">有効</span>
+              <span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700" data-slot="premium">プレミアム</span>
+              <span data-slot="status" class="status-badge status-active">有効</span>
             </div>
             <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
@@ -52,29 +52,28 @@
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作</div>
         <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button onclick="pOpen('mConfirmStopUser')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">アカウントを停止</button>
-          <button onclick="location.href='survey-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">このユーザーのアンケート一覧 →</button>
-          <button onclick="location.href='billing-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
+          <button data-go="surveys" onclick="location.href='survey-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">このユーザーのアンケート一覧 →</button>
+          <button data-go="billing" onclick="location.href='billing-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
         </div>
-        <div style="margin-top:8px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます(§3)。</div>
+        <div style="margin-top:8px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます。</div>
       </div>
       <div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
           <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
-          <button data-min-lv="4" title="モック未配線" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定 <span style="font-weight:400;font-size:11px">Lv4限定・理由入力+本人通知</span></button>
-          <span data-max-lv="3" style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示(§4.6)</span>
-          <span style="font-size:11.5px;color:#8a6414">※Lv4限定・理由入力・本人通知のルールはオペレーター管理(AD-09)決定の転用。ユーザーアカウントへの適用は要確定</span>
+          <button data-min-lv="4" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定 <span style="font-weight:400;font-size:11px">Lv4限定・理由入力+本人通知</span></button>
+          <span data-max-lv="3" style="font-size:11.5px;color:#8a93a5">管理者による直接設定はLv4のみ表示</span>
+          
         </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 <span style="font-weight:400;font-size:11px;color:#8a6414">※あったほうが良い・実現方式は要確定</span></div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 </div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px">
           <div style="display:flex;justify-content:space-between;gap:10px"><span>招待メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/28 10:02</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
           <div style="display:flex;justify-content:space-between;gap:10px"><span>本登録完了メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/29 14:20</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
-          <div style="font-size:11px;color:#8a93a5;line-height:1.6">※到達確認は「正しく実装できない」との報告があり、表示内容・精度は開発側との擦り合わせ待ち。</div>
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">利用状況</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px">
-          <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">アンケート数</div><div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">24</div></div>
-          <div onclick="location.href='billing-management.html'" style="background:#f7f8fb;border-radius:6px;padding:10px 14px;cursor:pointer"><div style="font-size:11.5px;color:#6b7484">入金未確認の請求 <span style="color:#3467d6">→</span></div><div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:#6b7484">0</div></div>
+          <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">アンケート数</div><div data-slot="surveys" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">24</div></div>
+          <div data-go="billing-unpaid" onclick="location.href='billing-management.html'" style="background:#f7f8fb;border-radius:6px;padding:10px 14px;cursor:pointer"><div style="font-size:11.5px;color:#6b7484">入金未確認の請求 <span style="color:#3467d6">→</span></div><div data-slot="unpaid" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:#6b7484">0</div></div>
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
@@ -135,5 +134,54 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+
+<script>
+// ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、
+// 集計値・操作ログ・モーダル本文の数値は固定のダミーのまま
+(function () {
+    var DATA = {"U-1052": {"company": "(株)マーケットビジョン", "name": "岡田 健一", "mail": "k.okada@market-v.co.jp", "status": "有効", "premium": true, "created": "2026/07/29 14:20", "surveys": 2, "unpaid": 1}, "U-1051": {"company": "—", "name": "—", "mail": "info@newcorp.example.jp", "status": "招待中", "premium": false, "created": "2026/07/28 11:02", "surveys": 0, "unpaid": 0}, "U-1050": {"company": "(株)イベントプラス", "name": "中山 亮", "mail": "r.nakayama@eventplus.co.jp", "status": "本登録未了", "premium": false, "created": "2026/07/27 16:48", "surveys": 1, "unpaid": 0}, "U-1049": {"company": "グロースパートナーズ(株)", "name": "三浦 沙織", "mail": "s.miura@growthp.co.jp", "status": "有効", "premium": false, "created": "2026/07/27 09:15", "surveys": 2, "unpaid": 0}, "U-1038": {"company": "(株)テックブリッジ", "name": "森田 優子", "mail": "y.morita@techbridge.co.jp", "status": "停止", "premium": true, "created": "2026/07/02 10:40", "surveys": 1, "unpaid": 1}, "U-1035": {"company": "地方創生機構", "name": "川口 誠", "mail": "m.kawaguchi@chihososei.or.jp", "status": "有効", "premium": false, "created": "2026/06/28 13:33", "surveys": 2, "unpaid": 1}, "U-1033": {"company": "(株)サンライトプロモーション", "name": "高橋 恵美", "mail": "e.takahashi@sunlight-pr.co.jp", "status": "有効", "premium": false, "created": "2026/06/21 10:05", "surveys": 1, "unpaid": 0}, "U-1031": {"company": "ミライ電装(株)", "name": "佐々木 剛", "mail": "t.sasaki@mirai-denso.co.jp", "status": "有効", "premium": true, "created": "2026/06/18 15:42", "surveys": 1, "unpaid": 0}, "U-1030": {"company": "(株)フィールドワークス", "name": "井上 真央", "mail": "m.inoue@fieldworks.co.jp", "status": "停止", "premium": false, "created": "2026/06/15 09:30", "surveys": 0, "unpaid": 0}, "U-1028": {"company": "北都物産(株)", "name": "山崎 亮太", "mail": "r.yamazaki@hokuto-b.co.jp", "status": "有効", "premium": false, "created": "2026/06/10 13:18", "surveys": 0, "unpaid": 1}, "U-1026": {"company": "(株)クレストメディカル", "name": "平野 沙耶", "mail": "s.hirano@crest-med.co.jp", "status": "有効", "premium": true, "created": "2026/06/05 11:22", "surveys": 1, "unpaid": 0}, "U-1025": {"company": "東亜精密工業(株)", "name": "大森 一樹", "mail": "k.omori@toa-seimitsu.co.jp", "status": "有効", "premium": false, "created": "2026/06/02 16:40", "surveys": 1, "unpaid": 0}, "U-1024": {"company": "—", "name": "—", "mail": "contact@brightlabo.example.jp", "status": "招待中", "premium": false, "created": "2026/05/30 10:11", "surveys": 0, "unpaid": 0}, "U-1022": {"company": "(株)ネオフーズ", "name": "村上 千尋", "mail": "c.murakami@neofoods.co.jp", "status": "有効", "premium": false, "created": "2026/05/27 14:03", "surveys": 1, "unpaid": 0}, "U-1021": {"company": "西日本トラベル(株)", "name": "藤田 大地", "mail": "d.fujita@nishinihon-tv.co.jp", "status": "本登録未了", "premium": false, "created": "2026/05/24 09:55", "surveys": 1, "unpaid": 0}, "U-1019": {"company": "(株)アークデザイン", "name": "小林 玲奈", "mail": "r.kobayashi@arc-design.co.jp", "status": "有効", "premium": true, "created": "2026/05/20 18:27", "surveys": 1, "unpaid": 0}, "U-1017": {"company": "セントラル機器(株)", "name": "岡本 修平", "mail": "s.okamoto@central-kiki.co.jp", "status": "停止", "premium": false, "created": "2026/05/15 12:48", "surveys": 1, "unpaid": 0}, "U-1016": {"company": "(株)ハーベスト農園", "name": "石川 美咲", "mail": "m.ishikawa@harvest-farm.co.jp", "status": "有効", "premium": false, "created": "2026/05/12 10:36", "surveys": 1, "unpaid": 0}, "U-1014": {"company": "光陽印刷(株)", "name": "近藤 貴文", "mail": "t.kondo@koyo-print.co.jp", "status": "有効", "premium": false, "created": "2026/05/08 15:14", "surveys": 1, "unpaid": 0}, "U-1012": {"company": "(株)ラピスソフト", "name": "中島 亜衣", "mail": "a.nakajima@lapis-soft.co.jp", "status": "有効", "premium": true, "created": "2026/05/02 09:41", "surveys": 1, "unpaid": 0}, "U-1009": {"company": "大和ハウジング(株)", "name": "三宅 健", "mail": "k.miyake@yamato-housing.co.jp", "status": "有効", "premium": false, "created": "2026/04/25 13:52", "surveys": 1, "unpaid": 0}, "U-1007": {"company": "(株)エコスタイル", "name": "長谷川 純", "mail": "j.hasegawa@ecostyle.co.jp", "status": "停止", "premium": false, "created": "2026/04/18 17:09", "surveys": 1, "unpaid": 0}, "U-1004": {"company": "青葉商事(株)", "name": "森本 直子", "mail": "n.morimoto@aoba-shoji.co.jp", "status": "有効", "premium": false, "created": "2026/04/10 11:33", "surveys": 0, "unpaid": 0}, "U-1002": {"company": "(株)テクノブレイン", "name": "川村 聡", "mail": "s.kawamura@technobrain.co.jp", "status": "有効", "premium": true, "created": "2026/04/02 08:57", "surveys": 1, "unpaid": 0}};
+    var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};
+    var DEF = 'U-1052';
+    var id = new URLSearchParams(location.search).get('id');
+    if (!DATA[id]) { id = DEF; }
+    var d = DATA[id] || DATA[DEF];
+    var base = DATA[DEF] || d;
+    if (!d || !base) { return; }
+    document.documentElement.setAttribute('data-current-id', id);
+
+    // 既定ダミーの語をこの対象の語へ置き換える
+    var swap = [[DEF, id]].concat(["company", "name", "mail", "created"].map(function (k) { return [base[k], d[k]]; }));
+    function replaceIn(node) {
+        for (var i = 0; i < node.childNodes.length; i++) {
+            var c = node.childNodes[i];
+            if (c.nodeType === 3) {
+                var t = c.nodeValue;
+                swap.forEach(function (p) { if (p[0] && p[0] !== p[1]) { t = t.split(p[0]).join(p[1]); } });
+                if (t !== c.nodeValue) { c.nodeValue = t; }
+            } else if (c.nodeType === 1) { replaceIn(c); }
+        }
+    }
+    replaceIn(document.body);
+    document.querySelectorAll('input[value]').forEach(function (el) {
+        swap.forEach(function (p) { if (p[0] && p[0] !== p[1] && el.value === p[0]) { el.value = p[1]; } });
+    });
+    
+    var b = document.querySelector('[data-slot="status"]');
+    if (b) { b.textContent = d.status; b.className = 'status-badge ' + (BADGE[d.status] || 'status-inactive'); }
+    var pm = document.querySelector('[data-slot="premium"]');
+    if (pm) { pm.style.display = d.premium ? '' : 'none'; }
+    var sv = document.querySelector('[data-slot="surveys"]');
+    if (sv) { sv.textContent = String(d.surveys); }
+    var up = document.querySelector('[data-slot="unpaid"]');
+    if (up) { up.textContent = String(d.unpaid); }
+    var GO = { 'surveys': 'survey-management.html?uid=' + id,
+               'billing': 'billing-management.html?uid=' + id,
+               'billing-unpaid': 'billing-management.html?uid=' + id + '&unpaid=1' };
+    document.querySelectorAll('[data-go]').forEach(function (el) {
+        var to = GO[el.getAttribute('data-go')];
+        if (to) { el.onclick = function () { location.href = to; }; }
+    });
+})();
+</script>
 </body>
 </html>

@@ -35,7 +35,7 @@
             </div>
             <div id="auditList" data-filter-keys="actor,type,target,group,from,to" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
               <div style="display:grid;grid-template-columns:136px 200px 56px 150px minmax(190px,1fr) 165px minmax(150px,1fr) 64px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
-                <span title="既定の並び順(ソートはモック未配線)" style="color:#5b6577">操作日時 ▼</span><span>操作者</span><span>権限</span><span>操作種別</span><span>対象</span><span>対象グループ</span><span>理由</span><span>結果</span>
+                <span title="既定の並び順" style="color:#5b6577">操作日時 ▼</span><span>操作者</span><span>権限</span><span>操作種別</span><span>対象</span><span>対象グループ</span><span>理由</span><span>結果</span>
               </div>
               <div data-pg="1" data-f-actor="y.sato@abroad-o.com(佐藤 由紀)" data-f-lv="Lv3" data-f-type="データ持ち出し" data-f-target="SV-10250 完成データCSV" data-f-group="アブロード本体" data-f-date="2026-07-31" style="display:grid;grid-template-columns:136px 200px 56px 150px minmax(190px,1fr) 165px minmax(150px,1fr) 64px;align-items:center;padding:8px 16px;min-height:48px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums">
                 <span>07/31 09:12</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>データ持ち出し</span><span style="padding-right:8px">SV-10250 完成データCSV</span><span style="font-size:12px">アブロード本体</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5;font-weight:500;font-size:12px">成功</span>
@@ -70,10 +70,10 @@
               <div id="auditList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="auditList-total">10</span> 件中 1〜10 件を表示(直近7日)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select title="全 10 件のため、いずれの表示件数でも1ページに収まります" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="auditList-total">10</span> 件中 1〜10 件を表示(直近7日)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span><span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">›</span></div>
             </div>
-            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">記録は追記のみ。画面から編集・削除は行えません(§4.2)。CSV出力の実行そのものも記録対象です(§4.5)。ログの保持期間(どこまで・いつまで残すか)は※要確定。種別「入金情報変更」はシートの対象列挙外の暫定追加(※要確定)。請求金額の直接編集は廃止したため種別「金額変更」は置いていません。</div>
+            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">記録は追記のみ。画面から編集・削除は行えません。CSV出力の実行そのものも記録対象です。請求金額の直接編集は廃止したため種別「金額変更」は置いていません。</div>
           </div>
         </main>
     </div>
