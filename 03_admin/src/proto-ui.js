@@ -122,7 +122,9 @@
         list.querySelectorAll('[data-pg]').forEach(function (r) {
             // 行はインラインstyleに display:grid を持つため、''でのクリアだと
             // 非表示指定ごとgridも消えてblockに落ちる。gridを明示して復元する
-            r.style.display = (r.getAttribute('data-pg') === String(n)) ? 'grid' : 'none';
+            // data-out は絞り込みで外れた行。ページに関わらず常に隠す
+            var on = !r.hasAttribute('data-out') && r.getAttribute('data-pg') === String(n);
+            r.style.display = on ? 'grid' : 'none';
         });
         var pager = document.getElementById(listId + '-pager');
         if (!pager) { return; }
@@ -147,12 +149,31 @@
     };
 
     // 表示件数の切替。行を再分割してページ番号ボタンを作り直す
+    // 絞り込みで外れた行(data-out)は数えない
     window.pPageSize = function (listId, size) {
         var list = document.getElementById(listId);
         var pager = document.getElementById(listId + '-pager');
-        if (!list || !pager || !size) { return; }
-        var rows = Array.prototype.slice.call(list.querySelectorAll('[data-pg]'));
-        if (!rows.length) { return; }
+        if (!list || !size) { return; }
+        list.setAttribute('data-page-size', String(size));
+        var rows = Array.prototype.slice.call(list.querySelectorAll('[data-pg]:not([data-out])'));
+        var empty = document.getElementById(listId + '-empty');
+        if (empty) { empty.style.display = rows.length ? 'none' : 'block'; }
+        if (!pager) {
+            // ページャを持たない一覧は絞り込み結果をそのまま表示する
+            list.querySelectorAll('[data-pg]').forEach(function (r) {
+                r.style.display = r.hasAttribute('data-out') ? 'none' : 'grid';
+            });
+            return;
+        }
+        if (!rows.length) {
+            Array.prototype.forEach.call(pager.querySelectorAll('button[data-page]'), function (b) {
+                b.parentNode.removeChild(b);
+            });
+            list.querySelectorAll('[data-pg]').forEach(function (r) { r.style.display = 'none'; });
+            var lbl0 = document.getElementById(listId + '-range');
+            if (lbl0) { lbl0.textContent = '0〜0'; }
+            return;
+        }
         rows.forEach(function (r, i) { r.setAttribute('data-pg', String(Math.floor(i / size) + 1)); });
         var pages = Math.ceil(rows.length / size);
         var tmpl = pager.querySelector('button[data-page]');
@@ -175,6 +196,133 @@
         // 1ページに収まる場合もページャは残す(ページ送りは pPage 側で淡色化される)
         window.pPage(listId, 1);
     };
+
+    // --- 一覧の絞り込み(モック) ---
+    // 行に data-f-<key>、絞り込みUIに data-f-key、一覧容器に data-filter-keys、
+    // 絞り込みバーに data-filter-for="{listId}" を付けて使う。
+    // 他画面からは同名のクエリ(?uid=U-1052 等)で同じ条件を引き継ぐ
+    var P_EXACT = { status: 1, plan: 1, unpaid: 1, group: 1, lv: 1, lang: 1, month: 1, type: 1, today: 1, isnew: 1, premium: 1 };
+    var P_LABEL = {
+        uid: 'ユーザーID', sid: 'アンケートID', oid: 'オペレーターID', cid: 'クーポンID',
+        company: '会社名', name: '氏名', mail: 'メールアドレス', code: 'コード', cname: 'クーポン名',
+        status: '状態', plan: '納期区分', group: '所属グループ', lv: '権限', lang: '言語',
+        month: '発行月', type: '操作種別', target: '対象', actor: '操作者', any: '氏名・メール・ID', from: '開始日', to: '終了日',
+        unpaid: '入金未確認のみ', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム'
+    };
+
+    function pFilterBar(listId) {
+        return document.querySelector('[data-filter-for="' + listId + '"]');
+    }
+
+    function pRenderChip(listId, conds) {
+        var list = document.getElementById(listId);
+        var chip = document.getElementById(listId + '-chip');
+        var keys = Object.keys(conds);
+        if (!chip) {
+            if (!keys.length) { return; }
+            chip = document.createElement('div');
+            chip.id = listId + '-chip';
+            chip.setAttribute('style', 'margin-top:12px;display:flex;align-items:center;gap:10px;'
+                + 'background:#eef2fb;border:1px solid #b9caee;border-radius:6px;padding:7px 12px;'
+                + 'font-size:12.5px;color:#1f3d80');
+            list.parentNode.insertBefore(chip, list);
+        }
+        if (!keys.length) { chip.style.display = 'none'; return; }
+        var text = keys.map(function (k) {
+            var label = P_LABEL[k] || k;
+            return (conds[k] === '1' && P_EXACT[k]) ? label : label + ' = ' + conds[k];
+        }).join(' / ');
+        chip.innerHTML = '';
+        var span = document.createElement('span');
+        span.textContent = '絞り込み中: ' + text;
+        var btn = document.createElement('button');
+        btn.textContent = '解除';
+        btn.setAttribute('style', 'background:#fff;color:#3467d6;border:1px solid #b9caee;border-radius:5px;'
+            + 'padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit');
+        btn.onclick = function () { window.pClearSearch(listId); };
+        chip.appendChild(span);
+        chip.appendChild(btn);
+        chip.style.display = 'flex';
+    }
+
+    window.pFilter = function (listId, conds) {
+        var list = document.getElementById(listId);
+        if (!list) { return; }
+        var use = {};
+        Object.keys(conds || {}).forEach(function (k) {
+            var v = String(conds[k] === undefined || conds[k] === null ? '' : conds[k]).trim();
+            if (v) { use[k] = v; }
+        });
+        var keys = Object.keys(use);
+        Array.prototype.forEach.call(list.querySelectorAll('[data-pg]'), function (r) {
+            var hit = keys.every(function (k) {
+                // from/to は data-f-date に対する期間比較(ISO形式なので文字列比較で足りる)
+                if (k === 'from' || k === 'to') {
+                    var d = r.getAttribute('data-f-date');
+                    if (!d) { return false; }
+                    return (k === 'from') ? (d >= use[k]) : (d <= use[k]);
+                }
+                var have = r.getAttribute('data-f-' + k);
+                if (have === null) { return false; }
+                return P_EXACT[k] ? (have === use[k])
+                    : (have.toLowerCase().indexOf(use[k].toLowerCase()) >= 0);
+            });
+            if (hit) { r.removeAttribute('data-out'); } else { r.setAttribute('data-out', '1'); }
+        });
+        var shown = list.querySelectorAll('[data-pg]:not([data-out])').length;
+        var totalEl = document.getElementById(listId + '-total');
+        if (totalEl) { totalEl.textContent = shown.toLocaleString('en-US'); }
+        pRenderChip(listId, use);
+        window.pPageSize(listId, parseInt(list.getAttribute('data-page-size') || '10', 10));
+    };
+
+    // 「検索」ボタン: 絞り込みバーの入力値を集めて適用する
+    window.pSearch = function (listId) {
+        var bar = pFilterBar(listId);
+        if (!bar) { return; }
+        var conds = {};
+        Array.prototype.forEach.call(bar.querySelectorAll('[data-f-key]'), function (el) {
+            var k = el.getAttribute('data-f-key');
+            conds[k] = (el.type === 'checkbox') ? (el.checked ? '1' : '') : el.value;
+        });
+        window.pFilter(listId, conds);
+    };
+
+    // 「条件をクリア」/絞り込みバッジの「解除」: 入力とURLのクエリを落として全件へ戻す
+    window.pClearSearch = function (listId) {
+        var bar = pFilterBar(listId);
+        if (bar) {
+            Array.prototype.forEach.call(bar.querySelectorAll('[data-f-key]'), function (el) {
+                if (el.type === 'checkbox') { el.checked = false; }
+                else if (el.tagName === 'SELECT') { el.selectedIndex = 0; }
+                else { el.value = ''; }
+            });
+        }
+        if (window.history && history.replaceState) {
+            history.replaceState(null, '', location.pathname);
+        }
+        window.pFilter(listId, {});
+    };
+
+    // 起動時: URLのクエリのうち data-filter-keys に載っているものを適用する
+    function pApplyUrlFilter(list) {
+        var listId = list.id;
+        var allowed = (list.getAttribute('data-filter-keys') || '').split(',').map(function (s) { return s.trim(); });
+        var q = new URLSearchParams(location.search);
+        var conds = {};
+        allowed.forEach(function (k) { if (k && q.get(k)) { conds[k] = q.get(k); } });
+        if (!Object.keys(conds).length) { return; }
+        var bar = pFilterBar(listId);
+        if (bar) {
+            Object.keys(conds).forEach(function (k) {
+                var el = bar.querySelector('[data-f-key="' + k + '"]');
+                if (!el) { return; }
+                if (el.type === 'checkbox') { el.checked = (conds[k] === '1'); }
+                else { el.value = conds[k]; }
+            });
+        }
+        window.pFilter(listId, conds);
+    }
 
     window.pPageStep = function (listId, delta) {
         var pager = document.getElementById(listId + '-pager');
@@ -305,7 +453,14 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('[id$="-pager"]').forEach(function (pager) {
             var listId = pager.id.slice(0, -6);
-            if (document.getElementById(listId)) { window.pPage(listId, parseInt(pager.getAttribute('data-current') || '1', 10)); }
+            var list = document.getElementById(listId);
+            if (!list) { return; }
+            if (!list.getAttribute('data-page-size')) { list.setAttribute('data-page-size', '10'); }
+            window.pPage(listId, parseInt(pager.getAttribute('data-current') || '1', 10));
+        });
+        // 他画面から引き継いだ絞り込み条件を適用する(ページャの有無は問わない)
+        document.querySelectorAll('[data-filter-keys]').forEach(function (list) {
+            if (list.id) { pApplyUrlFilter(list); }
         });
         document.querySelectorAll('button[data-requires]').forEach(function (btn) {
             var inp = document.getElementById(btn.getAttribute('data-requires'));
