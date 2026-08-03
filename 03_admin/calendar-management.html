@@ -33,10 +33,6 @@
                 <button id="calPrev" onclick="calMonth(-1)" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff;color:#374151;font-family:inherit">‹ 前月</button>
                 <span id="calTitle" style="font-size:17px;font-weight:700;min-width:110px;text-align:center">2026年 7月</span>
                 <button id="calNext" onclick="calMonth(1)" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:#fff;color:#374151;font-family:inherit">翌月 ›</button>
-                <div style="margin-left:12px;display:flex;border:1px solid #c8cdd8;border-radius:6px;overflow:hidden">
-                  <button id="calTabSv" onclick="calTab('sv')" style="border:none;padding:6px 16px;background:#3467d6;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px">アンケート</button>
-                  <button id="calTabAs" onclick="calTab('as')" style="border:none;padding:6px 16px;background:#fff;color:#5b6577;cursor:pointer;font-family:inherit;font-size:12.5px">アサイン</button>
-                </div>
               </div>
               <div style="display:flex;gap:14px;font-size:11.5px;color:#5b6577;align-items:center">
                 <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #c8cdd8"></span>営業日</span>
@@ -181,7 +177,7 @@
     var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
     var S = {
-        ym: '2026-07', sel: TODAY, tab: 'sv',
+        ym: '2026-07', sel: TODAY,
         reg: { w: { 0: true, 6: true }, hol: true },
         ind: {
             '2026-08-08': { t: 'sub', memo: '' },
@@ -213,7 +209,6 @@
         S.ym = MONTHS[i];
         calRender();
     };
-    window.calTab = function (t) { S.tab = t; calRender(); };
     window.calSelect = function (is) { S.sel = is; calRender(); };
 
     function cellLines(is, t) {
@@ -222,13 +217,11 @@
         var asg = asgOf(is).length;
         if (t.t === 'hol') { out.push('<span style="color:#6b7484">休業日' + (t.memo ? '(' + t.memo + ')' : '') + '</span>'); }
         if (t.t === 'sub') { out.push('<span style="color:#2b57b8">振替営業日</span>'); }
-        var svCol = S.tab === 'sv' ? '#5b6577' : '#8a93a5';
-        var asCol = S.tab === 'as' ? '#5b6577' : '#8a93a5';
-        if (sv) { out.push('<span style="color:' + (t.t === 'hol' ? '#8a93a5' : svCol) + (S.tab === 'sv' && t.t !== 'hol' ? ';font-weight:700' : '') + '">会期 ' + sv + '件</span>'); }
+        if (sv) { out.push('<span style="color:' + (t.t === 'hol' ? '#8a93a5' : '#5b6577') + '">会期 ' + sv + '件</span>'); }
         if (short(is)) {
             out.push('<span style="color:#c23934;font-weight:700">アサイン 0人</span>');
         } else if (asg) {
-            out.push('<span style="color:' + asCol + (S.tab === 'as' ? ';font-weight:700' : '') + '">アサイン ' + asg + '人</span>');
+            out.push('<span style="color:#5b6577">アサイン ' + asg + '人</span>');
         }
         return out.join('<br>');
     }
@@ -243,13 +236,6 @@
         prev.disabled = pi === 0; next.disabled = pi === MONTHS.length - 1;
         prev.style.color = prev.disabled ? '#c3c9d4' : '#374151';
         next.style.color = next.disabled ? '#c3c9d4' : '#374151';
-        var sv = document.getElementById('calTabSv'), as = document.getElementById('calTabAs');
-        sv.style.background = S.tab === 'sv' ? '#3467d6' : '#fff';
-        sv.style.color = S.tab === 'sv' ? '#fff' : '#5b6577';
-        sv.style.fontWeight = S.tab === 'sv' ? '700' : '400';
-        as.style.background = S.tab === 'as' ? '#3467d6' : '#fff';
-        as.style.color = S.tab === 'as' ? '#fff' : '#5b6577';
-        as.style.fontWeight = S.tab === 'as' ? '700' : '400';
 
         var first = new Date(y, m - 1, 1).getDay();
         var dim = new Date(y, m, 0).getDate();
