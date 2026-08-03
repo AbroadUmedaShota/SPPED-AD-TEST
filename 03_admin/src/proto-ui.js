@@ -146,6 +146,37 @@
         }
     };
 
+    // 表示件数の切替。行を再分割してページ番号ボタンを作り直す
+    window.pPageSize = function (listId, size) {
+        var list = document.getElementById(listId);
+        var pager = document.getElementById(listId + '-pager');
+        if (!list || !pager || !size) { return; }
+        var rows = Array.prototype.slice.call(list.querySelectorAll('[data-pg]'));
+        if (!rows.length) { return; }
+        rows.forEach(function (r, i) { r.setAttribute('data-pg', String(Math.floor(i / size) + 1)); });
+        var pages = Math.ceil(rows.length / size);
+        var tmpl = pager.querySelector('button[data-page]');
+        var style = tmpl ? tmpl.getAttribute('style') : '';
+        var steppers = Array.prototype.filter.call(pager.querySelectorAll('button'), function (b) {
+            return !b.hasAttribute('data-page');
+        });
+        Array.prototype.forEach.call(pager.querySelectorAll('button[data-page]'), function (b) {
+            b.parentNode.removeChild(b);
+        });
+        for (var i = 1; i <= pages; i++) {
+            var btn = document.createElement('button');
+            btn.setAttribute('data-page', String(i));
+            btn.setAttribute('data-range', ((i - 1) * size + 1) + '\u301c' + Math.min(i * size, rows.length));
+            btn.setAttribute('style', style);
+            btn.textContent = String(i);
+            btn.onclick = (function (n) { return function () { window.pPage(listId, n); }; })(i);
+            pager.insertBefore(btn, steppers[1] || null);
+        }
+        // 1ページに収まる場合はページ送り自体を隠す
+        pager.style.visibility = (pages > 1) ? 'visible' : 'hidden';
+        window.pPage(listId, 1);
+    };
+
     window.pPageStep = function (listId, delta) {
         var pager = document.getElementById(listId + '-pager');
         if (!pager) { return; }
