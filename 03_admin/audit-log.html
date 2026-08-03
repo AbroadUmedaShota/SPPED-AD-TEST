@@ -15,7 +15,7 @@
    基準は1920px表示。1459px未満で適用する。 */
 @media (max-width: 1459px) {
   #auditList > div { grid-template-columns: minmax(136px,136fr) minmax(200px,200fr) minmax(56px,56fr) minmax(150px,150fr) minmax(190px,190fr) minmax(150px,150fr) minmax(64px,64fr) !important; }
-  #auditList .c-opt { display: none; }
+  #auditList .c-opt { display: none !important; }
 }
 </style>
 </head>
@@ -30,7 +30,7 @@
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">操作ログ・監査ログ</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">操作ログ・監査ログ</h2>
-              <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
+              <button onclick="pOpen('mAuditCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
             <div data-filter-for="auditList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5b6577">期間 <input data-f-key="from" type="date" value="2026-07-24" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:12.5px;font-family:inherit;color:#1f2733"> 〜 <input data-f-key="to" type="date" value="2026-07-31" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:12.5px;font-family:inherit;color:#1f2733"></label>
@@ -70,22 +70,48 @@
                 <span>07/28 09:02</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>招待の実行</span><span style="padding-right:8px">OP-0061 鈴木 恵</span><span class="c-opt" style="font-size:12px">データパートナーズ株式会社</span><span style="color:#8a93a5">—</span><span style="color:#c23934;font-weight:700;font-size:12px" title="招待メール不達">失敗</span>
               </div>
               <div data-pg="1" data-f-actor="y.sato@abroad-o.com(佐藤 由紀)" data-f-lv="Lv3" data-f-type="クーポンの事後適用" data-f-target="(株)マーケットビジョン 2026/07分" data-f-group="アブロード本体" data-f-date="2026-07-27" style="display:grid;grid-template-columns:minmax(136px,136fr) minmax(200px,200fr) minmax(56px,56fr) minmax(150px,150fr) minmax(190px,190fr) minmax(165px,165fr) minmax(150px,150fr) minmax(64px,64fr);align-items:center;padding:8px 16px;min-height:48px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums">
-                <span>07/27 10:15</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>クーポンの事後適用</span><span style="padding-right:8px">(株)マーケットビジョン 2026/07分</span><span style="font-size:12px">アブロード本体</span><span title="SUMMER10 を事後適用(−7,360円)" style="font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45">SUMMER10 を事後適用(−7,360円)</span><span style="color:#8a93a5;font-weight:500;font-size:12px">成功</span>
+                <span>07/27 10:15</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>クーポンの事後適用</span><span style="padding-right:8px">(株)マーケットビジョン 2026/07分</span><span class="c-opt" style="font-size:12px">アブロード本体</span><span title="SUMMER10 を事後適用(−7,360円)" style="font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45">SUMMER10 を事後適用(−7,360円)</span><span style="color:#8a93a5;font-weight:500;font-size:12px">成功</span>
               </div>
               <div data-pg="1" data-f-actor="y.sato@abroad-o.com(佐藤 由紀)" data-f-lv="Lv3" data-f-type="ログイン" data-f-target="—" data-f-group="アブロード本体" data-f-date="2026-07-27" style="display:grid;grid-template-columns:minmax(136px,136fr) minmax(200px,200fr) minmax(56px,56fr) minmax(150px,150fr) minmax(190px,190fr) minmax(165px,165fr) minmax(150px,150fr) minmax(64px,64fr);align-items:center;padding:8px 16px;min-height:48px;font-size:12.5px;font-variant-numeric:tabular-nums">
-                <span>07/27 08:55</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>ログイン</span><span style="color:#8a93a5">—</span><span title="アブロード本体" style="font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45">アブロード本体</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5;font-weight:500;font-size:12px">成功</span>
+                <span>07/27 08:55</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">y.sato@abroad-o.com(佐藤 由紀)</span><span>Lv3</span><span>ログイン</span><span style="color:#8a93a5">—</span><span class="c-opt" title="アブロード本体" style="font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45">アブロード本体</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5;font-weight:500;font-size:12px">成功</span>
               </div>
               <div id="auditList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="auditList-total">10</span> 件中 1〜10 件を表示(直近7日)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
-              <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span><span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">›</span></div>
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="auditList-total">10</span> 件中 <span id="auditList-range">1〜10</span> 件を表示(直近7日)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select onchange="pPageSize('auditList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div id="auditList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('auditList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('auditList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('auditList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
             </div>
             <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">記録は追記のみ。画面から編集・削除は行えません。CSV出力の実行そのものも記録対象です。請求金額の直接編集は廃止したため種別「金額変更」は置いていません。</div>
           </div>
         </main>
     </div>
 </div>
+<div id="mAuditCsv" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">操作ログをCSV出力</span>
+      <span role="button" onclick="pClose('mAuditCsv')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">出力する範囲</span>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:#374151">
+          <label style="display:flex;align-items:center;gap:8px"><input type="radio" name="auditCsvScope" checked>現在の絞り込み条件（<span id="auditCsvCount">10</span>件）</label>
+          <label style="display:flex;align-items:center;gap:8px"><input type="radio" name="auditCsvScope">期間を指定して出力</label>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">開始日</span><input type="date" value="2026-07-25" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">終了日</span><input type="date" value="2026-07-31" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">列は画面の表示項目と同じ順で出力します。UTF-8(BOM付き)・CRLF・ヘッダー行あり。出力の実行自体も操作ログに記録されます。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mAuditCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mAuditCsv')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">出力する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>

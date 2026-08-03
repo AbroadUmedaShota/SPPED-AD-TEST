@@ -15,7 +15,7 @@
    基準は1920px表示。1459px未満で適用する。 */
 @media (max-width: 1459px) {
   #perfList > div { grid-template-columns: 110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr) !important; }
-  #perfList .c-opt { display: none; }
+  #perfList .c-opt { display: none !important; }
 }
 </style>
 </head>
@@ -30,11 +30,11 @@
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">実績管理</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">実績管理</h2>
-              <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
+              <button onclick="pOpen('mPerfCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
             <div data-filter-for="perfList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5b6577">対象期間
-                <select style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>2026/07(当月)</option><option>2026/06</option><option>2026/05</option></select>
+                <select id="perfMonth" onchange="perfSetMonth(this.value)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
               </label>
               <select data-f-key="group" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
               <button onclick="pSearch('perfList')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">表示</button>
@@ -59,39 +59,30 @@
               <div style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:42px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
                 <span>ID</span><span>氏名</span><span>所属グループ</span><span title="既定の並び順" style="text-align:right;color:#5b6577">作業件数 ▼</span><span class="c-opt" style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0058" data-f-name="王 麗華" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
-                <span style="font-weight:500">OP-0058</span><span>王 麗華</span><span style="font-size:12px">オフィスワークス株式会社</span><span style="text-align:right">3,214</span><span class="c-opt" style="text-align:right">3,085</span><span style="text-align:right;font-weight:700">96%</span><span style="text-align:right">88</span><span style="text-align:right">160,700 円</span>
+              <div data-pg="1" data-f-oid="OP-0058" data-f-name="王 麗華" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer" tabindex="0" role="button" onclick="perfToggle('OP-0058')">
+                <span style="font-weight:500">OP-0058</span><span>王 麗華</span><span style="font-size:12px">オフィスワークス株式会社</span><span data-slot="OP-0058-w" style="text-align:right">3,214</span><span data-slot="OP-0058-o" class="c-opt" style="text-align:right">3,085</span><span data-slot="OP-0058-r" style="text-align:right;font-weight:700">96%</span><span data-slot="OP-0058-s" style="text-align:right">88</span><span data-slot="OP-0058-p" style="text-align:right">160,700 円</span>
               </div>
-              <div style="padding:10px 18px 14px;background:#f7f9fd;border-bottom:1px solid #eef0f5">
-                <div style="font-size:11.5px;font-weight:700;color:#5b6577">OP-0058 王 麗華 — 作業グループ・入力項目別の内訳(行選択で展開・サンプル)</div>
-                <div style="margin-top:8px;background:#fff;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
-                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:32px;background:#f7f8fb;border-bottom:1px solid #eef0f5;font-size:11px;font-weight:700;color:#5b6577"><span>作業グループ / 入力項目</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span></div>
-                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;border-bottom:1px solid #eef0f5;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ① メールアドレス</span><span style="text-align:right">1,120</span><span style="text-align:right">1,092</span><span style="text-align:right;font-weight:700">98%</span><span style="text-align:right">21</span><span style="text-align:right">56,000 円</span></div>
-                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;border-bottom:1px solid #eef0f5;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ② 氏名(姓・名)</span><span style="text-align:right">986</span><span style="text-align:right">948</span><span style="text-align:right;font-weight:700">96%</span><span style="text-align:right">34</span><span style="text-align:right">49,300 円</span></div>
-                  <div style="display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;height:34px;font-size:12px;font-variant-numeric:tabular-nums"><span>グループ③ 会社・部署・役職</span><span style="text-align:right">1,108</span><span style="text-align:right">1,045</span><span style="text-align:right;font-weight:700;color:#8a6414">94%</span><span style="text-align:right">33</span><span style="text-align:right">55,400 円</span></div>
-                </div>
-                <div style="margin-top:6px;font-size:11px;color:#8a93a5">グループ④〜⑧は当月の担当なし(0件)。</div>
+              <div data-pg="1" data-f-oid="OP-0012" data-f-name="佐藤 由紀" data-f-group="アブロード本体" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums" tabindex="0" role="button" onclick="perfToggle('OP-0012')">
+                <span style="font-weight:500">OP-0012</span><span>佐藤 由紀</span><span style="font-size:12px">アブロード本体</span><span data-slot="OP-0012-w" style="text-align:right">2,980</span><span data-slot="OP-0012-o" class="c-opt" style="text-align:right">2,927</span><span data-slot="OP-0012-r" style="text-align:right;font-weight:700">98%</span><span data-slot="OP-0012-s" style="text-align:right">42</span><span data-slot="OP-0012-p" style="text-align:right">149,000 円</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0012" data-f-name="佐藤 由紀" data-f-group="アブロード本体" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-                <span style="font-weight:500">OP-0012</span><span>佐藤 由紀</span><span style="font-size:12px">アブロード本体</span><span style="text-align:right">2,980</span><span class="c-opt" style="text-align:right">2,927</span><span style="text-align:right;font-weight:700">98%</span><span style="text-align:right">42</span><span style="text-align:right">149,000 円</span>
+              <div data-pg="1" data-f-oid="OP-0034" data-f-name="田中 大輔" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums" tabindex="0" role="button" onclick="perfToggle('OP-0034')">
+                <span style="font-weight:500">OP-0034</span><span>田中 大輔</span><span style="font-size:12px">オフィスワークス株式会社</span><span data-slot="OP-0034-w" style="text-align:right">2,412</span><span data-slot="OP-0034-o" class="c-opt" style="text-align:right">2,290</span><span data-slot="OP-0034-r" style="text-align:right;font-weight:700">95%</span><span data-slot="OP-0034-s" style="text-align:right">61</span><span data-slot="OP-0034-p" style="text-align:right">120,600 円</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0034" data-f-name="田中 大輔" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-                <span style="font-weight:500">OP-0034</span><span>田中 大輔</span><span style="font-size:12px">オフィスワークス株式会社</span><span style="text-align:right">2,412</span><span class="c-opt" style="text-align:right">2,290</span><span style="text-align:right;font-weight:700">95%</span><span style="text-align:right">61</span><span style="text-align:right">120,600 円</span>
+              <div data-pg="1" data-f-oid="OP-0077" data-f-name="山本 彩" data-f-group="アブロード本体" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums" tabindex="0" role="button" onclick="perfToggle('OP-0077')">
+                <span style="font-weight:500">OP-0077</span><span>山本 彩</span><span style="font-size:12px">アブロード本体</span><span data-slot="OP-0077-w" style="text-align:right">2,742</span><span data-slot="OP-0077-o" class="c-opt" style="text-align:right">2,606</span><span data-slot="OP-0077-r" style="text-align:right;font-weight:700">95%</span><span data-slot="OP-0077-s" style="text-align:right">104</span><span data-slot="OP-0077-p" style="text-align:right">137,100 円</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0077" data-f-name="山本 彩" data-f-group="アブロード本体" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-                <span style="font-weight:500">OP-0077</span><span>山本 彩</span><span style="font-size:12px">アブロード本体</span><span style="text-align:right">2,742</span><span class="c-opt" style="text-align:right">2,606</span><span style="text-align:right;font-weight:700">95%</span><span style="text-align:right">104</span><span style="text-align:right">137,100 円</span>
+              <div data-pg="1" data-f-oid="OP-0081" data-f-name="陳 志明" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums" tabindex="0" role="button" onclick="perfToggle('OP-0081')">
+                <span style="font-weight:500">OP-0081</span><span>陳 志明</span><span style="font-size:12px">オフィスワークス株式会社</span><span data-slot="OP-0081-w" style="text-align:right">2,188</span><span data-slot="OP-0081-o" class="c-opt" style="text-align:right">2,014</span><span data-slot="OP-0081-r" style="text-align:right;font-weight:700;color:#8a6414">92%</span><span data-slot="OP-0081-s" style="text-align:right">196</span><span data-slot="OP-0081-p" style="text-align:right">109,400 円</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0081" data-f-name="陳 志明" data-f-group="オフィスワークス株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-                <span style="font-weight:500">OP-0081</span><span>陳 志明</span><span style="font-size:12px">オフィスワークス株式会社</span><span style="text-align:right">2,188</span><span class="c-opt" style="text-align:right">2,014</span><span style="text-align:right;font-weight:700;color:#8a6414">92%</span><span style="text-align:right">196</span><span style="text-align:right">109,400 円</span>
+              <div data-pg="1" data-f-oid="OP-0061" data-f-name="鈴木 恵" data-f-group="データパートナーズ株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;font-size:13px;font-variant-numeric:tabular-nums" tabindex="0" role="button" onclick="perfToggle('OP-0061')">
+                <span style="font-weight:500">OP-0061</span><span>鈴木 恵</span><span style="font-size:12px">データパートナーズ株式会社</span><span data-slot="OP-0061-w" style="text-align:right">1,926</span><span class="c-opt" data-slot="OP-0061-o" style="text-align:right">1,772</span><span data-slot="OP-0061-r" style="text-align:right;font-weight:700;color:#8a6414">92%</span><span data-slot="OP-0061-s" style="text-align:right">210</span><span data-slot="OP-0061-p" style="text-align:right">96,300 円</span>
               </div>
-              <div data-pg="1" data-f-oid="OP-0061" data-f-name="鈴木 恵" data-f-group="データパートナーズ株式会社" style="display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(120px,55fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr);align-items:center;padding:0 18px;height:46px;font-size:13px;font-variant-numeric:tabular-nums">
-                <span style="font-weight:500">OP-0061</span><span>鈴木 恵</span><span style="font-size:12px">データパートナーズ株式会社</span><span style="text-align:right">1,926</span><span style="text-align:right">1,772</span><span style="text-align:right;font-weight:700;color:#8a6414">92%</span><span style="text-align:right">210</span><span style="text-align:right">96,300 円</span>
-              </div>
+              <div id="perfDetail"></div>
               <div id="perfList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="perfList-total">6</span> 名中 1〜6 名を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
-              <div style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">‹</span><span style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700">1</span><span style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 10px;color:#8a93a5">›</span></div>
+              <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="perfList-total">6</span> 名中 <span id="perfList-range">1〜6</span> 名を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select onchange="pPageSize('perfList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
+              <div id="perfList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('perfList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜6" onclick="pPage('perfList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('perfList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
             </div>
             <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">チーム単位の集計はグループ(会社単位)との関係整理が必要なため未掲載。</div>
           </div>
@@ -99,8 +90,101 @@
     </div>
 </div>
 
+<div id="mPerfCsv" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">実績をCSV出力</span>
+      <span role="button" onclick="pClose('mPerfCsv')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">出力する範囲</span>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:#374151">
+          <label style="display:flex;align-items:center;gap:8px"><input type="radio" name="perfCsvScope" checked>現在の絞り込み条件(<span id="perfCsvMonth">2026/07</span>)</label>
+          <label style="display:flex;align-items:center;gap:8px"><input type="radio" name="perfCsvScope">作業グループ・入力項目別の内訳も含める</label>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">列は画面の表示項目と同じ順で出力します。UTF-8(BOM付き)・CRLF・ヘッダー行あり。出力は「データ持ち出し」として監査ログに記録されます。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mPerfCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mPerfCsv')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">出力する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+
+<script>
+// 実績管理(モック)。対象期間の切替と、行を選んだときの内訳展開をページ内の状態で行う。
+(function () {
+    'use strict';
+    var PERF = {"OP-0058": {"name": "王 麗華", "m": {"2026-07": {"w": 3214, "o": 3085, "s": 88, "rows": [{"n": "グループ① メールアドレス", "w": 1125, "o": 1080, "s": 31}, {"n": "グループ② 氏名(姓・名)", "w": 996, "o": 956, "s": 27}, {"n": "グループ③ 会社・部署・役職", "w": 1093, "o": 1049, "s": 30}]}, "2026-06": {"w": 2764, "o": 2653, "s": 76, "rows": [{"n": "グループ① メールアドレス", "w": 967, "o": 929, "s": 27}, {"n": "グループ② 氏名(姓・名)", "w": 857, "o": 822, "s": 24}, {"n": "グループ③ 会社・部署・役職", "w": 940, "o": 902, "s": 25}]}, "2026-05": {"w": 2282, "o": 2190, "s": 62, "rows": [{"n": "グループ① メールアドレス", "w": 799, "o": 766, "s": 22}, {"n": "グループ② 氏名(姓・名)", "w": 707, "o": 679, "s": 19}, {"n": "グループ③ 会社・部署・役職", "w": 776, "o": 745, "s": 21}]}}}, "OP-0012": {"name": "佐藤 由紀", "m": {"2026-07": {"w": 2980, "o": 2927, "s": 42, "rows": [{"n": "グループ① メールアドレス", "w": 1043, "o": 1024, "s": 15}, {"n": "グループ② 氏名(姓・名)", "w": 924, "o": 907, "s": 13}, {"n": "グループ③ 会社・部署・役職", "w": 1013, "o": 996, "s": 14}]}, "2026-06": {"w": 2563, "o": 2517, "s": 36, "rows": [{"n": "グループ① メールアドレス", "w": 897, "o": 881, "s": 13}, {"n": "グループ② 氏名(姓・名)", "w": 795, "o": 780, "s": 11}, {"n": "グループ③ 会社・部署・役職", "w": 871, "o": 856, "s": 12}]}, "2026-05": {"w": 2116, "o": 2078, "s": 30, "rows": [{"n": "グループ① メールアドレス", "w": 741, "o": 727, "s": 10}, {"n": "グループ② 氏名(姓・名)", "w": 656, "o": 644, "s": 9}, {"n": "グループ③ 会社・部署・役職", "w": 719, "o": 707, "s": 11}]}}}, "OP-0034": {"name": "田中 大輔", "m": {"2026-07": {"w": 2412, "o": 2290, "s": 61, "rows": [{"n": "グループ① メールアドレス", "w": 844, "o": 802, "s": 21}, {"n": "グループ② 氏名(姓・名)", "w": 748, "o": 710, "s": 19}, {"n": "グループ③ 会社・部署・役職", "w": 820, "o": 778, "s": 21}]}, "2026-06": {"w": 2074, "o": 1969, "s": 52, "rows": [{"n": "グループ① メールアドレス", "w": 726, "o": 689, "s": 18}, {"n": "グループ② 氏名(姓・名)", "w": 643, "o": 610, "s": 16}, {"n": "グループ③ 会社・部署・役職", "w": 705, "o": 670, "s": 18}]}, "2026-05": {"w": 1713, "o": 1626, "s": 43, "rows": [{"n": "グループ① メールアドレス", "w": 600, "o": 569, "s": 15}, {"n": "グループ② 氏名(姓・名)", "w": 531, "o": 504, "s": 13}, {"n": "グループ③ 会社・部署・役職", "w": 582, "o": 553, "s": 15}]}}}, "OP-0077": {"name": "山本 彩", "m": {"2026-07": {"w": 2742, "o": 2606, "s": 104, "rows": [{"n": "グループ① メールアドレス", "w": 960, "o": 912, "s": 36}, {"n": "グループ② 氏名(姓・名)", "w": 850, "o": 808, "s": 32}, {"n": "グループ③ 会社・部署・役職", "w": 932, "o": 886, "s": 36}]}, "2026-06": {"w": 2358, "o": 2241, "s": 89, "rows": [{"n": "グループ① メールアドレス", "w": 825, "o": 784, "s": 31}, {"n": "グループ② 氏名(姓・名)", "w": 731, "o": 695, "s": 28}, {"n": "グループ③ 会社・部署・役職", "w": 802, "o": 762, "s": 30}]}, "2026-05": {"w": 1947, "o": 1850, "s": 74, "rows": [{"n": "グループ① メールアドレス", "w": 681, "o": 648, "s": 26}, {"n": "グループ② 氏名(姓・名)", "w": 604, "o": 574, "s": 23}, {"n": "グループ③ 会社・部署・役職", "w": 662, "o": 628, "s": 25}]}}}, "OP-0081": {"name": "陳 志明", "m": {"2026-07": {"w": 2188, "o": 2014, "s": 196, "rows": [{"n": "グループ① メールアドレス", "w": 766, "o": 705, "s": 69}, {"n": "グループ② 氏名(姓・名)", "w": 678, "o": 624, "s": 61}, {"n": "グループ③ 会社・部署・役職", "w": 744, "o": 685, "s": 66}]}, "2026-06": {"w": 1882, "o": 1732, "s": 169, "rows": [{"n": "グループ① メールアドレス", "w": 659, "o": 606, "s": 59}, {"n": "グループ② 氏名(姓・名)", "w": 583, "o": 537, "s": 52}, {"n": "グループ③ 会社・部署・役職", "w": 640, "o": 589, "s": 58}]}, "2026-05": {"w": 1553, "o": 1430, "s": 139, "rows": [{"n": "グループ① メールアドレス", "w": 544, "o": 500, "s": 49}, {"n": "グループ② 氏名(姓・名)", "w": 481, "o": 443, "s": 43}, {"n": "グループ③ 会社・部署・役職", "w": 528, "o": 487, "s": 47}]}}}, "OP-0061": {"name": "鈴木 恵", "m": {"2026-07": {"w": 1926, "o": 1772, "s": 210, "rows": [{"n": "グループ① メールアドレス", "w": 674, "o": 620, "s": 74}, {"n": "グループ② 氏名(姓・名)", "w": 597, "o": 549, "s": 65}, {"n": "グループ③ 会社・部署・役職", "w": 655, "o": 603, "s": 71}]}, "2026-06": {"w": 1656, "o": 1524, "s": 181, "rows": [{"n": "グループ① メールアドレス", "w": 580, "o": 533, "s": 63}, {"n": "グループ② 氏名(姓・名)", "w": 513, "o": 472, "s": 56}, {"n": "グループ③ 会社・部署・役職", "w": 563, "o": 519, "s": 62}]}, "2026-05": {"w": 1367, "o": 1258, "s": 149, "rows": [{"n": "グループ① メールアドレス", "w": 478, "o": 440, "s": 52}, {"n": "グループ② 氏名(姓・名)", "w": 424, "o": 390, "s": 46}, {"n": "グループ③ 会社・部署・役職", "w": 465, "o": 428, "s": 51}]}}}};
+    var UNIT = 50;
+    var month = '2026-07';
+    var open = null;
+    var COLS = 'display:grid;grid-template-columns:minmax(220px,1fr) 110px 110px 80px 120px 120px;align-items:center;padding:0 12px;';
+
+    function num(n) { return n.toLocaleString('ja-JP'); }
+    function rate(o, w) { return w ? Math.round(o / w * 100) + '%' : '—'; }
+
+    function paint() {
+        Object.keys(PERF).forEach(function (oid) {
+            var d = PERF[oid].m[month];
+            function set(k, v) {
+                var el = document.querySelector('[data-slot="' + oid + '-' + k + '"]');
+                if (el) { el.textContent = v; }
+            }
+            set('w', num(d.w)); set('o', num(d.o)); set('r', rate(d.o, d.w));
+            set('s', num(d.s)); set('p', num(d.w * UNIT) + ' 円');
+        });
+        var mm = document.getElementById('perfCsvMonth');
+        if (mm) { mm.textContent = month.replace('-', '/'); }
+        renderDetail();
+    }
+
+    function renderDetail() {
+        var host = document.getElementById('perfDetail');
+        if (!host) { return; }
+        var row = open && document.querySelector('[data-f-oid="' + open + '"]');
+        if (!open || !row) { host.innerHTML = ''; return; }
+        var p = PERF[open], d = p.m[month];
+        var body = d.rows.map(function (g, i) {
+            var last = i === d.rows.length - 1;
+            var r = rate(g.o, g.w);
+            var warn = parseInt(r, 10) < 95 ? ';color:#8a6414' : '';
+            return '<div style="' + COLS + 'height:34px;' + (last ? '' : 'border-bottom:1px solid #eef0f5;') + 'font-size:12px;font-variant-numeric:tabular-nums">'
+                + '<span>' + g.n + '</span><span style="text-align:right">' + num(g.w) + '</span>'
+                + '<span style="text-align:right">' + num(g.o) + '</span>'
+                + '<span style="text-align:right;font-weight:700' + warn + '">' + r + '</span>'
+                + '<span style="text-align:right">' + num(g.s) + '</span>'
+                + '<span style="text-align:right">' + num(g.w * UNIT) + ' 円</span></div>';
+        }).join('');
+        host.innerHTML = '<div style="padding:10px 18px 14px;background:#f7f9fd;border-bottom:1px solid #eef0f5">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">'
+            + '<span style="font-size:11.5px;font-weight:700;color:#5b6577">' + open + ' ' + p.name + ' — 作業グループ・入力項目別の内訳(' + month.replace('-', '/') + ')</span>'
+            + '<button onclick="perfToggle(\'' + open + '\')" style="border:none;background:none;color:#5b6577;cursor:pointer;font-size:12px;font-family:inherit">閉じる ▲</button></div>'
+            + '<div style="margin-top:8px;background:#fff;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">'
+            + '<div style="' + COLS + 'height:32px;background:#f7f8fb;border-bottom:1px solid #eef0f5;font-size:11px;font-weight:700;color:#5b6577">'
+            + '<span>作業グループ / 入力項目</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span></div>'
+            + body + '</div></div>';
+        row.parentNode.insertBefore(host, row.nextSibling);
+    }
+
+    window.perfToggle = function (oid) {
+        open = (open === oid) ? null : oid;
+        Object.keys(PERF).forEach(function (k) {
+            var r = document.querySelector('[data-f-oid="' + k + '"]');
+            if (r) { r.style.background = (k === open) ? '#f7f9fd' : ''; }
+        });
+        renderDetail();
+    };
+    window.perfSetMonth = function (m) { month = m; paint(); };
+    document.addEventListener('DOMContentLoaded', paint);
+    if (document.readyState !== 'loading') { paint(); }
+})();
+</script>
+
 </body>
 </html>

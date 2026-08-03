@@ -131,7 +131,7 @@
             <div class="dash-head">
               <h2>ダッシュボード</h2>
               <div class="dash-head-meta">
-                <span style="font-size:12px;color:#6b7484">集計最終更新 2026/07/31 09:45(最大5分の遅延)</span>
+                <span style="font-size:12px;color:#6b7484">集計最終更新 <span id="dashUpdated" style="font-variant-numeric:tabular-nums">2026/07/31 09:45</span>(最大5分の遅延)</span>
                 <button type="button" class="dash-refresh">↻ 再取得</button>
               </div>
             </div>
@@ -271,23 +271,39 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+
 <script>
+// ダッシュボードの再取得(モック)。集計はサーバー側で最大5分の遅延があるため、
+// 押下時点の時刻へ最終更新を進めるところまでを表現する。
 (function () {
     'use strict';
-
-    // Enter / Space での押下は proto-ui.js の共通ハンドラが処理する
-
-    // 再取得: 集計値を取り直す(モックでは再読み込み)
-    document.addEventListener('DOMContentLoaded', function () {
-        var button = document.querySelector('.dash-refresh');
-        if (!button) { return; }
-        button.addEventListener('click', function () {
-            button.disabled = true;
-            button.textContent = '取得中…';
-            location.reload();
-        });
-    });
-}());
+    var base = new Date(2026, 6, 31, 9, 45);
+    function dashRefresh(btn) {
+        var el = document.getElementById('dashUpdated');
+        if (!el || btn.disabled) { return; }
+        var label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '取得中…';
+        setTimeout(function () {
+            base = new Date(base.getTime() + 5 * 60000);
+            function p(n) { return (n < 10 ? '0' : '') + n; }
+            el.textContent = base.getFullYear() + '/' + p(base.getMonth() + 1) + '/' + p(base.getDate())
+                + ' ' + p(base.getHours()) + ':' + p(base.getMinutes());
+            btn.disabled = false;
+            btn.textContent = label;
+        }, 500);
+    }
+    function wire() {
+        var b = document.querySelector('.dash-refresh');
+        if (b && !b.dataset.wired) {
+            b.dataset.wired = '1';
+            b.addEventListener('click', function () { dashRefresh(b); });
+        }
+    }
+    document.addEventListener('DOMContentLoaded', wire);
+    if (document.readyState !== 'loading') { wire(); }
+})();
 </script>
+
 </body>
 </html>

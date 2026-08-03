@@ -38,7 +38,7 @@
               
             </label>
             <button onclick="location.href='form.html?g=1'" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">グループ①から入力を開始</button>
-            <button data-min-lv="2" title="Lv2以上の機能" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">グループ一括入力<span style="font-weight:400;font-size:11px;margin-left:4px">Lv2以上</span></button>
+            <button onclick="pOpen('mBulkInput')" data-min-lv="2" title="Lv2以上の機能" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">グループ一括入力<span style="font-weight:400;font-size:11px;margin-left:4px">Lv2以上</span></button>
             <div style="flex-basis:100%;font-size:12px;color:#6b7484;line-height:1.7">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。スキップした名刺は全体キューへ戻ります。</div>
           </div>
           <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
@@ -91,8 +91,62 @@
         </main>
     </div>
 </div>
+<div id="mBulkInput" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:520px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">グループ一括入力<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">複数グループを続けて入力する</span></span>
+      <span role="button" onclick="pClose('mBulkInput')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">対象グループ(複数可)</span>
+        <div id="bulkChips" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">1回の入力で扱う件数</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>50件</option><option>100件</option><option>200件</option></select></label>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">選択したグループを順に入力画面へ送ります。件数は全体キューの状況によって変動し、他のオペレーターが先に着手した名刺は対象から外れます。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mBulkInput')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="bulkStart()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
+
+<script>
+// グループ一括入力(モック)。選んだグループの先頭を入力画面で開く。
+(function () {
+    'use strict';
+    var sel = { 1: true, 2: true };
+    function render() {
+        var host = document.getElementById('bulkChips');
+        if (!host) { return; }
+        var out = '';
+        for (var g = 1; g <= 8; g++) {
+            var on = !!sel[g];
+            out += '<button onclick="bulkToggle(' + g + ')" style="border:1px solid ' + (on ? '#3467d6' : '#c8cdd8')
+                + ';background:' + (on ? '#eef2fb' : '#fff') + ';color:' + (on ? '#3467d6' : '#5b6577')
+                + ';border-radius:999px;padding:4px 14px;font-size:12px;' + (on ? 'font-weight:700;' : '')
+                + 'cursor:pointer;font-family:inherit">グループ' + g + (on ? ' ✓' : '') + '</button>';
+        }
+        host.innerHTML = out;
+    }
+    window.bulkToggle = function (g) {
+        if (sel[g]) { delete sel[g]; } else { sel[g] = true; }
+        render();
+    };
+    window.bulkStart = function () {
+        var ks = Object.keys(sel).sort(function (a, b) { return a - b; });
+        if (!ks.length) { return; }
+        window.pClose('mBulkInput');
+        location.href = 'form.html?g=' + ks[0];
+    };
+    document.addEventListener('DOMContentLoaded', render);
+    if (document.readyState !== 'loading') { render(); }
+})();
+</script>
+
 </body>
 </html>
