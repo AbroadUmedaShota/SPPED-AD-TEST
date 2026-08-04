@@ -40,7 +40,7 @@
 | ファイル | 画面 | 画面 ID | 現行 URL | 状態 |
 | --- | --- | --- | --- | --- |
 | `10_admin_dashboard.md` | ダッシュボード | SCR-A-001 | `/admin/top`（メニューのリンク集） | 作成済み |
-| `11_admin_user_management.md` | ユーザー(利用者)管理 | SCR-A-002 | `/admin/user` | 作成済み |
+| `11_admin_user_management.md` | ユーザー管理 | SCR-A-002 | `/admin/user` | 作成済み |
 | `12_admin_user_detail.md` | ユーザー詳細 | SCR-A-003 | `/admin/user_edit?id=`（表示不良） | 作成済み |
 | `13_admin_survey_management.md` | アンケート管理 | SCR-A-004 | `/admin/surveys` | 作成済み |
 | `14_admin_survey_detail.md` | アンケート詳細 | SCR-A-005 | なし | 作成済み |
