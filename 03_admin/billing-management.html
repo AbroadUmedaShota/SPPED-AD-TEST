@@ -140,17 +140,19 @@
         <span style="color:#6b7484">作業ステータス</span><span data-slot="bdStatus"></span>
       </div>
       <div style="border:1px solid #e2e6ed;border-radius:8px;overflow:hidden">
-        <div style="display:flex;justify-content:space-between;padding:9px 16px;background:#f7f8fb;font-size:11.5px;font-weight:700;color:#5b6577"><span>内訳</span><span data-slot="bdNote" style="font-weight:400"></span></div>
-        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;font-size:13px;font-variant-numeric:tabular-nums">
-          <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">名刺データ化</span><span data-slot="bdCalc"></span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#6b7484;white-space:nowrap">お礼メール送信</span><span data-slot="bdMail" style="text-align:right"></span></div>
-            <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #eef0f5"><span style="color:#6b7484">小計</span><span data-slot="bdBase"></span></div>
-          <div data-slot="bdDiscRow" style="display:flex;justify-content:space-between"><span style="color:#6b7484">クーポン割引</span><span data-slot="bdDisc" style="color:#237a52;font-weight:700"></span></div>
-          <div data-slot="bdMemoRow" style="display:flex;justify-content:space-between;gap:12px"><span style="color:#6b7484">クーポンメモ</span><span data-slot="bdMemo" style="font-size:12px;color:#5b6577;text-align:right"></span></div>
-          <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #e2e6ed"><span style="font-weight:700">請求金額</span><span data-slot="bdAmount" style="font-size:18px;font-weight:700"></span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 16px;background:#f7f8fb;font-size:11.5px;font-weight:700;color:#5b6577;border-bottom:1px solid #e2e6ed"><span>内訳</span><span data-slot="bdNote" style="font-weight:400"></span></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:7px 16px;font-size:11px;font-weight:700;color:#8a93a5;border-bottom:1px solid #eef0f5"><span>品目</span><span style="text-align:right">数量</span><span style="text-align:right">単価</span><span style="text-align:right">金額</span></div>
+          <div style="padding:4px 16px 12px;font-size:13px;font-variant-numeric:tabular-nums">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:8px 0"><span style="color:#1f2733">名刺データ化<span data-slot="bdPlanNote" style="color:#8a93a5;font-size:11.5px;margin-left:6px"></span></span><span data-slot="bdQty" style="text-align:right"></span><span data-slot="bdUnit" style="text-align:right"></span><span data-slot="bdCalc" style="text-align:right"></span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid #f2f4f8"><span style="color:#1f2733">お礼メール送信</span><span data-slot="bdMailQty" style="text-align:right"></span><span data-slot="bdMailUnit" style="text-align:right"></span><span data-slot="bdMail" style="text-align:right"></span></div>
+            <div data-slot="bdMailNote" style="font-size:11.5px;color:#8a93a5;padding:0 0 8px;line-height:1.7"></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid #e2e6ed"><span style="color:#5b6577">小計</span><span></span><span></span><span data-slot="bdBase" style="text-align:right"></span></div>
+            <div data-slot="bdDiscRow" style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:8px 0"><span style="color:#5b6577">クーポン割引<span data-slot="bdDiscCode" style="color:#8a93a5;font-size:11.5px;margin-left:6px"></span></span><span></span><span></span><span data-slot="bdDisc" style="text-align:right;color:#237a52;font-weight:700"></span></div>
+            <div data-slot="bdMemoRow" style="font-size:11.5px;color:#8a93a5;padding:0 0 8px;line-height:1.7"></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 74px 108px;column-gap:10px;align-items:baseline;padding:11px 0 2px;border-top:2px solid #1f2733"><span style="font-weight:700">請求金額</span><span></span><span></span><span data-slot="bdAmount" style="text-align:right;font-size:18px;font-weight:700"></span></div>
+          </div>
         </div>
-      </div>
-      <div style="display:grid;grid-template-columns:92px 1fr;gap:8px 12px;font-size:13px;align-items:baseline;font-variant-numeric:tabular-nums">
+        <div style="display:grid;grid-template-columns:92px 1fr;gap:8px 12px;font-size:13px;align-items:baseline;font-variant-numeric:tabular-nums">
         <span style="color:#6b7484">納品日</span><span data-slot="bdDeliv"></span>
         <span style="color:#6b7484">請求日</span><span data-slot="bdBill"></span>
         <span style="color:#6b7484">支払期日</span><span data-slot="bdDue"></span>
@@ -215,18 +217,27 @@
         put('mBillDetail', 'bdPlan', b.plan + '(単価 ' + b.unit + ' 円)');
         put('mBillDetail', 'bdStatus', b.status);
         put('mBillDetail', 'bdNote', b.done ? '' : 'データ化中のため確定前の見込み');
-        put('mBillDetail', 'bdCalc', b.cnt.toLocaleString('ja-JP') + ' 件 × ' + b.unit
-            + ' 円 = ' + yen(b.dataAmt));
-        put('mBillDetail', 'bdMail', b.mail.toLocaleString('ja-JP') + ' 通(無料枠 '
-            + b.mailFree.toLocaleString('ja-JP') + ' 通を控除) → 課金 '
-            + b.mailPaid.toLocaleString('ja-JP') + ' 通 × 1 円 = ' + yen(b.mailAmt));
+        var n = function (v) { return v.toLocaleString('ja-JP'); };
+        put('mBillDetail', 'bdPlanNote', b.plan + 'プラン');
+        put('mBillDetail', 'bdQty', n(b.cnt) + ' 件');
+        put('mBillDetail', 'bdUnit', n(b.unit) + ' 円');
+        put('mBillDetail', 'bdCalc', yen(b.dataAmt));
+        put('mBillDetail', 'bdMailQty', n(b.mailPaid) + ' 通');
+        put('mBillDetail', 'bdMailUnit', '1 円');
+        put('mBillDetail', 'bdMail', yen(b.mailAmt));
+        put('mBillDetail', 'bdMailNote', '送信 ' + n(b.mail) + ' 通のうち、無料枠の '
+            + n(b.mailFree) + ' 通は請求対象外です。');
         put('mBillDetail', 'bdBase', yen(b.base));
         var dr = slot('mBillDetail', 'bdDiscRow');
-        dr.style.display = b.coupon ? 'flex' : 'none';
-        if (b.coupon) { put('mBillDetail', 'bdDisc', b.coupon + '(' + b.rate + '%)  −' + yen(b.disc)); }
+        dr.style.display = b.coupon ? 'grid' : 'none';
+        if (b.coupon) {
+            put('mBillDetail', 'bdDiscCode', b.coupon + ' ' + b.rate + '%');
+            put('mBillDetail', 'bdDisc', '− ' + yen(b.disc));
+        }
         var mr = slot('mBillDetail', 'bdMemoRow');
-        mr.style.display = b.coupon ? 'flex' : 'none';
-        if (b.coupon) { put('mBillDetail', 'bdMemo', b.memo || '—'); }
+        mr.style.display = (b.coupon && b.memo) ? '' : 'none';
+        if (b.coupon && b.memo) { put('mBillDetail', 'bdMemo', b.memo); }
+        mr.textContent = (b.coupon && b.memo) ? ('クーポンメモ: ' + b.memo) : '';
         put('mBillDetail', 'bdAmount', yen(b.amount));
         put('mBillDetail', 'bdDeliv', b.deliv + (b.done ? '' : '(予定)'));
         put('mBillDetail', 'bdBill', b.bill || '未請求');
