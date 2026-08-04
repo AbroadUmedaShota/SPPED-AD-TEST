@@ -66,7 +66,7 @@
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
                 <span style="font-size:11.5px;color:#5b6577">読み取れない文字は「〓」を入力</span>
                 <div style="display:flex;gap:10px">
-                  <button id="btnSkip" onclick="pOpen('mSkip')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0" title="ショートカット: Esc(理由を選択してスキップ)">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
+                  <button id="btnSkip" onclick="pSkipOpen()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0" title="ショートカット: Esc(理由を選択してスキップ)">スキップ <span style="font-weight:400;font-size:11px">Esc</span></button>
                   <button id="btnConfirm" onclick="pNextCard()" title="ショートカット: Ctrl+Enter" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
               </div>
@@ -250,6 +250,17 @@
     };
 
     // スキップ実行(その他選択時は理由必須)
+    // スキップの理由は開くたびに既定へ戻す(前回の選択と入力が残らないようにする)
+    window.pSkipOpen = function () {
+        var rs = document.querySelectorAll('#mSkip input[name="skipReason"]');
+        for (var i = 0; i < rs.length; i++) { rs[i].checked = (i === 0); }
+        var text = document.getElementById('skipReasonText');
+        if (text) { text.value = ''; text.style.border = ''; }
+        var err = document.getElementById('skipReasonErr');
+        if (err) { err.hidden = true; }
+        window.pOpen('mSkip');
+    };
+
     window.pSkipConfirm = function () {
         var other = document.getElementById('skipReasonOther');
         var text = document.getElementById('skipReasonText');
@@ -421,7 +432,7 @@
         }
         if (e.key === 'Escape') {
             var bs = document.getElementById('btnSkip');
-            if (!escHadModal && !(bs && bs.disabled)) { window.pOpen('mSkip'); }
+            if (!escHadModal && !(bs && bs.disabled)) { window.pSkipOpen(); }
             return;
         }
         if (e.key === '?' && !inField && !e.ctrlKey && !e.metaKey && !e.altKey) {
