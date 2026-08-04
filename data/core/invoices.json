@@ -28,15 +28,15 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "月額利用料・名刺データ化・お礼メール送信の費用を含みます。",
+    "notes": "プレミアム利用料・名刺データ化費用・お礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-04-001-BASE-1",
         "category": "BASE",
-        "itemName": "月額利用料",
-        "description": "プレミアムプラン 2026/04 月分",
+        "itemName": "プレミアム利用料",
+        "description": "2026年4月分 月額 10,000 円",
         "quantity": 1,
-        "unit": "式",
+        "unit": "ヶ月",
         "unitPrice": 10000,
         "amount": 10000,
         "taxable": true
@@ -44,7 +44,7 @@
       {
         "lineId": "INV-2026-04-001-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10174 / 超特急 プラン",
         "quantity": 516,
         "unit": "枚",
@@ -55,7 +55,7 @@
       {
         "lineId": "INV-2026-04-001-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10174 / 送信 516 通・無料枠 100 通控除",
         "quantity": 416,
         "unit": "通",
@@ -94,12 +94,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-05-001-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10179 / 通常 プラン",
         "quantity": 842,
         "unit": "枚",
@@ -110,7 +110,7 @@
       {
         "lineId": "INV-2026-05-001-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10179 / 送信 842 通・無料枠 100 通控除",
         "quantity": 742,
         "unit": "通",
@@ -149,12 +149,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-05-002-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10183 / 特急 プラン",
         "quantity": 1204,
         "unit": "枚",
@@ -165,7 +165,7 @@
       {
         "lineId": "INV-2026-05-002-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10183 / 送信 1,204 通・無料枠 100 通控除",
         "quantity": 1104,
         "unit": "通",
@@ -204,15 +204,15 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "月額利用料・名刺データ化・お礼メール送信の費用を含みます。",
+    "notes": "プレミアム利用料・名刺データ化費用・お礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-05-003-BASE-1",
         "category": "BASE",
-        "itemName": "月額利用料",
-        "description": "プレミアムプラン 2026/05 月分",
+        "itemName": "プレミアム利用料",
+        "description": "2026年5月分 月額 10,000 円",
         "quantity": 1,
-        "unit": "式",
+        "unit": "ヶ月",
         "unitPrice": 10000,
         "amount": 10000,
         "taxable": true
@@ -220,7 +220,7 @@
       {
         "lineId": "INV-2026-05-003-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10188 / オンデマンド プラン",
         "quantity": 2530,
         "unit": "枚",
@@ -231,7 +231,7 @@
       {
         "lineId": "INV-2026-05-003-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10188 / 送信 2,530 通・無料枠 100 通控除",
         "quantity": 2430,
         "unit": "通",
@@ -281,12 +281,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-05-004-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10192 / 通常 プラン",
         "quantity": 1760,
         "unit": "枚",
@@ -297,7 +297,7 @@
       {
         "lineId": "INV-2026-05-004-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10192 / 送信 1,760 通・無料枠 100 通控除",
         "quantity": 1660,
         "unit": "通",
@@ -336,12 +336,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-06-001-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10196 / お試し プラン",
         "quantity": 684,
         "unit": "枚",
@@ -352,7 +352,7 @@
       {
         "lineId": "INV-2026-06-001-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10196 / 送信 684 通・無料枠 100 通控除",
         "quantity": 584,
         "unit": "通",
@@ -391,12 +391,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-06-002-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10201 / 通常 プラン",
         "quantity": 2214,
         "unit": "枚",
@@ -407,7 +407,7 @@
       {
         "lineId": "INV-2026-06-002-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10201 / 送信 2,214 通・無料枠 100 通控除",
         "quantity": 2114,
         "unit": "通",
@@ -446,15 +446,15 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "月額利用料・名刺データ化・お礼メール送信の費用を含みます。",
+    "notes": "プレミアム利用料・名刺データ化費用・お礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-06-003-BASE-1",
         "category": "BASE",
-        "itemName": "月額利用料",
-        "description": "プレミアムプラン 2026/06 月分",
+        "itemName": "プレミアム利用料",
+        "description": "2026年6月分 月額 10,000 円",
         "quantity": 1,
-        "unit": "式",
+        "unit": "ヶ月",
         "unitPrice": 10000,
         "amount": 10000,
         "taxable": true
@@ -462,7 +462,7 @@
       {
         "lineId": "INV-2026-06-003-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10205 / 超特急 プラン",
         "quantity": 1038,
         "unit": "枚",
@@ -473,7 +473,7 @@
       {
         "lineId": "INV-2026-06-003-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10205 / 送信 1,038 通・無料枠 100 通控除",
         "quantity": 938,
         "unit": "通",
@@ -512,12 +512,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-06-004-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10209 / 特急 プラン",
         "quantity": 926,
         "unit": "枚",
@@ -528,7 +528,7 @@
       {
         "lineId": "INV-2026-06-004-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10209 / 送信 926 通・無料枠 100 通控除",
         "quantity": 826,
         "unit": "通",
@@ -567,12 +567,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-001-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10214 / 通常 プラン",
         "quantity": 1472,
         "unit": "枚",
@@ -583,7 +583,7 @@
       {
         "lineId": "INV-2026-07-001-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10214 / 送信 1,472 通・無料枠 100 通控除",
         "quantity": 1372,
         "unit": "通",
@@ -633,12 +633,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-002-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10218 / オンデマンド プラン",
         "quantity": 3105,
         "unit": "枚",
@@ -649,7 +649,7 @@
       {
         "lineId": "INV-2026-07-002-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10218 / 送信 3,105 通・無料枠 100 通控除",
         "quantity": 3005,
         "unit": "通",
@@ -688,15 +688,15 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "月額利用料・名刺データ化・お礼メール送信の費用を含みます。",
+    "notes": "プレミアム利用料・名刺データ化費用・お礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-003-BASE-1",
         "category": "BASE",
-        "itemName": "月額利用料",
-        "description": "プレミアムプラン 2026/07 月分",
+        "itemName": "プレミアム利用料",
+        "description": "2026年7月分 月額 10,000 円",
         "quantity": 1,
-        "unit": "式",
+        "unit": "ヶ月",
         "unitPrice": 10000,
         "amount": 10000,
         "taxable": true
@@ -704,7 +704,7 @@
       {
         "lineId": "INV-2026-07-003-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10221 / 特急 プラン",
         "quantity": 288,
         "unit": "枚",
@@ -715,7 +715,7 @@
       {
         "lineId": "INV-2026-07-003-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10221 / 送信 288 通・無料枠 100 通控除",
         "quantity": 188,
         "unit": "通",
@@ -765,15 +765,15 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "月額利用料・名刺データ化・お礼メール送信の費用を含みます。",
+    "notes": "プレミアム利用料・名刺データ化費用・お礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-004-BASE-1",
         "category": "BASE",
-        "itemName": "月額利用料",
-        "description": "プレミアムプラン 2026/07 月分",
+        "itemName": "プレミアム利用料",
+        "description": "2026年7月分 月額 10,000 円",
         "quantity": 1,
-        "unit": "式",
+        "unit": "ヶ月",
         "unitPrice": 10000,
         "amount": 10000,
         "taxable": true
@@ -781,7 +781,7 @@
       {
         "lineId": "INV-2026-07-004-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10229 / 超特急 プラン",
         "quantity": 1980,
         "unit": "枚",
@@ -792,7 +792,7 @@
       {
         "lineId": "INV-2026-07-004-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10229 / 送信 1,980 通・無料枠 100 通控除",
         "quantity": 1880,
         "unit": "通",
@@ -831,12 +831,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-005-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10233 / 通常 プラン",
         "quantity": 412,
         "unit": "枚",
@@ -847,7 +847,7 @@
       {
         "lineId": "INV-2026-07-005-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10233 / 送信 412 通・無料枠 100 通控除",
         "quantity": 312,
         "unit": "通",
@@ -886,12 +886,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-07-006-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10227 / お試し プラン",
         "quantity": 356,
         "unit": "枚",
@@ -902,7 +902,7 @@
       {
         "lineId": "INV-2026-07-006-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10227 / 送信 356 通・無料枠 100 通控除",
         "quantity": 256,
         "unit": "通",
@@ -941,12 +941,12 @@
       "accountNumber": "7128447",
       "accountHolder": "アブロードアウトソーシング株式会社"
     },
-    "notes": "名刺データ化とお礼メール送信の費用を含みます。",
+    "notes": "名刺データ化費用とお礼メール送信費用を含みます。",
     "items": [
       {
         "lineId": "INV-2026-08-001-ADDON-1",
         "category": "ADD_ON",
-        "itemName": "名刺データ化",
+        "itemName": "名刺データ化費用",
         "description": "SV-10250 / オンデマンド プラン",
         "quantity": 2150,
         "unit": "枚",
@@ -957,7 +957,7 @@
       {
         "lineId": "INV-2026-08-001-ADDON-2",
         "category": "ADD_ON",
-        "itemName": "お礼メール送信",
+        "itemName": "お礼メール送信費用",
         "description": "SV-10250 / 送信 2,150 通・無料枠 100 通控除",
         "quantity": 2050,
         "unit": "通",
