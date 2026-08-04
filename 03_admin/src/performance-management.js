@@ -91,7 +91,7 @@ function renderBreadcrumb() {
             <ol class="flex items-center space-x-1 text-xs text-on-surface-variant">
                 <li><a href="index.html" class="hover:text-primary hover:underline">ホーム</a></li>
                 <li><span class="material-icons text-[14px]">chevron_right</span></li>
-                <li><span class="font-bold text-on-surface">実績管理</span></li>
+                <li><span class="font-bold text-on-surface">オペレーター実績確認</span></li>
             </ol>
         </nav>
     `;

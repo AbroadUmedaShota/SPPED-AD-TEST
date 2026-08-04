@@ -40,23 +40,23 @@
 | ファイル | 画面 | 画面 ID | 現行 URL | 状態 |
 | --- | --- | --- | --- | --- |
 | `10_admin_dashboard.md` | ダッシュボード | SCR-A-001 | `/admin/top`（メニューのリンク集） | 作成済み |
-| `11_admin_user_management.md` | ユーザー管理 | SCR-A-002 | `/admin/user` | 作成済み |
+| `11_admin_user_management.md` | ユーザー(利用者)管理 | SCR-A-002 | `/admin/user` | 作成済み |
 | `12_admin_user_detail.md` | ユーザー詳細 | SCR-A-003 | `/admin/user_edit?id=`（表示不良） | 作成済み |
 | `13_admin_survey_management.md` | アンケート管理 | SCR-A-004 | `/admin/surveys` | 作成済み |
 | `14_admin_survey_detail.md` | アンケート詳細 | SCR-A-005 | なし | 作成済み |
 | `15_admin_billing.md` | 請求管理 | SCR-A-006 | `/admin/payment` | 作成済み |
 | `16_admin_invoice.md` | 請求書管理 | 未採番 | `/admin/invoice` | 作成済み |
 | `17_admin_coupon.md` | クーポン管理 | SCR-A-007 | `/admin/coupon` | 作成済み |
-| `18_admin_calendar.md` | 営業日カレンダー管理 | SCR-A-008 | `/admin/calendar` | 作成済み |
-| `19_admin_data_input_list.md` | 名刺入力一覧 | SCR-A-009 | `/admin/data_input_list` | 作成済み |
-| `20_admin_data_input_form.md` | 入力個票・入力画面 | SCR-A-010 | `/admin/data_input_screen` | 作成済み |
-| `21_admin_matching_list.md` | 照合管理一覧 | SCR-A-011 / SCR-A-012（2 ID の機能割当は同ファイル §11 の #13 で確定） | `/admin/matching_list` | 作成済み |
-| `22_admin_matching_form.md` | 照合個票・照合画面 | SCR-A-013 | 照合管理一覧から遷移 | 作成済み |
+| `18_admin_calendar.md` | 営業日カレンダー | SCR-A-008 | `/admin/calendar` | 作成済み |
+| `19_admin_data_input_list.md` | データ入力対象一覧 | SCR-A-009 | `/admin/data_input_list` | 作成済み |
+| `20_admin_data_input_form.md` | 名刺入力画面・入力画面 | SCR-A-010 | `/admin/data_input_screen` | 作成済み |
+| `21_admin_matching_list.md` | 照合結果一覧 | SCR-A-011 / SCR-A-012（2 ID の機能割当は同ファイル §11 の #13 で確定） | `/admin/matching_list` | 作成済み |
+| `22_admin_matching_form.md` | 名刺情報照合・照合画面 | SCR-A-013 | 照合結果一覧から遷移 | 作成済み |
 | `23_admin_operator_management.md` | オペレーター管理 | SCR-A-014 | `/admin/operator_list` | 作成済み |
-| `24_admin_achievements.md` | 実績管理 | SCR-A-015 | `/admin/achievements` | 作成済み |
+| `24_admin_achievements.md` | オペレーター実績確認 | SCR-A-015 | `/admin/achievements` | 作成済み |
 | `25_admin_audit_log.md` | 操作ログ・監査ログ | 未採番 | なし | 作成済み |
 
-画面別ファイルは 16 ファイルが揃っている。画面 ID は 17 であり、照合管理一覧（`21_admin_matching_list.md`）が SCR-A-011 / SCR-A-012 の 2 ID を 1 ファイルで扱う。請求書管理と操作ログ・監査ログの画面 ID は未採番であり、各ファイルの「画面外の確認事項」で採番を扱う。
+画面別ファイルは 16 ファイルが揃っている。画面 ID は 17 であり、照合結果一覧（`21_admin_matching_list.md`）が SCR-A-011 / SCR-A-012 の 2 ID を 1 ファイルで扱う。請求書管理と操作ログ・監査ログの画面 ID は未採番であり、各ファイルの「画面外の確認事項」で採番を扱う。
 
 エスカレーション画面（SCR-A-016）は検討を凍結中のため、本フォルダでは要件定義書を作成しない。凍結解除後に採番と作成を判断する。
 

@@ -337,7 +337,7 @@
 
 
     // 名刺画像エンジン: ホバー追従拡大・クリック固定・90度回転(回転時は収まるよう自動縮小)
-    // 入力個票・照合個票の共用。+/− と R はキーボードから、入力欄フォーカス中は Alt を併用する
+    // 名刺入力画面・名刺情報照合の共用。+/− と R はキーボードから、入力欄フォーカス中は Alt を併用する
     window.pInitCardZoom = function () {
         if (window.__cardZoomInit) { return; }
         window.__cardZoomInit = true;
