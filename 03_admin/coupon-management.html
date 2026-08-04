@@ -30,7 +30,7 @@
               <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">クーポン管理</span></div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
                 <h2 style="margin:0;font-size:20px;font-weight:700">クーポン管理</h2>
-                <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを作成'">＋ クーポンを作成</button>
+                <span style="display:flex;gap:10px"><button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pBulkOpen()">＋ 一括作成</button><button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを作成'">＋ クーポンを作成</button></span>
               </div>
               <div data-filter-for="couponList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                 <input data-f-key="cid" placeholder="クーポンID" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
@@ -46,19 +46,19 @@
                 </div>
                 <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0021" data-f-cname="サマーキャンペーン10" data-f-code="SUMMER10" data-f-date="2026/06/01" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0021</span><span>サマーキャンペーン10</span><span style="font-family:ui-monospace,monospace;font-size:12px">SUMMER10</span><span class="c-opt">2026/06/01</span><span>2026/09/30</span><span style="text-align:right">10%</span><span style="text-align:right">50</span><span style="text-align:right">18 <span style="color:#6b7484;font-size:11.5px">(36%)</span></span><span class="c-opt" style="font-size:12px;color:#5b6577">夏季販促</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pOpen('mCouponHistory');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0021');return false">利用履歴</a></span>
                 </div>
                 <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0018" data-f-cname="プレミアム移行応援" data-f-code="PREMUP15" data-f-date="2026/04/10" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0018</span><span>プレミアム移行応援</span><span style="font-family:ui-monospace,monospace;font-size:12px">PREMUP15</span><span class="c-opt">2026/04/10</span><span>2026/08/31</span><span style="text-align:right">15%</span><span style="text-align:right">20</span><span style="text-align:right;font-weight:700;color:#8a6414">20 <span style="font-size:11px">(上限到達)</span></span><span class="c-opt" style="font-size:12px;color:#5b6577">プラン移行促進</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pOpen('mCouponHistory');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0018');return false">利用履歴</a></span>
                 </div>
                 <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0015" data-f-cname="展示会ご紹介割" data-f-code="EXPOREF5" data-f-date="2026/03/02" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0015</span><span>展示会ご紹介割</span><span style="font-family:ui-monospace,monospace;font-size:12px">EXPOREF5</span><span class="c-opt">2026/03/02</span><span>2026/12/31</span><span style="text-align:right">5%</span><span style="text-align:right">100</span><span style="text-align:right">41 <span style="color:#6b7484;font-size:11.5px">(41%)</span></span><span class="c-opt" style="font-size:12px;color:#5b6577">紹介経由の申込向け</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pOpen('mCouponHistory');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0015');return false">利用履歴</a></span>
                 </div>
                 <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0009" data-f-cname="年度末感謝クーポン" data-f-code="THANKS20" data-f-date="2026/02/01" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;font-size:13px;font-variant-numeric:tabular-nums;color:#8a93a5;cursor:pointer">
                   <span style="font-weight:500">CP-0009</span><span style="color:#5b6577">年度末感謝クーポン</span><span style="font-family:ui-monospace,monospace;font-size:12px">THANKS20</span><span class="c-opt">2026/02/01</span><span>2026/03/31<br><span style="font-size:10.5px;border:1px solid #c8cdd8;border-radius:3px;padding:0 4px">期限切れ</span></span><span style="text-align:right">20%</span><span style="text-align:right">30</span><span style="text-align:right">12 <span style="font-size:11.5px">(40%)</span></span><span class="c-opt" style="font-size:12px">—</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pOpen('mCouponHistory');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0009');return false">利用履歴</a></span>
                 </div>
               <div id="couponList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
               </div>
@@ -67,24 +67,6 @@
                 <div id="couponList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('couponList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜4" onclick="pPage('couponList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('couponList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
               </div>
               <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">個別の請求への適用は請求管理(SCR-A-006)で実行。</div>
-              <div style="margin-top:24px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start">
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow:hidden">
-                  <div style="padding:12px 14px;font-size:12px;font-weight:700;color:#5b6577;border-bottom:1px solid #e2e6ed">クーポン別の使用率<span style="font-weight:400;color:#8a93a5;margin-left:8px">使用可能回数に対する使用回数</span></div>
-                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 110px 200px;column-gap:10px;align-items:center;padding:0 14px;height:38px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577"><span>クーポン</span><span style="text-align:right">割引率</span><span style="text-align:right">使用 / 可能</span><span>使用率</span></div>
-                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 110px 200px;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span><span style="font-weight:700">サマーキャンペーン10</span> <span style="font-size:11px;color:#8a93a5;font-family:ui-monospace,monospace">SUMMER10</span></span><span style="text-align:right">10%</span><span style="text-align:right">18 / 50</span><span><span style="display:inline-block;width:120px;height:6px;background:#eef0f5;border-radius:3px;vertical-align:middle;margin-right:8px"><span style="display:block;width:36%;height:6px;background:#3467d6;border-radius:3px"></span></span><span style="font-weight:700;color:#3467d6">36%</span></span></div>
-                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 110px 200px;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span><span style="font-weight:700">プレミアム移行応援</span> <span style="font-size:11px;color:#8a93a5;font-family:ui-monospace,monospace">PREMUP15</span></span><span style="text-align:right">15%</span><span style="text-align:right">20 / 20</span><span><span style="display:inline-block;width:120px;height:6px;background:#eef0f5;border-radius:3px;vertical-align:middle;margin-right:8px"><span style="display:block;width:100%;height:6px;background:#c23934;border-radius:3px"></span></span><span style="font-weight:700;color:#c23934">100%</span></span></div>
-                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 110px 200px;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span><span style="font-weight:700">展示会ご紹介割</span> <span style="font-size:11px;color:#8a93a5;font-family:ui-monospace,monospace">EXPOREF5</span></span><span style="text-align:right">5%</span><span style="text-align:right">41 / 100</span><span><span style="display:inline-block;width:120px;height:6px;background:#eef0f5;border-radius:3px;vertical-align:middle;margin-right:8px"><span style="display:block;width:41%;height:6px;background:#3467d6;border-radius:3px"></span></span><span style="font-weight:700;color:#3467d6">41%</span></span></div>
-                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 110px 200px;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span><span style="font-weight:700">年度末感謝クーポン</span> <span style="font-size:11px;color:#8a93a5;font-family:ui-monospace,monospace">THANKS20</span></span><span style="text-align:right">20%</span><span style="text-align:right">12 / 30</span><span><span style="display:inline-block;width:120px;height:6px;background:#eef0f5;border-radius:3px;vertical-align:middle;margin-right:8px"><span style="display:block;width:40%;height:6px;background:#3467d6;border-radius:3px"></span></span><span style="font-weight:700;color:#3467d6">40%</span></span></div>
-                </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow:hidden">
-                  <div style="padding:12px 14px;font-size:12px;font-weight:700;color:#5b6577;border-bottom:1px solid #e2e6ed">期間別の使用実績<span style="font-weight:400;color:#8a93a5;margin-left:8px">月ごと</span></div>
-                  <div style="display:grid;grid-template-columns:120px 110px 1fr;column-gap:10px;align-items:center;padding:0 14px;height:38px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577"><span>期間</span><span style="text-align:right">使用回数</span><span style="text-align:right">割引の合計金額</span></div>
-                  <div style="display:grid;grid-template-columns:120px 110px 1fr;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/05</span><span style="text-align:right">3 回</span><span style="text-align:right;font-weight:700">−92,400 円</span></div>
-                  <div style="display:grid;grid-template-columns:120px 110px 1fr;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/06</span><span style="text-align:right">5 回</span><span style="text-align:right;font-weight:700">−118,600 円</span></div>
-                  <div style="display:grid;grid-template-columns:120px 110px 1fr;column-gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/07</span><span style="text-align:right">4 回</span><span style="text-align:right;font-weight:700">−84,700 円</span></div>
-                </div>
-              </div>
-
             </div>
         </main>
     </div>
@@ -98,38 +80,91 @@
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:grid;grid-template-columns:1fr 200px;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">クーポン名 <span style="color:#c23934">必須</span></span><input value="サマーキャンペーン10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">コード <span style="color:#c23934">必須</span></span><input value="SUMMER10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:ui-monospace,monospace"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">クーポン名 <span style="color:#c23934">必須</span></span><input id="cpName" value="サマーキャンペーン10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">コード <span style="color:#c23934">必須</span></span><input id="cpCode" value="SUMMER10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:ui-monospace,monospace"></label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">割引率(%)</span><input aria-label="割引率(%)" value="10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能回数</span><input aria-label="使用可能回数" value="50" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能期限</span><input aria-label="使用可能期限" type="date" value="2026-09-30" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">割引率(%)</span><input id="cpRate" aria-label="割引率(%)" value="10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能回数</span><input id="cpLimit" aria-label="使用可能回数" value="50" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能期限</span><input id="cpUntil" aria-label="使用可能期限" type="date" value="2026-09-30" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input aria-label="メモ(任意)" value="夏季販促" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">使用済み回数がある場合、割引率の変更は適用済みの請求へ遡及しません。作成・変更は監査ログに記録されます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input id="cpMemo" aria-label="メモ(任意)" value="夏季販促" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div id="cpErr" hidden style="font-size:12px;color:#c23934;font-weight:700"></div><div style="font-size:11.5px;color:#6b7484;line-height:1.7">使用済み回数がある場合、割引率の変更は適用済みの請求へ遡及しません。作成・変更は監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mCoupon')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mCoupon')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="pCouponSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
 
+<div id="mBulkCoupon" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:720px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+      <span style="font-size:15px;font-weight:700">クーポンの一括作成</span>
+      <span role="button" onclick="pClose('mBulkCoupon')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="display:flex;gap:18px;padding:14px 22px;border-bottom:1px solid #eef0f5">
+      <span id="bkStep1" style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">1</span>共通設定</span>
+      <span id="bkStep2" style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">2</span>コードの確認</span>
+      <span id="bkStep3" style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">3</span>作成の実行</span>
+    </div>
+
+    <div id="bkPane1" style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">作成件数 <span style="color:#c23934">必須</span></span><input id="bkQty" type="number" min="1" value="10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">割引率(%)</span><input id="bkRate" type="number" min="1" max="50" value="10" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能回数</span><input id="bkLimit" type="number" min="1" value="1" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;text-align:right"></label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">使用可能期限</span><input id="bkUntil" type="date" value="2026-12-31" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;padding:8px 10px;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">コードの接頭辞</span><input id="bkPrefix" value="CP" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;font-family:ui-monospace,monospace"></label>
+      </div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メモ(任意)</span><input id="bkMemo" value="" placeholder="管理用の内部メモ" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">ここで指定した割引率・使用可能回数・使用可能期限・メモは、作成するすべてのクーポンに共通で適用されます。</div>
+      <div id="bkErr1" hidden style="font-size:12px;color:#c23934;font-weight:700"></div>
+    </div>
+
+    <div id="bkPane2" style="display:none;padding:18px 22px;flex-direction:column;gap:12px">
+      <div style="font-size:12.5px;color:#5b6577;line-height:1.7">重複しないコードを自動で生成しました。必要に応じて書き換えてから作成してください。</div>
+      <div style="border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:44px 200px minmax(0,1fr);column-gap:10px;align-items:center;padding:0 12px;height:34px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577"><span>No</span><span>クーポンコード</span><span>クーポン名</span></div>
+        <div id="bkRows" style="max-height:260px;overflow-y:auto"></div>
+      </div>
+      <div id="bkErr2" hidden style="font-size:12px;color:#c23934;font-weight:700"></div>
+    </div>
+
+    <div id="bkPane3" style="display:none;padding:26px 22px;flex-direction:column;align-items:center;gap:10px">
+      <div style="font-size:15px;font-weight:700"><span id="bkDone">0</span> 件のクーポンを作成しました</div>
+      <div style="font-size:12.5px;color:#6b7484;line-height:1.7;text-align:center">作成したクーポンは一覧の先頭に表示されます。<br>コードの一覧はCSVで取得できます。</div>
+      <button onclick="pBulkCsv()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px">コードの一覧をCSVで取得</button>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;gap:10px;padding:0 22px 18px">
+      <button id="bkBack" onclick="pBulkStep(-1)" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">戻る</button>
+      <span></span>
+      <span style="display:flex;gap:10px">
+        <button id="bkCancel" onclick="pClose('mBulkCoupon')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+        <button id="bkNext" onclick="pBulkStep(1)" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">次へ</button>
+        <button id="bkRun" onclick="pBulkRun()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成を実行</button>
+        <button id="bkClose" onclick="pClose('mBulkCoupon')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      </span>
+    </div>
+  </div>
+</div>
 <div id="mCouponHistory" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:780px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">利用履歴<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SUMMER10 — 18回 / 50回使用</span></span>
+      <span style="font-size:15px;font-weight:700">利用履歴<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px" id="chHead"></span></span>
       <span role="button" onclick="pClose('mCouponHistory')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:6px 22px 16px">
-      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:38px;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577"><span>適用日時</span><span>会社名</span><span>対象請求</span><span style="text-align:right">割引率</span><span style="text-align:right">割引額</span><span style="text-align:right">適用後の金額</span></div>
-      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/07/20 11:08</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">(株)ネオフーズ</span><span>SV-10214分</span><span style="text-align:right">10%</span><span style="text-align:right;color:#237a52;font-weight:700">−7,360 円</span><span style="text-align:right;font-weight:700">66,240 円</span></div>
-      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/07/12 15:44</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">(株)クレストメディカル</span><span>SV-10221分</span><span style="text-align:right">5%</span><span style="text-align:right;color:#237a52;font-weight:700">−1,440 円</span><span style="text-align:right;font-weight:700">27,360 円</span></div>
-      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:44px;font-size:12.5px;font-variant-numeric:tabular-nums"><span>2026/07/02 09:30</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">(株)ラピスソフト</span><span>SV-10188分</span><span style="text-align:right">15%</span><span style="text-align:right;color:#237a52;font-weight:700">−75,900 円</span><span style="text-align:right;font-weight:700">430,100 円</span></div>
-      <div style="margin-top:10px;font-size:11.5px;color:#6b7484">直近3件を表示。全履歴はCSV出力で確認できます。</div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
+          <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:38px;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577"><span>適用日時</span><span>会社名</span><span>対象請求</span><span style="text-align:right">割引率</span><span style="text-align:right">割引額</span><span style="text-align:right">適用後の金額</span></div>
+          <div id="chRows"></div>
+          <div style="margin-top:10px;font-size:11.5px;color:#6b7484" id="chNote"></div>
+          <div style="margin-top:10px"><a href="#b" id="chToBill" style="font-size:12.5px">請求管理でこのクーポンの適用を確認 →</a></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button onclick="pClose('mCouponHistory')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
     </div>
   </div>
@@ -137,5 +172,253 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// 作成モーダルの保存。新規のときだけ一覧へ行を足す(編集は既存行を触らない)
+window.pCouponSave = function () {
+    var isNew = document.getElementById('mCouponTitle').textContent.indexOf('作成') >= 0;
+    if (isNew) {
+        var v = function (id) { return document.getElementById(id).value.trim(); };
+        var code = v('cpCode');
+        var dup = document.querySelector('#couponList [data-f-code="' + code + '"]');
+        var err = document.getElementById('cpErr');
+        if (!code || !v('cpName')) { err.textContent = 'クーポン名とコードは必須です'; err.hidden = false; return; }
+        if (dup) { err.textContent = 'コード ' + code + ' は既に使われています'; err.hidden = false; return; }
+        err.hidden = true;
+        window.cpAddCoupons([{ name: v('cpName'), code: code, rate: v('cpRate'),
+                               limit: v('cpLimit'), until: v('cpUntil'), memo: v('cpMemo') }]);
+    }
+    pClose('mCoupon');
+};
+</script>
+
+<script>
+// 作成したクーポンを一覧へ反映する。モックのためページを離れると消える
+(function () {
+    var ROW_COLS = 'display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) '
+        + 'minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) '
+        + 'minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;'
+        + 'border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer';
+    var seq = 0;
+
+    function esc(v) {
+        return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function nextId() {
+        var max = 0;
+        Array.prototype.forEach.call(document.querySelectorAll('#couponList [data-f-cid]'), function (r) {
+            var n = parseInt(String(r.getAttribute('data-f-cid')).replace(/\D/g, ''), 10);
+            if (n > max) { max = n; }
+        });
+        seq++;
+        return 'CP-' + String(max + seq).padStart(4, '0');
+    }
+
+    function today() {
+        var d = new Date();
+        return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/'
+            + String(d.getDate()).padStart(2, '0');
+    }
+
+    // c = {name, code, rate, limit, until, memo}
+    window.cpAddCoupons = function (list) {
+        var box = document.getElementById('couponList');
+        var head = box.querySelector('[data-pg]');
+        var html = '';
+        var ids = [];
+        for (var i = 0; i < list.length; i++) {
+            var c = list[i], id = nextId();
+            ids.push(id);
+            var until = String(c.until || '').replace(/-/g, '/');
+            html += '<div tabindex="0" role="button" data-pg="1" data-f-cid="' + id + '"'
+                 + ' data-f-cname="' + esc(c.name) + '" data-f-code="' + esc(c.code) + '"'
+                 + ' data-f-date="' + today() + '" class="proto-row-hover"'
+                 + ' onclick="pOpen(\'mCoupon\');document.getElementById(\'mCouponTitle\').textContent=\'クーポンを編集\'"'
+                 + ' style="' + ROW_COLS + '">'
+                 + '<span style="font-weight:500">' + id + '</span>'
+                 + '<span>' + esc(c.name) + '</span>'
+                 + '<span style="font-family:ui-monospace,monospace;font-size:12px">' + esc(c.code) + '</span>'
+                 + '<span class="c-opt">' + today() + '</span>'
+                 + '<span>' + until + '</span>'
+                 + '<span style="text-align:right">' + c.rate + '%</span>'
+                 + '<span style="text-align:right">' + c.limit + '</span>'
+                 + '<span style="text-align:right">0 <span style="color:#6b7484;font-size:11.5px">(0%)</span></span>'
+                 + '<span class="c-opt" style="font-size:12px;color:#5b6577">' + (esc(c.memo) || '—') + '</span>'
+                 + '<span style="padding-left:12px;display:flex;gap:10px;font-size:12px">'
+                 + '<a href="#c" onclick="event.stopPropagation();pOpen(\'mCoupon\');'
+                 + 'document.getElementById(\'mCouponTitle\').textContent=\'クーポンを編集\';return false">編集</a>'
+                 + '<a href="#c" onclick="event.stopPropagation();pCouponHistory(\'' + id + '\');return false">利用履歴</a>'
+                 + '</span></div>';
+            COUPON_HISTORY[id] = { code: c.code, rate: c.rate, used: 0, cap: c.limit, rows: [] };
+        }
+        head.insertAdjacentHTML('beforebegin', html);
+        // 絞り込みと件数・ページを引き直す(作成直後の行が隠れないよう条件は解除する)
+        window.pClearSearch('couponList');
+        return ids;
+    };
+}());
+</script>
+
+<script>
+// 利用履歴(仕様書17 §4.5)。請求管理の実データに合わせ、クーポンごとに切り替える
+var COUPON_HISTORY = {"CP-0021": {"code": "SUMMER10", "rate": 10, "used": 18, "cap": 50, "rows": [["2026/07/05 11:08", "(株)ネオフーズ", "SV-10214", "7,360", "66,240"]]}, "CP-0018": {"code": "PREMUP15", "rate": 15, "used": 20, "cap": 20, "rows": [["2026/05/22 15:44", "(株)ラピスソフト", "SV-10188", "75,900", "430,100"]]}, "CP-0015": {"code": "EXPOREF5", "rate": 5, "used": 41, "cap": 100, "rows": [["2026/07/15 09:30", "(株)クレストメディカル", "SV-10221", "1,440", "27,360"]]}, "CP-0009": {"code": "THANKS20", "rate": 20, "used": 12, "cap": 30, "rows": []}};
+window.pCouponHistory = function (cid) {
+    var c = COUPON_HISTORY[cid];
+    if (!c) { return; }
+    document.getElementById('chHead').textContent = c.code + '(' + c.rate + '%) — ' + c.used + '回 / ' + c.cap + '回使用';
+    var html = '';
+    for (var i = 0; i < c.rows.length; i++) {
+        var r = c.rows[i];
+        html += '<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 110px 64px 110px 120px;align-items:center;height:44px;border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums">'
+             + '<span>' + r[0] + '</span>'
+             + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">' + r[1] + '</span>'
+             + '<a href="survey-detail.html?id=' + r[2] + '">' + r[2] + '</a>'
+             + '<span style="text-align:right">' + c.rate + '%</span>'
+             + '<span style="text-align:right;color:#237a52;font-weight:700">-' + r[3] + ' 円</span>'
+             + '<span style="text-align:right;font-weight:700">' + r[4] + ' 円</span></div>';
+    }
+    if (!html) {
+        html = '<div style="padding:18px 0;text-align:center;font-size:12.5px;color:#8a93a5">請求管理に残っている適用はありません</div>';
+    }
+    document.getElementById('chRows').innerHTML = html;
+    document.getElementById('chNote').textContent = '請求管理に残っている適用を新しい順に表示しています。それ以前の履歴はCSV出力で確認できます。';
+    document.getElementById('chToBill').href = 'billing-management.html?coupon=' + c.code;
+    pOpen('mCouponHistory');
+};
+</script>
+
+<script>
+// クーポンの一括作成(仕様書17 §4.6)。共通設定 → コードの確認 → 作成の実行 の3段階
+(function () {
+    var step = 1, made = [];
+
+    function show(id, on) { document.getElementById(id).style.display = on ? '' : 'none'; }
+
+    function paint() {
+        for (var i = 1; i <= 3; i++) {
+            var on = (i === step);
+            var el = document.getElementById('bkStep' + i);
+            el.style.color = on ? '#1f2733' : '#8a93a5';
+            el.firstElementChild.style.background = on ? '#3467d6' : '#e2e6ed';
+            el.firstElementChild.style.color = on ? '#fff' : '#6b7484';
+            document.getElementById('bkPane' + i).style.display = on ? 'flex' : 'none';
+        }
+        show('bkBack', step === 2);
+        show('bkNext', step === 1);
+        show('bkRun', step === 2);
+        show('bkCancel', step !== 3);
+        show('bkClose', step === 3);
+    }
+
+    function err(id, msg) {
+        var e = document.getElementById(id);
+        e.textContent = msg || '';
+        e.hidden = !msg;
+    }
+
+    // 既存のコードと重ならない値を作る
+    function existing() {
+        var out = {};
+        var rows = document.querySelectorAll('#couponList [data-f-code]');
+        for (var i = 0; i < rows.length; i++) { out[rows[i].getAttribute('data-f-code')] = 1; }
+        return out;
+    }
+
+    function gen(n, prefix) {
+        var used = existing(), out = [], seq = 1;
+        while (out.length < n) {
+            var code = (prefix || 'CP') + String(seq).padStart(4, '0');
+            seq++;
+            if (used[code]) { continue; }
+            used[code] = 1;
+            out.push(code);
+        }
+        return out;
+    }
+
+    window.pBulkOpen = function () {
+        step = 1; made = [];
+        err('bkErr1', ''); err('bkErr2', '');
+        paint();
+        pOpen('mBulkCoupon');
+    };
+
+    window.pBulkStep = function (d) {
+        if (d > 0 && step === 1) {
+            var n = parseInt(document.getElementById('bkQty').value, 10);
+            if (!(n >= 1)) { err('bkErr1', '作成件数は1以上の整数で入力してください'); return; }
+            if (n > 200) { err('bkErr1', '一度に作成できるのは200件までです'); return; }
+            err('bkErr1', '');
+            var codes = gen(n, document.getElementById('bkPrefix').value.trim());
+            var memo = document.getElementById('bkMemo').value.trim();
+            var html = '';
+            for (var i = 0; i < codes.length; i++) {
+                html += '<div style="display:grid;grid-template-columns:44px 200px minmax(0,1fr);column-gap:10px;'
+                     + 'align-items:center;padding:5px 12px;border-bottom:1px solid #eef0f5">'
+                     + '<span style="font-size:12px;color:#8a93a5">' + (i + 1) + '</span>'
+                     + '<input class="bk-code" value="' + codes[i] + '" style="width:100%;box-sizing:border-box;'
+                     + 'border:1px solid #c8cdd8;border-radius:5px;padding:5px 8px;font-size:12.5px;'
+                     + 'font-family:ui-monospace,monospace">'
+                     + '<input class="bk-name" value="' + (memo || '一括作成') + ' ' + (i + 1)
+                     + '" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:5px;'
+                     + 'padding:5px 8px;font-size:12.5px;font-family:inherit"></div>';
+            }
+            document.getElementById('bkRows').innerHTML = html;
+            step = 2;
+        } else if (d < 0 && step === 2) {
+            step = 1;
+        }
+        paint();
+    };
+
+    window.pBulkRun = function () {
+        var codes = document.querySelectorAll('#bkRows .bk-code');
+        var names = document.querySelectorAll('#bkRows .bk-name');
+        var used = existing(), dup = [];
+        for (var i = 0; i < codes.length; i++) {
+            var v = codes[i].value.trim();
+            codes[i].style.borderColor = '#c8cdd8';
+            if (!v || used[v]) { dup.push(i + 1); codes[i].style.borderColor = '#c23934'; }
+            used[v] = 1;
+        }
+        if (dup.length) {
+            err('bkErr2', dup.length + ' 件のコードが重複または空です(' + dup.slice(0, 8).join(', ')
+                + (dup.length > 8 ? ' ほか' : '') + ')。書き換えてから実行してください');
+            return;
+        }
+        err('bkErr2', '');
+        made = [];
+        for (var j = 0; j < codes.length; j++) { made.push([codes[j].value.trim(), names[j].value.trim()]); }
+        var rate = document.getElementById('bkRate').value;
+        var lim = document.getElementById('bkLimit').value;
+        var until = document.getElementById('bkUntil').value;
+        var memo = document.getElementById('bkMemo').value.trim();
+        window.cpAddCoupons(made.map(function (m) {
+            return { name: m[1], code: m[0], rate: rate, limit: lim, until: until, memo: memo };
+        }));
+        document.getElementById('bkDone').textContent = made.length;
+        step = 3;
+        paint();
+    };
+
+    window.pBulkCsv = function () {
+        var rate = document.getElementById('bkRate').value;
+        var lim = document.getElementById('bkLimit').value;
+        var until = document.getElementById('bkUntil').value;
+        var lines = ['コード,クーポン名,割引率,使用可能回数,使用可能期限'];
+        for (var i = 0; i < made.length; i++) {
+            lines.push(made[i][0] + ',' + made[i][1] + ',' + rate + '%,' + lim + ',' + until);
+        }
+        var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'coupons_bulk.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+}());
+</script>
+
 </body>
 </html>
