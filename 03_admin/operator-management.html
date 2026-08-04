@@ -84,7 +84,7 @@
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メールアドレス <span style="color:#c23934">必須</span></span><input placeholder="operator@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">所属グループ</span><select data-group-select aria-label="所属グループ" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">権限レベル</span><select aria-label="権限レベル" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv1(Operator)</option><option>Lv2(OperatorAdmin)</option></select></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">権限レベル</span><select data-invite-lv aria-label="権限レベル" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv1(Operator)</option><option>Lv2(OperatorAdmin)</option></select></label>
       </div>
       <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">対応可能言語</span>
         <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
@@ -143,9 +143,9 @@
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">設定</div>
         <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;font-size:13px">
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select data-group-select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">権限レベル<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
-          <div data-min-lv="4" style="font-size:11px;color:#8a6414">Lv4シナリオ: Lv3(Admin)の付与も選択可</div>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select data-op-field="group" data-group-select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">権限レベル<select data-op-field="lv" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
+          <div data-slot="opLvNote" style="font-size:11px;color:#8a6414"></div>
           <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;color:#6b7484">対応可能言語
             <span style="display:flex;gap:6px;flex-wrap:wrap">
               <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
@@ -155,7 +155,7 @@
               <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">韓国語</span>
             </span>
           </div>
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">ステータス<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>有効</option><option>無効</option></select></label>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">ステータス<select data-op-field="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>有効</option><option>無効</option></select></label>
           <div style="display:flex;justify-content:flex-end;margin-top:4px">
             <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmDisableOp')">変更を保存</button>
           </div>
@@ -235,7 +235,18 @@
 <script src="src/proto-level.js"></script>
 <script>
 // 招待・グループ作成・設定変更を一覧へ反映する(モックのため再読込で戻る)
-window.pOpInviteSend = function () {
+// 招待で付与できるのも自分より下位まで(23_admin_operator_management.md §4.4)
+    document.addEventListener('DOMContentLoaded', function () {
+        var sel = document.querySelector('[data-invite-lv]');
+        if (!sel) { return; }
+        var me = parseInt(String(localStorage.getItem('adminMockLevel') || 'lv4').replace(/\D/g, ''), 10) || 4;
+        var L = { 1: 'Lv1(Operator)', 2: 'Lv2(OperatorAdmin)', 3: 'Lv3(Admin)', 4: 'Lv4(MasterAdmin)' };
+        var html = '';
+        for (var n = 1; n <= Math.min(me - 1, 4); n++) { html += '<option>' + L[n] + '</option>'; }
+        sel.innerHTML = html || '<option>Lv1(Operator)</option>';
+    });
+
+    window.pOpInviteSend = function () {
     var box = document.getElementById('mInviteOp');
     var mail = box.querySelector('input').value.trim();
     var sels = box.querySelectorAll('select');
@@ -344,6 +355,77 @@ window.pOpSetPw = function () {
     var BADGE = { '有効': 'status-active', '無効': 'status-inactive', '招待中': 'status-info' };
     var DEF = 'OP-0034';
     var cur = DEF;
+    document.addEventListener('DOMContentLoaded', function () {
+        var m = document.getElementById('opModal');
+        if (m) { fillFields(m, OPS[DEF]); }
+    });
+
+    // 表示シナリオ(ログイン中の権限)を取る
+    function myLv() {
+        var v = localStorage.getItem('adminMockLevel') || 'lv4';
+        return parseInt(String(v).replace(/\D/g, ''), 10) || 4;
+    }
+
+    var LV_LABEL = { 1: 'Lv1(Operator)', 2: 'Lv2(OperatorAdmin)', 3: 'Lv3(Admin)', 4: 'Lv4(MasterAdmin)' };
+
+    // 権限レベル・所属グループ・ステータスを対象の値に合わせ、変更できる範囲を効かせる。
+    // 制約は 23_admin_operator_management.md §4.4:
+    //   自分と同等以上の権限レベルのアカウントは変更できない / 自分より上位のレベルは付与できない
+    function fillFields(m, d) {
+        var me = myLv();
+        var target = parseInt(String(d.lv).replace(/\D/g, ''), 10) || 1;
+        var locked = target >= me;
+
+        var lvSel = m.querySelector('[data-op-field="lv"]');
+        if (lvSel) {
+            var max = Math.min(me - 1, 4);            // 自分より上位は付与できない
+            var html = '';
+            for (var n = 1; n <= 4; n++) {
+                // 付与できる範囲に加え、対象の現在値は必ず出す(表示が消えないように)
+                if (n <= max || n === target) {
+                    html += '<option value="' + n + '"' + (n === target ? ' selected' : '') + '>'
+                         + LV_LABEL[n] + '</option>';
+                }
+            }
+            lvSel.innerHTML = html;
+            lvSel.value = String(target);
+        }
+
+        var grSel = m.querySelector('[data-op-field="group"]');
+        if (grSel) {
+            var found = false;
+            for (var g = 0; g < grSel.options.length; g++) {
+                if (grSel.options[g].textContent.trim() === d.group) { found = true; }
+            }
+            if (!found && d.group) { grSel.add(new Option(d.group, d.group)); }
+            grSel.value = d.group;
+        }
+
+        var stSel = m.querySelector('[data-op-field="status"]');
+        if (stSel) {
+            var has = false;
+            for (var t = 0; t < stSel.options.length; t++) {
+                if (stSel.options[t].textContent.trim() === d.status) { has = true; }
+            }
+            if (!has) { stSel.add(new Option(d.status, d.status)); }
+            stSel.value = d.status;
+        }
+
+        [lvSel, stSel].forEach(function (el) {
+            if (!el) { return; }
+            el.disabled = locked;
+            el.style.background = locked ? '#f2f4f8' : '';
+            el.style.color = locked ? '#8a93a5' : '';
+        });
+
+        var note = m.querySelector('[data-slot="opLvNote"]');
+        if (note) {
+            note.textContent = locked
+                ? '自分と同等以上の権限レベルのため、権限レベルとステータスは変更できません。'
+                : ('付与できるのは ' + LV_LABEL[1] + ' 〜 ' + LV_LABEL[Math.min(me - 1, 4)] + ' です。');
+        }
+    }
+
     window.pOpenOperator = function (oid) {
         var m = document.getElementById('opModal');
         var d = OPS[oid] || OPS[DEF];
@@ -367,6 +449,7 @@ window.pOpSetPw = function () {
         });
         var b = m.querySelector('[data-slot="opstatus"]');
         if (b) { b.textContent = d.status; b.className = 'status-badge ' + (BADGE[d.status] || 'status-inactive'); }
+        fillFields(m, d);
         var go = m.querySelector('[data-go="perf"]');
         if (go) { go.onclick = function () { location.href = 'performance-management.html?oid=' + oid; return false; }; }
         cur = oid;
