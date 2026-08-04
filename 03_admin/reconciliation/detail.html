@@ -23,7 +23,7 @@
               <h2 style="margin:0;font-size:18px;font-weight:700">名刺情報照合</h2>
               <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums"><span id="svBadgeM">アンケートID SV-10236</span></span>
               <span style="font-size:12px;color:#5b6577"><span id="titleM">製造業DXセミナー2026</span></span>
-              <span style="font-size:12px;color:#c23934;font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span>
+              <span style="font-size:12px;color:#c23934;font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span><span id="rcMismatch" tabindex="0" role="button" title="押すと次の不一致へ移動します(N キー)" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:999px;padding:3px 12px;cursor:pointer;font-variant-numeric:tabular-nums"></span><span id="rcAllMatch" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#237a52;background:#edf7f1;border:1px solid #9fceb6;border-radius:999px;padding:3px 12px">全 16 項目が一致</span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px">
               <span id="lockBadge" style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで <span id="lockSec">182</span>秒)</span>
@@ -62,52 +62,52 @@
                   <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:0 14px;height:36px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577">
                     <span>項目</span><span>OCR結果</span><span>DB値</span><span>入力1</span><span>入力2</span><span>入力3</span><span>修正入力</span><span>完成内容</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">メールアドレス <span style="font-size:10.5px;color:#8a93a5;font-weight:400">①</span></span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">t.yamada@abroad.co.jp</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">姓 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">②</span></span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">山田</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">②</span></span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">太郎</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">会社名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロ一ド株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロ一ド株式会社</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード株式会社</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード(株)</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード株式会社</span><span style="padding-right:10px"><input id="fixCompany" aria-label="会社名の完成内容" spellcheck="false" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneCompany" style="font-weight:700">アブロード株式会社</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">部署名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span></span><span style="overflow-wrap:anywhere">営業部</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">営業部</span><span style="overflow-wrap:anywhere">営業部</span><span style="overflow-wrap:anywhere">営業部</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">営業部</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">役職名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','部長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">部長</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span style="padding-right:10px"><input id="fixRole" aria-label="役職名の完成内容" spellcheck="false" value="" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneRole" style="font-weight:700;color:#8a6414">未確定</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">郵便番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span></span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">150-0001</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">住所1 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span></span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">住所2 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7階')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7階</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span style="padding-right:10px"><input id="fixAddr2" aria-label="住所2の完成内容" spellcheck="false" value="アブロードビル7F" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneAddr2" style="font-weight:700">アブロードビル7F</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">電話番号1 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">03-1234-5678</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">電話番号2 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">〓</span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">〓</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">携帯番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">090-8765-4321</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">FAX番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5670')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5670</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span style="padding-right:10px"><input id="fixFax" aria-label="FAX番号の完成内容" spellcheck="false" value="" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneFax" style="font-weight:700;color:#8a6414">未確定</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
+                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
                     <span style="font-weight:700">URL <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑥</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','http://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">http://www.abroad.co.jp</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span style="padding-right:10px"><input id="fixUrl" aria-label="URLの完成内容" spellcheck="false" value="https://www.abroad.co.jp" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneUrl" style="font-weight:700">https://www.abroad.co.jp</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">その他メモ <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑦</span></span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span>
                   </div>
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
+                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
                     <span style="font-weight:700">フリー入力 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑧</span></span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">〓</span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">〓</span>
                   </div>
 </div>
@@ -154,7 +154,8 @@
       <span style="font-weight:700">Enter</span><span>次の未確定の修正入力へ(すべて確定済みなら確定ボタンへ)</span>
       <span style="font-weight:700">Alt + 1〜3</span><span>フォーカス中の行の入力1〜3を修正入力へ複写</span>
       <span style="font-weight:700">Ctrl + Z</span><span>複写を直前の値に戻す</span>
-      <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
+      <span style="font-weight:700">N</span><span>次の不一致の項目へ移動(入力中は不一致の件数バッジを押す)</span>
+          <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
       <span style="font-weight:700">R</span><span>画像を90度回転(入力中は Alt+R)</span>
       <span style="font-weight:700">画像ホバー / クリック</span><span>カーソル位置を拡大 / その位置で固定(再クリックで解除)</span>
       <span style="font-weight:700">?</span><span>この一覧を表示</span>
@@ -168,6 +169,70 @@
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
+<script>
+// 比較表は縦にスクロールするため、不一致の件数を見出しへ出して見落としを防ぐ。
+// バッジ(または N キー)で次の不一致へ送る
+(function () {
+    var idx = -1;
+
+    function rows() {
+        return document.querySelectorAll('.rc-row[data-rc="mismatch"]');
+    }
+
+    function paint() {
+        var m = rows();
+        var total = document.querySelectorAll('.rc-row').length;
+        var bad = document.getElementById('rcMismatch');
+        var good = document.getElementById('rcAllMatch');
+        if (!bad || !good) { return; }
+        if (m.length) {
+            bad.textContent = '!不一致 ' + m.length + ' / ' + total + ' 項目';
+            bad.style.display = 'inline-flex';
+            good.style.display = 'none';
+        } else {
+            good.textContent = '全 ' + total + ' 項目が一致';
+            good.style.display = 'inline-flex';
+            bad.style.display = 'none';
+        }
+    }
+
+    // 次の不一致へ送り、行を一瞬強調する
+    window.pNextMismatch = function () {
+        var m = rows();
+        if (!m.length) { return; }
+        idx = (idx + 1) % m.length;
+        var r = m[idx];
+        r.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        var keep = r.style.outline;
+        r.style.outline = '2px solid #c8951a';
+        r.style.outlineOffset = '-2px';
+        setTimeout(function () { r.style.outline = keep; }, 900);
+        var inp = r.querySelector('input');
+        if (inp) { inp.focus({ preventScroll: true }); }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        paint();
+        var bad = document.getElementById('rcMismatch');
+        if (bad) {
+            bad.addEventListener('click', window.pNextMismatch);
+            bad.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.pNextMismatch(); }
+            });
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'n' && e.key !== 'N') { return; }
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) { return; }
+        if (document.querySelector('.proto-modal:not([hidden])')) { return; }
+        e.preventDefault();
+        window.pNextMismatch();
+    });
+}());
+</script>
+
 <script>
 // 照合フロー(モック): 修正入力の監視・確定・候補複写・ロック管理
 // 画像操作(ホバー拡大・クリック固定・回転)は proto-ui.js の pInitCardZoom を使用
