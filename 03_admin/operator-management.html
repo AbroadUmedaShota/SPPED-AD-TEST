@@ -37,7 +37,7 @@
             </div>
             <div data-filter-for="operatorsList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <input data-f-key="any" placeholder="氏名・メールアドレス・オペレーターID(部分一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:280px;font-family:inherit">
-              <select aria-label="所属グループ" data-f-key="group" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
+              <select data-group-select aria-label="所属グループ" data-f-key="group" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
               <select aria-label="権限" data-f-key="lv" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">権限: すべて</option><option>Lv1</option><option>Lv2</option><option>Lv3</option><option>Lv4</option></select>
               <select aria-label="ステータス" data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">ステータス: すべて</option><option>有効</option><option>無効</option><option>招待中</option></select>
               <select aria-label="言語" data-f-key="lang" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">言語: すべて</option><option>日本語</option><option>英語</option><option>中国語簡体字</option><option>中国語繁体字</option><option>韓国語</option></select>
@@ -83,7 +83,7 @@
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メールアドレス <span style="color:#c23934">必須</span></span><input placeholder="operator@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">所属グループ</span><select aria-label="所属グループ" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">所属グループ</span><select data-group-select aria-label="所属グループ" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select></label>
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">権限レベル</span><select aria-label="権限レベル" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv1(Operator)</option><option>Lv2(OperatorAdmin)</option></select></label>
       </div>
       <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">対応可能言語</span>
@@ -143,7 +143,7 @@
         </div>
         <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">設定</div>
         <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;font-size:13px">
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select data-group-select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
           <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">権限レベル<select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
           <div data-min-lv="4" style="font-size:11px;color:#8a6414">Lv4シナリオ: Lv3(Admin)の付与も選択可</div>
           <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;color:#6b7484">対応可能言語
@@ -292,18 +292,18 @@ window.pOpGroupCreate = function () {
     var name = box.querySelector('input').value.trim();
     var err = document.getElementById('opGrpErr');
     if (!name) { err.textContent = 'グループ名を入力してください'; err.hidden = false; return; }
+    // グループの選択肢を持つ場所は複数ある(招待・絞り込み・オペレーター詳細)。
+    // 追加漏れが起きないよう data-group-select を付けた全てへ足す
+    var sels = document.querySelectorAll('[data-group-select]');
     var dup = false;
-    document.querySelectorAll('#mInviteOp select option').forEach(function (o) {
-        if (o.textContent.trim() === name) { dup = true; }
-    });
+    for (var i = 0; i < sels.length; i++) {
+        for (var j = 0; j < sels[i].options.length; j++) {
+            if (sels[i].options[j].textContent.trim() === name) { dup = true; }
+        }
+    }
     if (dup) { err.textContent = name + ' は既にあります'; err.hidden = false; return; }
     err.hidden = true;
-    // 招待の所属グループと絞り込みの選択肢へ足す
-    document.querySelectorAll('#mInviteOp select').forEach(function (sel, i) {
-        if (i === 0) { sel.add(new Option(name, name)); }
-    });
-    var f = document.querySelector('[data-f-key="group"]');
-    if (f && f.tagName === 'SELECT') { f.add(new Option(name, name)); }
+    for (var k = 0; k < sels.length; k++) { sels[k].add(new Option(name, name)); }
     window.pToast('グループ「' + name + '」を作成しました');
     window.pClose('mOpGroup');
 };
