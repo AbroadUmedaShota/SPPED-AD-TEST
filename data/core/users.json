@@ -108,5 +108,133 @@
     "billingPostalCode": "",
     "billingAddress": "",
     "billingBuildingFloor": ""
+  },
+  {
+    "accountId": "ACC-1002",
+    "companyName": "(株)テクノブレイン",
+    "lastName": "川村",
+    "firstName": "聡",
+    "email": "s.kawamura@technobrain.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1007",
+    "companyName": "(株)エコスタイル",
+    "lastName": "長谷川",
+    "firstName": "純",
+    "email": "j.hasegawa@ecostyle.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1009",
+    "companyName": "大和ハウジング(株)",
+    "lastName": "三宅",
+    "firstName": "健",
+    "email": "k.miyake@yamato-housing.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1012",
+    "companyName": "(株)ラピスソフト",
+    "lastName": "中島",
+    "firstName": "亜衣",
+    "email": "a.nakajima@lapis-soft.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1014",
+    "companyName": "光陽印刷(株)",
+    "lastName": "近藤",
+    "firstName": "貴文",
+    "email": "t.kondo@koyo-print.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1016",
+    "companyName": "(株)ハーベスト農園",
+    "lastName": "石川",
+    "firstName": "美咲",
+    "email": "m.ishikawa@harvest-farm.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1017",
+    "companyName": "セントラル機器(株)",
+    "lastName": "岡本",
+    "firstName": "修平",
+    "email": "s.okamoto@central-kiki.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1019",
+    "companyName": "(株)アークデザイン",
+    "lastName": "小林",
+    "firstName": "玲奈",
+    "email": "r.kobayashi@arc-design.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1021",
+    "companyName": "西日本トラベル(株)",
+    "lastName": "藤田",
+    "firstName": "大地",
+    "email": "d.fujita@nishinihon-tv.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1022",
+    "companyName": "(株)ネオフーズ",
+    "lastName": "村上",
+    "firstName": "千尋",
+    "email": "c.murakami@neofoods.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1025",
+    "companyName": "東亜精密工業(株)",
+    "lastName": "大森",
+    "firstName": "一樹",
+    "email": "k.omori@toa-seimitsu.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1026",
+    "companyName": "(株)クレストメディカル",
+    "lastName": "平野",
+    "firstName": "沙耶",
+    "email": "s.hirano@crest-med.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1049",
+    "companyName": "グロースパートナーズ(株)",
+    "lastName": "三浦",
+    "firstName": "沙織",
+    "email": "s.miura@growthp.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1031",
+    "companyName": "ミライ電装(株)",
+    "lastName": "佐々木",
+    "firstName": "剛",
+    "email": "t.sasaki@mirai-denso.co.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1035",
+    "companyName": "地方創生機構",
+    "lastName": "川口",
+    "firstName": "誠",
+    "email": "m.kawaguchi@chihososei.or.jp",
+    "billingAddressType": "same"
+  },
+  {
+    "accountId": "ACC-1050",
+    "companyName": "(株)イベントプラス",
+    "lastName": "中山",
+    "firstName": "亮",
+    "email": "r.nakayama@eventplus.co.jp",
+    "billingAddressType": "same"
   }
 ]
