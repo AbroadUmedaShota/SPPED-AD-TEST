@@ -426,6 +426,69 @@
         refreshLabel();
     };
 
+
+    // 操作の結果を短く知らせる。実データを持たないモックでも、押した操作が通ったことを示す
+    window.pToast = function (msg, kind) {
+        var box = document.getElementById('p-toast');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'p-toast';
+            box.setAttribute('role', 'status');
+            box.setAttribute('aria-live', 'polite');
+            box.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);'
+                + 'z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;'
+                + 'pointer-events:none';
+            document.body.appendChild(box);
+        }
+        var t = document.createElement('div');
+        t.style.cssText = 'background:' + (kind === 'error' ? '#c23934' : '#1f2733')
+            + ';color:#fff;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;'
+            + 'box-shadow:0 8px 24px rgba(12,18,30,.28);opacity:0;transition:opacity .12s';
+        t.textContent = msg;
+        box.appendChild(t);
+        requestAnimationFrame(function () { t.style.opacity = '1'; });
+        setTimeout(function () {
+            t.style.opacity = '0';
+            setTimeout(function () { if (t.parentNode) { t.parentNode.removeChild(t); } }, 200);
+        }, 2600);
+    };
+
+    // 画面のデータからCSVを組み立てて保存する。Excelで開けるようBOM付きUTF-8・CRLF
+    window.pCsv = function (name, rows) {
+        var body = rows.map(function (r) {
+            return r.map(function (v) {
+                v = (v === undefined || v === null) ? '' : String(v);
+                return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+            }).join(',');
+        }).join('\r\n');
+        var blob = new Blob(['\ufeff' + body], { type: 'text/csv;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 0);
+        window.pToast(name + ' を保存しました');
+    };
+
+    // 一覧の行を書き換える。cells は 0 起点の位置 → HTML
+    window.pRowSet = function (row, cells, attrs) {
+        if (!row) { return; }
+        var kids = row.children;
+        Object.keys(cells || {}).forEach(function (i) {
+            if (kids[i]) { kids[i].innerHTML = cells[i]; }
+        });
+        Object.keys(attrs || {}).forEach(function (k) {
+            row.setAttribute('data-f-' + k, attrs[k]);
+        });
+    };
+
+    // 一覧の行を取り出す(data-f-<key> の完全一致)
+    window.pRow = function (listId, key, val) {
+        return document.querySelector('#' + listId + ' [data-f-' + key + '="' + val + '"]');
+    };
+
     window.pClose = function (id) {
         var m = document.getElementById(id);
         if (m) { m.hidden = true; }

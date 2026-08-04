@@ -155,7 +155,7 @@
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mCsvImport')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mCsvImport')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取り込む</button>
+      <button onclick="pCalImport()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取り込む</button>
     </div>
   </div>
 </div>
@@ -163,6 +163,17 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// CSV取り込みの結果を知らせる(モックのため取り込み内容は反映しない)
+window.pCalImport = function () {
+    var f = document.querySelector('#mCsvImport input[type="file"]');
+    var name = (f && f.files && f.files[0]) ? f.files[0].name : '';
+    if (!name) { window.pToast('取り込むCSVファイルを選択してください', 'error'); return; }
+    window.pToast(name + ' を取り込みました');
+    window.pClose('mCsvImport');
+};
+</script>
+
 
 <script>
 // 営業日カレンダー(モック)。表示範囲は2026年6月〜8月、データはアンケート管理から導出した静的セット。

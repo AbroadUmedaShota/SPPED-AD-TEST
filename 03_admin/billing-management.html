@@ -176,10 +176,10 @@
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">事後適用は当月内の請求に限ります。適用状況はクーポン管理の利用履歴から確認できます。適用・取消は監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:space-between;gap:10px;padding:0 22px 18px">
-      <button data-slot="cpRemove" onclick="pClose('mCouponApply')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">適用を取り消す</button>
+      <button data-slot="cpRemove" onclick="pCouponRemove()" onclick="pClose('mCouponApply')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">適用を取り消す</button>
       <span style="display:flex;gap:10px">
       <button data-initial-focus onclick="pClose('mCouponApply')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-slot="cpSubmit" onclick="pClose('mCouponApply')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">適用する</button></span>
+      <button data-slot="cpSubmit" onclick="pCouponRun()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">適用する</button></span>
     </div>
   </div>
 </div>
@@ -245,6 +245,47 @@
         put('mCouponApply', 'cpSubmit', applied ? '変更する' : '適用する');
         window.pCouponCalc();
         window.pOpen('mCouponApply');
+    };
+
+    // クーポンの適用・取り消しを一覧と詳細へ反映する(モックのため再読込で戻る)
+    function couponCell(b) {
+        if (!b.coupon) { return '<span style="padding-left:14px;color:#8a93a5">—</span>'; }
+        return '<span style="font-size:11px;white-space:nowrap;padding-left:14px">'
+            + '<span style="color:#3467d6;font-weight:700">' + b.coupon + '</span> '
+            + '<span style="color:#237a52;font-weight:700">−' + b.rate + '%</span></span>';
+    }
+
+    function applyToRow(sid) {
+        var b = BILLS[sid];
+        var row = window.pRow('billingList', 'sid', sid);
+        if (!row) { return; }
+        window.pRowSet(row, { 3: yen(b.amount), 4: couponCell(b) }, { coupon: b.coupon || '—' });
+    }
+
+    window.pCouponRun = function () {
+        var b = BILLS[cur];
+        if (!b) { window.pClose('mCouponApply'); return; }
+        var code = slot('mCouponApply', 'cpSelect').value;
+        b.coupon = code;
+        b.rate = RATE[code] || 0;
+        b.disc = Math.floor(b.base * b.rate / 100);
+        b.amount = b.base - b.disc;
+        applyToRow(cur);
+        window.pToast(cur + ' に ' + code + ' を適用しました(−' + yen(b.disc) + ')');
+        window.pClose('mCouponApply');
+    };
+
+    window.pCouponRemove = function () {
+        var b = BILLS[cur];
+        if (!b) { window.pClose('mCouponApply'); return; }
+        var was = b.coupon;
+        b.coupon = '';
+        b.rate = 0;
+        b.disc = 0;
+        b.amount = b.base;
+        applyToRow(cur);
+        window.pToast(cur + ' の ' + was + ' の適用を取り消しました');
+        window.pClose('mCouponApply');
     };
 
     window.pCouponCalc = function () {

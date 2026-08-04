@@ -100,7 +100,7 @@
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)を停止します。停止中は本人のログインとメール配信などの自動処理が止まります。操作は監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button data-initial-focus onclick="pClose('mConfirmStopUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmStopUser')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">停止する</button>
+      <button onclick="pUdStop()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">停止する</button>
     </div>
   </div>
 </div>
@@ -114,7 +114,7 @@
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button onclick="pClose('mConfirmSaveUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="pUdSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -128,7 +128,7 @@
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">k.okada@market-v.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button data-initial-focus onclick="pClose('mConfirmResetPwUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmResetPwUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
+      <button onclick="pUdResetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
     </div>
   </div>
 </div>
@@ -150,7 +150,7 @@
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mSetPwUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mSetPwUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
+      <button onclick="pUdSetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
     </div>
   </div>
 </div>
@@ -158,6 +158,31 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// 詳細画面での操作を画面表示へ反映する(モックのため再読込で戻る)
+window.pUdStop = function () {
+    document.querySelectorAll('[data-slot="status"]').forEach(function (e) {
+        e.className = 'status-badge status-inactive';
+        e.textContent = '停止';
+    });
+    window.pToast('このアカウントを停止しました');
+    window.pClose('mConfirmStopUser');
+};
+window.pUdSave = function () {
+    window.pToast('変更を保存しました');
+    window.pClose('mConfirmSaveUser');
+};
+window.pUdResetPw = function () {
+    var m = document.getElementById('mConfirmResetPwUser').innerText.match(/[\w.@-]+@[\w.-]+/);
+    window.pToast((m ? m[0] : '対象') + ' へパスワード初期化メールを送信しました');
+    window.pClose('mConfirmResetPwUser');
+};
+window.pUdSetPw = function () {
+    window.pToast('パスワードを設定し、本人へ通知しました');
+    window.pClose('mSetPwUser');
+};
+</script>
+
 
 <script>
 // ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、

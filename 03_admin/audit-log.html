@@ -107,7 +107,7 @@
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mAuditCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mAuditCsv')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">出力する</button>
+      <button onclick="pAuditCsv()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">出力する</button>
     </div>
   </div>
 </div>
@@ -115,5 +115,39 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// 一覧の表示中の行からCSVを作る。列見出しは一覧のヘッダーをそのまま使う
+window.pListCsv = function (listId, name) {
+    var list = document.getElementById(listId);
+    if (!list) { return; }
+    var head = list.firstElementChild;
+    var cols = [];
+    Array.prototype.forEach.call(head.children, function (c) {
+        cols.push(c.textContent.replace(/[▼▲]/g, '').trim());
+    });
+    var rows = [cols];
+    Array.prototype.forEach.call(list.querySelectorAll('[data-pg]:not([data-out])'), function (r) {
+        var line = [];
+        Array.prototype.forEach.call(r.children, function (c) {
+            line.push(c.textContent.replace(/\s+/g, ' ').trim());
+        });
+        rows.push(line);
+    });
+    // 操作列は出力しない
+    var last = cols.length - 1;
+    if (/^操作$/.test(cols[last])) {
+        rows = rows.map(function (r) { return r.slice(0, last); });
+    }
+    window.pCsv(name, rows);
+};
+</script>
+
+<script>
+window.pAuditCsv = function () {
+    window.pListCsv('auditList', 'audit_log.csv');
+    window.pClose('mAuditCsv');
+};
+</script>
+
 </body>
 </html>

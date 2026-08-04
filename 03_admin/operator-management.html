@@ -97,9 +97,10 @@
       </div>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">招待中のアカウントは一覧に「招待中」として表示されます。Lv3以上の付与はLv4のみ実行できます。本モックは「付与上限=Lv2」の解釈で表示しています。</div>
     </div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+    <div id="opInvErr" hidden style="font-size:12px;color:#c23934;font-weight:700;padding:0 22px 8px"></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mInviteOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mInviteOp')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待を送信</button>
+      <button onclick="pOpInviteSend()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待を送信</button>
     </div>
   </div>
 </div>
@@ -114,9 +115,10 @@
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">グループ名 <span style="color:#c23934">必須</span></span><input placeholder="例: 株式会社〇〇(委託先)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">作成後、オペレーター招待時の所属先として選択できます。グループ作成はLv3以上のみ実行できます。</div>
     </div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+    <div id="opGrpErr" hidden style="font-size:12px;color:#c23934;font-weight:700;padding:0 22px 8px"></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mOpGroup')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mOpGroup')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成する</button>
+      <button onclick="pOpGroupCreate()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成する</button>
     </div>
   </div>
 </div>
@@ -187,7 +189,7 @@
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">OP-0034 田中 大輔の設定を更新します。ステータスを「無効」へ変更した場合、進行中の作業ロックは解放され、本人はログインできなくなります。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button data-initial-focus onclick="pClose('mConfirmDisableOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmDisableOp')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="pOpSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -201,7 +203,7 @@
     <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">d.tanaka@officeworks.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button data-initial-focus onclick="pClose('mConfirmResetPwOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmResetPwOp')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
+      <button onclick="pOpResetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
     </div>
   </div>
 </div>
@@ -223,7 +225,7 @@
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mSetPwOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mSetPwOp')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
+      <button onclick="pOpSetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
     </div>
   </div>
 </div>
@@ -231,6 +233,109 @@
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// 招待・グループ作成・設定変更を一覧へ反映する(モックのため再読込で戻る)
+window.pOpInviteSend = function () {
+    var box = document.getElementById('mInviteOp');
+    var mail = box.querySelector('input').value.trim();
+    var sels = box.querySelectorAll('select');
+    var group = sels[0] ? sels[0].value : '';
+    var lv = (sels[1] ? sels[1].value : 'Lv1').replace(/\(.*$/, '');
+    var err = document.getElementById('opInvErr');
+    if (!mail || mail.indexOf('@') < 0) {
+        err.textContent = 'メールアドレスを入力してください'; err.hidden = false; return;
+    }
+    if (window.pRow('operatorsList', 'mail', mail)) {
+        err.textContent = mail + ' は既に登録または招待済みです'; err.hidden = false; return;
+    }
+    err.hidden = true;
+    var langs = [];
+    box.querySelectorAll('span').forEach(function (c) {
+        var t = (c.textContent || '').trim();
+        if (t.slice(-1) === '✓') { langs.push(t.replace(/\s*✓$/, '')); }
+    });
+    var list = document.getElementById('operatorsList');
+    var head = list.querySelector('[data-pg]');
+    var max = 0;
+    list.querySelectorAll('[data-f-oid]').forEach(function (r) {
+        var n = parseInt(r.getAttribute('data-f-oid').replace(/\D/g, ''), 10);
+        if (n > max) { max = n; }
+    });
+    var oid = 'OP-' + String(max + 1).padStart(4, '0');
+    var now = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+    var today = now.getFullYear() + '/' + p(now.getMonth() + 1) + '/' + p(now.getDate());
+    var html = '<div tabindex="0" role="button" data-pg="1" data-f-any="' + oid + ' ' + mail
+        + '" data-f-oid="' + oid + '" data-f-name="—" data-f-mail="' + mail + '" data-f-group="' + group
+        + '" data-f-lv="' + lv + '" data-f-lang="' + (langs.join('・') || '—')
+        + '" data-f-status="招待中" class="proto-row-hover" onclick="pOpenOperator(\'' + oid + '\')"'
+        + ' style="' + head.getAttribute('style') + '">'
+        + '<span style="font-weight:500;font-variant-numeric:tabular-nums">' + oid + '</span>'
+        + '<span style="color:#8a93a5">—</span>'
+        + '<span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+        + 'padding-right:10px">' + mail + '</span>'
+        + '<span>' + group + '</span>'
+        + '<span><span style="font-size:11px;font-weight:700;color:#3467d6;border:1px solid #b9caee;'
+        + 'border-radius:4px;padding:1px 6px">' + lv + '</span></span>'
+        + '<span style="font-size:12px;color:#5b6577">' + (langs.join('・') || '—') + '</span>'
+        + '<span><span class="status-badge status-info">招待中</span></span>'
+        + '<span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">'
+        + today + '</span>'
+        + '<span class="c-opt" style="font-size:12px;color:#8a93a5">—</span></div>';
+    head.insertAdjacentHTML('beforebegin', html);
+    window.pClearSearch('operatorsList');
+    window.pToast(mail + ' へ招待メールを送信しました');
+    window.pClose('mInviteOp');
+};
+
+window.pOpGroupCreate = function () {
+    var box = document.getElementById('mOpGroup');
+    var name = box.querySelector('input').value.trim();
+    var err = document.getElementById('opGrpErr');
+    if (!name) { err.textContent = 'グループ名を入力してください'; err.hidden = false; return; }
+    var dup = false;
+    document.querySelectorAll('#mInviteOp select option').forEach(function (o) {
+        if (o.textContent.trim() === name) { dup = true; }
+    });
+    if (dup) { err.textContent = name + ' は既にあります'; err.hidden = false; return; }
+    err.hidden = true;
+    // 招待の所属グループと絞り込みの選択肢へ足す
+    document.querySelectorAll('#mInviteOp select').forEach(function (sel, i) {
+        if (i === 0) { sel.add(new Option(name, name)); }
+    });
+    var f = document.querySelector('[data-f-key="group"]');
+    if (f && f.tagName === 'SELECT') { f.add(new Option(name, name)); }
+    window.pToast('グループ「' + name + '」を作成しました');
+    window.pClose('mOpGroup');
+};
+
+window.pOpSave = function () {
+    var oid = (document.querySelector('#opModal [data-slot="opId"]') || {}).textContent
+        || (document.getElementById('opModal').innerText.match(/OP-\d+/) || [''])[0];
+    var sel = document.querySelector('#opModal select[aria-label="ステータス"], #opModal select');
+    var st = sel ? sel.value : '';
+    var row = oid ? window.pRow('operatorsList', 'oid', oid.trim()) : null;
+    if (row && st) {
+        var cls = st === '有効' ? 'status-active' : (st === '無効' ? 'status-inactive' : 'status-info');
+        window.pRowSet(row, { 6: '<span class="status-badge ' + cls + '">' + st + '</span>' },
+            { status: st });
+        window.pSearch('operatorsList');
+    }
+    window.pToast((oid || 'オペレーター').trim() + ' の設定を保存しました');
+    window.pClose('mConfirmDisableOp');
+};
+
+window.pOpResetPw = function () {
+    var m = document.getElementById('mConfirmResetPwOp').innerText.match(/[\w.@-]+@[\w.-]+/);
+    window.pToast((m ? m[0] : '対象') + ' へパスワード初期化メールを送信しました');
+    window.pClose('mConfirmResetPwOp');
+};
+
+window.pOpSetPw = function () {
+    window.pToast('パスワードを設定し、本人へ通知しました');
+    window.pClose('mSetPwOp');
+};
+</script>
+
 
 <script>
 // 一覧の行から開くオペレーター詳細モーダル(モック)。識別情報だけを対象へ差し替える
