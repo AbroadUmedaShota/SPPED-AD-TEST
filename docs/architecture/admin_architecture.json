@@ -540,7 +540,7 @@
         "#p-toast"
       ],
       "dependencies": [],
-      "evidence": "03_admin/src/proto-ui.js:1-592（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:227(pSortable)",
+      "evidence": "03_admin/src/proto-ui.js:596-639（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:249(pSortable)",
       "specDoc": "docs/リライト版仕様書/admin/01_admin_common_ui.md"
     },
     {
@@ -3817,7 +3817,7 @@
       "severity": "medium",
       "title": "同一機能が画面ごとに重複実装されている",
       "detail": "pDlPick（データDL）が survey-management / survey-detail / reconciliation-index の3画面に、pListCsv（一覧CSV出力）が audit-log / performance-management の2画面に、ほぼ同一内容で別々に定義されている。",
-      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:574-596（pListCsv）と 601-617（pDlPick）に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:118-121 / performance-management.html:119-122 のラッパのみ",
+      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:596-618（pListCsv）と 623-639（pDlPick）に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:118-121 / performance-management.html:119-122 のラッパのみ",
       "impact": "CSVの列定義やZIPの扱いを変えるとき、修正漏れが3〜2箇所に分散する",
       "recommendation": "proto-ui.js へ pDlPick / pListCsv を移し、画面側は列定義だけを渡す形にする",
       "status": "resolved-2026-08-06",
@@ -4149,7 +4149,7 @@
       "evidence": "tests/e2e/admin-mock/consistency.spec.js の「請求書管理の一覧に → が出ない」",
       "impact": "同一タブで開くのに外部へ出ると思わせる",
       "recommendation": "→ を外す。実際に新規タブで開く2箇所（回答画面のプレビュー、請求書の新規タブ）は ↗ のままでよい",
-      "status": "open"
+      "status": "resolved-2026-08-06"
     },
     {
       "id": "R-25",
@@ -4179,7 +4179,7 @@
       "evidence": "tests/e2e/admin-mock/consistency.spec.js の「Tab がモーダルの外へ出ない」",
       "impact": "キーボードだけで操作すると、モーダルを開いた時点で実行もキャンセルもできなくなる",
       "recommendation": "proto-ui.js の1箇所で全画面に効く",
-      "status": "open"
+      "status": "resolved-2026-08-06"
     },
     {
       "id": "R-28",
@@ -4189,7 +4189,7 @@
       "evidence": "tests/e2e/admin-mock/consistency.spec.js の「開いた直後に実行系のボタンへフォーカスしない」",
       "impact": "Enter を続けて押すと意図せず送信される",
       "recommendation": "data-initial-focus を最初の入力欄へ付け替える",
-      "status": "open"
+      "status": "resolved-2026-08-06"
     },
     {
       "id": "R-29",
@@ -4209,7 +4209,7 @@
       "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-30 見出し階層」",
       "impact": "読み上げの見出しジャンプが働かない",
       "recommendation": "画面名の h2 を h1 にする。見た目は font-size の指定で変わらない",
-      "status": "open"
+      "status": "resolved-2026-08-06"
     }
   ]
 }
