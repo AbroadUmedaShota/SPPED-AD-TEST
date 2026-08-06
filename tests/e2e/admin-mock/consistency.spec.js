@@ -59,7 +59,6 @@ test.describe('R-30 見出し階層', () => {
 
 test.describe('R-24 画面内の遷移に矢印を使わない', () => {
   test('請求書管理の一覧に → が出ない', async ({ page }) => {
-    test.fail(); // 未修正: 「請求書を表示 →」が16件
     const t = await visibleText(page, '/03_admin/invoice-management.html');
     expect(t).not.toContain('→');
   });
