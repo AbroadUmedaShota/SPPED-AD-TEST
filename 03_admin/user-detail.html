@@ -291,12 +291,20 @@
     window.pUdBilling = function () { location.href = 'billing-management.html?uid=' + uid(); };
 
     // ---- アカウント状態ごとの出し分け(§4.6・§7.1) ----
+    // 招待は本登録より前に起こる。登録日時から前日へ戻した値を招待の日時として扱う
+    // (月初でも Date が前月末へ繰り下げる)
+    function inviteAt(created) {
+        var m = /^(\d{4})\/(\d{2})\/(\d{2})/.exec(created || '');
+        if (!m) { return created; }
+        var d = new Date(+m[1], +m[2] - 1, +m[3] - 1);
+        var p = function (n) { return (n < 10 ? '0' : '') + n; };
+        return d.getFullYear() + '/' + p(d.getMonth() + 1) + '/' + p(d.getDate()) + ' 10:02';
+    }
     // 送達状況は状態で変わる。招待中はまだ本登録が完了していない
     function paintMail(status, created) {
         var box = document.querySelector('[data-slot="mailBox"]');
         if (!box) { return; }
-        var day = created.replace(/ .*$/, '');
-        var rows = [['招待メール', day + ' 10:02']];
+        var rows = [['招待メール', inviteAt(created)]];
         if (status !== '招待中') { rows.push(['本登録完了メール', created]); }
         box.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;justify-content:space-between;gap:10px"><span>' + esc(r[0])
@@ -390,7 +398,7 @@
         if (status !== '招待中') {
             rows.push([created, '招待から本登録が完了', '本人']);
         }
-        rows.push([created.replace(/ .*$/, '') + ' 10:02', '招待を実行', 'admin@abroad-o.com']);
+        rows.push([inviteAt(created), '招待を実行', 'admin@abroad-o.com']);
         log.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;gap:10px">'
                 + '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + esc(r[0])
