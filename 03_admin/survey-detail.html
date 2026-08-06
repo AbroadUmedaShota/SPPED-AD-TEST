@@ -62,7 +62,7 @@
         <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
         <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">4</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご意見・ご要望</span><span style="font-size:11.5px;color:#5b6577">自由記述</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
       </div>
-      <div style="margin-top:8px;font-size:11.5px;color:#6b7484;line-height:1.7">会期開始後の設問構成の変更は例外対応として扱います。会期終了後は変更できません。</div>
+      <div style="margin-top:8px;font-size:11.5px;color:#6b7484;line-height:1.7">会期開始後の設問構成の変更は要注意操作として扱います。会期終了後は変更できません。</div>
                 </div>
                 <div style="display:flex;justify-content:flex-end;margin-top:14px">
                   <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
@@ -99,7 +99,7 @@
                   </div>
                 </div>
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">例外対応<span style="font-weight:400;color:#8a93a5;margin-left:8px">所定の運用フローの外で行う操作</span></div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">要注意操作<span style="font-weight:400;color:#8a93a5;margin-left:8px">所定の運用フローの外で行う操作</span></div>
                   <div data-slot="exPublish" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">公開後のアンケート変更</span>
@@ -181,7 +181,7 @@
       <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px" data-slot="tmValue">【人事・労務フォーラム】ご来場ありがとうございました</div>
       <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">本文</div>
       <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151" data-slot="tmValue">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。変更は例外対応「公開後のアンケート変更」から行います。</div>
+      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。変更は要注意操作「公開後のアンケート変更」から行います。</div>
       </div>
       <div data-slot="tmEdit" hidden style="display:flex;flex-direction:column;gap:12px">
         <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後のアンケート変更として編集しています。<span data-slot="tmReason" style="font-weight:700"></span></div>
@@ -191,7 +191,7 @@
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button data-initial-focus onclick="pClose('mThanksMail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
-      <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">例外対応として保存する</button>
+      <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">要注意操作として保存する</button>
     </div>
   </div>
 </div>
@@ -305,7 +305,7 @@
       <span role="button" onclick="pQClose()" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
     <div id="qGate" hidden style="margin:12px 22px 0;flex-shrink:0;font-size:12px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:8px 12px;line-height:1.7">
-      会期中の設問変更は<strong>例外対応</strong>です。<span id="qAnswerNote"></span>既に受け付けた回答と変更後の設問構成の対応関係は要確定(<span style="font-family:ui-monospace,Consolas,monospace">§11 #2</span>)のため、実行前に主催者との合意を取ってください。
+      会期中の設問変更は<strong>要注意操作</strong>です。<span id="qAnswerNote"></span>既に受け付けた回答と変更後の設問構成の対応関係は要確定(<span style="font-family:ui-monospace,Consolas,monospace">§11 #2</span>)のため、実行前に主催者との合意を取ってください。
     </div>
     <div style="flex:1;min-height:0;overflow-y:auto;padding:12px 22px 0">
       <div id="qLangBar" hidden style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px 12px;background:#f7f9fd;border:1px solid #b9caee;border-radius:6px">
@@ -353,7 +353,7 @@
 <script>
 // 設問構成の編集(モック)。会期状態で扱いが変わる(14_admin_survey_detail.md §2.1)
 //   会期前            … 通常編集。保存操作で確定する
-//   会期開始後〜終了  … 例外対応。実行理由を必須にし、監査ログへ記録する
+//   会期開始後〜終了  … 要注意操作。実行理由を必須にし、監査ログへ記録する
 //   会期終了後        … 変更できない(確認のみ)
 (function () {
     'use strict';
@@ -1072,7 +1072,7 @@
     window.pQOpen = function (approvedReason) {
         var btn = document.querySelector('[data-slot="qEditBtn"]');
         if (btn && btn.disabled) { return; }
-        // 会期中の変更は例外対応。先に §4.6 の確認(対象・範囲・理由)を通す
+        // 会期中の変更は要注意操作。先に §4.6 の確認(対象・範囲・理由)を通す
         if (document.body.getAttribute('data-survey-live') === '1' && approvedReason === undefined) {
             var q = document.getElementById('rEditQ');
             if (q) { q.checked = true; }
@@ -1089,7 +1089,7 @@
         if (r) { r.value = approvedReason || ''; }
         document.getElementById('qErr').hidden = true;
         var save = document.getElementById('qSave');
-        save.textContent = exception ? '例外対応として保存する' : '保存する';
+        save.textContent = exception ? '要注意操作として保存する' : '保存する';
         save.style.background = exception ? '#c23934' : '#3467d6';
         var note = document.getElementById('qAnswerNote');
         if (note) {
@@ -1293,7 +1293,7 @@ window.pSdLog = function (title, reason, exception, detail) {
     row.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + when + '</span>'
         + '<span>' + e(title)
         + (detail ? '<br><span style="color:#5b6577;font-size:11.5px">' + e(detail) + '</span>' : '')
-        + (exception ? '<span style="color:#c23934;font-weight:700;margin-left:6px">例外対応</span>' : '')
+        + (exception ? '<span style="color:#c23934;font-weight:700;margin-left:6px">要注意操作</span>' : '')
         + '<br><span style="color:#8a93a5">実行者: admin@abroad-o.com'
         + (reason ? '・理由: ' + e(reason) : '') + '</span></span>';
     log.insertBefore(row, log.firstChild);
@@ -1301,7 +1301,7 @@ window.pSdLog = function (title, reason, exception, detail) {
 
 // 基本情報の編集可否(14_admin_survey_detail.md §2.1)
 //   会期前     … 通常編集。保存操作で確定する
-//   会期中     … 例外対応。「公開後のアンケート変更」を通るまで編集させない
+//   会期中     … 要注意操作。「公開後のアンケート変更」を通るまで編集させない
 //   会期終了後 … 変更できない(確認のみ)
 var basicState = 'normal';
 var basicReason = '';
@@ -1322,17 +1322,17 @@ function paintBasic() {
         save.style.background = locked ? '#eceef3' : (basicState === 'unlocked' ? '#c23934' : '#3467d6');
         save.style.color = locked ? '#8a93a5' : '#fff';
         save.style.cursor = locked ? 'default' : 'pointer';
-        save.textContent = basicState === 'unlocked' ? '例外対応として保存' : '変更を保存';
+        save.textContent = basicState === 'unlocked' ? '要注意操作として保存' : '変更を保存';
     }
     var head = q('basicHeadNote');
     if (head) {
         head.textContent = basicState === 'closed' ? '会期終了後のため確認のみ'
             : basicState === 'normal' ? '管理者による編集(代行)が可能'
-                : '会期中のため例外対応として扱う';
+                : '会期中のため要注意操作として扱う';
     }
     if (text) {
         text.textContent = basicState === 'locked'
-            ? '会期中の基本情報の変更は例外対応です。実行理由の入力と監査ログへの記録を伴います。'
+            ? '会期中の基本情報の変更は要注意操作です。実行理由の入力と監査ログへの記録を伴います。'
             : basicState === 'unlocked'
                 ? '公開後のアンケート変更として編集しています。理由: ' + basicReason
                 : '会期終了後は基本情報を変更できません(確認のみ)。';
@@ -1356,7 +1356,7 @@ window.pSdSave = function () {
     window.pToast('変更を保存しました');
     window.pClose('mConfirmSaveSurvey');
     if (basicState === 'unlocked') {
-        // 1回の例外対応で1回の保存。続けて直すならもう一度確認を通す
+        // 1回の要注意操作で1回の保存。続けて直すならもう一度確認を通す
         basicState = 'locked';
         basicReason = '';
         paintBasic();
@@ -1375,7 +1375,7 @@ window.pSdDeleteAnswer = function () {
     window.pToast('回答' + (id ? ' ' + id : '') + ' を削除しました');
     window.pClose('mDangerDeleteAnswer');
 };
-// 例外対応「公開後のアンケート変更」。設問構成を選んだ場合は編集画面へ理由ごと引き継ぐ
+// 要注意操作「公開後のアンケート変更」。設問構成を選んだ場合は編集画面へ理由ごと引き継ぐ
 // (会期中の設問変更のゲートを1本にするため。14_admin_survey_detail.md §4.3 / §4.6)
 window.pSdStartEdit = function () {
     var reason = (document.getElementById('rEdit') || {}).value || '';
@@ -1393,12 +1393,12 @@ window.pSdStartEdit = function () {
     if (wantMail) { window.pSdThanksUnlock(reason); opened.push('お礼メール設定'); }
     window.pToast('公開後の変更を開始しました(' + opened.join('・') + ')');
     // モーダルは同時に1つしか開けない。設問構成を先に開き、お礼メールは
-    // 回答状況の「お礼メール内容を編集(例外対応)」から入り直せる
+    // 回答状況の「お礼メール内容を編集(要注意操作)」から入り直せる
     if (wantQ && window.pQOpen) { window.pQOpen(reason); return; }
     if (wantMail) { window.pSdThanks(); }
 };
 
-// 例外対応の確認を、基本情報だけ選んだ状態で開く
+// 要注意操作の確認を、基本情報だけ選んだ状態で開く
 window.pSdAskBasic = function () {
     ['rEditBasic', 'rEditQ', 'rEditMail'].forEach(function (id, i) {
         var e = document.getElementById(id);
@@ -1407,19 +1407,19 @@ window.pSdAskBasic = function () {
     window.pOpen('mDangerEdit');
 };
 
-// お礼メールは通常は閲覧だけ(§4.5)。例外対応を通したときだけ編集できる(§4.6)。
+// お礼メールは通常は閲覧だけ(§4.5)。要注意操作を通したときだけ編集できる(§4.6)。
 // 解除は画面の状態として持ち、回答状況のボタンから何度でも入り直せるようにする
 var thanksReason = '';
 var thanksUnlocked = false;
 function paintThanks() {
     var b = document.querySelector('[data-slot="thanksBtn"]');
     if (!b) { return; }
-    b.textContent = thanksUnlocked ? 'お礼メール内容を編集(例外対応)' : 'お礼メール内容の確認';
+    b.textContent = thanksUnlocked ? 'お礼メール内容を編集(要注意操作)' : 'お礼メール内容の確認';
     b.style.color = thanksUnlocked ? '#c23934' : '#374151';
     b.style.borderColor = thanksUnlocked ? '#e3b6b3' : '#c8cdd8';
     b.title = thanksUnlocked
         ? '公開後のアンケート変更として編集できます。理由: ' + thanksReason
-        : '変更は例外対応「公開後のアンケート変更」から開始します';
+        : '変更は要注意操作「公開後のアンケート変更」から開始します';
 }
 window.pSdThanksUnlock = function (reason) {
     thanksReason = reason || '';
@@ -1453,7 +1453,7 @@ window.pSdThanksSave = function () {
     window.pSdLog('お礼メールの内容を変更', thanksReason, true);
     window.pToast('お礼メールの内容を保存しました');
     window.pClose('mThanksMail');
-    // 1回の例外対応で1回の保存。続けて直すならもう一度確認を通す
+    // 1回の要注意操作で1回の保存。続けて直すならもう一度確認を通す
     thanksUnlocked = false;
     thanksReason = '';
     paintThanks();
@@ -1565,16 +1565,16 @@ window.pSdUpload = function () {
             qBtn.style.cursor = 'default';
             qBtn.title = '会期終了後は設問構成を変更できません';
         } else if (live) {
-            qBtn.textContent = '設問を編集(例外対応)';
+            qBtn.textContent = '設問を編集(要注意操作)';
             qBtn.style.color = '#c23934';
             qBtn.style.borderColor = '#e3b6b3';
-            qBtn.title = '会期中の変更は例外対応です。実行理由の入力が必要です';
+            qBtn.title = '会期中の変更は要注意操作です。実行理由の入力が必要です';
         }
     }
     if (qNote) {
         qNote.textContent = '全' + qCount + '問・'
             + (closed ? '会期終了後のため変更できません'
-                      : live ? '会期中のため変更は例外対応として扱います'
+                      : live ? '会期中のため変更は要注意操作として扱います'
                              : '会期前は通常編集として変更できます');
     }
     var qTarget = document.querySelector('#mQuestions [data-slot="qTarget"]');
