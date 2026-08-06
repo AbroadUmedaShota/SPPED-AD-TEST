@@ -51,7 +51,6 @@ test.describe('決着済みの用語（戻ったら落ちる）', () => {
 test.describe('R-30 見出し階層', () => {
   for (const s of SCREENS) {
     test(`${s.name}: h1 がちょうど1つある`, async ({ page }) => {
-      test.fail(); // 未修正: 全画面が h2 から始まっている
       await openScreen(page, s.path);
       expect(await page.locator('h1').count()).toBe(1);
     });
@@ -165,7 +164,7 @@ test.describe('R-05 〜 R-13 用語の統一', () => {
     for (const l of links) {
       const url = new URL(l.href, page.url()).href;
       const body = await (await page.request.get(url)).text();
-      const m = /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(body);
+      const m = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(body);
       const title = m ? m[1].replace(/<[^>]+>/g, '').trim() : '';
       if (title && title !== l.label) { mismatch.push(`${l.label} → ${title}`); }
     }
