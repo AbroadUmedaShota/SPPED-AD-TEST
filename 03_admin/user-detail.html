@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - ユーザー詳細</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,7 +197,9 @@ window.pUdSetPw = function () {
     if (!d || !base) { return; }
     document.documentElement.setAttribute('data-current-id', id);
 
-    // 既定ダミーの語をこの対象の語へ置き換える
+    // 既定ダミーの語をこの対象の語へ置き換える。
+    // 対象にできるのは会社名・氏名・メールのような固有で長い値だけ。
+    // 状態名のような短い一般語を混ぜると本文の説明文や選択肢まで巻き込むため、それらは data-slot で入れる
     var swap = [[DEF, id]].concat(["company", "name", "mail", "created", "tel"].map(function (k) { return [base[k], d[k]]; }));
     function replaceIn(node) {
         for (var i = 0; i < node.childNodes.length; i++) {

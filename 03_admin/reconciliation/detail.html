@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - 名刺情報照合</title>
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -476,7 +475,8 @@
 </script>
 
 <script>
-// ?id= で対象アンケートを切り替える(モック)。差し替えるのは識別情報のみ
+// ?id= で対象アンケートを切り替える(モック)。差し替えるのは識別情報のみ。
+// 状態名のような短い一般語は置換対象にしない(本文の説明文や選択肢まで巻き込むため)
 (function () {
     var DATA = {"SV-10262": {"uid": "U-1049", "company": "グロースパートナーズ(株)", "title": "SV-10262"}, "SV-10259": {"uid": "U-1052", "company": "(株)マーケットビジョン", "title": "SV-10259"}, "SV-10257": {"uid": "U-1035", "company": "地方創生機構", "title": "SV-10257"}, "SV-10250": {"uid": "U-1050", "company": "(株)イベントプラス", "title": "SV-10250"}, "SV-10244": {"uid": "U-1052", "company": "(株)マーケットビジョン", "title": "SV-10244"}, "SV-10238": {"uid": "U-1038", "company": "(株)テックブリッジ", "title": "SV-10238"}, "SV-10236": {"uid": "U-1033", "company": "(株)サンライトプロモーション", "title": "SV-10236"}, "SV-10233": {"uid": "U-1035", "company": "地方創生機構", "title": "SV-10233"}, "SV-10229": {"uid": "U-1031", "company": "ミライ電装(株)", "title": "SV-10229"}, "SV-10227": {"uid": "U-1049", "company": "グロースパートナーズ(株)", "title": "SV-10227"}, "SV-10221": {"uid": "U-1026", "company": "(株)クレストメディカル", "title": "SV-10221"}, "SV-10218": {"uid": "U-1025", "company": "東亜精密工業(株)", "title": "SV-10218"}, "SV-10214": {"uid": "U-1022", "company": "(株)ネオフーズ", "title": "SV-10214"}, "SV-10209": {"uid": "U-1021", "company": "西日本トラベル(株)", "title": "SV-10209"}, "SV-10205": {"uid": "U-1019", "company": "(株)アークデザイン", "title": "SV-10205"}, "SV-10201": {"uid": "U-1017", "company": "セントラル機器(株)", "title": "SV-10201"}, "SV-10196": {"uid": "U-1016", "company": "(株)ハーベスト農園", "title": "SV-10196"}, "SV-10192": {"uid": "U-1014", "company": "光陽印刷(株)", "title": "SV-10192"}, "SV-10188": {"uid": "U-1012", "company": "(株)ラピスソフト", "title": "SV-10188"}, "SV-10183": {"uid": "U-1009", "company": "大和ハウジング(株)", "title": "SV-10183"}, "SV-10179": {"uid": "U-1007", "company": "(株)エコスタイル", "title": "SV-10179"}, "SV-10174": {"uid": "U-1002", "company": "(株)テクノブレイン", "title": "SV-10174"}};
     var DEF = 'SV-10236';

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - 照合結果一覧</title>
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -146,26 +145,6 @@
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
-<script>
-// ダウンロードの選択で実際にファイルを保存する。名刺画像は実ファイルを作れないため受付のみ知らせる
-window.pDlPick = function (kind) {
-    var sid = (document.querySelector('#mDl [data-slot="dlSid"]') || {}).textContent
-        || (document.getElementById('mDl').innerText.match(/SV-\d+/) || ['export'])[0];
-    if (kind === 'zip') {
-        window.pToast(sid + ' の名刺画像(ZIP)の取得を受け付けました');
-        window.pClose('mDl');
-        return;
-    }
-    var head = ['回答ID', '氏名', '会社名', '部署名', '役職名', 'メールアドレス', '電話番号', '受信日時'];
-    var rows = [head];
-    var n = (kind === 'all') ? 8 : 5;
-    for (var i = 1; i <= n; i++) {
-        rows.push(['#' + (8800 + i), '—', '—', '—', '—', '—', '—', '—']);
-    }
-    window.pCsv(sid + (kind === 'all' ? '_all' : '_final') + '.csv', rows);
-    window.pClose('mDl');
-};
-</script>
 
 </body>
 </html>

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - 営業日カレンダー</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,7 +197,7 @@ window.pCalImport = function () {
         asg: CAL.assigns
     };
 
-    function lv() { return parseInt((localStorage.getItem('adminMockLevel') || 'lv4').replace('lv', ''), 10) || 4; }
+    function lv() { return window.pLevel(); }  // 表示シナリオの判定は proto-level.js に寄せる
     function pad2(n) { return (n < 10 ? '0' : '') + n; }
     function dow(is) { return new Date(is + 'T00:00:00').getDay(); }
     function typ(is) {

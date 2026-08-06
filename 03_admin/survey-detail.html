@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - アンケート詳細</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,61 +26,71 @@
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <span style="font-size:16px;font-weight:700">人事・労務フォーラム 来場者アンケート</span>
               <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">アンケートID SV-10262</span>
-              <span data-slot="status" class="status-badge status-inactive">会期前</span>
-              <span style="font-size:12px;color:#5b6577">申込プラン: 通常</span>
-              <span style="font-size:12px;color:#5b6577">対象ユーザー: <a data-go="user" href="user-detail.html">U-1049 グロースパートナーズ(株)</a></span>
             </div>
             <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
               <div style="display:flex;flex-direction:column;gap:16px">
               <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">基本設定 <span style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
+                <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">基本情報 <span data-slot="basicHeadNote" style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
                 <div style="padding-top:14px;display:flex;flex-direction:column;gap:14px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">タイトル <span style="color:#c23934">必須</span></span><input value="人事・労務フォーラム 来場者アンケート" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div data-slot="basicGate" hidden style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;font-size:11.5px;color:#8a6414;line-height:1.7"><span data-slot="basicGateText" style="min-width:0"></span><button data-slot="basicGateBtn" onclick="pSdAskBasic()" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更を開始する</button></div>
+      <div data-slot="basicFields" style="display:flex;flex-direction:column;gap:14px">
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">タイトル <span style="color:#c23934">必須</span></span><input data-slot="title" value="人事・労務フォーラム 来場者アンケート" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期開始</span><input type="datetime-local" value="2026-08-03T10:00" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期終了</span><input type="datetime-local" value="2026-08-05T17:00" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期開始</span><input data-slot="periodStart" type="datetime-local" value="2026-08-03T10:00" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期終了</span><input data-slot="periodEnd" type="datetime-local" value="2026-08-05T17:00" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
       </div>
-      <label style="display:block;max-width:240px"><span style="font-size:11.5px;font-weight:700;color:#5b6577">データ化の納期区分</span><select style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>お試し</option><option selected>通常</option><option>特急</option><option>超特急</option><option>オンデマンド</option></select></label>
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#5b6577">対応言語<span style="font-weight:400;color:#8a93a5;margin-left:8px">先頭が第一言語・最大3言語まで</span></div>
+        <div id="svLangs" style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
+      </div>
+      </div>
       <div style="display:grid;grid-template-columns:110px 1fr;gap:10px 12px;padding-top:4px;font-size:13px;align-items:center;color:#374151">
-        <span style="color:#6b7484">作業ステータス</span><span><span data-slot="status" class="status-badge status-inactive">会期前</span></span>
+        <span style="color:#6b7484">作業ステータス</span><span><span data-slot="status" class="status-badge status-inactive">会期前</span><span data-slot="delivery" style="font-size:11.5px;color:#6b7484;margin-left:8px"></span></span>
         <span style="color:#6b7484">作成者</span><span><a data-go="user" href="user-detail.html">U-1049 三浦 沙織(グロースパートナーズ(株))</a></span>
         <span style="color:#6b7484">作成日時</span><span style="font-variant-numeric:tabular-nums">2026/07/28 09:15</span>
         <span style="color:#6b7484">最終更新日時</span><span style="font-variant-numeric:tabular-nums">2026/07/30 15:41</span>
       </div>
       <div style="font-size:11.5px;color:#6b7484;line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。利用者側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。</div>
-      <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:6px">設問構成<span style="font-weight:400;color:#8a93a5;margin-left:8px">全5問・会期前のみ変更できます</span></div>
-      <div style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11px;font-weight:700;color:#5b6577"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">1</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">本日のご来場のきっかけを教えてください</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">2</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご興味のある製品分野</span><span style="font-size:11.5px;color:#5b6577">複数選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">4</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご意見・ご要望</span><span style="font-size:11.5px;color:#5b6577">自由記述</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 120px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">5</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">お名刺の撮影</span><span style="font-size:11.5px;color:#5b6577">名刺アップロード</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:6px">
+        <span style="font-size:12px;font-weight:700;color:#5b6577">設問構成<span data-slot="qNote" style="font-weight:400;color:#8a93a5;margin-left:8px">全4問・会期前は通常編集として変更できます</span></span>
+        <button data-slot="qEditBtn" onclick="pQOpen()" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">設問を編集</button>
+      </div>
+      <div id="qList" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11px;font-weight:700;color:#5b6577"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">1</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">本日のご来場のきっかけを教えてください</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">2</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご興味のある製品分野</span><span style="font-size:11.5px;color:#5b6577">複数選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">4</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご意見・ご要望</span><span style="font-size:11.5px;color:#5b6577">自由記述</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
       </div>
       <div style="margin-top:8px;font-size:11.5px;color:#6b7484;line-height:1.7">会期開始後の設問構成の変更は例外対応として扱います。会期終了後は変更できません。</div>
                 </div>
                 <div style="display:flex;justify-content:flex-end;margin-top:14px">
-                  <button onclick="pOpen('mConfirmSaveSurvey')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                  <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
                 </div>
               </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアンケートに対する操作</span></div>
-                  <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
-                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(08/04→08/03開始)<br><span style="color:#8a93a5">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
-                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:#8a93a5">実行者: 本人(U-1049)</span></span></div>
-                  </div>
-                </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:16px">
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">状態と数値</div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">名刺データ化設定<span style="font-weight:400;color:#8a93a5;margin-left:8px">確認のみ・変更は申込内容の変更として扱う</span></div>
+                  <div style="display:grid;grid-template-columns:132px 1fr;gap:10px 12px;padding-top:14px;font-size:13px;align-items:center;color:#374151">
+                    <span style="color:#6b7484">データ化申込プラン</span><span><span data-slot="plan" style="font-weight:700">通常</span><span style="font-size:11.5px;color:#8a93a5;margin-left:8px">納期区分</span></span>
+                    <span style="color:#6b7484">データ化対象の名刺</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizTotal">0</span> 件</span>
+                    <span style="color:#6b7484">入力・照合の進捗</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizProgress">入力 0 件 / 照合 0 件</span></span>
+                  </div>
+                  <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                    <button data-min-lv="2" onclick="location.href='reconciliation/index.html?sid=' + (document.documentElement.getAttribute('data-current-id') || 'SV-10262')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合結果を表示</button>
+                  </div>
+                  <div style="margin-top:8px;font-size:11.5px;color:#8a93a5">データ化作業そのものは名刺入力・照合の作業画面で行います。本画面では確認だけを行います。</div>
+                </div>
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">回答状況</div>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px">
-                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">回答数</div><div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">0</div></div>
-                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">会期</div><div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.6">08/03 10:00<br>〜08/05 17:00</div></div>
+                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">回答数</div><div data-slot="answers" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">0</div></div>
+                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">直近の回答日時</div><div data-slot="lastAnswer" style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.6">—</div></div>
                   </div>
                   <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
                     <button onclick="pOpen('mDl')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">データDL ▾</button>
-                    <button onclick="pOpen('mThanksMail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">お礼メール内容の確認</button>
+                    <button data-slot="thanksBtn" onclick="pSdThanks()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">お礼メール内容の確認</button>
                   </div>
                   <div style="margin-top:8px;font-size:11.5px;color:#8a93a5">照合が完了したデータは自動で完成データへ反映されます(公開の手動操作はなし)。現行実装が自動反映かは開発側へ現状開示を要求中。</div>
                   <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #eef0f5;margin-top:12px">
@@ -91,28 +100,28 @@
                 </div>
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
                   <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">例外対応<span style="font-weight:400;color:#8a93a5;margin-left:8px">所定の運用フローの外で行う操作</span></div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                  <div data-slot="exPublish" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">公開後のアンケート変更</span>
                       <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">利用者側では制限される公開後の変更を、管理者が代行して行う</span>
                     </span>
                     <button onclick="pOpen('mDangerEdit')" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更する</button>
                   </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                  <div data-slot="exUpload" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">完了データの手動アップロード</span>
                       <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">照合完了データの自動反映に障害が起きた際、ファイルを直接取り込む代替手段</span>
                     </span>
                     <button onclick="pOpen('mDangerUpload')" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">取り込む</button>
                   </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                  <div data-slot="exDelete" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">個別回答の削除</span>
                       <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">回答者からの削除依頼などに応じて、特定の回答を削除する</span>
                     </span>
                     <button onclick="pOpen('mDangerDeleteAnswer')" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">削除する</button>
                   </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0">
+                  <div data-slot="exStop" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">強制停止</span>
                       <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">トラブル発生時に、会期中の回答受付を直ちに停止する</span>
@@ -120,6 +129,13 @@
                     <button onclick="pOpen('mConfirmForceStop')" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">停止する</button>
                   </div>
                   <div style="padding-top:10px;border-top:1px solid #e2e6ed;font-size:11.5px;color:#6b7484;line-height:1.7">いずれの操作も実行理由の入力が必須で、監査ログに記録されます。</div>
+                </div>
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアンケートに対する操作</span></div>
+                  <div id="sdLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
+                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(08/04→08/03開始)<br><span style="color:#8a93a5">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
+                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:#8a93a5">実行者: 本人(U-1049)</span></span></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -156,18 +172,26 @@
 <div id="mThanksMail" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">お礼メールの内容確認<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span style="font-size:15px;font-weight:700"><span data-slot="tmTitle">お礼メールの内容確認</span><span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
       <span role="button" onclick="pClose('mThanksMail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px">
+      <div data-slot="tmView">
       <div style="font-size:11.5px;font-weight:700;color:#5b6577">件名</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px">【人事・労務フォーラム】ご来場ありがとうございました</div>
+      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px" data-slot="tmValue">【人事・労務フォーラム】ご来場ありがとうございました</div>
       <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">本文</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。</div>
+      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151" data-slot="tmValue">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
+      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。変更は例外対応「公開後のアンケート変更」から行います。</div>
+      </div>
+      <div data-slot="tmEdit" hidden style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後のアンケート変更として編集しています。<span data-slot="tmReason" style="font-weight:700"></span></div>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">件名</span><input id="tmSubject" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">本文</span><textarea id="tmBody" rows="8" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.8;resize:vertical"></textarea></label>
+      </div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
-      <button onclick="pClose('mThanksMail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      <button data-initial-focus onclick="pClose('mThanksMail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">例外対応として保存する</button>
     </div>
   </div>
 </div>
@@ -179,21 +203,21 @@
       <span role="button" onclick="pClose('mDangerEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後(データ化完了・ユーザー公開済み)のアンケートを変更すると、回答済みデータ・完成データとの不整合が生じる可能性があります。</div>
+      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後(データ化完了・ユーザー公開済み)のアンケートを変更すると、回答済みデータ・完成データとの不整合が生じる可能性があります。<span data-slot="deAnswers" style="display:block;margin-top:6px;font-weight:700"></span></div>
       <div>
         <span style="font-size:11.5px;font-weight:700;color:#5b6577">変更する範囲</span>
         <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:13px">
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked>基本設定(タイトル・会期・納期区分)</label>
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox">設問の修正 <span style="font-size:11.5px;color:#8a93a5">(設問編集は別画面・本モック対象外)</span></label>
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox">お礼メール設定</label>
+          <label style="display:flex;align-items:center;gap:8px"><input id="rEditBasic" type="checkbox" checked>基本情報(タイトル・会期・対応言語)</label>
+          <label style="display:flex;align-items:center;gap:8px"><input id="rEditQ" type="checkbox">設問構成の修正 <span style="font-size:11.5px;color:#8a93a5">(実行すると設問の編集画面を開きます)</span></label>
+          <label style="display:flex;align-items:center;gap:8px"><input id="rEditMail" type="checkbox">お礼メール設定 <span style="font-size:11.5px;color:#8a93a5">(実行すると件名・本文を編集できます)</span></label>
         </div>
       </div>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rEdit" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">実行するとこの画面の基本設定が編集可能になります(通常編集とは別の「公開後変更」として監査ログに記録)。モックでは演出のみです。</div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">選んだ範囲だけが編集可能になります(通常編集とは別の「公開後変更」として監査ログに記録)。設問構成・お礼メール設定を選んだ場合は続けてその編集画面を開き、入力した理由をそのまま引き継ぎます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button data-initial-focus onclick="pClose('mDangerEdit')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-requires="rEdit" onclick="pClose('mDangerEdit')" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
+      <button data-requires="rEdit" onclick="pSdStartEdit()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
     </div>
   </div>
 </div>
@@ -266,7 +290,7 @@
       <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
       <span role="button" onclick="pClose('mConfirmSaveSurvey')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートの基本設定(タイトル・会期・納期区分)を更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートの基本情報(タイトル・会期・対応言語)を更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button onclick="pClose('mConfirmSaveSurvey')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
       <button onclick="pSdSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
@@ -274,35 +298,1069 @@
   </div>
 </div>
 
+<div id="mQuestions" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:840px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0;flex-shrink:0">
+      <span style="font-size:15px;font-weight:700">設問構成の編集<span data-slot="qTarget" style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px"></span></span>
+      <span role="button" onclick="pQClose()" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+    </div>
+    <div id="qGate" hidden style="margin:12px 22px 0;flex-shrink:0;font-size:12px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:8px 12px;line-height:1.7">
+      会期中の設問変更は<strong>例外対応</strong>です。<span id="qAnswerNote"></span>既に受け付けた回答と変更後の設問構成の対応関係は要確定(<span style="font-family:ui-monospace,Consolas,monospace">§11 #2</span>)のため、実行前に主催者との合意を取ってください。
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:12px 22px 0">
+      <div id="qLangBar" hidden style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px 12px;background:#f7f9fd;border:1px solid #b9caee;border-radius:6px">
+        <span style="font-size:11px;font-weight:700;color:#5b6577">編集言語</span>
+        <span id="qLangTabs" style="display:flex;gap:6px"></span>
+        <span id="qLangHint" style="font-size:11px;color:#6b7484;margin-left:auto"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;height:32px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px 6px 0 0;font-size:11px;font-weight:700;color:#5b6577">
+        <span>設問（押すと開いて編集できます）</span><span>並び / 削除</span>
+      </div>
+      <div id="qEdit" style="border:1px solid #e2e6ed;border-top:none;border-radius:0 0 6px 6px;padding:4px 8px 8px"></div>
+      <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <button onclick="pQAdd()" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">＋ 設問を追加</button>
+        <span id="qCount" style="font-size:11.5px;color:#6b7484"></span>
+      </div>
+      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.8">
+        設問タイプは利用者側のアンケート編集画面と同じ12種です。名刺の撮影は設問ではなく、アンケート単位の名刺データ化設定が持ちます。<br>多言語アンケートでは第一言語が必須で、それ以外の言語が未入力のときの回答画面での扱いは要確認です。<br>
+        設問の編集を本画面内で行うか専用画面へ分離するかは要確定(<span style="font-family:ui-monospace,Consolas,monospace">14_admin_survey_detail.md §11 #5</span>)。
+      </div>
+    </div>
+    <div id="qDiffWrap" style="padding:12px 22px 0;flex-shrink:0">
+      <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-bottom:5px">変更内容</div>
+      <div id="qDiff" style="max-height:112px;overflow-y:auto;font-size:12px;line-height:1.8;color:#374151;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:8px 12px"></div>
+    </div>
+    <div id="qReasonWrap" hidden style="padding:12px 22px 0;flex-shrink:0">
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span>
+        <input id="qReason" placeholder="例: 主催者からの依頼により設問3を削除" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div id="qErr" hidden style="margin-top:6px;font-size:12px;color:#c23934">実行理由を入力してください</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;flex-shrink:0;border-top:1px solid #e2e6ed;margin-top:12px">
+      <button onclick="pQPreview()" style="margin-right:auto;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答画面でプレビュー ↗</button>
+      <span id="qCloseAsk" hidden style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c23934;white-space:nowrap">保存していない変更があります。破棄しますか?
+        <button onclick="pQCloseDo(1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">破棄して閉じる</button>
+        <button onclick="pQCloseDo(0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit">編集に戻る</button></span>
+      <button id="qCancel" data-initial-focus onclick="pQClose()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button id="qSave" onclick="pQSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+
 <script>
-// ダウンロードの選択で実際にファイルを保存する。名刺画像は実ファイルを作れないため受付のみ知らせる
-window.pDlPick = function (kind) {
-    var sid = (document.querySelector('#mDl [data-slot="dlSid"]') || {}).textContent
-        || (document.getElementById('mDl').innerText.match(/SV-\d+/) || ['export'])[0];
-    if (kind === 'zip') {
-        window.pToast(sid + ' の名刺画像(ZIP)の取得を受け付けました');
-        window.pClose('mDl');
-        return;
+// 設問構成の編集(モック)。会期状態で扱いが変わる(14_admin_survey_detail.md §2.1)
+//   会期前            … 通常編集。保存操作で確定する
+//   会期開始後〜終了  … 例外対応。実行理由を必須にし、監査ログへ記録する
+//   会期終了後        … 変更できない(確認のみ)
+(function () {
+    'use strict';
+
+    // 設問タイプ・型別の設定・多言語の扱いは利用者側エディタ
+    // (02_dashboard/src/surveyCreation-v2.js) に合わせる。
+    // 要件書 §4.3 が「利用者側のアンケート編集画面と同一の機能構成」と定めているため。
+    // 名刺は設問タイプではない(アンケート単位の bizcardEnabled / 名刺データ化設定が持つ)ので、ここには無い
+    var TYPES = [
+        { v: 'free_answer', label: 'フリーアンサー' },
+        { v: 'single_answer', label: 'シングルアンサー' },
+        { v: 'multi_answer', label: 'マルチアンサー' },
+        { v: 'dropdown', label: 'ドロップダウン回答' },
+        { v: 'rating_scale', label: '評定尺度' },
+        { v: 'number_answer', label: '数値回答' },
+        { v: 'matrix_sa', label: 'マトリックス(SA)' },
+        { v: 'matrix_ma', label: 'マトリックス(MA)' },
+        { v: 'date_time', label: '日付/時間' },
+        { v: 'handwriting', label: '手書きスペース' },
+        { v: 'image', label: '画像添付' },
+        { v: 'explanation_card', label: '説明カード' }
+    ];
+    var CHOICE_TYPES = { single_answer: 1, multi_answer: 1, dropdown: 1 };
+    var MATRIX_TYPES = { matrix_sa: 1, matrix_ma: 1 };
+    var HEIGHTS = [{ v: 150, label: '低め' }, { v: 200, label: '標準' }, { v: 320, label: '高め' }];
+
+    // 利用者側の SUPPORTED_LANGS と同じ5言語。先頭が第一言語で、選べるのは第一言語含め3言語まで
+    var LANGS = [
+        { code: 'ja', name: '日本語' },
+        { code: 'en', name: 'English' },
+        { code: 'zh-CN', name: '中文(简体)' },
+        { code: 'zh-TW', name: '中文(繁體)' },
+        { code: 'vi', name: 'Tiếng Việt' }
+    ];
+    var MAX_LANGS = 3;
+    function langName(c) {
+        for (var i = 0; i < LANGS.length; i++) { if (LANGS[i].code === c) { return LANGS[i].name; } }
+        return c;
     }
-    var head = ['回答ID', '氏名', '会社名', '部署名', '役職名', 'メールアドレス', '電話番号', '受信日時'];
-    var rows = [head];
-    var n = (kind === 'all') ? 8 : 5;
-    for (var i = 1; i <= n; i++) {
-        rows.push(['#' + (8800 + i), '—', '—', '—', '—', '—', '—', '—']);
+
+    function family(t) { return CHOICE_TYPES[t] ? 'choice' : (MATRIX_TYPES[t] ? 'matrix' : t); }
+    function defaultConfig(t) {
+        if (t === 'free_answer') { return { multiline: true, minLength: '', maxLength: '' }; }
+        if (t === 'number_answer') { return { min: '', max: '', unit: '', step: '' }; }
+        if (t === 'date_time') { return { showDate: true, showTime: true }; }
+        if (t === 'handwriting') { return { height: 200 }; }
+        if (t === 'rating_scale') { return { points: 5, minLabel: '', maxLabel: '', showMidLabel: false, midLabel: '' }; }
+        return {};
     }
-    window.pCsv(sid + (kind === 'all' ? '_all' : '_final') + '.csv', rows);
-    window.pClose('mDl');
-};
+
+    // 多言語の値は利用者側と同じく {ja:'…', en:'…'} の形で持つ
+    function mk(v) { return (v && typeof v === 'object') ? v : { ja: v || '' }; }
+    function tv(o, lang) { return (o && o[lang]) || ''; }
+    function cloneTv(o) {
+        var r = {};
+        Object.keys(o || {}).forEach(function (k) { r[k] = o[k]; });
+        return r;
+    }
+
+    var QUESTIONS = [
+        { text: { ja: '本日のご来場のきっかけを教えてください', en: 'How did you hear about this event?' },
+          type: 'single_answer', required: true,
+          options: [{ ja: '招待状・DM', en: 'Invitation / DM' }, { ja: 'Webサイト', en: 'Website' },
+                    { ja: 'SNS', en: 'Social media' }, { ja: '知人の紹介', en: 'Referral' }, { ja: 'その他', en: 'Other' }] },
+        { text: { ja: 'ご興味のある製品分野', en: 'Product areas of interest' },
+          type: 'multi_answer', required: true,
+          options: [{ ja: 'クラウド', en: 'Cloud' }, { ja: 'AI・機械学習', en: 'AI / ML' },
+                    { ja: 'セキュリティ', en: 'Security' }, { ja: 'データ基盤', en: 'Data platform' },
+                    { ja: '業務自動化', en: 'Automation' }] },
+        { text: { ja: '導入をご検討の時期', en: '' }, type: 'single_answer', required: false,
+          options: [{ ja: '3か月以内', en: '' }, { ja: '半年以内', en: '' }, { ja: '1年以内', en: '' }, { ja: '未定', en: '' }] },
+        { text: { ja: 'ご意見・ご要望', en: 'Comments' }, type: 'free_answer', required: false,
+          config: { multiline: true, minLength: '', maxLength: '1000' } }
+    ];
+    var surveyLangs = ['ja'];
+    var answerCount = 0;      // このアンケートが既に受け付けている回答数
+    var nextQid = 1;
+    var activeLang = 'ja';
+
+    var draft = [];
+    var openIdx = -1;
+    var pendingDel = -1;
+    var pendingItemDel = null;
+    var pendingType = null;
+
+    function label(v) {
+        for (var i = 0; i < TYPES.length; i++) { if (TYPES[i].v === v) { return TYPES[i].label; } }
+        return v;
+    }
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+    function clone(q) {
+        var cfg = defaultConfig(q.type);
+        Object.keys(q.config || {}).forEach(function (k) { cfg[k] = q.config[k]; });
+        return {
+            qid: q.qid || ('q' + (nextQid++)),
+            text: cloneTv(mk(q.text)), type: q.type, required: q.required,
+            options: (q.options || []).map(function (o) { return cloneTv(mk(o)); }),
+            rows: (q.rows || []).map(function (o) { return cloneTv(mk(o)); }),
+            cols: (q.cols || []).map(function (o) { return cloneTv(mk(o)); }),
+            config: cfg
+        };
+    }
+    function primary() { return surveyLangs[0]; }
+    // 第一言語以外で空のままの項目を数える(回答画面での扱いは要確認なので、印で知らせるに留める)
+    function missingFor(q, lang) {
+        var n = 0;
+        if (!tv(q.text, lang)) { n++; }
+        ['options', 'rows', 'cols'].forEach(function (k) {
+            (q[k] || []).forEach(function (o) { if (!tv(o, lang)) { n++; } });
+        });
+        return n;
+    }
+    function summary(q) {
+        var c = q.config || {};
+        var base = '';
+        if (CHOICE_TYPES[q.type]) { base = '選択肢 ' + q.options.length; }
+        else if (MATRIX_TYPES[q.type]) { base = '行 ' + q.rows.length + ' × 列 ' + q.cols.length; }
+        else if (q.type === 'rating_scale') { base = (c.points || 5) + '段階'; }
+        else if (q.type === 'free_answer') {
+            base = (c.multiline ? '複数行' : '単一行') + (c.maxLength ? '・最大' + c.maxLength + '文字' : '');
+        } else if (q.type === 'number_answer') {
+            var r = (c.min !== '' || c.max !== '') ? (c.min || '') + '〜' + (c.max || '') : '';
+            base = [r, c.unit].filter(Boolean).join('・');
+        } else if (q.type === 'date_time') {
+            base = [c.showDate ? '日付' : '', c.showTime ? '時刻' : ''].filter(Boolean).join('と') || '未選択';
+        } else if (q.type === 'handwriting') { base = '高さ ' + (c.height || 200) + 'px'; }
+        return base;
+    }
+    function missingBadge(q) {
+        var out = [];
+        surveyLangs.slice(1).forEach(function (l) {
+            var n = missingFor(q, l);
+            if (n) { out.push(langName(l) + ' ' + n + '件未入力'); }
+        });
+        return out.join(' / ');
+    }
+
+    // ---- 対応言語(アンケート単位) ----
+    var CHIP = 'display:inline-flex;align-items:center;gap:6px;border:1px solid #b9caee;background:#eef2fb;'
+        + 'color:#1f3d80;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700';
+    function paintLangs() {
+        var box = document.getElementById('svLangs');
+        var badge = document.getElementById('svLangBadge');
+        if (badge) { badge.textContent = surveyLangs.map(langName).join(' / '); }
+        if (!box) { return; }
+        var html = surveyLangs.map(function (c, i) {
+            return '<span data-lang="' + c + '" style="' + CHIP + '">' + esc(langName(c))
+                + (i === 0
+                    ? '<span style="font-size:10px;font-weight:700;background:#3467d6;color:#fff;border-radius:4px;padding:1px 6px">第一言語</span>'
+                    : '<button title="第一言語にする" onclick="pLangFirst(\'' + c + '\')" style="border:none;background:none;color:#2b57b8;font-size:12px;cursor:pointer;padding:0 2px">↑</button>'
+                      + '<button title="この言語を外す" onclick="pLangAsk(\'' + c + '\')" style="border:none;background:none;color:#c23934;font-size:13px;cursor:pointer;padding:0 2px">×</button>')
+                + '</span>';
+        }).join('');
+        var rest = LANGS.filter(function (l) { return surveyLangs.indexOf(l.code) < 0; });
+        if (surveyLangs.length < MAX_LANGS && rest.length) {
+            html += '<select onchange="pLangAdd(this.value);this.selectedIndex=0" style="border:1px solid #c8cdd8;'
+                + 'border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;color:#1f2733">'
+                + '<option value="">＋ 言語を追加</option>'
+                + rest.map(function (l) { return '<option value="' + l.code + '">' + l.name + '</option>'; }).join('')
+                + '</select>';
+        } else if (surveyLangs.length >= MAX_LANGS) {
+            html += '<span style="font-size:11px;color:#8a93a5">第一言語を含め' + MAX_LANGS + '言語までです</span>';
+        }
+        box.innerHTML = html;
+    }
+    window.pLangInit = function (list) {
+        surveyLangs = (list && list.length) ? list.slice(0, MAX_LANGS) : ['ja'];
+        activeLang = surveyLangs[0];
+        paintLangs();
+        paintList();
+    };
+    window.pLangAdd = function (code) {
+        if (!code || surveyLangs.indexOf(code) >= 0 || surveyLangs.length >= MAX_LANGS) { return; }
+        surveyLangs.push(code);
+        paintLangs();
+        paintList();
+    };
+    window.pLangFirst = function (code) {
+        var i = surveyLangs.indexOf(code);
+        if (i <= 0) { return; }
+        surveyLangs.splice(i, 1);
+        surveyLangs.unshift(code);
+        activeLang = code;
+        paintLangs();
+        paintList();
+    };
+    // 言語を外すと、その言語で入力済みの内容が画面から消えるため確認を挟む
+    window.pLangAsk = function (code) {
+        var box = document.getElementById('svLangs');
+        if (!box) { return; }
+        var used = QUESTIONS.reduce(function (a, q) { return a + (missingFor(q, code) ? 0 : 1); }, 0);
+        box.innerHTML = '<span style="font-size:12px;color:#c23934">'
+            + esc(langName(code)) + ' を対応言語から外しますか?'
+            + (used ? '（この言語で入力済みの設問が ' + used + ' 件あります）' : '')
+            + '</span>'
+            + '<button onclick="pLangDel(\'' + code + '\',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;'
+            + 'border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">外す</button>'
+            + '<button onclick="pLangDel(\'' + code + '\',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;'
+            + 'border-radius:5px;padding:4px 12px;font-size:11.5px;cursor:pointer;font-family:inherit">やめる</button>';
+    };
+    window.pLangDel = function (code, run) {
+        if (run) {
+            var i = surveyLangs.indexOf(code);
+            if (i > 0) { surveyLangs.splice(i, 1); }
+            if (activeLang === code) { activeLang = surveyLangs[0]; }
+        }
+        paintLangs();
+        paintList();
+    };
+
+    // 未入力を「/」の羅列にしない。入力済みだけを並べ、残りは件数で示す
+    function listText(list, lang) {
+        var filled = [], blank = 0;
+        (list || []).forEach(function (o) {
+            var t = tv(o, lang);
+            if (t) { filled.push(t); } else { blank++; }
+        });
+        if (!filled.length) { return blank ? blank + ' 件すべて未入力' : '—'; }
+        return filled.join(' / ') + (blank ? '（他 ' + blank + ' 件未入力）' : '');
+    }
+
+    // ---- 変更内容(要件書 §4.6「変更する範囲」「既存回答への影響」) ----
+    function itemsText(list) {
+        return listText(list, primary());
+    }
+    function qLabel(q, i) { return (i + 1) + '問目「' + (tv(q.text, primary()) || '(未入力)') + '」'; }
+
+    function diffOf(before, after) {
+        var out = [];
+        var bById = {}, aById = {};
+        before.forEach(function (q, i) { bById[q.qid] = { q: q, i: i }; });
+        after.forEach(function (q, i) { aById[q.qid] = { q: q, i: i }; });
+
+        after.forEach(function (q, i) {
+            if (!bById[q.qid]) { out.push({ kind: 'add', text: '設問を追加: ' + qLabel(q, i) }); }
+        });
+        before.forEach(function (q, i) {
+            if (!aById[q.qid]) {
+                out.push({ kind: 'del', text: '設問を削除: ' + qLabel(q, i), answered: true });
+            }
+        });
+
+        // 並び順(両方に残っている設問だけで見る)
+        var bOrder = before.filter(function (q) { return aById[q.qid]; }).map(function (q) { return q.qid; });
+        var aOrder = after.filter(function (q) { return bById[q.qid]; }).map(function (q) { return q.qid; });
+        if (bOrder.join(',') !== aOrder.join(',')) { out.push({ kind: 'move', text: '設問の並び順を変更' }); }
+
+        after.forEach(function (q, i) {
+            var b = bById[q.qid];
+            if (!b) { return; }
+            var o = b.q, chg = [];
+            surveyLangs.forEach(function (l) {
+                if (tv(o.text, l) !== tv(q.text, l)) {
+                    chg.push('設問文' + (surveyLangs.length > 1 ? '(' + langName(l) + ')' : '') + 'を変更');
+                }
+            });
+            if (o.type !== q.type) { chg.push('設問タイプを ' + label(o.type) + ' → ' + label(q.type)); }
+            if (o.required !== q.required) { chg.push(q.required ? '任意 → 必須' : '必須 → 任意'); }
+            ['options', 'rows', 'cols'].forEach(function (k) {
+                var name = { options: '選択肢', rows: '行', cols: '列' }[k];
+                if (itemsText(o[k]) !== itemsText(q[k])) {
+                    chg.push(o[k].length !== q[k].length
+                        ? name + 'を変更(' + o[k].length + '件 → ' + q[k].length + '件)'
+                        : name + 'の内容を変更');
+                }
+            });
+            var ck = Object.keys(q.config || {}).filter(function (k) {
+                return String((o.config || {})[k]) !== String(q.config[k]);
+            });
+            if (ck.length) { chg.push('回答設定を変更'); }
+            if (chg.length) {
+                out.push({ kind: 'edit', text: qLabel(q, i) + ': ' + chg.join('、'), answered: true });
+            }
+        });
+        return out;
+    }
+
+    function paintDiff() {
+        var box = document.getElementById('qDiff');
+        if (!box) { return; }
+        var list = diffOf(QUESTIONS.map(clone), draft);
+        var save = document.getElementById('qSave');
+        if (!list.length) {
+            box.innerHTML = '<span style="color:#8a93a5">変更はありません</span>';
+            if (save) { save.disabled = true; save.style.opacity = '0.55'; save.style.cursor = 'default'; }
+            return;
+        }
+        if (save) { save.disabled = false; save.style.opacity = ''; save.style.cursor = 'pointer'; }
+        // 既存回答がある状態で既存設問を削除・変更する場合は、影響する回答数を添える(§4.6)
+        var touches = answerCount > 0 && list.some(function (c) { return c.answered; });
+        box.innerHTML = list.map(function (c) {
+            var mark = { add: '＋', del: '－', move: '⇅', edit: '✎' }[c.kind] || '・';
+            var color = c.kind === 'del' ? '#c23934' : (c.kind === 'add' ? '#237a52' : '#374151');
+            return '<div style="color:' + color + '">' + mark + ' ' + esc(c.text) + '</div>';
+        }).join('')
+            + (touches
+                ? '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #c8cdd8;color:#8a6414">'
+                  + '既存の回答 ' + answerCount.toLocaleString('en-US') + ' 件が影響を受けます。'
+                  + '変更後の対応関係は要確定(§11 #2)のため、実行前に主催者と扱いを合意してください。</div>'
+                : '');
+    }
+
+    window.pQAnswers = function (n) { answerCount = n || 0; };
+
+    // ---- 一覧(読み取り専用・第一言語で表示) ----
+    var ROW = 'display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;'
+        + 'align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px';
+
+    function paintList() {
+        var list = document.getElementById('qList');
+        if (!list) { return; }
+        var L = primary();
+        var head = list.firstElementChild;
+        list.innerHTML = '';
+        list.appendChild(head);
+        QUESTIONS.forEach(function (q, i) {
+            var sub = '';
+            if (CHOICE_TYPES[q.type] && q.options.length) {
+                sub = '選択肢 ' + q.options.length + ': ' + listText(q.options, L);
+            } else if (MATRIX_TYPES[q.type]) {
+                sub = '行: ' + listText(q.rows, L) + '　列: ' + listText(q.cols, L);
+            } else {
+                sub = summary(q);
+            }
+            var miss = missingBadge(q);
+            var d = document.createElement('div');
+            d.setAttribute('style', ROW + (i === QUESTIONS.length - 1 ? ';border-bottom:none' : ''));
+            d.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;align-self:start;padding-top:2px">'
+                + (i + 1) + '</span>'
+                + '<span style="min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;'
+                + 'white-space:nowrap"><span data-qtext' + (tv(q.text, L) ? '' : ' style="color:#a3aab8"')
+                + '>' + esc(tv(q.text, L) || '(設問文なし)') + '</span>'
+                + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:#8a6414;background:#fdf6ec;'
+                    + 'border:1px solid #e8cf9e;border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
+                + '</span>'
+                + (sub ? '<span style="display:block;font-size:11px;color:#8a93a5;margin-top:2px;overflow:hidden;'
+                    + 'text-overflow:ellipsis;white-space:nowrap">' + esc(sub) + '</span>' : '')
+                + '</span>'
+                + '<span style="font-size:11.5px;color:#5b6577;align-self:start;padding-top:2px">' + esc(label(q.type)) + '</span>'
+                + (q.required
+                    ? '<span style="font-size:11px;color:#c23934;font-weight:700;align-self:start;padding-top:2px">必須</span>'
+                    : '<span style="font-size:11px;color:#8a93a5;align-self:start;padding-top:2px">任意</span>');
+            list.appendChild(d);
+        });
+        var note = document.querySelector('[data-slot="qNote"]');
+        if (note) { note.textContent = note.textContent.replace(/全\d+問/, '全' + QUESTIONS.length + '問'); }
+    }
+
+    // ---- 編集 ----
+    var ICON = 'width:26px;height:26px;border:1px solid #c8cdd8;border-radius:5px;background:#fff;font-size:11px';
+    var TXT = 'width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;'
+        + 'padding:7px 10px;font-size:12.5px;font-family:inherit';
+    var NUM = 'width:110px;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;'
+        + 'padding:7px 10px;font-size:12.5px;font-family:inherit';
+    var FIELD = 'font-size:11px;font-weight:700;color:#5b6577;margin-bottom:5px';
+    function seg(on) {
+        return 'padding:6px 14px;border:1px solid ' + (on ? '#3467d6' : '#c8cdd8') + ';border-radius:6px;'
+            + 'background:' + (on ? '#eef2fb' : '#fff') + ';color:' + (on ? '#2b57b8' : '#374151')
+            + ';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit';
+    }
+    function cfgSet(i, k, v) { return 'pQCfg(' + i + ',\'' + k + '\',' + JSON.stringify(v) + ')'; }
+    function langSuffix() {
+        return surveyLangs.length > 1 ? ' <span style="font-weight:400;color:#8a93a5">(' + esc(langName(activeLang)) + ')</span>' : '';
+    }
+
+    function paintLangBar() {
+        var bar = document.getElementById('qLangBar');
+        if (!bar) { return; }
+        if (surveyLangs.length <= 1) { bar.hidden = true; return; }
+        bar.hidden = false;
+        document.getElementById('qLangTabs').innerHTML = surveyLangs.map(function (c, i) {
+            var n = draft.reduce(function (a, q) { return a + missingFor(q, c); }, 0);
+            return '<button onclick="pQLang(\'' + c + '\')" style="' + seg(c === activeLang) + '">'
+                + esc(langName(c)) + (i === 0 ? '（第一言語）' : '')
+                + (i > 0 && n ? '<span style="margin-left:6px;font-size:10px;color:#8a6414">未入力' + n + '</span>' : '')
+                + '</button>';
+        }).join('');
+        document.getElementById('qLangHint').textContent =
+            activeLang === primary() ? '第一言語は必須です' : '未入力のままにした場合の回答画面での扱いは要確認';
+    }
+    window.pQLang = function (c) { activeLang = c; paintLangBar(); paintEditor(); };
+
+    function itemEditor(qi, kind, items, name) {
+        return '<div><div style="' + FIELD + '">' + name + langSuffix() + '</div>'
+            + items.map(function (o, oi) {
+                var mine = (pendingItemDel === qi + ':' + kind + ':' + oi);
+                var other = surveyLangs.length > 1 && activeLang !== primary() ? tv(o, primary()) : '';
+                return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+                    + '<span style="flex:1;min-width:0">'
+                    + '<input value="' + esc(tv(o, activeLang)) + '" placeholder="' + (other ? esc(other) : '')
+                    + '" oninput="pQItemSet(' + qi + ',\'' + kind + '\',' + oi + ',this.value)" style="' + TXT + '">'
+                    + (other ? '<span style="display:block;font-size:10.5px;color:#8a93a5;margin-top:2px">'
+                        + esc(langName(primary())) + ': ' + esc(other) + '</span>' : '')
+                    + '</span>'
+                    + (mine
+                        ? '<span style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:11px;color:#c23934">削除しますか?'
+                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700">削除</button>'
+                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:3px 9px;font-size:11px">やめる</button></span>'
+                        : '<button title="上へ" onclick="pQItemMove(' + qi + ',\'' + kind + '\',' + oi + ',-1)"' + (oi === 0 ? ' disabled' : '')
+                          + ' style="' + ICON + ';color:' + (oi === 0 ? '#c3c9d4' : '#374151') + '">↑</button>'
+                          + '<button title="下へ" onclick="pQItemMove(' + qi + ',\'' + kind + '\',' + oi + ',1)"' + (oi === items.length - 1 ? ' disabled' : '')
+                          + ' style="' + ICON + ';color:' + (oi === items.length - 1 ? '#c3c9d4' : '#374151') + '">↓</button>'
+                          + '<button title="削除" onclick="pQItemAsk(' + qi + ',\'' + kind + '\',' + oi + ')" style="' + ICON
+                          + ';border-color:#e3b6b3;color:#c23934">×</button>')
+                    + '</div>';
+            }).join('')
+            + '<button onclick="pQItemAdd(' + qi + ',\'' + kind + '\')" style="background:#fff;color:#3467d6;'
+            + 'border:1px solid #b9caee;border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;'
+            + 'cursor:pointer;font-family:inherit">＋ ' + name + 'を追加</button></div>';
+    }
+
+    function typeSettings(q, i) {
+        var c = q.config || {};
+        if (CHOICE_TYPES[q.type]) { return itemEditor(i, 'options', q.options, '選択肢'); }
+        if (MATRIX_TYPES[q.type]) {
+            return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+                + itemEditor(i, 'rows', q.rows, '行') + itemEditor(i, 'cols', q.cols, '列') + '</div>';
+        }
+        if (q.type === 'free_answer') {
+            return '<div><div style="' + FIELD + '">入力形式</div>'
+                + '<div style="display:flex;gap:8px;margin-bottom:12px">'
+                + '<button onclick="' + cfgSet(i, 'multiline', false) + '" style="' + seg(!c.multiline) + '">単一行</button>'
+                + '<button onclick="' + cfgSet(i, 'multiline', true) + '" style="' + seg(!!c.multiline) + '">複数行</button></div>'
+                + '<div style="display:flex;gap:16px;flex-wrap:wrap">'
+                + '<div><div style="' + FIELD + '">最小文字数</div><input type="number" min="0" value="' + esc(c.minLength)
+                + '" placeholder="指定なし" oninput="pQCfg(' + i + ',\'minLength\',this.value)" style="' + NUM + '"></div>'
+                + '<div><div style="' + FIELD + '">最大文字数</div><input type="number" min="0" value="' + esc(c.maxLength)
+                + '" placeholder="指定なし" oninput="pQCfg(' + i + ',\'maxLength\',this.value)" style="' + NUM + '"></div>'
+                + '</div></div>';
+        }
+        if (q.type === 'number_answer') {
+            return '<div><div style="display:flex;gap:16px;flex-wrap:wrap">'
+                + '<div><div style="' + FIELD + '">最小値</div><input type="number" value="' + esc(c.min)
+                + '" placeholder="指定なし" oninput="pQCfg(' + i + ',\'min\',this.value)" style="' + NUM + '"></div>'
+                + '<div><div style="' + FIELD + '">最大値</div><input type="number" value="' + esc(c.max)
+                + '" placeholder="指定なし" oninput="pQCfg(' + i + ',\'max\',this.value)" style="' + NUM + '"></div>'
+                + '<div><div style="' + FIELD + '">単位</div><input value="' + esc(c.unit)
+                + '" placeholder="例: 人" oninput="pQCfg(' + i + ',\'unit\',this.value)" style="' + NUM + '"></div>'
+                + '<div><div style="' + FIELD + '">刻み幅</div><input type="number" value="' + esc(c.step)
+                + '" placeholder="指定なし" oninput="pQCfg(' + i + ',\'step\',this.value)" style="' + NUM + '"></div>'
+                + '</div></div>';
+        }
+        if (q.type === 'date_time') {
+            return '<div><div style="' + FIELD + '">入力させる項目</div>'
+                + '<div style="display:flex;gap:18px">'
+                + '<label style="display:flex;align-items:center;gap:7px;font-size:12.5px"><input type="checkbox"'
+                + (c.showDate ? ' checked' : '') + ' onchange="pQCfg(' + i + ',\'showDate\',this.checked)">日付</label>'
+                + '<label style="display:flex;align-items:center;gap:7px;font-size:12.5px"><input type="checkbox"'
+                + (c.showTime ? ' checked' : '') + ' onchange="pQCfg(' + i + ',\'showTime\',this.checked)">時刻</label>'
+                + '</div></div>';
+        }
+        if (q.type === 'handwriting') {
+            var h = c.height || 200;
+            return '<div><div style="' + FIELD + '">手書きエリアの高さ (120〜480px)</div>'
+                + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+                + HEIGHTS.map(function (p) {
+                    return '<button onclick="' + cfgSet(i, 'height', p.v) + '" style="' + seg(h === p.v) + '">'
+                        + p.label + '(' + p.v + ')</button>';
+                }).join('')
+                + '<input type="number" min="120" max="480" value="' + h
+                + '" oninput="pQCfg(' + i + ',\'height\',parseInt(this.value,10)||200)" style="' + NUM + '"></div></div>';
+        }
+        if (q.type === 'rating_scale') {
+            return '<div><div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">'
+                + '<div><div style="' + FIELD + '">段階数</div><input type="number" min="2" max="10" value="' + (c.points || 5)
+                + '" onchange="pQCfg(' + i + ',\'points\',parseInt(this.value,10)||5)" style="' + NUM + '"></div>'
+                + '<div style="flex:1;min-width:150px"><div style="' + FIELD + '">左端のラベル</div><input value="' + esc(c.minLabel)
+                + '" placeholder="低い" oninput="pQCfg(' + i + ',\'minLabel\',this.value)" style="' + TXT + '"></div>'
+                + '<div style="flex:1;min-width:150px"><div style="' + FIELD + '">右端のラベル</div><input value="' + esc(c.maxLabel)
+                + '" placeholder="高い" oninput="pQCfg(' + i + ',\'maxLabel\',this.value)" style="' + TXT + '"></div>'
+                + '</div><label style="display:flex;align-items:center;gap:7px;font-size:12.5px;margin-top:10px">'
+                + '<input type="checkbox"' + (c.showMidLabel ? ' checked' : '')
+                + ' onchange="pQCfg(' + i + ',\'showMidLabel\',this.checked)">中央のラベルを出す</label>'
+                + (c.showMidLabel
+                    ? '<div style="margin-top:8px"><input value="' + esc(c.midLabel) + '" placeholder="どちらでもない" '
+                      + 'oninput="pQCfg(' + i + ',\'midLabel\',this.value)" style="' + TXT + '"></div>' : '')
+                + '</div>';
+        }
+        if (q.type === 'image') {
+            return '<div style="font-size:11.5px;color:#6b7484;line-height:1.7">回答画面では写真の撮影またはファイルの選択で回答します。設定項目はありません。</div>';
+        }
+        if (q.type === 'explanation_card') {
+            return '<div style="font-size:11.5px;color:#6b7484;line-height:1.7">回答欄を持たない設問です。本文は設問文に入力します。</div>';
+        }
+        return '';
+    }
+
+    function paintEditor() {
+        var box = document.getElementById('qEdit');
+        var html = '';
+        draft.forEach(function (q, i) { html += separator(i) + card(q, i); });
+        html += separator(draft.length);
+        box.innerHTML = html;
+        document.getElementById('qCount').textContent = '全 ' + draft.length + ' 問';
+        paintDiff();
+    }
+
+    function separator(at) {
+        return '<div data-sep="' + at + '" style="display:flex;align-items:center;justify-content:center;height:18px">'
+            + '<button onclick="pQAdd(' + at + ')" title="ここに設問を追加" '
+            + 'style="font-size:10.5px;color:#8a93a5;background:#fff;border:1px dashed #c8cdd8;border-radius:999px;'
+            + 'padding:1px 10px;cursor:pointer;font-family:inherit">＋ ここに設問を追加</button></div>';
+    }
+
+    function card(q, i) {
+        var open = (openIdx === i);
+        var del = (pendingDel === i);
+        var sum = summary(q);
+        var miss = missingBadge(q);
+        var L = primary();
+
+        var actions = del
+            ? '<span style="display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:11.5px;color:#c23934">削除しますか?'
+              + '<button onclick="event.stopPropagation();pQDel(' + i + ',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700">削除する</button>'
+              + '<button onclick="event.stopPropagation();pQDel(' + i + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:4px 12px;font-size:11.5px">やめる</button></span>'
+            : '<span style="display:flex;gap:4px">'
+              + '<button title="上へ" onclick="event.stopPropagation();pQMove(' + i + ',-1)"' + (i === 0 ? ' disabled' : '')
+              + ' style="' + ICON + ';color:' + (i === 0 ? '#c3c9d4' : '#374151') + '">↑</button>'
+              + '<button title="下へ" onclick="event.stopPropagation();pQMove(' + i + ',1)"' + (i === draft.length - 1 ? ' disabled' : '')
+              + ' style="' + ICON + ';color:' + (i === draft.length - 1 ? '#c3c9d4' : '#374151') + '">↓</button>'
+              + '<button title="設問を複製" onclick="event.stopPropagation();pQDup(' + i + ')" style="' + ICON + ';color:#374151">⧉</button>'
+              + '<button title="設問を削除" onclick="event.stopPropagation();pQAsk(' + i + ')" style="' + ICON
+              + ';border-color:#e3b6b3;color:#c23934">×</button></span>';
+
+        var header = '<div onclick="pQToggle(' + i + ')" tabindex="0" role="button" aria-expanded="' + open + '" '
+            + 'style="display:grid;grid-template-columns:20px 28px minmax(160px,1fr) auto;column-gap:10px;'
+            + 'align-items:center;padding:10px 12px;cursor:pointer;user-select:none' + (open ? ';background:#f7f9fd' : '') + '">'
+            + '<span style="color:#8a93a5;font-size:11px;display:inline-block' + (open ? ';transform:rotate(90deg)' : '') + '">▶</span>'
+            + '<span style="font-size:12px;color:#8a93a5;font-variant-numeric:tabular-nums">' + (i + 1) + '</span>'
+            + '<span style="min-width:0">'
+            + '<span style="display:block;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+            + '<span data-qtext>' + (tv(q.text, L).trim() ? esc(tv(q.text, L)) : '<span style="color:#c23934;font-weight:400">(設問文が未入力)</span>') + '</span>'
+            + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:#8a6414;background:#fdf6ec;'
+                + 'border:1px solid #e8cf9e;border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
+            + '</span>'
+            + '<span style="display:block;font-size:11px;color:#8a93a5;margin-top:2px">' + esc(label(q.type))
+            + ' · ' + (q.required ? '必須' : '任意') + (sum ? ' · ' + esc(sum) : '') + '</span></span>'
+            + actions + '</div>';
+
+        var warn = '';
+        if (pendingType && pendingType.i === i) {
+            warn = '<div style="margin-top:8px;font-size:11.5px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;'
+                + 'border-radius:6px;padding:8px 11px;line-height:1.7;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+                + '<span style="flex:1;min-width:200px">' + esc(label(pendingType.to))
+                + ' へ変更すると、入力済みの' + (family(q.type) === 'choice' ? '選択肢' : family(q.type) === 'matrix' ? '行・列' : '詳細設定')
+                + 'はリセットされます。</span>'
+                + '<button onclick="pQTypeConfirm(' + i + ',1)" style="border:1px solid #8a6414;background:#8a6414;color:#fff;'
+                + 'border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700">変更する</button>'
+                + '<button onclick="pQTypeConfirm(' + i + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;'
+                + 'border-radius:5px;padding:4px 12px;font-size:11.5px">やめる</button></div>';
+        }
+
+        var otherText = (surveyLangs.length > 1 && activeLang !== L) ? tv(q.text, L) : '';
+        var settings = typeSettings(q, i);
+        var detail = !open ? '' :
+            '<div style="border-top:1px solid #eef0f5;background:#fbfcfe;padding:14px 12px 14px 50px;'
+            + 'display:flex;flex-direction:column;gap:14px">'
+            + '<div><div style="' + FIELD + '">設問文' + langSuffix() + '</div>'
+            + '<input value="' + esc(tv(q.text, activeLang)) + '" placeholder="' + (otherText ? esc(otherText) : '')
+            + '" oninput="pQSet(' + i + ',\'text\',this.value)" style="' + TXT + '">'
+            + (otherText ? '<div style="font-size:10.5px;color:#8a93a5;margin-top:3px">' + esc(langName(L)) + ': '
+                + esc(otherText) + '</div>' : '') + '</div>'
+            + '<div><div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">'
+            + '<div style="flex:0 0 220px"><div style="' + FIELD + '">設問タイプ</div>'
+            + '<select onchange="pQTypeAsk(' + i + ',this.value)" style="' + TXT + '">'
+            + TYPES.map(function (t) {
+                return '<option value="' + t.v + '"' + (t.v === q.type ? ' selected' : '') + '>' + t.label + '</option>';
+            }).join('') + '</select></div>'
+            + '<label style="display:flex;align-items:center;gap:7px;font-size:12.5px;padding-bottom:8px">'
+            + '<input type="checkbox"' + (q.required ? ' checked' : '')
+            + (q.type === 'explanation_card' ? ' disabled' : '')
+            + ' onchange="pQSet(' + i + ',\'required\',this.checked)">回答を必須にする'
+            + (q.type === 'explanation_card'
+                ? '<span style="font-size:11px;color:#8a93a5">説明カードは回答欄を持たないため対象外</span>' : '')
+            + '</label></div>' + warn + '</div>'
+            + (settings || '') + '</div>';
+
+        return '<div data-q="' + i + '" style="border:1px solid #e2e6ed;border-radius:8px;background:'
+            + (del ? '#fdf6f5' : '#fff') + '">' + header + detail + '</div>';
+    }
+
+    window.pQToggle = function (i) {
+        if (pendingDel === i || (pendingType && pendingType.i === i)) { return; }
+        openIdx = (openIdx === i) ? -1 : i;
+        pendingItemDel = null;
+        paintEditor();
+    };
+    function refreshSummary(i) {
+        var card = document.querySelector('#qEdit [data-q="' + i + '"]');
+        if (!card) { return; }
+        var sub = card.querySelector('[role="button"] > span:nth-child(3) > span:nth-child(2)');
+        var s = summary(draft[i]);
+        if (sub) {
+            sub.textContent = label(draft[i].type) + ' · ' + (draft[i].required ? '必須' : '任意') + (s ? ' · ' + s : '');
+        }
+        var t = card.querySelector('[data-qtext]');
+        if (t && tv(draft[i].text, primary()).trim()) { t.textContent = tv(draft[i].text, primary()); }
+        paintLangBar();
+        paintDiff();
+    }
+    window.pQSet = function (i, key, val) {
+        if (key === 'text') { draft[i].text[activeLang] = val; }
+        else { draft[i][key] = val; }
+        refreshSummary(i);
+    };
+    window.pQCfg = function (i, key, val) {
+        draft[i].config[key] = val;
+        if (['multiline', 'showDate', 'showTime', 'height', 'showMidLabel'].indexOf(key) >= 0) { paintEditor(); }
+        else { refreshSummary(i); }
+    };
+
+    window.pQTypeAsk = function (i, to) {
+        var q = draft[i];
+        var loses = family(q.type) !== family(to)
+            && ((family(q.type) === 'choice' && q.options.length)
+                || (family(q.type) === 'matrix' && (q.rows.length || q.cols.length))
+                || Object.keys(q.config || {}).some(function (k) {
+                    var v = q.config[k];
+                    return v !== '' && v !== false && v !== null && v !== undefined;
+                }));
+        if (!loses) { applyType(i, to); return; }
+        pendingType = { i: i, to: to };
+        paintEditor();
+    };
+    window.pQTypeConfirm = function (i, run) {
+        var to = pendingType && pendingType.to;
+        pendingType = null;
+        if (run && to) { applyType(i, to); } else { paintEditor(); }
+    };
+    function applyType(i, to) {
+        var q = draft[i];
+        var same = family(q.type) === family(to);
+        q.type = to;
+        if (!same) {
+            if (!CHOICE_TYPES[to]) { q.options = []; }
+            if (!MATRIX_TYPES[to]) { q.rows = []; q.cols = []; }
+            q.config = defaultConfig(to);
+        }
+        if (CHOICE_TYPES[to] && !q.options.length) { q.options = [mk('選択肢1'), mk('選択肢2')]; }
+        if (MATRIX_TYPES[to]) {
+            if (!q.rows.length) { q.rows = [mk('行1'), mk('行2')]; }
+            if (!q.cols.length) { q.cols = [mk('列1'), mk('列2')]; }
+        }
+        if (to === 'explanation_card') { q.required = false; }
+        pendingItemDel = null;
+        paintEditor();
+    }
+
+    window.pQMove = function (i, d) {
+        var j = i + d;
+        if (j < 0 || j >= draft.length) { return; }
+        var t = draft[i]; draft[i] = draft[j]; draft[j] = t;
+        if (openIdx === i) { openIdx = j; } else if (openIdx === j) { openIdx = i; }
+        pendingDel = -1; pendingItemDel = null; pendingType = null;
+        paintEditor();
+    };
+    window.pQDup = function (i) {
+        var copy = clone(draft[i]);
+        copy.qid = 'q' + (nextQid++);   // 複製は別の設問として扱う(差分で「追加」に出す)
+        draft.splice(i + 1, 0, copy);
+        openIdx = i + 1;
+        pendingDel = -1; pendingItemDel = null; pendingType = null;
+        paintEditor();
+    };
+    window.pQAsk = function (i) { pendingDel = i; pendingItemDel = null; pendingType = null; paintEditor(); };
+    window.pQDel = function (i, run) {
+        pendingDel = -1;
+        if (run) {
+            draft.splice(i, 1);
+            if (openIdx === i) { openIdx = -1; } else if (openIdx > i) { openIdx--; }
+        }
+        paintEditor();
+    };
+    window.pQAdd = function (at) {
+        var idx = (at === undefined || at === null) ? draft.length : at;
+        draft.splice(idx, 0, clone({ text: {}, type: 'single_answer', required: false,
+                                     options: [mk('選択肢1'), mk('選択肢2')] }));
+        openIdx = idx;
+        pendingDel = -1; pendingItemDel = null; pendingType = null;
+        paintEditor();
+        var c = document.querySelector('#qEdit [data-q="' + idx + '"]');
+        if (c) {
+            c.scrollIntoView({ block: 'nearest' });
+            var t = c.querySelector('input[oninput^="pQSet"]');
+            if (t) { t.focus(); }
+        }
+    };
+
+    window.pQItemSet = function (qi, kind, oi, val) { draft[qi][kind][oi][activeLang] = val; refreshSummary(qi); };
+    window.pQItemMove = function (qi, kind, oi, d) {
+        var a = draft[qi][kind], j = oi + d;
+        if (j < 0 || j >= a.length) { return; }
+        var t = a[oi]; a[oi] = a[j]; a[j] = t;
+        pendingItemDel = null;
+        paintEditor();
+    };
+    window.pQItemAsk = function (qi, kind, oi) { pendingItemDel = qi + ':' + kind + ':' + oi; paintEditor(); };
+    window.pQItemDel = function (qi, kind, oi, run) {
+        pendingItemDel = null;
+        if (run) { draft[qi][kind].splice(oi, 1); }
+        paintEditor();
+    };
+    window.pQItemAdd = function (qi, kind) {
+        var seed = { options: '選択肢', rows: '行', cols: '列' }[kind] || '項目';
+        var o = {};
+        o[primary()] = seed + (draft[qi][kind].length + 1);
+        draft[qi][kind].push(o);
+        pendingItemDel = null;
+        paintEditor();
+    };
+
+    window.pQOpen = function (approvedReason) {
+        var btn = document.querySelector('[data-slot="qEditBtn"]');
+        if (btn && btn.disabled) { return; }
+        // 会期中の変更は例外対応。先に §4.6 の確認(対象・範囲・理由)を通す
+        if (document.body.getAttribute('data-survey-live') === '1' && approvedReason === undefined) {
+            var q = document.getElementById('rEditQ');
+            if (q) { q.checked = true; }
+            window.pOpen('mDangerEdit');
+            return;
+        }
+        draft = QUESTIONS.map(clone);
+        openIdx = -1; pendingDel = -1; pendingItemDel = null; pendingType = null;
+        activeLang = primary();
+        var exception = document.body.getAttribute('data-survey-live') === '1';
+        document.getElementById('qGate').hidden = !exception;
+        document.getElementById('qReasonWrap').hidden = !exception;
+        var r = document.getElementById('qReason');
+        if (r) { r.value = approvedReason || ''; }
+        document.getElementById('qErr').hidden = true;
+        var save = document.getElementById('qSave');
+        save.textContent = exception ? '例外対応として保存する' : '保存する';
+        save.style.background = exception ? '#c23934' : '#3467d6';
+        var note = document.getElementById('qAnswerNote');
+        if (note) {
+            note.innerHTML = answerCount > 0
+                ? 'このアンケートは既に <strong>' + answerCount.toLocaleString('en-US') + ' 件</strong>の回答を受け付けています。'
+                : '';
+        }
+        document.getElementById('qCloseAsk').hidden = true;
+        document.getElementById('qCancel').hidden = false;
+        paintLangBar();
+        paintEditor();
+        window.pOpen('mQuestions');
+    };
+
+    // ---- 未保存のまま閉じない ----
+    function isDirty() { return diffOf(QUESTIONS.map(clone), draft).length > 0; }
+    window.pQClose = function () {
+        if (!isDirty()) { window.pClose('mQuestions'); return; }
+        document.getElementById('qCloseAsk').hidden = false;
+        document.getElementById('qCancel').hidden = true;
+    };
+    window.pQCloseDo = function (discard) {
+        document.getElementById('qCloseAsk').hidden = true;
+        document.getElementById('qCancel').hidden = false;
+        if (discard) { window.pClose('mQuestions'); }
+    };
+    // Esc とオーバーレイクリックは proto-ui.js が閉じるので、未保存のときだけ先に止める
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') { return; }
+        var m = document.getElementById('mQuestions');
+        if (!m || m.hidden || !isDirty()) { return; }
+        e.stopPropagation();
+        window.pQClose();
+    }, true);
+    document.addEventListener('click', function (e) {
+        var m = document.getElementById('mQuestions');
+        if (!m || m.hidden || e.target !== m || !isDirty()) { return; }
+        e.stopPropagation();
+        window.pQClose();
+    }, true);
+
+    // ---- 回答画面でのプレビュー ----
+    // 利用者側と同じ受け渡し(localStorage の surveyPreviewData + survey-answer.html?preview=1)。
+    // 請求書と違い ID に依存しないため、管理画面の下書きをそのまま渡せる
+    window.pQPreview = function () {
+        var qs = draft.map(function (q, i) {
+            var c = q.config || {};
+            var base = { id: q.qid || ('q' + i), type: q.type, text: cloneTv(q.text),
+                         required: !!q.required, meta: {} };
+            if (CHOICE_TYPES[q.type]) {
+                base.options = q.options.map(function (o, oi) { return { text: cloneTv(o), value: 'opt_' + oi }; });
+            }
+            if (MATRIX_TYPES[q.type]) {
+                base.rows = q.rows.map(function (r, ri) { return { id: 'row_' + ri, text: cloneTv(r) }; });
+                base.columns = q.cols.map(function (o, ci) { return { id: 'col_' + ci, value: 'col_' + ci, text: cloneTv(o) }; });
+            }
+            if (q.type === 'free_answer') {
+                base.meta.validation = { text: { multiline: c.multiline !== false,
+                    minLength: c.minLength || 0, maxLength: c.maxLength || 0 } };
+            }
+            if (q.type === 'number_answer') {
+                if (c.min !== '') { base.min = c.min; }
+                if (c.max !== '') { base.max = c.max; }
+                base.step = c.step !== '' ? c.step : 1;
+            }
+            if (q.type === 'date_time') {
+                var sd = c.showDate !== false, st = c.showTime !== false;
+                base.meta.dateTimeConfig = { inputMode: sd && st ? 'datetime' : (st ? 'time' : 'date') };
+            }
+            if (q.type === 'handwriting') { base.meta.handwritingConfig = { canvasHeight: c.height || 200 }; }
+            if (q.type === 'rating_scale') {
+                var lg = {}; lg[primary()] = c.minLabel || '';
+                var lg2 = {}; lg2[primary()] = c.maxLabel || '';
+                var lg3 = {}; lg3[primary()] = c.midLabel || '';
+                base.meta.ratingScaleConfig = { points: c.points || 5, minLabel: lg, maxLabel: lg2,
+                    showMidLabel: !!c.showMidLabel, midLabel: lg3 };
+            }
+            return base;
+        });
+        var title = {};
+        surveyLangs.forEach(function (l) {
+            title[l] = (document.querySelector('[data-slot="title"]') || {}).value || '';
+        });
+        try {
+            localStorage.setItem('surveyPreviewData', JSON.stringify({
+                displayTitle: title, description: {}, periodStart: '', periodEnd: '',
+                editorLanguage: primary(), activeLanguages: surveyLangs.slice(),
+                questions: qs,
+                settings: { requireContactInfo: true, bizcardEnabled: true, allowContinuousAnswer: true }
+            }));
+        } catch (err) {
+            window.pToast('プレビュー用のデータを保存できませんでした', 'error');
+            return;
+        }
+        window.open('../02_dashboard/survey-answer.html?preview=1', '_blank', 'noopener');
+        window.pToast('回答画面のプレビューを新規タブで開きました');
+    };
+
+    window.pQSave = function () {
+        var exception = document.body.getAttribute('data-survey-live') === '1';
+        var reason = (document.getElementById('qReason') || {}).value || '';
+        var err = document.getElementById('qErr');
+        var L = primary();
+        function stop(msg, idx, lang) {
+            err.textContent = msg;
+            err.hidden = false;
+            if (lang) { activeLang = lang; }
+            if (idx >= 0) { openIdx = idx; paintLangBar(); paintEditor(); }
+            return false;
+        }
+        if (exception && !reason.trim()) {
+            document.getElementById('qReason').focus();
+            return stop('実行理由を入力してください', -1);
+        }
+        var iEmpty = draft.findIndex(function (q) { return !tv(q.text, L).trim(); });
+        if (iEmpty >= 0) {
+            return stop('設問文が空の設問があります(' + (iEmpty + 1) + '問目・' + langName(L) + ')', iEmpty, L);
+        }
+        var iChoice = draft.findIndex(function (q) {
+            return (CHOICE_TYPES[q.type] && q.options.filter(function (o) { return tv(o, L).trim(); }).length < 2)
+                || (MATRIX_TYPES[q.type] && (!q.rows.length || !q.cols.length));
+        });
+        if (iChoice >= 0) {
+            return stop('選択肢が足りない設問があります(' + (iChoice + 1) + '問目・選択式は2件以上、マトリックスは行と列が各1件以上)', iChoice, L);
+        }
+        // 空のまま残した選択肢は回答画面でラベルなしの選択肢になる。設問文と同じく第一言語では空を許さない
+        var blankAt = -1, blankKind = '';
+        draft.some(function (q, i) {
+            var kinds = CHOICE_TYPES[q.type] ? ['options'] : MATRIX_TYPES[q.type] ? ['rows', 'cols'] : [];
+            return kinds.some(function (k) {
+                if (!(q[k] || []).some(function (o) { return !tv(o, L).trim(); })) { return false; }
+                blankAt = i;
+                blankKind = { options: '選択肢', rows: '行', cols: '列' }[k];
+                return true;
+            });
+        });
+        if (blankAt >= 0) {
+            return stop(blankKind + 'が空のままの設問があります(' + (blankAt + 1) + '問目・' + langName(L)
+                + ')。使わない' + blankKind + 'は削除してください', blankAt, L);
+        }
+        var iDate = draft.findIndex(function (q) {
+            return q.type === 'date_time' && !q.config.showDate && !q.config.showTime;
+        });
+        if (iDate >= 0) { return stop('日付/時間で入力させる項目が選ばれていません(' + (iDate + 1) + '問目)', iDate); }
+        err.hidden = true;
+        var changed = diffOf(QUESTIONS.map(clone), draft);
+        QUESTIONS = draft.map(clone);
+        draft = QUESTIONS.map(clone);
+        paintList();
+        paintDiff();
+        pQLog(exception, reason.trim(), changed);
+        var miss = QUESTIONS.reduce(function (a, q) {
+            return a + surveyLangs.slice(1).reduce(function (b, l) { return b + missingFor(q, l); }, 0);
+        }, 0);
+        window.pToast('設問構成を保存しました(全' + QUESTIONS.length + '問'
+            + (miss ? '・第一言語以外に未入力 ' + miss + '件' : '') + ')');
+        window.pClose('mQuestions');
+    };
+
+    function pQLog(exception, reason, changes) {
+        if (!window.pSdLog) { return; }
+        window.pSdLog('設問構成を変更(全' + QUESTIONS.length + '問・'
+            + surveyLangs.map(langName).join('/') + ')', reason, exception,
+            changes && changes.length ? changes.map(function (c) { return c.text; }).join(' / ') : '');
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') { return; }
+        var t = e.target;
+        if (!t || !t.closest || !t.closest('#qEdit [role="button"]')) { return; }
+        if (t.closest('button, input, select')) { return; }
+        e.preventDefault();
+        t.closest('[role="button"]').click();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        QUESTIONS = QUESTIONS.map(clone);   // qid を振ってから使う
+        paintLangs();
+        paintList();
+    });
+})();
 </script>
 
 <script>
 // アンケート詳細での操作を画面表示へ反映する(モックのため再読込で戻る)
+
+// 操作ログへ1行足す。設問構成の変更もこれを使う
+window.pSdLog = function (title, reason, exception, detail) {
+    var log = document.getElementById('sdLog');
+    if (!log) { return; }
+    var e = function (t) {
+        return String(t).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    };
+    var n = new Date(), p = function (v) { return String(v).padStart(2, '0'); };
+    var when = n.getFullYear() + '/' + p(n.getMonth() + 1) + '/' + p(n.getDate())
+        + ' ' + p(n.getHours()) + ':' + p(n.getMinutes());
+    var row = document.createElement('div');
+    row.setAttribute('style', 'display:flex;gap:10px');
+    row.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + when + '</span>'
+        + '<span>' + e(title)
+        + (detail ? '<br><span style="color:#5b6577;font-size:11.5px">' + e(detail) + '</span>' : '')
+        + (exception ? '<span style="color:#c23934;font-weight:700;margin-left:6px">例外対応</span>' : '')
+        + '<br><span style="color:#8a93a5">実行者: admin@abroad-o.com'
+        + (reason ? '・理由: ' + e(reason) : '') + '</span></span>';
+    log.insertBefore(row, log.firstChild);
+};
+
+// 基本情報の編集可否(14_admin_survey_detail.md §2.1)
+//   会期前     … 通常編集。保存操作で確定する
+//   会期中     … 例外対応。「公開後のアンケート変更」を通るまで編集させない
+//   会期終了後 … 変更できない(確認のみ)
+var basicState = 'normal';
+var basicReason = '';
+function paintBasic() {
+    var q = function (n) { return document.querySelector('[data-slot="' + n + '"]'); };
+    var fields = q('basicFields'), gate = q('basicGate'), text = q('basicGateText');
+    var btn = q('basicGateBtn'), save = q('saveBasic');
+    if (!fields || !gate) { return; }
+    var locked = (basicState === 'locked' || basicState === 'closed');
+    fields.inert = locked;
+    fields.style.pointerEvents = locked ? 'none' : '';
+    fields.style.opacity = locked ? '0.55' : '';
+    gate.hidden = (basicState === 'normal');
+    if (btn) { btn.hidden = (basicState !== 'locked'); }
+    if (save) {
+        save.hidden = (basicState === 'closed');
+        save.disabled = locked;
+        save.style.background = locked ? '#eceef3' : (basicState === 'unlocked' ? '#c23934' : '#3467d6');
+        save.style.color = locked ? '#8a93a5' : '#fff';
+        save.style.cursor = locked ? 'default' : 'pointer';
+        save.textContent = basicState === 'unlocked' ? '例外対応として保存' : '変更を保存';
+    }
+    var head = q('basicHeadNote');
+    if (head) {
+        head.textContent = basicState === 'closed' ? '会期終了後のため確認のみ'
+            : basicState === 'normal' ? '管理者による編集(代行)が可能'
+                : '会期中のため例外対応として扱う';
+    }
+    if (text) {
+        text.textContent = basicState === 'locked'
+            ? '会期中の基本情報の変更は例外対応です。実行理由の入力と監査ログへの記録を伴います。'
+            : basicState === 'unlocked'
+                ? '公開後のアンケート変更として編集しています。理由: ' + basicReason
+                : '会期終了後は基本情報を変更できません(確認のみ)。';
+    }
+}
+window.pSdBasicInit = function (live, closed) {
+    basicState = closed ? 'closed' : (live ? 'locked' : 'normal');
+    basicReason = '';
+    paintBasic();
+};
+window.pSdUnlockBasic = function (reason) {
+    basicReason = reason || '';
+    basicState = 'unlocked';
+    paintBasic();
+    var t = document.querySelector('[data-slot="title"]');
+    if (t) { t.focus(); }
+};
 window.pSdSave = function () {
+    window.pSdLog('基本情報を変更', basicReason, basicState === 'unlocked',
+        'タイトル・会期・対応言語');
     window.pToast('変更を保存しました');
     window.pClose('mConfirmSaveSurvey');
+    if (basicState === 'unlocked') {
+        // 1回の例外対応で1回の保存。続けて直すならもう一度確認を通す
+        basicState = 'locked';
+        basicReason = '';
+        paintBasic();
+    }
 };
 window.pSdForceStop = function () {
     document.querySelectorAll('[data-slot="status"]').forEach(function (e) {
@@ -316,6 +1374,98 @@ window.pSdDeleteAnswer = function () {
     var id = (document.getElementById('mDangerDeleteAnswer').querySelector('input') || {}).value || '';
     window.pToast('回答' + (id ? ' ' + id : '') + ' を削除しました');
     window.pClose('mDangerDeleteAnswer');
+};
+// 例外対応「公開後のアンケート変更」。設問構成を選んだ場合は編集画面へ理由ごと引き継ぐ
+// (会期中の設問変更のゲートを1本にするため。14_admin_survey_detail.md §4.3 / §4.6)
+window.pSdStartEdit = function () {
+    var reason = (document.getElementById('rEdit') || {}).value || '';
+    var pick = function (id) { return !!(document.getElementById(id) || {}).checked; };
+    var wantBasic = pick('rEditBasic'), wantQ = pick('rEditQ'), wantMail = pick('rEditMail');
+    if (!wantBasic && !wantQ && !wantMail) {
+        window.pToast('変更する範囲を選んでください', 'error');
+        return;
+    }
+    window.pClose('mDangerEdit');
+    var opened = [];
+    // 基本情報はこの画面で編集させるため、モーダルは開かずロックを外すだけ
+    if (wantBasic) { window.pSdUnlockBasic(reason); opened.push('基本情報'); }
+    if (wantQ) { opened.push('設問構成'); }
+    if (wantMail) { window.pSdThanksUnlock(reason); opened.push('お礼メール設定'); }
+    window.pToast('公開後の変更を開始しました(' + opened.join('・') + ')');
+    // モーダルは同時に1つしか開けない。設問構成を先に開き、お礼メールは
+    // 回答状況の「お礼メール内容を編集(例外対応)」から入り直せる
+    if (wantQ && window.pQOpen) { window.pQOpen(reason); return; }
+    if (wantMail) { window.pSdThanks(); }
+};
+
+// 例外対応の確認を、基本情報だけ選んだ状態で開く
+window.pSdAskBasic = function () {
+    ['rEditBasic', 'rEditQ', 'rEditMail'].forEach(function (id, i) {
+        var e = document.getElementById(id);
+        if (e) { e.checked = (i === 0); }
+    });
+    window.pOpen('mDangerEdit');
+};
+
+// お礼メールは通常は閲覧だけ(§4.5)。例外対応を通したときだけ編集できる(§4.6)。
+// 解除は画面の状態として持ち、回答状況のボタンから何度でも入り直せるようにする
+var thanksReason = '';
+var thanksUnlocked = false;
+function paintThanks() {
+    var b = document.querySelector('[data-slot="thanksBtn"]');
+    if (!b) { return; }
+    b.textContent = thanksUnlocked ? 'お礼メール内容を編集(例外対応)' : 'お礼メール内容の確認';
+    b.style.color = thanksUnlocked ? '#c23934' : '#374151';
+    b.style.borderColor = thanksUnlocked ? '#e3b6b3' : '#c8cdd8';
+    b.title = thanksUnlocked
+        ? '公開後のアンケート変更として編集できます。理由: ' + thanksReason
+        : '変更は例外対応「公開後のアンケート変更」から開始します';
+}
+window.pSdThanksUnlock = function (reason) {
+    thanksReason = reason || '';
+    thanksUnlocked = true;
+    paintThanks();
+};
+window.pSdThanks = function () {
+    var box = document.getElementById('mThanksMail');
+    var subject = document.getElementById('tmSubject');
+    var body = document.getElementById('tmBody');
+    if (!subject.value) {
+        // 表示中の内容を編集欄へ写す(モックのため保存しても表示側は変えない)。
+        // モーダルが閉じている間は innerText が改行を返さないため <br> を自分で置き換える
+        var blocks = box.querySelectorAll('[data-slot="tmValue"]');
+        subject.value = blocks[0] ? blocks[0].textContent.trim() : '';
+        if (blocks[1]) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = blocks[1].innerHTML.replace(/<br\s*\/?>/gi, String.fromCharCode(10));
+            body.value = tmp.textContent.replace(/[ \t]+$/gm, '').trim();
+        }
+    }
+    var head = box.querySelector('[data-slot="tmTitle"]');
+    if (head) { head.textContent = thanksUnlocked ? 'お礼メールの内容編集' : 'お礼メールの内容確認'; }
+    box.querySelector('[data-slot="tmReason"]').textContent = '理由: ' + thanksReason;
+    box.querySelector('[data-slot="tmView"]').hidden = thanksUnlocked;
+    box.querySelector('[data-slot="tmEdit"]').hidden = !thanksUnlocked;
+    box.querySelector('[data-slot="tmSave"]').hidden = !thanksUnlocked;
+    window.pOpen('mThanksMail');
+};
+window.pSdThanksSave = function () {
+    window.pSdLog('お礼メールの内容を変更', thanksReason, true);
+    window.pToast('お礼メールの内容を保存しました');
+    window.pClose('mThanksMail');
+    // 1回の例外対応で1回の保存。続けて直すならもう一度確認を通す
+    thanksUnlocked = false;
+    thanksReason = '';
+    paintThanks();
+};
+
+// 会期状態で実行できない操作は要素ごと出さない(§7.2・§4.6)。
+// 公開後のアンケート変更と強制停止は会期中だけ。回答の削除と手動アップロードは会期に依らない
+window.pSdExceptionInit = function (live) {
+    ['exPublish', 'exStop'].forEach(function (n) {
+        var e = document.querySelector('[data-slot="' + n + '"]');
+        if (e) { e.hidden = !live; }
+    });
 };
 window.pSdUpload = function () {
     window.pToast('完了データの取込を実行しました');
@@ -338,8 +1488,10 @@ window.pSdUpload = function () {
     if (!d || !base) { return; }
     document.documentElement.setAttribute('data-current-id', id);
 
-    // 既定ダミーの語をこの対象の語へ置き換える
-    var swap = [[DEF, id]].concat(["title", "uid", "company", "plan"].map(function (k) { return [base[k], d[k]]; }));
+    // 既定ダミーの語をこの対象の語へ置き換える。
+    // プラン名・状態名のような短い一般語は対象にしない(本文の説明文や選択肢まで巻き込むため)。
+    // それらは data-slot / select の選択で入れる
+    var swap = [[DEF, id]].concat(["title", "uid", "company"].map(function (k) { return [base[k], d[k]]; }));
     function replaceIn(node) {
         for (var i = 0; i < node.childNodes.length; i++) {
             var c = node.childNodes[i];
@@ -355,8 +1507,107 @@ window.pSdUpload = function () {
         swap.forEach(function (p) { if (p[0] && p[0] !== p[1] && el.value === p[0]) { el.value = p[1]; } });
     });
     
-    var b = document.querySelector('[data-slot="status"]');
-    if (b) { b.textContent = d.status; b.className = 'status-badge ' + (BADGE[d.status] || 'status-inactive'); }
+    // ステータスバッジは画面上に複数ある(見出しと作業ステータス行)。すべて対象へ合わせる
+    document.querySelectorAll('[data-slot="status"]').forEach(function (b) {
+        b.textContent = d.status;
+        b.className = 'status-badge ' + (BADGE[d.status] || 'status-inactive');
+    });
+    // 申込プラン(納期区分)は名刺データ化設定に1箇所だけ置く(§4.4)。
+    // 文字列置換の対象にはしない — 「通常」「特急」は説明文にも出る短い一般語のため
+    document.querySelectorAll('[data-slot="plan"]').forEach(function (e) { e.textContent = d.plan; });
+
+    // 名刺データ化設定(§4.4)と回答状況(§4.5)の値。いずれもモックのダミー。
+    // 入力・照合の内訳件数と直近の回答日時は元データを持たないため、会期状態から粗い表現で出す
+    function slot(name, text) {
+        var e = document.querySelector('[data-slot="' + name + '"]');
+        if (e) { e.textContent = text; }
+    }
+    var PROGRESS = { '会期前': '未着手', '会期中': '未着手', 'データ化中': '作業中', 'データ化完了': '完了' };
+    var m = /^(\d\d)\/(\d\d) (\d\d:\d\d)〜(\d\d)\/(\d\d) (\d\d:\d\d)$/.exec(d.period || '');
+    // 会期の入力欄も対象へ合わせる。ここが既定のままだと直近の回答日時と食い違う
+    if (m) {
+        var ps = document.querySelector('[data-slot="periodStart"]');
+        var pe = document.querySelector('[data-slot="periodEnd"]');
+        if (ps) { ps.value = '2026-' + m[1] + '-' + m[2] + 'T' + m[3]; }
+        if (pe) { pe.value = '2026-' + m[4] + '-' + m[5] + 'T' + m[6]; }
+    }
+    // 一覧の answers は「3,842」のような件数と「納品済 08/03」のような納品注記が混在する。
+    // 件数でないときは納品注記として作業ステータスの横へ出し、回答数にはデータ化件数を使う
+    var isCount = /^[0-9,]+$/.test(d.answers);
+    slot('answers', isCount ? d.answers : (d.dataCount && d.dataCount !== '—' ? d.dataCount : '—'));
+    slot('delivery', isCount ? '' : d.answers);
+    slot('bizTotal', d.dataCount);
+    slot('bizProgress', (PROGRESS[d.status] || '不明') + '（内訳は照合画面で確認）');
+    var last = '—';
+    if (m && d.status !== '会期前') {
+        last = d.status === '会期中' ? '2026/' + m[1] + '/' + m[2] + ' ' + m[3]
+                                     : '2026/' + m[4] + '/' + m[5] + ' ' + m[6];
+    }
+    slot('lastAnswer', last);
+
+    // 設問構成の変更導線は会期状態で扱いが変わる(14_admin_survey_detail.md §2.1)
+    var live = (d.status === '会期中');
+    var closed = (d.status !== '会期前' && !live);   // データ化中・データ化完了 = 会期終了後
+    document.body.setAttribute('data-survey-live', live ? '1' : '0');
+    document.body.setAttribute('data-survey-closed', closed ? '1' : '0');
+    if (window.pSdBasicInit) { window.pSdBasicInit(live, closed); }
+    if (window.pSdExceptionInit) { window.pSdExceptionInit(live); }
+    var qBtn = document.querySelector('[data-slot="qEditBtn"]');
+    var qNote = document.querySelector('[data-slot="qNote"]');
+    var qCount = document.querySelectorAll('#qList > div').length - 1;
+    if (qBtn) {
+        if (closed) {
+            qBtn.disabled = true;
+            qBtn.textContent = '変更できません';
+            qBtn.style.background = '#eceef3';
+            qBtn.style.color = '#8a93a5';
+            qBtn.style.borderColor = '#eceef3';
+            qBtn.style.cursor = 'default';
+            qBtn.title = '会期終了後は設問構成を変更できません';
+        } else if (live) {
+            qBtn.textContent = '設問を編集(例外対応)';
+            qBtn.style.color = '#c23934';
+            qBtn.style.borderColor = '#e3b6b3';
+            qBtn.title = '会期中の変更は例外対応です。実行理由の入力が必要です';
+        }
+    }
+    if (qNote) {
+        qNote.textContent = '全' + qCount + '問・'
+            + (closed ? '会期終了後のため変更できません'
+                      : live ? '会期中のため変更は例外対応として扱います'
+                             : '会期前は通常編集として変更できます');
+    }
+    var qTarget = document.querySelector('#mQuestions [data-slot="qTarget"]');
+    if (qTarget) { qTarget.textContent = id + ' ' + d.title; }
+
+    // アンケートの対応言語(モック)。先頭が第一言語
+    var SURVEY_LANGS = {
+        'SV-10262': ['ja', 'en'],
+        'SV-10259': ['ja', 'en', 'zh-CN'],
+        'SV-10257': ['ja'],
+        'SV-10250': ['ja', 'vi'],
+        'SV-10244': ['ja', 'en']
+    };
+    if (window.pLangInit) { window.pLangInit(SURVEY_LANGS[id] || ['ja']); }
+
+    // 既存回答への影響を出すため回答数を渡す(要件書 §4.6)。
+    // answers は会期中なら件数、データ化中以降は納品予定日の文言が入るため dataCount を見る
+    if (window.pQAnswers) {
+        var num = function (v) {
+            var m = String(v || '').match(/^[\d,]+$/);
+            return m ? parseInt(m[0].replace(/,/g, ''), 10) : 0;
+        };
+        var n = num(d.answers) || num(d.dataCount);
+        window.pQAnswers(n);
+        var de = document.querySelector('[data-slot="deAnswers"]');
+        if (de) {
+            de.textContent = n > 0
+                ? 'このアンケートは既に ' + n.toLocaleString('en-US') + ' 件の回答を受け付けています。'
+                    + '既存の回答との対応関係は未確定です(14_admin_survey_detail.md §11 #2)。'
+                : 'このアンケートはまだ回答を受け付けていません。';
+        }
+    }
+
     var GO = { 'user': 'user-detail.html?id=' + d.uid,
                'billing': 'billing-management.html?uid=' + d.uid };
     document.querySelectorAll('[data-go]').forEach(function (el) {

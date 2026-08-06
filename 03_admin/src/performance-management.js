@@ -1,3 +1,7 @@
+// 【未参照】この実装は現行画面から読み込まれていない(2026-08-06 時点)。
+// 現行は 03_admin/performance-management.html の inline script。
+// docs/画面設計/仕様/18_screen_inventory_current.md ほかが棚卸し対象として参照しているため残置する。
+
 import { debounce } from '../../02_dashboard/src/utils.js';
 
 // Google-like color palette for avatars

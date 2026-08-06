@@ -1,6 +1,232 @@
 /* admin-style.css */
 /* 管理画面リファクタリング版デザイン(design_handoff_admin_ui/prototype.dc.html 準拠) */
 
+/* ============================================================
+   ベースリセット + ユーティリティ
+   Tailwind CDN(cdn.tailwindcss.com) の置き換え。到達16画面が実際に使う分だけを持つ。
+   CDN はブラウザ内で CSS を生成するため初回描画にちらつきが出るうえ、
+   外部通信が閉じた環境ではレイアウトが崩れるため、静的CSSへ移した。
+   到達不能な escalations.html / reconciliation/list.html は骨格が別世代のため CDN のまま。
+   このファイルは同2枚も読み込むが、以下は Tailwind と同義の定義なので競合しない。
+   ============================================================ */
+
+/* preflight のうち、このアプリが実際に依存している分 */
+*,
+::before,
+::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+}
+
+html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    line-height: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+b, strong { font-weight: bolder; }
+small { font-size: 80%; }
+
+ol, ul, menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+}
+
+fieldset, legend { margin: 0; padding: 0; }
+
+button, input, optgroup, select, textarea {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+button, [type='button'], [type='reset'], [type='submit'] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+}
+
+button, [role="button"] {
+    cursor: pointer;
+}
+
+button {
+    background-color: transparent;
+    border: 0;
+}
+
+:disabled { cursor: default; }
+
+textarea { resize: vertical; }
+
+img, svg, video, canvas, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* インラインの display 指定より hidden 属性を優先する(display:flex 付きの要素が隠れない事故を防ぐ) */
+[hidden] { display: none !important; }
+
+/* フォーム部品(@tailwindcss/forms のベース相当)。
+   枠線・余白は各要素の inline style が持つため、ここでは
+   ネイティブ装飾の打ち消しと、選択矢印・チェック印だけを受け持つ */
+[type='text'], [type='email'], [type='url'], [type='password'], [type='number'],
+[type='date'], [type='datetime-local'], [type='month'], [type='search'],
+[type='tel'], [type='time'], [type='week'], [multiple],
+input:not([type]), textarea, select {
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid #6b7280;
+    border-radius: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+/* 日付・時刻入力の内部フィールド。既定の上下パディングを消さないと高さが2px増える */
+::-webkit-date-and-time-value {
+    min-height: 1.5em;
+    text-align: inherit;
+}
+
+::-webkit-datetime-edit {
+    display: inline-flex;
+}
+
+/* 1つでも解釈できないセレクタが混ざるとルール全体が捨てられるため、個別に書く */
+::-webkit-datetime-edit { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-year-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-month-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-day-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-hour-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-minute-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-second-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-millisecond-field { padding-top: 0; padding-bottom: 0; }
+::-webkit-datetime-edit-meridiem-field { padding-top: 0; padding-bottom: 0; }
+
+[type='file'] {
+    background: unset;
+    border-color: inherit;
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+    font-size: unset;
+    line-height: inherit;
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+::placeholder {
+    opacity: 1;
+    color: #9ca3af;
+}
+
+[type='checkbox'], [type='radio'] {
+    appearance: none;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    color: #2563eb;
+    background-color: #fff;
+    background-origin: border-box;
+    border: 1px solid #6b7280;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+[type='checkbox'] { border-radius: 0; }
+[type='radio'] { border-radius: 100%; }
+
+[type='checkbox']:checked,
+[type='radio']:checked {
+    border-color: transparent;
+    background-color: currentColor;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+[type='radio']:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+}
+
+[type='checkbox']:focus,
+[type='radio']:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+}
+
+/* ユーティリティ(マークアップで使われているものだけ) */
+.flex { display: flex; }
+.flex-1 { flex: 1 1 0%; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-3 { gap: 0.75rem; }
+.min-w-0 { min-width: 0; }
+.min-h-screen { min-height: 100vh; }
+.relative { position: relative; }
+.fixed { position: fixed; }
+.top-0 { top: 0; }
+.left-0 { left: 0; }
+.right-0 { right: 0; }
+.inset-y-0 { top: 0; bottom: 0; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+.p-2 { padding: 0.5rem; }
+.px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+.rounded { border-radius: 0.25rem; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+
+@media (min-width: 1024px) {
+    .lg\:hidden { display: none; }
+}
+
 /* デザイントークン上書き(service-top-style.css の CSS変数を管理画面用に差し替え) */
 :root {
     --color-primary: #3467D6;
@@ -26,7 +252,14 @@ body {
     color: #1F2733;
 }
 
-a { color: #3467D6; }
+/* リンク色: Tailwind CDN では preflight の a{color:inherit} が後勝ちしていたため、
+   従来 a{color:#3467D6} は効いていなかった。見た目を変えないよう inherit を維持する。
+   :hover は詳細度が高く従来から効いていたのでそのまま残す */
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
 a:hover { color: #2B57B8; }
 
 button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible {

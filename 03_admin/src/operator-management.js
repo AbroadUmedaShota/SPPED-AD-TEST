@@ -1,3 +1,7 @@
+// 【未参照】この実装は現行画面から読み込まれていない(2026-08-06 時点)。
+// 現行は 03_admin/operator-management.html の inline script。
+// docs/画面設計/仕様/18_screen_inventory_current.md ほかが棚卸し対象として参照しているため残置する。
+
 /**
  * operator-management.js
  * Operator management page specific javascript

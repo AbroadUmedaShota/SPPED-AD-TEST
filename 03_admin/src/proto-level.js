@@ -19,6 +19,12 @@
         return LEVELS[v] ? v : 'lv4';
     }
 
+    // 現在の表示シナリオを数値(1〜4)で返す。未設定・未定義値は 4(MasterAdmin)。
+    // 各画面が localStorage を直読みすると、ここのフォールバック規則と食い違うため窓口を1本にする
+    window.pLevel = function () {
+        return LEVELS[currentKey()].n;
+    };
+
     function applyVisibility(lv) {
         document.querySelectorAll('[data-min-lv], [data-max-lv]').forEach(function (el) {
             var min = parseInt(el.getAttribute('data-min-lv') || '1', 10);
@@ -84,11 +90,11 @@
     document.addEventListener('DOMContentLoaded', function () {
         var key = currentKey();
         applyPage(key);
-        var tries = 0;
-        var timer = setInterval(function () {
-            tries++;
-            wireChrome(key);
-            if (tries > 30) { clearInterval(timer); }
-        }, 100);
+        wireChrome(key);  // 既に揃っている場合(注入が先に終わっていた場合)の保険
+    });
+
+    // ヘッダー・サイドバーは admin.js が非同期に注入する。完了通知を受けてから配線する
+    document.addEventListener('admin:chrome-ready', function () {
+        wireChrome(currentKey());
     });
 })();

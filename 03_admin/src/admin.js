@@ -1,5 +1,3 @@
-import { initThemeToggle } from '../../02_dashboard/src/lib/themeToggle.js';
-
 let adminBasePath = '';
 
 function resolveAdminBasePath() {
@@ -70,6 +68,13 @@ function adjustRelativePaths(container) {
  * @param {function|null} callback An optional callback function to execute after the HTML is loaded.
  */
 async function loadCommonHtml(placeholderId, filePath, callback = null) {
+    // 注入先を持たない画面では取得もしない。現行画面はフッターを表示しないため、
+    // 先に確認しないと common/footer.html を毎ページ取得しては捨てることになる
+    const placeholder = document.getElementById(placeholderId);
+    if (!placeholder) {
+        return;
+    }
+
     try {
         const basePath = resolveAdminBasePath();
         const response = await fetch(`${basePath}${filePath}`);
@@ -77,13 +82,10 @@ async function loadCommonHtml(placeholderId, filePath, callback = null) {
             throw new Error(`Failed to load ${filePath}: ${response.statusText}`);
         }
         const html = await response.text();
-        const placeholder = document.getElementById(placeholderId);
-        if (placeholder) {
-            placeholder.innerHTML = html;
-            adjustRelativePaths(placeholder);
-            if (callback && typeof callback === 'function') {
-                callback();
-            }
+        placeholder.innerHTML = html;
+        adjustRelativePaths(placeholder);
+        if (callback && typeof callback === 'function') {
+            callback();
         }
     } catch (error) {
         console.error(`Error loading common HTML from ${filePath}:`, error);
@@ -202,8 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initAdminSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
-    // Initialize theme toggle after common elements are loaded
-    initThemeToggle();
+    // 共通パーツが揃ったことを知らせる。proto-level.js はこれを待ってヘッダー・サイドバーへ配線する
+    document.dispatchEvent(new CustomEvent('admin:chrome-ready'));
 
     // Page-specific initialization
     const page = window.location.pathname.split('/').pop();

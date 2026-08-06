@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPEED AD 管理画面 アーキテクチャマップ</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --ink:#1b2432; --ink-2:#5b6577; --ink-3:#8a93a5;
+  --line:#e2e6ed; --line-2:#cfd006; --accent:#2f62d4; --accent-soft:#eaf0fd;
+  --warn:#8a6414; --warn-bg:#fdf6ec; --danger:#c23934;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
+  --l-infra:#64748b; --l-runtime:#2f62d4; --l-chrome:#0e8a86; --l-style:#7c56c4;
+  --l-screen:#1f4fb8; --l-external:#a2660c; --l-legacy:#a4485c;
+  --canvasbg:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f141c; --panel:#161d27; --ink:#e8ecf4; --ink-2:#a8b2c4; --ink-3:#78829a;
+    --line:#27303e; --accent:#7aa2ef; --accent-soft:#1b2740;
+    --warn:#e2c07a; --warn-bg:#2a2416; --danger:#e2857f;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    --l-infra:#94a3b8; --l-runtime:#7aa2ef; --l-chrome:#4fc4bf; --l-style:#b195e8;
+    --l-screen:#8fb0f5; --l-external:#e0ac54; --l-legacy:#e08a9c;
+    --canvasbg:#131922;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+button,input,select{font-family:inherit; font-size:inherit; color:inherit}
+
+/* ---------- レイアウト ---------- */
+.app{display:flex; flex-direction:column; height:100vh; min-height:0}
+.topbar{
+  flex:none; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:10px 18px; background:var(--panel); border-bottom:1px solid var(--line);
+}
+.brand{display:flex; align-items:baseline; gap:10px; margin-right:auto; min-width:0}
+.brand h1{margin:0; font-size:15.5px; font-weight:700; letter-spacing:.01em; white-space:nowrap}
+.brand .sub{font-size:11.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.searchwrap{position:relative; display:flex; align-items:center}
+.searchwrap input{
+  width:230px; padding:7px 30px 7px 11px; border:1px solid var(--line); border-radius:7px;
+  background:var(--bg); outline:none;
+}
+.searchwrap input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.searchwrap .hint{position:absolute; right:9px; font-size:10.5px; color:var(--ink-3); pointer-events:none}
+.searchcount{font-size:11.5px; color:var(--ink-2); min-width:66px}
+.tbtn{
+  background:var(--panel); border:1px solid var(--line); border-radius:7px;
+  padding:6px 12px; font-size:12.5px; cursor:pointer; white-space:nowrap;
+}
+.tbtn:hover{border-color:var(--accent); color:var(--accent)}
+
+.filters{
+  flex:none; display:flex; align-items:center; gap:8px 16px; flex-wrap:wrap;
+  padding:8px 18px; background:var(--panel); border-bottom:1px solid var(--line);
+}
+.fgroup{display:flex; align-items:center; gap:7px; flex-wrap:wrap}
+.flabel{font-size:11px; font-weight:700; color:var(--ink-3); letter-spacing:.04em; white-space:nowrap}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer; -webkit-user-select:none; user-select:none;
+  border:1px solid var(--line); border-radius:999px; padding:3px 11px 3px 8px;
+  font-size:11.5px; background:var(--panel); color:var(--ink-2); white-space:nowrap;
+}
+.chip .dot{width:9px; height:9px; border-radius:50%; background:currentColor; flex:none}
+.chip.on{color:var(--ink); border-color:currentColor; background:var(--accent-soft)}
+.chip.off{opacity:.45}
+.chip input{display:none}
+
+.main{flex:1; display:grid; grid-template-columns:minmax(0,1fr) 384px; min-height:0}
+.stage{position:relative; min-width:0; background:var(--canvasbg); overflow:hidden}
+svg#graph{width:100%; height:100%; display:block; cursor:grab; touch-action:none}
+svg#graph.dragging{cursor:grabbing}
+
+.zoomctl{
+  position:absolute; left:14px; bottom:14px; display:flex; gap:6px;
+  background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:5px;
+  box-shadow:var(--shadow);
+}
+.zoomctl button{
+  width:30px; height:28px; border:none; background:transparent; border-radius:6px;
+  cursor:pointer; font-size:14px; line-height:1; color:var(--ink-2);
+}
+.zoomctl button.wide{width:auto; padding:0 10px; font-size:11.5px}
+.zoomctl button:hover{background:var(--accent-soft); color:var(--accent)}
+
+.stagenote{
+  position:absolute; right:14px; bottom:14px; font-size:11px; color:var(--ink-3);
+  background:var(--panel); border:1px solid var(--line); border-radius:7px; padding:5px 10px;
+  box-shadow:var(--shadow); pointer-events:none; max-width:320px;
+}
+
+/* ---------- ノード ---------- */
+.node{cursor:pointer}
+.node rect.box{fill:var(--panel); stroke-width:1.4}
+.node .nm{font-size:12.4px; font-weight:700; fill:var(--ink)}
+.node .sb{font-size:10.5px; fill:var(--ink-3)}
+.node .badge{font-size:9.5px; font-weight:700}
+.node:hover rect.box{filter:drop-shadow(0 3px 10px rgba(20,40,90,.18))}
+.node.sel rect.box{stroke-width:2.6}
+.node.dim{opacity:.16}
+.node.hidden{display:none}
+.node.match rect.box{stroke-dasharray:none}
+.node.pulse rect.box{animation:pulse 1s ease-out 2}
+@keyframes pulse{0%{stroke-width:1.4}30%{stroke-width:4}100%{stroke-width:1.4}}
+.node.unreach rect.box{stroke-dasharray:5 3}
+
+.cluster rect{fill:none; stroke:var(--line); stroke-width:1.2; stroke-dasharray:4 4}
+.cluster text{font-size:11px; font-weight:700; fill:var(--ink-3); letter-spacing:.06em}
+
+.edge{fill:none; stroke-width:1.5; opacity:.62}
+.edge.dim{opacity:.05}
+.edge.hi{stroke-width:3.2; opacity:1}
+.edge.hidden{display:none}
+.edgelabel{font-size:10px; fill:var(--ink-2); paint-order:stroke; stroke:var(--canvasbg); stroke-width:3px}
+
+/* ---------- ツールチップ ---------- */
+#tip{
+  position:fixed; z-index:60; max-width:390px; pointer-events:none; opacity:0;
+  transition:opacity .1s; background:var(--panel); border:1px solid var(--line);
+  border-radius:10px; box-shadow:var(--shadow); padding:12px 14px;
+}
+#tip.on{opacity:1}
+#tip .tt-h{display:flex; align-items:center; gap:8px; margin-bottom:6px}
+#tip .tt-n{font-size:13.5px; font-weight:700}
+#tip .tt-t{font-size:10px; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap}
+#tip .tt-d{font-size:11.8px; color:var(--ink-2); margin-bottom:8px}
+#tip dl{margin:0; display:grid; grid-template-columns:64px 1fr; gap:3px 10px; font-size:11.3px}
+#tip dt{color:var(--ink-3); font-weight:700}
+#tip dd{margin:0; color:var(--ink-2); min-width:0}
+#tip ul{margin:0; padding-left:14px}
+#tip .tt-f{margin-top:8px; font-size:10.5px; color:var(--ink-3); border-top:1px solid var(--line); padding-top:6px}
+
+/* ---------- 右パネル ---------- */
+.panel{
+  border-left:1px solid var(--line); background:var(--panel);
+  display:flex; flex-direction:column; min-height:0; min-width:0;
+}
+.ptabs{flex:none; display:flex; border-bottom:1px solid var(--line)}
+.ptab{
+  flex:1; padding:11px 8px; border:none; background:transparent; cursor:pointer;
+  font-size:12.5px; font-weight:700; color:var(--ink-3); border-bottom:2px solid transparent;
+}
+.ptab.on{color:var(--accent); border-bottom-color:var(--accent)}
+.pbody{flex:1; overflow-y:auto; padding:14px 16px 40px; min-height:0}
+.pbody::-webkit-scrollbar{width:9px}
+.pbody::-webkit-scrollbar-thumb{background:var(--line); border-radius:9px}
+
+.pintro{font-size:11.8px; color:var(--ink-2); margin:0 0 12px; line-height:1.75}
+.fcat{font-size:10.5px; font-weight:700; color:var(--ink-3); letter-spacing:.08em; margin:14px 0 6px}
+.fcat:first-of-type{margin-top:0}
+.flow{
+  border:1px solid var(--line); border-radius:9px; margin-bottom:7px; overflow:hidden;
+  background:var(--panel);
+}
+.flow.on{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.fhead{
+  width:100%; text-align:left; border:none; background:transparent; cursor:pointer;
+  padding:9px 12px; display:flex; align-items:flex-start; gap:9px;
+}
+.fhead:hover{background:var(--accent-soft)}
+.fnum{
+  flex:none; width:20px; height:20px; border-radius:6px; background:var(--accent-soft);
+  color:var(--accent); font-size:10.5px; font-weight:700; display:flex;
+  align-items:center; justify-content:center; margin-top:1px;
+}
+.flow.on .fnum{background:var(--accent); color:#fff}
+.fname{font-size:12.6px; font-weight:700; line-height:1.45}
+.fdesc{font-size:11px; color:var(--ink-3); margin-top:2px; line-height:1.6}
+.fsteps{display:none; padding:2px 12px 12px; border-top:1px dashed var(--line)}
+.flow.on .fsteps{display:block}
+.fmeta{font-size:11px; color:var(--ink-2); margin:9px 0 10px; padding:7px 10px;
+  background:var(--warn-bg); border:1px solid var(--line); border-radius:7px; color:var(--warn)}
+.step{
+  display:grid; grid-template-columns:20px 1fr; gap:9px; padding:7px 0;
+  border-bottom:1px dashed var(--line); cursor:pointer;
+}
+.step:last-child{border-bottom:none}
+.step:hover .stx{color:var(--accent)}
+.sn{font-size:10.5px; font-weight:700; color:var(--ink-3); text-align:right; padding-top:1px}
+.stn{font-size:11.5px; font-weight:700}
+.stx{font-size:11.3px; color:var(--ink-2); line-height:1.65}
+.sev{font-size:10px; color:var(--ink-3); margin-top:3px; word-break:break-all}
+
+.dsec{margin-bottom:14px}
+.dsec h4{
+  margin:0 0 6px; font-size:10.5px; font-weight:700; color:var(--ink-3); letter-spacing:.08em;
+}
+.dsec ul{margin:0; padding-left:16px; font-size:11.8px; color:var(--ink-2); line-height:1.75}
+.dsec p{margin:0; font-size:12px; color:var(--ink-2); line-height:1.8}
+.dhead{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px}
+.dhead h3{margin:0; font-size:15px; font-weight:700}
+.tag{font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; white-space:nowrap}
+.tag.ok{background:var(--accent-soft); color:var(--accent)}
+.tag.no{background:var(--warn-bg); color:var(--warn)}
+.path{
+  display:block; font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;
+  font-size:11px; color:var(--ink-2); background:var(--bg); border:1px solid var(--line);
+  border-radius:5px; padding:3px 7px; margin-bottom:3px; word-break:break-all;
+}
+.pill{
+  display:inline-block; font-size:10.8px; border:1px solid var(--line); border-radius:999px;
+  padding:2px 9px; margin:0 4px 4px 0; color:var(--ink-2);
+}
+.edgerow{
+  display:flex; align-items:flex-start; gap:8px; padding:6px 0;
+  border-bottom:1px dashed var(--line); font-size:11.4px; cursor:pointer;
+}
+.edgerow:last-child{border-bottom:none}
+.edgerow:hover{color:var(--accent)}
+.edgerow .dir{flex:none; font-size:10px; font-weight:700; color:var(--ink-3); width:26px; text-align:center; padding-top:2px}
+.edgerow .er-n{font-weight:700}
+.edgerow .er-d{color:var(--ink-3); font-size:10.8px; line-height:1.6}
+.empty{font-size:12px; color:var(--ink-3); padding:24px 4px; text-align:center; line-height:1.9}
+.finding{border:1px solid var(--line); border-radius:9px; padding:10px 12px; margin-bottom:8px}
+.finding h5{margin:0 0 4px; font-size:12.4px; font-weight:700; display:flex; gap:7px; align-items:center}
+.sev-b{font-size:9.5px; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap}
+.sev-high{background:#fdecea; color:#b3261e}
+.sev-medium{background:var(--warn-bg); color:var(--warn)}
+.sev-low{background:var(--accent-soft); color:var(--accent)}
+.sev-info{background:var(--bg); color:var(--ink-3)}
+.sev-b.done{background:#e6f4ec; color:#237a52}
+.sev-b.partial{background:#eef2fb; color:#2b57b8}
+@media (prefers-color-scheme: dark){
+  .sev-high{background:#3a1d1c; color:#e2857f}
+  .sev-b.done{background:#17301f; color:#6cc491}
+  .sev-b.partial{background:#1b2740; color:#7aa2ef}
+}
+.finding.closed{border-left:3px solid #2b8a4b}
+.finding p{margin:0 0 5px; font-size:11.4px; color:var(--ink-2); line-height:1.7}
+.finding p.res{color:#237a52; background:#f2f9f5; border-radius:6px; padding:6px 9px}
+@media (prefers-color-scheme: dark){ .finding p.res{color:#6cc491; background:#16241c} }
+.finding .fx{font-size:10.6px; color:var(--ink-3); line-height:1.65}
+.rev{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; padding:10px 12px; margin-bottom:8px}
+.rev b{font-size:11px} .rev ul{margin:4px 0 8px; padding-left:16px; font-size:11.2px; color:var(--ink-2); line-height:1.7}
+.legend{display:grid; grid-template-columns:1fr; gap:5px; font-size:11.3px; color:var(--ink-2)}
+.legend .lr{display:flex; align-items:center; gap:8px}
+.legend .sw{width:26px; height:0; border-top-width:2.5px; border-top-style:solid; flex:none}
+.legend .bx{width:16px; height:12px; border-radius:3px; border-width:1.6px; border-style:solid; flex:none; background:var(--panel)}
+
+@media (max-width:1120px){
+  .main{grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(300px,1fr) minmax(0,42vh)}
+  .panel{border-left:none; border-top:1px solid var(--line)}
+  .searchwrap input{width:170px}
+}
+@media (max-width:620px){
+  .brand .sub{display:none}
+  .topbar,.filters{padding-left:12px; padding-right:12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>SPEED AD 管理画面 アーキテクチャマップ</h1>
+      <span class="sub" id="brandSub"></span>
+    </div>
+    <div class="searchwrap">
+      <input id="q" type="search" placeholder="ノード・ファイル・技術を検索" aria-label="検索">
+      <span class="hint">/</span>
+    </div>
+    <span class="searchcount" id="qcount"></span>
+    <button type="button" class="tbtn" id="btnClear">選択解除</button>
+  </header>
+
+  <div class="filters">
+    <div class="fgroup">
+      <span class="flabel">レイヤー</span>
+      <span id="layerChips"></span>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">関係</span>
+      <span id="kindChips"></span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stage">
+      <svg id="graph" role="img" aria-label="管理画面のコンポーネント依存図"></svg>
+      <div class="zoomctl">
+        <button type="button" id="zIn"  title="拡大" aria-label="拡大">＋</button>
+        <button type="button" id="zOut" title="縮小" aria-label="縮小">−</button>
+        <button type="button" id="zFit" class="wide" title="全体表示" aria-label="全体表示">全体</button>
+      </div>
+      <div class="stagenote" id="stageNote">ドラッグで移動 / ホイールで拡大縮小 / ノード押下で詳細</div>
+    </div>
+
+    <aside class="panel">
+      <div class="ptabs">
+        <button type="button" class="ptab on" data-tab="flows">主要フロー</button>
+        <button type="button" class="ptab" data-tab="detail">ノード詳細</button>
+        <button type="button" class="ptab" data-tab="findings">発見事項</button>
+      </div>
+      <div class="pbody" id="pFlows"></div>
+      <div class="pbody" id="pDetail" hidden></div>
+      <div class="pbody" id="pFindings" hidden></div>
+    </aside>
+  </div>
+</div>
+
+<div id="tip" aria-hidden="true"></div>
+
+<script>
+const DATA = /*__ARCH_DATA__*/;
+
+/* ===================== 配置定義 ===================== */
+const NW = 182, NH = 62;
+const POS = {
+  'static-file-host':[60,40], 'ext-tailwind-cdn':[280,40], 'ext-google-fonts':[500,40],
+  'browser-localstorage':[1500,40],
+  'dashboard-shared-css':[280,140], 'admin-style-css':[500,140],
+  'page-shell':[60,250], 'admin-js':[300,250], 'proto-ui-js':[520,250],
+  'proto-level-js':[740,250], 'theme-toggle-js':[960,250],
+  'common-header':[300,360], 'common-sidebar':[520,360], 'common-footer':[740,360],
+  'scr-dashboard':[60,490],
+  'scr-user-management':[300,490], 'scr-user-detail':[300,580],
+  'scr-survey-management':[500,490], 'scr-survey-detail':[500,580],
+  'scr-billing-management':[740,490], 'scr-invoice-management':[740,580],
+  'scr-coupon-management':[940,490], 'scr-calendar-management':[940,580],
+  'scr-operator-management':[1180,490], 'scr-performance-management':[1180,580],
+  'scr-audit-log':[1180,670],
+  'scr-data-entry-index':[300,710], 'scr-data-entry-form':[300,800],
+  'scr-reconciliation-index':[500,710], 'scr-reconciliation-detail':[500,800],
+  'site-root-index':[60,710], 'user-invoice-detail':[740,710], 'csv-download':[940,710],
+  'redirect-data-entry':[300,920], 'redirect-data-entry-management':[500,920],
+  'orphan-escalations':[700,920], 'orphan-reconciliation-list':[900,920],
+  'legacy-unused-modules':[1100,920], 'legacy-data-json':[1300,920]
+};
+const CLUSTERS = [
+  {x:288,y:458,w:390,h:196,label:'ユーザー・アンケート'},
+  {x:728,y:458,w:390,h:196,label:'請求・マスタ'},
+  {x:1168,y:458,w:206,h:282,label:'オペレーター・監査'},
+  {x:288,y:678,w:390,h:196,label:'名刺オペレーション'},
+  {x:288,y:888,w:1198,h:112,label:'旧実装・到達不能（index.html から到達しない）'}
+];
+const CANVAS = {w:1760, h:1035};
+
+const LAYERS = {
+  infra:  {label:'基盤・外部',   color:'var(--l-infra)'},
+  runtime:{label:'共通ランタイム', color:'var(--l-runtime)'},
+  chrome: {label:'共通レイアウト', color:'var(--l-chrome)'},
+  style:  {label:'スタイル',     color:'var(--l-style)'},
+  screen: {label:'画面',        color:'var(--l-screen)'},
+  external:{label:'外部連携・出力',color:'var(--l-external)'},
+  legacy: {label:'旧実装',      color:'var(--l-legacy)'}
+};
+const KINDS = {
+  navigate: {label:'画面遷移',   color:'#2f62d4', dash:''},
+  inject:   {label:'注入',      color:'#0e8a86', dash:''},
+  load:     {label:'読み込み',   color:'#94a3b8', dash:'5 4'},
+  call:     {label:'API呼び出し', color:'#2b8a4b', dash:'2 3'},
+  mutate:   {label:'DOM操作',    color:'#7c56c4', dash:'6 3'},
+  storage:  {label:'保存領域',   color:'#a2660c', dash:'2 3'},
+  embed:    {label:'埋め込み',   color:'#c07a12', dash:''},
+  output:   {label:'出力',      color:'#2b8a4b', dash:''},
+  redirect: {label:'転送',      color:'#a4485c', dash:'6 3'},
+  structure:{label:'構成（16画面→共通シェル）', color:'#b9c2d0', dash:'1 5', off:true}
+};
+const TYPE_JA = {
+  infrastructure:'インフラ', 'external-dependency':'外部依存', storage:'ストレージ',
+  pattern:'共通パターン', 'runtime-module':'ランタイム', 'layout-partial':'レイアウト',
+  stylesheet:'スタイル', screen:'画面', 'external-screen':'外部画面',
+  'output-artifact':'出力', 'dead-code':'未参照コード', 'dead-data':'未参照データ',
+  redirect:'リダイレクト', 'orphan-screen':'到達不能画面'
+};
+
+/* ===================== 状態 ===================== */
+const N = {}, E = [];
+DATA.nodes.forEach(n=>{ N[n.id]=n; });
+const state = {
+  layers:new Set(Object.keys(LAYERS)),
+  kinds:new Set(Object.keys(KINDS).filter(k=>!KINDS[k].off)),
+  flow:null, node:null, query:'',
+  t:{x:0,y:0,k:1}
+};
+
+/* ===================== SVG 構築 ===================== */
+const SVGNS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('graph');
+function el(t,a){const e=document.createElementNS(SVGNS,t);for(const k in (a||{}))e.setAttribute(k,a[k]);return e;}
+
+const defs=el('defs');
+Object.keys(KINDS).forEach(k=>{
+  ['','-hi'].forEach(suf=>{
+    const m=el('marker',{id:'ar-'+k+suf,viewBox:'0 0 10 10',refX:'9',refY:'5',
+      markerWidth:suf?'7':'6',markerHeight:suf?'7':'6',orient:'auto-start-reverse'});
+    m.appendChild(el('path',{d:'M0,0 L10,5 L0,10 z',fill:suf?'var(--accent)':KINDS[k].color}));
+    defs.appendChild(m);
+  });
+});
+svg.appendChild(defs);
+const vp=el('g',{id:'vp'});
+svg.appendChild(vp);
+const gCluster=el('g'), gEdge=el('g'), gNode=el('g');
+vp.appendChild(gCluster); vp.appendChild(gEdge); vp.appendChild(gNode);
+
+CLUSTERS.forEach(c=>{
+  const g=el('g',{class:'cluster'});
+  g.appendChild(el('rect',{x:c.x,y:c.y,width:c.w,height:c.h,rx:12}));
+  const t=el('text',{x:c.x+12,y:c.y+17}); t.textContent=c.label; g.appendChild(t);
+  gCluster.appendChild(g);
+});
+
+/* --- 文字幅を見積もって折り返す（全角1em / 半角0.55em） --- */
+function widthEm(s){let w=0;for(const ch of s){w += /[\x00-\x7F]/.test(ch)?0.55:1;}return w;}
+function wrap(s,budget,maxLines){
+  const out=[]; let cur='',w=0;
+  for(const ch of s){
+    const cw=/[\x00-\x7F]/.test(ch)?0.55:1;
+    if(w+cw>budget && cur){ out.push(cur); cur=''; w=0; if(out.length===maxLines-1) break; }
+    cur+=ch; w+=cw;
+  }
+  if(out.length<maxLines){
+    const rest=s.slice(out.join('').length);
+    if(widthEm(rest)>budget){
+      let acc='',aw=0;
+      for(const ch of rest){const cw=/[\x00-\x7F]/.test(ch)?0.55:1; if(aw+cw>budget-0.7)break; acc+=ch; aw+=cw;}
+      out.push(acc+'…');
+    } else if(rest) out.push(rest);
+  }
+  return out.length?out:[s];
+}
+
+const nodeEls={};
+DATA.nodes.forEach(n=>{
+  const p=POS[n.id]; if(!p) return;
+  const [x,y]=p; const cx=x+NW/2, cy=y+NH/2;
+  n._x=cx; n._y=cy; n._w=NW; n._h=NH;
+  const color=LAYERS[n.layer].color;
+  const g=el('g',{class:'node'+(n.reachable===false?' unreach':''),'data-id':n.id,tabindex:'0',role:'button'});
+  g.appendChild(el('rect',{class:'box',x:x,y:y,width:NW,height:NH,rx:9,stroke:color}));
+  const lines=wrap(n.name,12.6,2);
+  const sub=(TYPE_JA[n.type]||n.type)+(n.minLevel?(' · Lv'+n.minLevel+'以上'):'');
+  const nameY = lines.length>1 ? cy-11 : cy-3;
+  lines.forEach((ln,i)=>{
+    const t=el('text',{class:'nm',x:cx,y:nameY+i*15,'text-anchor':'middle','dominant-baseline':'middle'});
+    t.textContent=ln; g.appendChild(t);
+  });
+  const st=el('text',{class:'sb',x:cx,y:cy+(lines.length>1?20:16),'text-anchor':'middle','dominant-baseline':'middle',fill:color});
+  st.textContent=sub; g.appendChild(st);
+  gNode.appendChild(g);
+  nodeEls[n.id]=g;
+});
+
+/* --- エッジ --- */
+const pairSeen={};
+DATA.edges.forEach(e=>{
+  const a=N[e.source], b=N[e.target];
+  if(!a||!b||a._x===undefined||b._x===undefined) return;
+  const key=[e.source,e.target].sort().join('|');
+  const idx=(pairSeen[key]=(pairSeen[key]||0)+1)-1;
+  const canon=(e.source<e.target)?1:-1;
+  e._off=(14+idx*22)*canon;
+  const kind=KINDS[e.kind]?e.kind:'load';
+  const path=el('path',{class:'edge','data-id':e.id,d:edgePath(a,b,e._off),
+    stroke:KINDS[kind].color,'marker-end':'url(#ar-'+kind+')'});
+  if(KINDS[kind].dash) path.setAttribute('stroke-dasharray',KINDS[kind].dash);
+  gEdge.appendChild(path);
+  E.push({def:e,elp:path,kind:kind});
+});
+
+function clipTo(n,tx,ty){
+  const dx=tx-n._x, dy=ty-n._y;
+  if(!dx&&!dy) return {x:n._x,y:n._y};
+  const hw=n._w/2+7, hh=n._h/2+7;
+  const s=Math.min(dx?hw/Math.abs(dx):Infinity, dy?hh/Math.abs(dy):Infinity);
+  return {x:n._x+dx*s, y:n._y+dy*s};
+}
+function edgePath(a,b,off){
+  const mx=(a._x+b._x)/2, my=(a._y+b._y)/2;
+  const dx=b._x-a._x, dy=b._y-a._y, len=Math.hypot(dx,dy)||1;
+  const cx=mx+(-dy/len)*off, cy=my+(dx/len)*off;
+  const p1=clipTo(a,cx,cy), p2=clipTo(b,cx,cy);
+  return `M${p1.x.toFixed(1)},${p1.y.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+}
+
+/* ===================== ズーム / パン ===================== */
+function applyT(){ vp.setAttribute('transform',`translate(${state.t.x},${state.t.y}) scale(${state.t.k})`); }
+function fit(){
+  const r=svg.getBoundingClientRect();
+  const vis=DATA.nodes.filter(n=>POS[n.id]&&state.layers.has(n.layer));
+  if(!vis.length) return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  vis.forEach(n=>{x0=Math.min(x0,n._x-n._w/2);y0=Math.min(y0,n._y-n._h/2);
+                  x1=Math.max(x1,n._x+n._w/2);y1=Math.max(y1,n._y+n._h/2);});
+  const pad=46, w=x1-x0+pad*2, h=y1-y0+pad*2;
+  const k=Math.min(r.width/w, r.height/h, 1.6);
+  state.t.k=k;
+  state.t.x=(r.width-(x1+x0)*k)/2;
+  state.t.y=(r.height-(y1+y0)*k)/2;
+  applyT();
+}
+function zoomAt(f,px,py){
+  const r=svg.getBoundingClientRect();
+  const cx=(px===undefined)?r.width/2:px-r.left, cy=(py===undefined)?r.height/2:py-r.top;
+  const k1=Math.max(.22,Math.min(3.2,state.t.k*f));
+  const s=k1/state.t.k;
+  state.t.x=cx-(cx-state.t.x)*s; state.t.y=cy-(cy-state.t.y)*s; state.t.k=k1;
+  applyT();
+}
+svg.addEventListener('wheel',ev=>{ev.preventDefault();zoomAt(ev.deltaY<0?1.12:1/1.12,ev.clientX,ev.clientY);},{passive:false});
+let drag=null;
+svg.addEventListener('pointerdown',ev=>{
+  if(ev.target.closest('.node')) return;
+  drag={x:ev.clientX,y:ev.clientY,tx:state.t.x,ty:state.t.y};
+  svg.classList.add('dragging'); svg.setPointerCapture(ev.pointerId);
+});
+svg.addEventListener('pointermove',ev=>{
+  if(!drag) return;
+  state.t.x=drag.tx+(ev.clientX-drag.x); state.t.y=drag.ty+(ev.clientY-drag.y); applyT();
+});
+['pointerup','pointercancel'].forEach(t=>svg.addEventListener(t,()=>{drag=null;svg.classList.remove('dragging');}));
+document.getElementById('zIn').onclick=()=>zoomAt(1.25);
+document.getElementById('zOut').onclick=()=>zoomAt(1/1.25);
+document.getElementById('zFit').onclick=fit;
+
+function focusNode(id,pulse){
+  const n=N[id]; if(!n||n._x===undefined) return;
+  const r=svg.getBoundingClientRect();
+  const k=Math.max(state.t.k,.85);
+  state.t.k=k; state.t.x=r.width/2-n._x*k; state.t.y=r.height/2-n._y*k;
+  applyT();
+  if(pulse&&nodeEls[id]){
+    nodeEls[id].classList.add('pulse');
+    setTimeout(()=>nodeEls[id]&&nodeEls[id].classList.remove('pulse'),2100);
+  }
+}
+
+/* ===================== フィルタ・強調 ===================== */
+function flowSets(f){
+  const ns=new Set(), es=new Set();
+  (f.steps||[]).forEach(s=>{ if(s.node) ns.add(s.node); if(s.edge) es.add(s.edge); });
+  DATA.edges.forEach(e=>{ if(es.has(e.id)){ ns.add(e.source); ns.add(e.target); } });
+  return {ns,es};
+}
+function neighborSets(id){
+  const ns=new Set([id]), es=new Set();
+  DATA.edges.forEach(e=>{
+    if(e.source===id||e.target===id){ es.add(e.id); ns.add(e.source); ns.add(e.target); }
+  });
+  return {ns,es};
+}
+function matches(n,q){
+  if(!q) return true;
+  const hay=[n.name,n.id,n.description,(n.filePaths||[]).join(' '),(n.technologies||[]).join(' '),
+             (n.responsibilities||[]).join(' '),TYPE_JA[n.type]||''].join(' ').toLowerCase();
+  return hay.includes(q);
+}
+function render(){
+  const q=state.query.trim().toLowerCase();
+  let hi=null;
+  if(state.flow) hi=flowSets(state.flow);
+  else if(state.node) hi=neighborSets(state.node);
+
+  let hit=0;
+  DATA.nodes.forEach(n=>{
+    const g=nodeEls[n.id]; if(!g) return;
+    const vis=state.layers.has(n.layer);
+    g.classList.toggle('hidden',!vis);
+    if(!vis) return;
+    const m=matches(n,q); if(q&&m) hit++;
+    const inHi=hi?hi.ns.has(n.id):true;
+    g.classList.toggle('dim', (!!q&&!m) || (!!hi&&!inHi));
+    g.classList.toggle('sel', state.node===n.id);
+  });
+  document.getElementById('qcount').textContent = q ? (hit+' 件一致') : '';
+
+  E.forEach(({def,elp,kind})=>{
+    const vis = state.kinds.has(kind) && state.layers.has(N[def.source].layer) && state.layers.has(N[def.target].layer);
+    elp.classList.toggle('hidden',!vis);
+    if(!vis) return;
+    const on = hi ? hi.es.has(def.id) : false;
+    const near = hi ? (hi.ns.has(def.source)&&hi.ns.has(def.target)) : true;
+    elp.classList.toggle('hi',on);
+    elp.classList.toggle('dim', hi ? !(on||near) : false);
+    elp.setAttribute('marker-end','url(#ar-'+kind+(on?'-hi':'')+')');
+  });
+}
+
+/* ===================== チップUI ===================== */
+const layerChips=document.getElementById('layerChips');
+Object.entries(LAYERS).forEach(([k,v])=>{
+  const l=document.createElement('label');
+  l.className='chip on'; l.style.color=v.color;
+  l.innerHTML=`<span class="dot"></span><span>${v.label}</span>`;
+  l.onclick=()=>{
+    if(state.layers.has(k)) state.layers.delete(k); else state.layers.add(k);
+    l.classList.toggle('on',state.layers.has(k)); l.classList.toggle('off',!state.layers.has(k));
+    render();
+  };
+  layerChips.appendChild(l);
+});
+const kindChips=document.getElementById('kindChips');
+Object.entries(KINDS).forEach(([k,v])=>{
+  const on=state.kinds.has(k);
+  const l=document.createElement('label');
+  l.className='chip '+(on?'on':'off'); l.style.color=v.color;
+  l.innerHTML=`<span class="dot"></span><span>${v.label}</span>`;
+  l.onclick=()=>{
+    if(state.kinds.has(k)) state.kinds.delete(k); else state.kinds.add(k);
+    l.classList.toggle('on',state.kinds.has(k)); l.classList.toggle('off',!state.kinds.has(k));
+    render();
+  };
+  kindChips.appendChild(l);
+});
+
+/* ===================== ツールチップ ===================== */
+const tip=document.getElementById('tip');
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function li(arr,max){
+  if(!arr||!arr.length) return '<span style="color:var(--ink-3)">—</span>';
+  const a=arr.slice(0,max).map(v=>'<li>'+esc(v)+'</li>').join('');
+  return '<ul>'+a+(arr.length>max?'<li style="color:var(--ink-3)">ほか'+(arr.length-max)+'件</li>':'')+'</ul>';
+}
+function showTip(n,ev){
+  const c=LAYERS[n.layer].color;
+  tip.innerHTML=
+    `<div class="tt-h"><span class="tt-n">${esc(n.name)}</span>
+      <span class="tt-t" style="color:${c};border:1px solid ${c}">${esc(TYPE_JA[n.type]||n.type)}</span></div>
+     <div class="tt-d">${esc(n.description).slice(0,150)}${n.description.length>150?'…':''}</div>
+     <dl>
+       <dt>責務</dt><dd>${li(n.responsibilities,3)}</dd>
+       <dt>使用技術</dt><dd>${esc((n.technologies||[]).join(' / '))||'—'}</dd>
+       <dt>入力</dt><dd>${li(n.inputs,2)}</dd>
+       <dt>出力</dt><dd>${li(n.outputs,2)}</dd>
+     </dl>
+     <div class="tt-f">${esc((n.filePaths&&n.filePaths[0])||'（ファイル実体なし）')}${(n.filePaths||[]).length>1?' ほか'+(n.filePaths.length-1)+'ファイル':''} ・ 押下で全文</div>`;
+  tip.classList.add('on');
+  moveTip(ev);
+}
+function moveTip(ev){
+  const r=tip.getBoundingClientRect();
+  let x=ev.clientX+16, y=ev.clientY+16;
+  if(x+r.width>innerWidth-8) x=ev.clientX-r.width-16;
+  if(y+r.height>innerHeight-8) y=Math.max(8,ev.clientY-r.height-16);
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+gNode.addEventListener('mouseover',ev=>{const g=ev.target.closest('.node'); if(g&&!g.classList.contains('dim')) showTip(N[g.dataset.id],ev);});
+gNode.addEventListener('mousemove',ev=>{if(tip.classList.contains('on'))moveTip(ev);});
+gNode.addEventListener('mouseout',ev=>{if(!ev.relatedTarget||!ev.relatedTarget.closest('.node'))tip.classList.remove('on');});
+
+/* ===================== パネル ===================== */
+const pFlows=document.getElementById('pFlows'), pDetail=document.getElementById('pDetail'), pFindings=document.getElementById('pFindings');
+function tab(name){
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  pFlows.hidden=name!=='flows'; pDetail.hidden=name!=='detail'; pFindings.hidden=name!=='findings';
+}
+document.querySelectorAll('.ptab').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+
+/* --- フロー一覧 --- */
+function buildFlows(){
+  const cats={};
+  DATA.flows.forEach(f=>{ (cats[f.category||'その他']=cats[f.category||'その他']||[]).push(f); });
+  let html='<p class="pintro">'+esc(DATA.metadata.scope.definition)+
+    '<br>フローを選ぶと、経路上のノードと関係だけが図に残ります。手順を押すとその要素へ移動します。</p>';
+  let no=0;
+  Object.entries(cats).forEach(([cat,fs])=>{
+    html+='<div class="fcat">'+esc(cat)+'</div>';
+    fs.forEach(f=>{
+      no++;
+      html+=`<div class="flow" data-flow="${f.id}">
+        <button type="button" class="fhead"><span class="fnum">${no}</span>
+          <span><span class="fname">${esc(f.name)}</span><span class="fdesc">${esc(f.description)}</span></span></button>
+        <div class="fsteps">
+          <div class="fmeta">起点: ${esc(f.trigger||'unknown')}</div>
+          ${(f.steps||[]).map(s=>`<div class="step" data-node="${esc(s.node||'')}">
+              <span class="sn">${s.order}</span>
+              <span><span class="stn">${esc(N[s.node]?N[s.node].name:(s.node||'unknown'))}</span>
+              <span class="stx"> — ${esc(s.action)}</span>
+              <span class="sev">${esc(s.evidence||'')}</span></span></div>`).join('')}
+        </div></div>`;
+    });
+  });
+  pFlows.innerHTML=html;
+  pFlows.querySelectorAll('.flow').forEach(box=>{
+    box.querySelector('.fhead').onclick=()=>{
+      const id=box.dataset.flow;
+      if(state.flow&&state.flow.id===id){ state.flow=null; box.classList.remove('on'); }
+      else{
+        state.flow=DATA.flows.find(f=>f.id===id); state.node=null;
+        pFlows.querySelectorAll('.flow').forEach(b=>b.classList.remove('on'));
+        box.classList.add('on');
+        box.scrollIntoView({block:'nearest',behavior:'smooth'});
+      }
+      render();
+    };
+    box.querySelectorAll('.step').forEach(st=>{
+      st.onclick=()=>{ const id=st.dataset.node; if(id&&N[id]) focusNode(id,true); };
+    });
+  });
+}
+
+/* --- ノード詳細 --- */
+function showDetail(id){
+  const n=N[id]; if(!n) return;
+  const c=LAYERS[n.layer].color;
+  const outs=DATA.edges.filter(e=>e.source===id), ins=DATA.edges.filter(e=>e.target===id);
+  const sec=(t,b)=>`<div class="dsec"><h4>${t}</h4>${b}</div>`;
+  const rows=(arr,dir)=>arr.length?arr.map(e=>{
+    const other=N[dir==='out'?e.target:e.source];
+    return `<div class="edgerow" data-node="${esc(other?other.id:'')}">
+      <span class="dir">${dir==='out'?'→':'←'}</span>
+      <span><span class="er-n">${esc(other?other.name:'?')}</span>
+      <span class="er-d"><br>${esc(e.relationship)} · ${esc(e.protocol)}<br>${esc(e.description)}</span></span></div>`;
+  }).join(''):'<p style="color:var(--ink-3);font-size:11.5px">なし</p>';
+
+  pDetail.innerHTML=
+    `<div class="dhead"><h3>${esc(n.name)}</h3>
+      <span class="tag" style="color:${c};background:transparent;border:1px solid ${c}">${esc(TYPE_JA[n.type]||n.type)}</span>
+      <span class="tag ${n.reachable===false?'no':'ok'}">${n.reachable===false?'到達不能':'到達可能'}</span>
+      ${n.minLevel?`<span class="tag ok">Lv${n.minLevel}以上</span>`:''}
+      <span class="tag ${n.confidence==='verified'?'ok':'no'}">${esc(n.confidence)}</span></div>
+    ${n.url?`<p style="font-size:11.5px;color:var(--ink-3);margin:0 0 10px">${esc(n.url)}</p>`:'<div style="height:6px"></div>'}
+    ${sec('役割',`<p>${esc(n.description)}</p>`)}
+    ${sec('責務',li(n.responsibilities,20))}
+    ${sec('使用技術',(n.technologies||[]).map(t=>`<span class="pill">${esc(t)}</span>`).join('')||'—')}
+    ${sec('入力',li(n.inputs,20))}
+    ${sec('出力',li(n.outputs,20))}
+    ${sec('ファイル',(n.filePaths||[]).length?(n.filePaths||[]).map(p=>`<code class="path">${esc(p)}</code>`).join(''):'<p style="color:var(--ink-3)">ファイル実体なし</p>')}
+    ${n.dataSource?sec('データの持ち方',`<p>${esc(n.dataSource)}</p>`):''}
+    ${n.specDoc?sec('対応する要件書',`<code class="path">${esc(n.specDoc)}</code>`):''}
+    ${n.risk?sec('留意点',`<p>${esc(n.risk)}</p>`):''}
+    ${n.impact?sec('影響',`<p>${esc(n.impact)}</p>`):''}
+    ${(n.unknowns||[]).length?sec('unknown（コードから判断できない）',li(n.unknowns,10)):''}
+    ${sec('この要素から出る依存 ('+outs.length+')',rows(outs,'out'))}
+    ${sec('この要素へ入る依存 ('+ins.length+')',rows(ins,'in'))}
+    ${sec('根拠',`<p style="font-size:11px;color:var(--ink-3)">${esc(n.evidence||'unknown')}</p>`)}`;
+  pDetail.querySelectorAll('.edgerow').forEach(r=>{
+    r.onclick=()=>{const t=r.dataset.node; if(t&&N[t]){selectNode(t);focusNode(t,true);} };
+  });
+  pDetail.scrollTop=0;
+}
+function selectNode(id){
+  state.node=id; state.flow=null;
+  pFlows.querySelectorAll('.flow').forEach(b=>b.classList.remove('on'));
+  showDetail(id); tab('detail'); render();
+}
+gNode.addEventListener('click',ev=>{const g=ev.target.closest('.node'); if(g) selectNode(g.dataset.id);});
+gNode.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'||ev.key===' '){const g=ev.target.closest('.node'); if(g){ev.preventDefault();selectNode(g.dataset.id);}}
+});
+
+/* --- 発見事項 + 凡例 --- */
+function buildFindings(){
+  const m=DATA.metadata;
+  let html=`<div class="dsec"><h4>概要</h4>
+    <p>${esc(m.applicationType)}。バックエンド: ${esc(m.backend)}。ビルド: ${esc(m.buildSystem)}。<br>
+    エントリ <code class="path" style="display:inline-block;margin:4px 0 0">${esc(m.entryPoint)}</code></p></div>
+    <div class="dsec"><h4>規模</h4><p>
+      到達画面 ${m.statistics.reachableScreens} / 共通ランタイム ${m.statistics.sharedRuntimeModules} 本 /
+      ノード ${m.statistics.nodes} / 関係 ${m.statistics.edges} / フロー ${m.statistics.flows}<br>
+      到達不能JS ${m.statistics.unreachableJsLines.toLocaleString()} 行
+    </p></div>
+    <div class="dsec"><h4>凡例（ノードの枠色 = レイヤー）</h4><div class="legend">`;
+  Object.values(LAYERS).forEach(v=>{ html+=`<div class="lr"><span class="bx" style="border-color:${v.color}"></span>${esc(v.label)}</div>`; });
+  html+=`<div class="lr"><span class="bx" style="border-color:var(--l-legacy);border-style:dashed"></span>破線枠 = index.html から到達しない</div></div></div>
+    <div class="dsec"><h4>凡例（線の色 = 関係）</h4><div class="legend">`;
+  Object.values(KINDS).forEach(v=>{
+    html+=`<div class="lr"><span class="sw" style="border-top-color:${v.color};${v.dash?'border-top-style:dashed':''}"></span>${esc(v.label)}</div>`;
+  });
+  html+='</div></div>';
+  (DATA.metadata.revisions||[]).forEach(r=>{
+    html+=`<div class="dsec"><h4>改訂 ${esc(r.date)}</h4><div class="rev">
+      <p style="margin:0 0 6px;font-size:11.4px;color:var(--ink-2)">${esc(r.summary)}</p>
+      ${(r.corrections||[]).length?'<b>訂正</b><ul>'+r.corrections.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ul>':''}
+      ${(r.codeChanges||[]).length?'<b>反映したコード変更</b><ul>'+r.codeChanges.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ul>':''}
+    </div></div>`;
+  });
+  html+='<div class="dsec"><h4>発見事項</h4>';
+  (DATA.findings||[]).forEach(f=>{
+    const st=f.status||'';
+    const badge = st.startsWith('resolved') ? '<span class="sev-b done">対応済み</span>'
+                : st.startsWith('mitigated') ? '<span class="sev-b partial">手当て済み</span>' : '';
+    html+=`<div class="finding${st?' closed':''}">
+      <h5><span class="sev-b sev-${esc(f.severity)}">${esc(f.severity)}</span>${badge}${esc(f.title)}</h5>
+      <p>${esc(f.detail)}</p>
+      ${f.resolution?`<p class="res"><b>対応</b>: ${esc(f.resolution)}</p>`:''}
+      <div class="fx"><b>影響</b>: ${esc(f.impact)}<br><b>${f.resolution?'補足':'対応案'}</b>: ${esc(f.recommendation)}<br><b>根拠</b>: ${esc(f.evidence)}</div>
+    </div>`;
+  });
+  html+='</div>';
+  pFindings.innerHTML=html;
+}
+
+/* ===================== 初期化 ===================== */
+document.getElementById('brandSub').textContent =
+  DATA.metadata.entryUrl+' から到達する範囲 ・ '+DATA.metadata.generatedAt+' 時点';
+buildFlows(); buildFindings();
+pDetail.innerHTML='<div class="empty">図のノードを押すと、役割・責務・使用技術・入出力・依存関係を表示します。</div>';
+
+const qi=document.getElementById('q');
+qi.addEventListener('input',()=>{state.query=qi.value;render();});
+document.getElementById('btnClear').onclick=()=>{
+  state.flow=null; state.node=null; state.query=''; qi.value='';
+  pFlows.querySelectorAll('.flow').forEach(b=>b.classList.remove('on'));
+  render();
+};
+addEventListener('keydown',ev=>{
+  if(ev.key==='/'&&document.activeElement!==qi){ev.preventDefault();qi.focus();}
+  if(ev.key==='Escape'){document.getElementById('btnClear').click();qi.blur();}
+});
+addEventListener('resize',()=>{ if(!state.node&&!state.flow) fit(); });
+
+render();
+requestAnimationFrame(fit);
+</script>
+</body>
+</html>

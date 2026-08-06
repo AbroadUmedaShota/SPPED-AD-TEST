@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedAd - オペレーター管理</title>
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -239,7 +238,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var sel = document.querySelector('[data-invite-lv]');
         if (!sel) { return; }
-        var me = parseInt(String(localStorage.getItem('adminMockLevel') || 'lv4').replace(/\D/g, ''), 10) || 4;
+        var me = window.pLevel();
         var L = { 1: 'Lv1(Operator)', 2: 'Lv2(OperatorAdmin)', 3: 'Lv3(Admin)', 4: 'Lv4(MasterAdmin)' };
         var html = '';
         for (var n = 1; n <= Math.min(me - 1, 4); n++) { html += '<option>' + L[n] + '</option>'; }
@@ -360,10 +359,9 @@ window.pOpSetPw = function () {
         if (m) { fillFields(m, OPS[DEF]); }
     });
 
-    // 表示シナリオ(ログイン中の権限)を取る
+    // 表示シナリオ(ログイン中の権限)を取る。判定は proto-level.js に寄せる
     function myLv() {
-        var v = localStorage.getItem('adminMockLevel') || 'lv4';
-        return parseInt(String(v).replace(/\D/g, ''), 10) || 4;
+        return window.pLevel();
     }
 
     var LV_LABEL = { 1: 'Lv1(Operator)', 2: 'Lv2(OperatorAdmin)', 3: 'Lv3(Admin)', 4: 'Lv4(MasterAdmin)' };

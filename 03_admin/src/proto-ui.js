@@ -472,6 +472,53 @@
         window.pToast(name + ' を保存しました');
     };
 
+    // 一覧の表示中の行からCSVを作る。列見出しは一覧のヘッダーをそのまま使う。
+    // 操作ログ・オペレーター実績確認の共用
+    window.pListCsv = function (listId, name) {
+        var list = document.getElementById(listId);
+        if (!list) { return; }
+        var head = list.firstElementChild;
+        var cols = [];
+        Array.prototype.forEach.call(head.children, function (c) {
+            cols.push(c.textContent.replace(/[▼▲]/g, '').trim());
+        });
+        var rows = [cols];
+        Array.prototype.forEach.call(list.querySelectorAll('[data-pg]:not([data-out])'), function (r) {
+            var line = [];
+            Array.prototype.forEach.call(r.children, function (c) {
+                line.push(c.textContent.replace(/\s+/g, ' ').trim());
+            });
+            rows.push(line);
+        });
+        // 操作列は出力しない
+        var last = cols.length - 1;
+        if (/^操作$/.test(cols[last])) {
+            rows = rows.map(function (r) { return r.slice(0, last); });
+        }
+        window.pCsv(name, rows);
+    };
+
+    // 回答データDLモーダル(#mDl)の選択で実際にファイルを保存する。
+    // 名刺画像は実ファイルを作れないため受付のみ知らせる。
+    // アンケート管理・アンケート詳細・照合結果一覧の共用
+    window.pDlPick = function (kind) {
+        var sid = (document.querySelector('#mDl [data-slot="dlSid"]') || {}).textContent
+            || (document.getElementById('mDl').innerText.match(/SV-\d+/) || ['export'])[0];
+        if (kind === 'zip') {
+            window.pToast(sid + ' の名刺画像(ZIP)の取得を受け付けました');
+            window.pClose('mDl');
+            return;
+        }
+        var head = ['回答ID', '氏名', '会社名', '部署名', '役職名', 'メールアドレス', '電話番号', '受信日時'];
+        var rows = [head];
+        var n = (kind === 'all') ? 8 : 5;
+        for (var i = 1; i <= n; i++) {
+            rows.push(['#' + (8800 + i), '—', '—', '—', '—', '—', '—', '—']);
+        }
+        window.pCsv(sid + (kind === 'all' ? '_all' : '_final') + '.csv', rows);
+        window.pClose('mDl');
+    };
+
     // 一覧の行を書き換える。cells は 0 起点の位置 → HTML
     window.pRowSet = function (row, cells, attrs) {
         if (!row) { return; }

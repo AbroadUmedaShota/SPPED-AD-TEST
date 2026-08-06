@@ -489,7 +489,47 @@
         page-break-after: auto;
       }
     }
+
+    /* 埋め込み表示(?embed=1)
+       管理画面の請求書管理が iframe でこの画面を読み込み、請求書のシートだけを見せるために使う。
+       クエリが無いときは何も効かないため、通常の閲覧には影響しない。 */
+    html[data-embed="1"] #header-placeholder,
+    html[data-embed="1"] #sidebar-placeholder,
+    html[data-embed="1"] #footer-placeholder,
+    html[data-embed="1"] #mobileSidebarOverlay,
+    html[data-embed="1"] #breadcrumb-container,
+    html[data-embed="1"] main > div > header {
+      display: none !important;
+    }
+
+    html[data-embed="1"] body {
+      background: #f2f4f8 !important;
+    }
+
+    html[data-embed="1"] main {
+      padding: 0 !important;
+    }
+
+    html[data-embed="1"] .flex.flex-1 {
+      padding-top: 0 !important;
+    }
+
+    html[data-embed="1"] #invoice-sheet-container {
+      margin: 0 auto;
+    }
+
+    html[data-embed="1"] .invoice-sheet {
+      margin: 16px auto !important;
+      box-shadow: 0 2px 10px rgba(12, 18, 30, .12);
+    }
   </style>
+
+  <script>
+    // 埋め込み表示の判定。描画前に属性を立てて、枠がちらつかないようにする
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.documentElement.setAttribute('data-embed', '1');
+    }
+  </script>
 
 </head>
 
