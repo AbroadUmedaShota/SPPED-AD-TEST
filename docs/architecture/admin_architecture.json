@@ -257,6 +257,27 @@
           "補助テキストの #8a93a5 は白背景で 3.09:1 と WCAG AA に届かない。308箇所で使用、IDの表示も含む",
           "差し替え前の名刺画像は git の履歴には残る。公開サイトからは消えるが、履歴からの完全な削除は履歴の書き換えが要るためユーザー判断"
         ]
+      },
+      {
+        "date": "2026-08-06 (11)",
+        "summary": "レビュー30件を findings へ登録し、ループのキューにした。あわせて回帰ゲートを tests/e2e/admin-mock へ用意した",
+        "corrections": [
+          "check_refs.py が行番号の範囲しか見ていなかったため、中身が別物を指す参照を7件通していた（data-filter-keys が4画面で1行ずれ、proto-ui.js の from/to 比較が約100行、user-detail.html の DATA/replaceIn/GO が約270行、invoice の embed 付与が7行）",
+          "検証がセッション限りのスクリプトにあり、次のセッションでは何も残らなかった",
+          "scripts/dev-server.py が単一スレッドで、並列ワーカーからのリクエストが直列化していた"
+        ],
+        "codeChanges": [
+          "tests/e2e/admin-mock/: 6本の spec を追加。npx playwright test --project=local tests/e2e/admin-mock で回る",
+          "consistency.spec.js: レビュー指摘を検査にした。未修正は test.fail() で「落ちるのが正しい」状態にし、直すと赤くなって注釈外しを促す",
+          "check_refs.py: file:line の但し書きに書いた識別子が実際にその行にあるかを照合する",
+          "scripts/dev-server.py: ThreadingHTTPServer へ",
+          "findings に R-01〜R-30 を追加。R-01〜R-04 は是正済み、R-05 以降が残り（open 12件＝判断が要らないもの / deferred-要判断 14件）"
+        ],
+        "verification": [
+          "Playwright: local プロジェクト 147件（既存9件＋admin-mock 138件）",
+          "意図的に請求書管理のページングを壊し、ゲートが赤になることを確認",
+          "check_refs.py / build.py"
+        ]
       }
     ]
   },
@@ -3889,6 +3910,306 @@
       "recommendation": "Tailwind CDN を admin-style.css 内の静的CSS（preflight 相当のリセット＋22ユーティリティ＋@tailwindcss/forms のベース相当）へ置き換え、到達16画面から script 行を削除した（2026-08-06）。Google Fonts は残置。到達不能な escalations.html / reconciliation/list.html は骨格が別世代のため CDN のまま。",
       "status": "resolved-2026-08-06",
       "resolution": "16画面＋モーダル5種の前後スクリーンショットをピクセル比較しながら、body margin・a の下線・フォーム要素の padding/appearance・select の line-height などの差を1つずつ潰した。差分ピクセルは 1,559,973 から 72,372 まで縮小し、ダッシュボードと営業日カレンダーは完全一致。残差は input[type=datetime-local] がシャドウDOM由来で2px高いことによるもので、アンケート詳細のページ高さが2px変わる（上流の ::-webkit-datetime-edit ルールを入れても Chrome では変化しなかった）。"
+    },
+    {
+      "id": "R-01",
+      "severity": "high",
+      "title": "請求書管理のページングが件数表示と合っていなかった",
+      "detail": "16行すべてが data-pg=\"1\" で、表示件数10を選んでいるのに16行出ていた。件数表示だけ「全16件中1〜5件」と別の数を出し、ページャにも2ページ目が無かった。",
+      "evidence": "03_admin/invoice-management.html:54（invoiceList-pager）",
+      "impact": "一覧の件数表示が信用できなくなる。他8画面は正しかったため、この画面だけ挙動が違った",
+      "recommendation": "10件ずつ2ページへ分けた。tests/e2e/admin-mock/lists.spec.js が9画面すべてで行数・件数表示・ページ数の一致を見る",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-02",
+      "severity": "medium",
+      "title": "オペレーター実績確認の「集計最終更新」が2つ並んでいた",
+      "detail": "performance-management.html の32行目と33行目が完全に同一だった。",
+      "evidence": "03_admin/performance-management.html:32（集計最終更新）",
+      "impact": "同じ情報が重複して出るだけでなく、CSV出力ボタンが右端から押し出されていた",
+      "recommendation": "1つにし、残した側へ margin-right:auto を付けた",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-03",
+      "severity": "high",
+      "title": "ユーザー詳細で招待が本登録より後の日時になっていた",
+      "detail": "招待メールの日時を「登録日の 10:02」で固定していたため、登録日時が10:02より前のアカウントで時系列が逆転した。U-1002 は招待 10:02 → 本登録完了 08:57 だった。",
+      "evidence": "03_admin/user-detail.html:296（inviteAt）",
+      "impact": "メール送達状況と操作ログの両方に出るため、運用者が実際の順序を誤解する",
+      "recommendation": "inviteAt() で登録日時の前日を返し、送達状況と操作ログが同じ値を使う",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-04",
+      "severity": "high",
+      "title": "実在の名刺画像が公開状態で置かれていた",
+      "detail": "dummy_card_front/back.png は名前に反して実物の名刺写真で、氏名・メール・電話・住所が写っていた。表と裏が別人で、照合表の値ともどこも一致していなかった。GitHub Pages が公開設定のため誰でも取得できた。",
+      "evidence": "03_admin/reconciliation/detail.html:47（dummy_card_front）",
+      "impact": "社外の個人情報がインターネットから取得できる状態だった。照合作業のデモとしても成立していなかった",
+      "recommendation": "架空の名刺へ差し替え、照合表が期待する値と一致させた。差し替え前の画像は git の履歴に残るため、履歴からの削除は別途判断が要る",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-05",
+      "severity": "high",
+      "title": "納期区分を指す言葉が6通りある",
+      "detail": "ダッシュボード=納期区分 / アンケート管理=申込プラン / アンケート詳細=データ化申込プラン（補足に納期区分）/ ユーザー詳細=データ化の申込 / 請求管理の脚注=プラン / 照合画面=納期。値はどれも 通常・特急・超特急・オンデマンド・お試し で同じ。さらに「プラン」はプレミアム契約の意味でも使われ、ユーザー詳細では1画面に2つの意味の「プラン」が出る。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-05 納期区分: 呼び方を1つに絞る」",
+      "impact": "運用者が別のものだと思って読む。仕様書と画面の対応も取りづらい",
+      "recommendation": "どれを正とするかは事業側の決定。決まれば置換は機械的に行える",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-06",
+      "severity": "medium",
+      "title": "「操作ログ」と「監査ログ」が混在している",
+      "detail": "本文中では監査ログ29回・操作ログ12回。画面名は「操作ログ・監査ログ」で両方を名乗り、サイドバーは「操作ログ」だけ。セクション見出しは「操作ログ」なのに説明文は「監査ログに記録されます」。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-06 操作ログ: 呼び方を1つに絞る」",
+      "impact": "2種類の記録があるのか1つなのかが読み取れない",
+      "recommendation": "同じものなら1語に寄せる。別物なら画面上で区別が付くようにする",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-07",
+      "severity": "medium",
+      "title": "サイドバーの項目名と遷移先の画面名が違う",
+      "detail": "サイドバー「名刺入力画面」→ 画面名「データ入力対象一覧」、「照合画面」→「照合結果一覧」。ダッシュボードのリンクは画面名側を使っているため、1つの画面に名前が2つある。この2項目だけ「〜画面」で終わっているのも他と揃っていない。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-07 サイドバーの項目名と、遷移先の画面名が一致する」",
+      "impact": "サイドバーで選んだ先に別の名前が出る。手順書を書くときにどちらを使うか決まらない",
+      "recommendation": "どちらかに寄せる。サイドバーは他が「〜管理」「〜確認」なので画面名側に合わせる案が素直",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-08",
+      "severity": "low",
+      "title": "言語名の書き方が2系統ある",
+      "detail": "アンケート詳細は 日本語 / English / 中文(简体)、オペレーター管理は 日本語 / 英語 / 中国語簡繁 / 韓国語。同じ言語を別の表記で書いている。",
+      "evidence": "03_admin/operator-management.html / 03_admin/survey-detail.html",
+      "impact": "対応言語で絞り込むときに一致しない",
+      "recommendation": "表示言語（利用者が回答する言語）と対応可能言語（オペレーターが扱える言語）で用途が違うため、揃えるかどうかも含めて判断が要る",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-09",
+      "severity": "low",
+      "title": "会社名の株式会社表記が揃っていない",
+      "detail": "(株) が265回、株式会社が57回。前株13社・後株10社。同じ会社が両方の表記で出ている（アブロード(株) と アブロード株式会社、(株)サンプル商事 と 株式会社サンプル商事）。半角の (株) が「三浦 沙織((株)マーケットビジョン)」のような二重括弧も生んでいる。",
+      "evidence": "03_admin/billing-management.html / 03_admin/invoice-management.html",
+      "impact": "同じ取引先が別会社に見える。検索でも一致しない",
+      "recommendation": "デモデータの整備。実データの持ち方に合わせて決める",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-10",
+      "severity": "low",
+      "title": "「ユーザー」と「利用者」が混ざっている",
+      "detail": "画面名は「ユーザー管理」だがボタンは「＋ 利用者を招待」。ユーザー詳細の中ではユーザー7回・利用者5回。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-10 ユーザーの呼称: 呼び方を1つに絞る」",
+      "impact": "同じ相手を指しているか判断できない",
+      "recommendation": "仕様書側の用語と突き合わせて1語に寄せる",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-11",
+      "severity": "low",
+      "title": "同じ画面で文末が言い切りとです・ますで混ざる",
+      "detail": "アンケート詳細に「会期中のため要注意操作として扱う」と「会期中のため変更は要注意操作として扱います」が並んでいる。",
+      "evidence": "03_admin/survey-detail.html",
+      "impact": "読み手には書き手が複数いるように見える",
+      "recommendation": "補足文は言い切り、案内文はです・ます、のように役割で決める",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-12",
+      "severity": "low",
+      "title": "同じ操作のボタン名が4通りある",
+      "detail": "招待をキャンセル / 招待をキャンセルする / 招待を取り消す / 取り消し。ほかにも 削除↔削除する、停止↔停止する、再送↔再送する、変更を保存↔保存する。",
+      "evidence": "03_admin/user-detail.html / 03_admin/operator-management.html",
+      "impact": "同じ結果になる操作が別物に見える",
+      "recommendation": "「〜する」を付ける条件（確認ダイアログの実行ボタンだけ、など）を決めて揃える",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-13",
+      "severity": "low",
+      "title": "同じ対象を「件」と「名」で数えている",
+      "detail": "オペレーター管理は「全 6 件中 1〜6 件を表示」、オペレーター実績確認は「全 6 名中 1〜6 名を表示」。数えているのは同じ6人。",
+      "evidence": "03_admin/operator-management.html / 03_admin/performance-management.html",
+      "impact": "別の集計に見える",
+      "recommendation": "人は「名」、それ以外は「件」で統一する案が素直",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-14",
+      "severity": "medium",
+      "title": "日付の書式が画面によって違う",
+      "detail": "会期・最終ログイン・操作ログは 07/30 10:00（年なし）、請求管理・作成日時は 2026/07/30（年あり）。オペレーター管理は同じ行に両方出る。営業日カレンダーに 2026-08-08 が2件、ユーザー詳細の請求月だけ 2026年04月。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-14 日付の書式」",
+      "impact": "年をまたぐ会期（12月→1月）が読めない。ISO と和式は他のどことも揃っていない",
+      "recommendation": "年を出すと列幅が変わるため、どこまで出すかは画面設計の判断が要る",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-15",
+      "severity": "low",
+      "title": "日本語の文中で半角の括弧を使っている",
+      "detail": "全角は7箇所だけで、他は半角。(株) の半角と重なって「三浦 沙織((株)マーケットビジョン)」のような二重括弧になる。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「日本語の文中では全角の括弧を使う」",
+      "impact": "和文の中で括弧の前後が詰まって読みにくい",
+      "recommendation": "会社名の略記 (株) を除き、日本語の文中は全角に寄せる",
+      "status": "open"
+    },
+    {
+      "id": "R-16",
+      "severity": "low",
+      "title": "空欄の em dash と全角マイナスが見分けられない",
+      "detail": "クーポンの割引率が −15%（U+2212）、空欄が —（em dash）。請求管理と操作ログで両方が同じ列の近くに出る。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「空欄の — と マイナスの − を取り違えない」",
+      "impact": "値が入っていないのか負の数なのか判断できない",
+      "recommendation": "マイナスは半角の - に寄せ、空欄は — のままにする",
+      "status": "open"
+    },
+    {
+      "id": "R-17",
+      "severity": "medium",
+      "title": "請求管理でアンケートを検索できない",
+      "detail": "1行=1アンケートに直したのに、検索欄は ユーザーID と 会社名 だけ。アンケートタイトルもIDも打てない。",
+      "evidence": "docs/リライト版仕様書/admin/15_admin_billing.md",
+      "impact": "一覧の主キーで探せない。件数が増えると目視で追うことになる",
+      "recommendation": "15_admin_billing.md §4.3 が検索条件を3つと明記しているため、仕様側を変えるかどうかの判断が要る",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-18",
+      "severity": "medium",
+      "title": "請求管理の「完了予定日」が請求日より前になっている",
+      "detail": "全19行で 完了予定日 = 請求日 − 1日。作業ステータスは「データ化完了」なのに「予定日」が出ている。",
+      "evidence": "03_admin/billing-management.html",
+      "impact": "完了しているのに予定日が出る、または過去日の予定が出る。どちらの読み方でも成立しない",
+      "recommendation": "列が何を指すのか（データ化の完了か、請求処理の完了か）を決めてから、列名かデータのどちらを直すか判断する",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-19",
+      "severity": "low",
+      "title": "請求管理の「クーポン」ボタンが何をするか読めない",
+      "detail": "操作列のボタン名が名詞1語。クーポン列にすでに値がある行にも同じボタンが出る。他画面のボタンはすべて動詞。",
+      "evidence": "03_admin/billing-management.html",
+      "impact": "適用するのか変更するのか外すのか、押すまで分からない",
+      "recommendation": "「クーポンを適用」など動詞にし、適用済みの行では文言を変える",
+      "status": "open"
+    },
+    {
+      "id": "R-20",
+      "severity": "low",
+      "title": "クーポン管理で数値とメモがくっついて見える",
+      "detail": "列としては「使用回数(率)」と「メモ」に分かれているが、幅の配分で 18 (36%)夏季販促 のように詰まる。列見出しも「使用回数(率)メモ」と読める。",
+      "evidence": "03_admin/coupon-management.html:44（使用回数）",
+      "impact": "数値がどこで終わってメモがどこから始まるか読めない",
+      "recommendation": "列の幅を配分し直す",
+      "status": "open"
+    },
+    {
+      "id": "R-21",
+      "severity": "low",
+      "title": "警告色のオレンジに凡例がない",
+      "detail": "オペレーター実績確認は正答率95%未満をオレンジにしているが画面に説明がない。ダッシュボードとアンケート管理の「オンデマンド」「超特急」がオレンジ太字なのも理由が読めない。",
+      "evidence": "03_admin/performance-management.html:166（warn）",
+      "impact": "色が付いている理由が分からず、良いのか悪いのかも判断できない",
+      "recommendation": "しきい値を注記に出す。プランの色分けは意味があるなら凡例、無いなら外す",
+      "status": "open"
+    },
+    {
+      "id": "R-22",
+      "severity": "low",
+      "title": "対応言語の説明が同じ画面に2回出る",
+      "detail": "見出し横に「先頭が第一言語・最大3言語まで」、チップの右に「第一言語を含め3言語までです」。同じことを違う語尾で書いている。",
+      "evidence": "03_admin/survey-detail.html",
+      "impact": "2つの制約があるように読める",
+      "recommendation": "片方に寄せる",
+      "status": "open"
+    },
+    {
+      "id": "R-23",
+      "severity": "low",
+      "title": "照合画面の凡例がチェックボックスに見える",
+      "detail": "下部の「一致 / 不一致(修正対象) / 不一致(確定済み)」は色見本だが、四角が押せそうに見える。項目名の後ろの丸数字にも凡例がない。「DB値」は運用者向けの語ではない。",
+      "evidence": "03_admin/reconciliation/detail.html",
+      "impact": "絞り込みできると思って押す。丸数字の意味が分からない",
+      "recommendation": "色見本と分かる形にし、丸数字の意味を書く",
+      "status": "open"
+    },
+    {
+      "id": "R-24",
+      "severity": "low",
+      "title": "画面内の遷移に矢印を使っている",
+      "detail": "請求書管理の「請求書を表示 →」が16件。本サービスでは矢印付きが外部リンクを想起させるという判断で、アンケート管理からは既に撤去済み。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「請求書管理の一覧に → が出ない」",
+      "impact": "同一タブで開くのに外部へ出ると思わせる",
+      "recommendation": "→ を外す。実際に新規タブで開く2箇所（回答画面のプレビュー、請求書の新規タブ）は ↗ のままでよい",
+      "status": "open"
+    },
+    {
+      "id": "R-25",
+      "severity": "low",
+      "title": "検索欄にラベルが無い",
+      "detail": "プレースホルダだけの入力欄が9画面にある。入力すると何の欄だったか分からなくなる。オペレーター管理は幅が足りず「氏名・メールアドレス・オペレーターID(部:」で切れ、言語のセレクトも枠に収まっていない。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-25 検索欄のラベル」",
+      "impact": "入力後に欄の意味が消える。読み上げでも何の欄か分からない",
+      "recommendation": "aria-label を付ける。見た目を変えずに直せる",
+      "status": "open"
+    },
+    {
+      "id": "R-26",
+      "severity": "info",
+      "title": "開発用のメモが画面に出ている",
+      "detail": "クーポン管理の「請求管理(SCR-A-006)で実行」、アンケート管理の「15_admin_billing.md §7.2」など、画面IDや仕様書のファイル名が本文に出ている。",
+      "evidence": "03_admin/coupon-management.html / 03_admin/survey-management.html",
+      "impact": "レビューに出す画面としてはノイズになる",
+      "recommendation": "モックの注記として意図的に置いたものなので、残すか脚注へ寄せるかの判断が要る",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-27",
+      "severity": "medium",
+      "title": "モーダルのフォーカスが外へ抜ける",
+      "detail": "Tab を1〜5回押すとフォーカスが body に落ちる。背景は inert なので背景の要素には行かないが、そこから先へ進めずモーダル内のボタンにも戻れない。Esc で閉じることと、閉じた後に元のボタンへ戻ることは正しく動く。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「Tab がモーダルの外へ出ない」",
+      "impact": "キーボードだけで操作すると、モーダルを開いた時点で実行もキャンセルもできなくなる",
+      "recommendation": "proto-ui.js の1箇所で全画面に効く",
+      "status": "open"
+    },
+    {
+      "id": "R-28",
+      "severity": "medium",
+      "title": "開いた直後のフォーカスが実行ボタンに当たる",
+      "detail": "クーポン管理は「保存する」、オペレーター管理は「招待を送信」にフォーカスが当たる。ユーザー管理は入力欄で正しい。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「開いた直後に実行系のボタンへフォーカスしない」",
+      "impact": "Enter を続けて押すと意図せず送信される",
+      "recommendation": "data-initial-focus を最初の入力欄へ付け替える",
+      "status": "open"
+    },
+    {
+      "id": "R-29",
+      "severity": "medium",
+      "title": "補助テキストのコントラストが足りない",
+      "detail": "#8a93a5 が白背景で 3.09:1（WCAG AA は 4.5:1）。308箇所で使われ、その中に U-1049 や SV-10174 のような識別子も含まれる。ページャの無効な ‹ は 1.66:1。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-29 文字色のコントラスト（WCAG AA）」",
+      "impact": "読めないと困る情報が読みにくい。明るい場所や低品質のモニタで消える",
+      "recommendation": "色を1段濃くすると全画面の印象が変わるため、どこまで上げるかの判断が要る。識別子だけ先に濃くする案もある",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-30",
+      "severity": "low",
+      "title": "どの画面にも h1 が無い",
+      "detail": "見出しが h2 から始まっている。16画面すべて。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-30 見出し階層」",
+      "impact": "読み上げの見出しジャンプが働かない",
+      "recommendation": "画面名の h2 を h1 にする。見た目は font-size の指定で変わらない",
+      "status": "open"
     }
   ]
 }
