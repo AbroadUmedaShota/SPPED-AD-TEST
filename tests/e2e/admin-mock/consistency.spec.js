@@ -1,0 +1,289 @@
+const { test, expect } = require('@playwright/test');
+const { SCREENS, openScreen } = require('./_screens');
+
+/**
+ * 2026-08-06 の通しレビューで人が目で見つけた指摘を、毎回走る検査にしたもの。
+ *
+ * まだ直していない項目は test.fail() を付けてある。「落ちるのが正しい」状態で、
+ * 直すと不意に通って赤くなるので、そのとき注釈を外す。
+ * どの項目かは docs/architecture/admin_architecture.json の findings（R-xx）と対応する。
+ */
+
+/** 画面に実際に出ている文字（タグの外側のテキスト） */
+async function visibleText(page, path) {
+  await openScreen(page, path);
+  return page.locator('#main-content').innerText();
+}
+
+/** 全16画面の表示テキストを集める */
+async function allText(page) {
+  const out = {};
+  for (const s of SCREENS) {
+    out[s.name] = await visibleText(page, s.path);
+  }
+  return out;
+}
+
+test.describe('決着済みの用語（戻ったら落ちる）', () => {
+  test('「例外対応」は使わない（2026-08-06 に「要注意操作」へ改称）', async ({ page }) => {
+    test.slow();
+    const texts = await allText(page);
+    const hit = Object.entries(texts).filter(([, t]) => t.includes('例外対応')).map(([n]) => n);
+    expect(hit, `旧称が残っている画面: ${hit.join(', ')}`).toEqual([]);
+  });
+
+  test('実在しそうな連絡先を画面に出さない', async ({ page }) => {
+    test.slow();
+    const texts = await allText(page);
+    // モックで使ってよいのは架空のドメインと 03-1234 / 090-8765 系のダミーだけ。
+    // 実在の名刺から拾った値が紛れ込むのを防ぐ
+    const banned = [/@repinc\.co\.jp/, /s-umeda@/, /03-6895-\d{4}/, /03-5835-\d{4}/];
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      for (const re of banned) {
+        if (re.test(t)) { hit.push(`${name}: ${t.match(re)[0]}`); }
+      }
+    }
+    expect(hit, `実在の連絡先らしき文字列: ${hit.join(' / ')}`).toEqual([]);
+  });
+});
+
+test.describe('R-30 見出し階層', () => {
+  for (const s of SCREENS) {
+    test(`${s.name}: h1 がちょうど1つある`, async ({ page }) => {
+      test.fail(); // 未修正: 全画面が h2 から始まっている
+      await openScreen(page, s.path);
+      expect(await page.locator('h1').count()).toBe(1);
+    });
+  }
+});
+
+test.describe('R-24 画面内の遷移に矢印を使わない', () => {
+  test('請求書管理の一覧に → が出ない', async ({ page }) => {
+    test.fail(); // 未修正: 「請求書を表示 →」が16件
+    const t = await visibleText(page, '/03_admin/invoice-management.html');
+    expect(t).not.toContain('→');
+  });
+
+  test('新規タブで開くものだけ ↗ を付けてよい', async ({ page }) => {
+    await openScreen(page, '/03_admin/invoice-management.html');
+    const bad = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('#main-content a, #main-content button').forEach((el) => {
+        if ((el.textContent || '').includes('↗') && el.getAttribute('target') !== '_blank') {
+          out.push((el.textContent || '').trim().slice(0, 24));
+        }
+      });
+      return out;
+    });
+    expect(bad, `別タブで開かないのに ↗ が付いている: ${bad.join(', ')}`).toEqual([]);
+  });
+});
+
+test.describe('R-14 日付の書式', () => {
+  // 未修正: 会期・最終ログインは年なし、作成日時・請求日は年あり。
+  // 実際に混ざっているのはこの6画面だけ。他の画面は検査を有効にしたまま残す（退行を拾うため）
+  const MIXED = ['ダッシュボード', 'ユーザー管理', 'ユーザー詳細', 'アンケート詳細', 'オペレーター管理', '照合結果一覧'];
+
+  for (const s of SCREENS) {
+    test(`${s.name}: 年ありと年なしの日付が混ざらない`, async ({ page }) => {
+      test.fail(MIXED.includes(s.name));
+      const t = await visibleText(page, s.path);
+      const withYear = t.match(/20\d\d\/\d\d?\/\d\d?/g) || [];
+      const withoutYear = (t.match(/(?<![\d/])\d{2}\/\d{2}(?![\d/])/g) || []);
+      expect(
+        withYear.length > 0 && withoutYear.length > 0,
+        `年あり(${withYear.length}件) と 年なし(${withoutYear.length}件) が同じ画面にある`,
+      ).toBe(false);
+    });
+  }
+
+  test('ISO 形式（2026-08-08）と和式（2026年04月）を表示に使わない', async ({ page }) => {
+    test.fail(); // 未修正: 営業日カレンダー2件・ユーザー詳細の請求月
+    test.slow();
+    const texts = await allText(page);
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      if (/20\d\d-\d\d-\d\d/.test(t)) { hit.push(`${name}: ISO`); }
+      if (/20\d\d年\d+月/.test(t)) { hit.push(`${name}: 和式`); }
+    }
+    expect(hit, hit.join(' / ')).toEqual([]);
+  });
+});
+
+test.describe('R-15 / R-16 記号', () => {
+  test('日本語の文中では全角の括弧を使う', async ({ page }) => {
+    test.fail(); // 未修正: 半角が大多数、全角は7箇所だけ
+    test.slow();
+    const texts = await allText(page);
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      // 「(株)」は会社名の略記なので対象外。それ以外で 仮名/漢字 の直後に来る半角括弧を見る
+      const m = t.replace(/\(株\)/g, '').match(/[ぁ-んァ-ヶ一-龥][()]/g);
+      if (m) { hit.push(`${name}: ${m.length}件`); }
+    }
+    expect(hit, hit.join(' / ')).toEqual([]);
+  });
+
+  test('空欄の — と マイナスの − を取り違えない', async ({ page }) => {
+    test.fail(); // 未修正: 割引率が全角マイナス(U+2212)、空欄が em dash
+    test.slow();
+    const texts = await allText(page);
+    const hit = Object.entries(texts)
+      .filter(([, t]) => t.includes('−'))
+      .map(([n]) => n);
+    expect(hit, `全角マイナスを使っている画面: ${hit.join(', ')}`).toEqual([]);
+  });
+});
+
+test.describe('R-05 〜 R-13 用語の統一', () => {
+  const CASES = [
+    { id: 'R-05', label: '納期区分', words: ['納期区分', '申込プラン', 'データ化申込プラン', 'データ化の申込'] },
+    { id: 'R-06', label: '操作ログ', words: ['操作ログ', '監査ログ'] },
+    { id: 'R-10', label: 'ユーザーの呼称', words: ['ユーザー', '利用者'] },
+  ];
+  for (const c of CASES) {
+    test(`${c.id} ${c.label}: 呼び方を1つに絞る`, async ({ page }) => {
+      test.fail(); // 未着手: どの語を正とするかは事業側の判断（Phase 3 で確定させる）
+      test.slow();
+      const texts = await allText(page);
+      const used = c.words.filter((w) => Object.values(texts).some((t) => t.includes(w)));
+      expect(used, `${used.length}通りの呼び方が使われている: ${used.join(' / ')}`).toHaveLength(1);
+    });
+  }
+
+  test('R-07 サイドバーの項目名と、遷移先の画面名が一致する', async ({ page }) => {
+    test.fail(); // 未修正: 「名刺入力画面」→「データ入力対象一覧」、「照合画面」→「照合結果一覧」
+    test.slow(); // サイドバーの全項目を順に開くので時間がかかる
+    await openScreen(page, '/03_admin/index.html');
+    const links = await page.evaluate(() => [...document.querySelectorAll('#sidebar-placeholder a')]
+      .map((a) => ({ label: (a.textContent || '').trim(), href: a.getAttribute('href') }))
+      .filter((x) => x.label && x.href && !x.href.startsWith('#')));
+
+    const mismatch = [];
+    for (const l of links) {
+      await page.goto(new URL(l.href, page.url()).href, { waitUntil: 'domcontentloaded' });
+      // 見出しは HTML に直書きなので描画を待てば必ずある
+      await page.waitForSelector('#main-content h2', { timeout: 10000 });
+      const title = ((await page.locator('#main-content h2').first().textContent()) || '').trim();
+      if (title && title !== l.label) { mismatch.push(`${l.label} → ${title}`); }
+    }
+    expect(mismatch, mismatch.join(' / ')).toEqual([]);
+  });
+});
+
+test.describe('R-27 / R-28 モーダルのキーボード操作', () => {
+  const MODALS = [
+    { screen: 'ユーザー管理', path: '/03_admin/user-management.html', open: 'button:has-text("利用者を招待")' },
+    { screen: 'クーポン管理', path: '/03_admin/coupon-management.html', open: 'button:has-text("クーポンを作成")' },
+    { screen: 'オペレーター管理', path: '/03_admin/operator-management.html', open: 'button:has-text("新規招待")' },
+  ];
+
+  for (const m of MODALS) {
+    test(`${m.screen}: Tab がモーダルの外へ出ない`, async ({ page }) => {
+      test.fail(); // 未修正: 数回の Tab で focus が body へ抜け、モーダルへ戻れなくなる
+      await openScreen(page, m.path);
+      await page.click(m.open);
+      await page.waitForTimeout(300);
+
+      for (let i = 0; i < 25; i++) {
+        await page.keyboard.press('Tab');
+        const inside = await page.evaluate(() => {
+          const modal = [...document.querySelectorAll('.proto-modal')].find((x) => !x.hidden);
+          return modal ? modal.contains(document.activeElement) : null;
+        });
+        expect(inside, `${i + 1} 回目の Tab でモーダルの外へ出た`).toBe(true);
+      }
+    });
+
+    test(`${m.screen}: 開いた直後に実行系のボタンへフォーカスしない`, async ({ page }) => {
+      // 未修正: クーポン管理は「保存する」、オペレーター管理は「招待を送信」に当たる。
+      // ユーザー管理は入力欄に当たっていて正しいので、そちらは検査を有効のまま残す
+      test.fail(m.screen !== 'ユーザー管理');
+      await openScreen(page, m.path);
+      await page.click(m.open);
+      await page.waitForTimeout(300);
+      const focused = await page.evaluate(() => {
+        const a = document.activeElement;
+        return { tag: a.tagName, text: (a.textContent || '').trim() };
+      });
+      const dangerous = /保存|送信|作成|実行|削除|停止/;
+      expect(
+        focused.tag === 'BUTTON' && dangerous.test(focused.text),
+        `開いた直後のフォーカスが「${focused.text}」`,
+      ).toBe(false);
+    });
+  }
+
+  test('Esc で閉じ、開いたボタンへフォーカスが戻る', async ({ page }) => {
+    await openScreen(page, MODALS[0].path);
+    await page.click(MODALS[0].open);
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const back = await page.evaluate(() => (document.activeElement.textContent || '').trim());
+    expect(back).toContain('招待');
+  });
+});
+
+test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
+  for (const s of SCREENS.slice(0, 6)) {
+    test(`${s.name}: 本文が 4.5:1 以上ある`, async ({ page }) => {
+      test.fail(); // 未修正: 補助テキストの #8a93a5 が白背景で 3.09:1（308箇所で使用）
+      await openScreen(page, s.path);
+      const bad = await page.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = c.match(/\d+/g).map(Number).map((v) => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const out = [];
+        document.querySelectorAll('#main-content *').forEach((el) => {
+          if (el.children.length || !(el.textContent || '').trim()) { return; }
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) { return; }
+          const cs = getComputedStyle(el);
+          let bg = cs.backgroundColor;
+          let n = el;
+          while (bg === 'rgba(0, 0, 0, 0)' && n.parentElement) { n = n.parentElement; bg = getComputedStyle(n).backgroundColor; }
+          if (bg === 'rgba(0, 0, 0, 0)') { bg = 'rgb(255,255,255)'; }
+          const l1 = lum(cs.color);
+          const l2 = lum(bg);
+          const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          const px = parseFloat(cs.fontSize);
+          const need = (px >= 24 || (px >= 18.66 && parseInt(cs.fontWeight, 10) >= 700)) ? 3 : 4.5;
+          if (ratio < need) { out.push(`${Math.round(ratio * 100) / 100}:1 ${cs.color} 「${(el.textContent || '').trim().slice(0, 18)}」`); }
+        });
+        return [...new Set(out)].slice(0, 3);
+      });
+      expect(bad, bad.join(' / ')).toEqual([]);
+    });
+  }
+});
+
+test.describe('R-25 検索欄のラベル', () => {
+  // 未修正: プレースホルダだけで aria-label も label も無い欄が残っている画面
+  const UNNAMED = ['ユーザー管理', 'アンケート管理', '請求管理', '請求書管理', 'クーポン管理',
+    'オペレーター管理', '操作ログ', '名刺入力画面', '照合結果一覧'];
+
+  for (const s of SCREENS) {
+    test(`${s.name}: 入力欄に名前が付いている`, async ({ page }) => {
+      test.fail(UNNAMED.includes(s.name));
+      await openScreen(page, s.path);
+      const unnamed = await page.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('#main-content input:not([type=hidden]), #main-content select, #main-content textarea')
+          .forEach((el) => {
+            if (el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')) { return; }
+            if (el.id && document.querySelector(`label[for="${el.id}"]`)) { return; }
+            if (el.closest('label')) { return; }
+            out.push(el.tagName.toLowerCase() + ' placeholder=' + (el.getAttribute('placeholder') || '(なし)'));
+          });
+        return out;
+      });
+      expect(unnamed, `名前の無い入力欄: ${unnamed.join(', ')}`).toEqual([]);
+    });
+  }
+});
