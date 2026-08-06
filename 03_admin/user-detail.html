@@ -21,7 +21,7 @@
             <div style="font-size:12px;color:#6b7484">ホーム › <a href="user-management.html">ユーザー管理</a> › <span style="color:#1f2733">ユーザー詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
               <h2 style="margin:0;font-size:20px;font-weight:700">ユーザー詳細</h2>
-              <button onclick="location.href='user-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+              <button onclick="pUdGo('user-management.html')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
             </div>
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px">
               <span style="font-size:16px;font-weight:700">岡田 健一</span>
@@ -29,59 +29,57 @@
               <span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700" data-slot="premium">プレミアム</span>
               <span data-slot="status" class="status-badge status-active">有効</span>
             </div>
-            <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">アカウント情報 <span style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
-        <div style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
-          <span style="color:#6b7484">会社名</span><input aria-label="会社名" value="(株)マーケットビジョン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-          <span style="color:#6b7484">氏名</span><input aria-label="氏名" value="岡田 健一" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-          <span style="color:#6b7484">メール</span><input aria-label="メール" value="k.okada@market-v.co.jp" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-          <span style="color:#6b7484">電話番号</span><input aria-label="電話番号" value="03-5152-8364" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;font-variant-numeric:tabular-nums">
-          <span style="color:#6b7484">ユーザーID</span><span style="font-variant-numeric:tabular-nums">U-1052</span>
-          <span style="color:#6b7484">アカウント状態</span><span><span data-slot="status" class="status-badge status-active">有効</span> <span style="font-size:11.5px;color:#8a93a5">変更はユーザー管理から</span></span>
-          <span style="color:#6b7484">登録日時</span><span style="font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
-          <span style="color:#6b7484">最終ログイン</span><span style="font-variant-numeric:tabular-nums">2026/08/01 18:22</span>
-        </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">契約(プレミアム関連)</div>
-        <div style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
-          <span style="color:#6b7484">プラン</span><select aria-label="プラン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>プレミアム(月額 10,000円・税別)</option><option>通常</option></select>
-          <span style="color:#6b7484">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
-        </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:12px">
-          <button onclick="pOpen('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
-        </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作</div>
-        <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="pOpen('mConfirmStopUser')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">アカウントを停止</button>
-          <button data-go="surveys" onclick="location.href='survey-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">このユーザーのアンケート一覧 →</button>
-          <button data-go="billing" onclick="location.href='billing-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
-        </div>
-        <div style="margin-top:8px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます。</div>
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
-        <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
-          <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
-          <button data-min-lv="4" onclick="pOpen('mSetPwUser')" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
+            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">アカウント情報 <span style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
+                  <div data-slot="inviteBand" hidden style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#eef2fb;border:1px solid #b9caee;border-radius:6px;font-size:11.5px;color:#1f3d80;line-height:1.7"><span data-slot="inviteText" style="min-width:0"></span><span style="flex-shrink:0;display:flex;gap:8px"><button onclick="pOpen('mResendInvite')" style="background:#fff;color:#2b57b8;border:1px solid #b9caee;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待を再送</button><button onclick="pOpen('mCancelInvite')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待をキャンセル</button></span></div>
+                  <div data-slot="acctFields" style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
+                  <span style="color:#6b7484">会社名</span><input aria-label="会社名" value="(株)マーケットビジョン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:#6b7484">氏名</span><input aria-label="氏名" value="岡田 健一" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:#6b7484">メール</span><input aria-label="メール" value="k.okada@market-v.co.jp" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:#6b7484">電話番号</span><input aria-label="電話番号" value="03-5152-8364" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;font-variant-numeric:tabular-nums">
+                  <span style="color:#6b7484">ユーザーID</span><span style="font-variant-numeric:tabular-nums">U-1052</span>
+                  <span style="color:#6b7484">アカウント状態</span><span><span data-slot="status" class="status-badge status-active">有効</span> <span style="font-size:11.5px;color:#8a93a5">変更はユーザー管理から</span></span>
+                  <span style="color:#6b7484">登録日時</span><span style="font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
+                  <span style="color:#6b7484">最終ログイン</span><span data-slot="lastLogin" style="font-variant-numeric:tabular-nums">2026/08/01 18:22</span>
+                  </div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">契約(プレミアム関連)</div>
+                  <div data-slot="acctFields" style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
+                  <span style="color:#6b7484">プラン</span><select data-slot="planSelect" aria-label="プラン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>プレミアム(月額 10,000円・税別)</option><option>通常</option></select>
+                  <span style="color:#6b7484">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end;margin-top:12px">
+                  <button onclick="pOpen('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                  </div>
+                  <div style="margin-top:14px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます。アカウントの停止・再開はユーザー管理で行います。</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
+                  <div data-slot="pwBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
+                  <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
+                  <button data-min-lv="4" onclick="pOpen('mSetPwUser')" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
 
-        </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 </div>
-        <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px">
-          <div style="display:flex;justify-content:space-between;gap:10px"><span>招待メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/28 10:02</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
-          <div style="display:flex;justify-content:space-between;gap:10px"><span>本登録完了メール <span style="color:#8a93a5;font-variant-numeric:tabular-nums">2026/07/29 14:20</span></span><span style="color:#237a52;font-weight:700">送達</span></div>
-        </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">利用状況</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px">
-          <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">アンケート数</div><div data-slot="surveys" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">24</div></div>
-          <div tabindex="0" role="link" data-go="billing" onclick="location.href='billing-management.html'" style="background:#f7f8fb;border-radius:6px;padding:10px 14px;cursor:pointer"><div style="font-size:11.5px;color:#6b7484">請求件数 <span style="color:#3467d6">→</span></div><div data-slot="bills" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">0</div></div>
-        </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
-        <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
-          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/29 14:20</span><span>招待から本登録が完了<br><span style="color:#8a93a5">実行者: 本人</span></span></div>
-          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 10:02</span><span>招待を実行<br><span style="color:#8a93a5">実行者: admin@abroad-o.com</span></span></div>
-        </div>
-      </div>
+                  </div>
+                  <div data-slot="pwNote" hidden style="margin-top:8px;font-size:11.5px;color:#8a6414;line-height:1.7"></div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送達状況 </div>
+                  <div data-slot="mailBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
+                </div>
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid #e2e6ed"><span style="font-size:12px;font-weight:700;color:#5b6577">紐づくアンケート<span data-slot="svCount" style="font-weight:400;color:#8a93a5;margin-left:8px"></span></span><button data-go="surveys" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">アンケート管理で絞り込む</button></div>
+                  <div id="udSurveys" data-page-size="5" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden"></div>
+                </div>
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid #e2e6ed"><span style="font-size:12px;font-weight:700;color:#5b6577">請求状況<span data-slot="blCount" style="font-weight:400;color:#8a93a5;margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
+                  <div data-slot="unpaidBand" hidden style="margin-top:10px"></div>
+                  <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden"></div>
+                </div>
+                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+                  <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -90,19 +88,6 @@
 </div>
 
 <!-- モーダル群 -->
-<div id="mConfirmStopUser" class="proto-modal" hidden>
-  <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
-      <span style="font-size:15px;font-weight:700">アカウントを停止しますか?</span>
-      <span role="button" onclick="pClose('mConfirmStopUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
-    </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)を停止します。停止中は本人のログインとメール配信などの自動処理が止まります。操作は監査ログに記録されます。</div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmStopUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdStop()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">停止する</button>
-    </div>
-  </div>
-</div>
 
 <div id="mConfirmSaveUser" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
@@ -154,9 +139,284 @@
   </div>
 </div>
 
+<div id="mResendInvite" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待を再送しますか?</span><span role="button" onclick="pClose('mResendInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mrTarget"></span> へ招待メールを再送します。新しいリンクを発行し、有効期限は再度 72 時間になります。以前のリンクは無効になります。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mResendInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button><button onclick="pUdResend()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">再送する</button></div>
+  </div>
+</div>
+
+<div id="mCancelInvite" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待をキャンセルしますか?</span><span role="button" onclick="pClose('mCancelInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mcTarget"></span> への招待を取り消します。発行済みのリンクは無効になり、この利用者は登録できなくなります。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mCancelInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">やめる</button><button onclick="pUdCancelInvite()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待をキャンセルする</button></div>
+  </div>
+</div>
+
+<div id="mLeaveUser" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">保存していない変更があります</span><span role="button" onclick="pClose('mLeaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">アカウント情報の変更が保存されていません。このまま移動すると入力した内容は失われます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mLeaveUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集に戻る</button><button onclick="pUdLeaveDo()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">破棄して移動</button></div>
+  </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
+<script>
+// 紐づくアンケート(§4.4)・請求状況(§4.5)・招待の再送(§4.6)・未保存で離れる確認(§4.2)。
+// 一覧の元データはアンケート詳細と請求管理のモックから取り込んだもの
+(function () {
+    'use strict';
+    var SURVEYS = {"U-1049": [{"sid": "SV-10262", "title": "人事・労務フォーラム 来場者アンケート", "period": "08/03 10:00〜08/05 17:00", "status": "会期前", "plan": "通常"}, {"sid": "SV-10227", "title": "スタートアップピッチ2026 来場者アンケート", "period": "07/10 11:00〜07/10 19:00", "status": "データ化完了", "plan": "お試し"}], "U-1052": [{"sid": "SV-10259", "title": "ITインフラEXPO 2026 来場者アンケート", "period": "07/30 10:00〜08/01 17:00", "status": "会期中", "plan": "特急"}, {"sid": "SV-10244", "title": "マーケティングサミット2026 来場者アンケート", "period": "07/22 09:30〜07/24 18:00", "status": "データ化中", "plan": "超特急"}], "U-1035": [{"sid": "SV-10257", "title": "医療機器・ヘルスケア展 来場者アンケート", "period": "07/29 10:00〜07/31 17:00", "status": "会期中", "plan": "通常"}, {"sid": "SV-10233", "title": "地方創生フォーラム 参加者アンケート", "period": "07/16 13:00〜07/16 18:00", "status": "データ化中", "plan": "通常"}], "U-1050": [{"sid": "SV-10250", "title": "食品・飲料展 出展者アンケート", "period": "07/24 10:00〜07/26 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1038": [{"sid": "SV-10238", "title": "BtoB EXPO 東京 2026 来場者アンケート", "period": "07/21 10:00〜07/23 17:00", "status": "データ化中", "plan": "オンデマンド"}], "U-1033": [{"sid": "SV-10236", "title": "スマート物流EXPO 来場者アンケート", "period": "07/18 10:00〜07/20 17:00", "status": "データ化中", "plan": "特急"}], "U-1031": [{"sid": "SV-10229", "title": "グリーンエネルギー展 来場者アンケート", "period": "07/14 10:00〜07/16 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1026": [{"sid": "SV-10221", "title": "医薬品研究セミナー 参加者アンケート", "period": "07/07 13:00〜07/07 17:30", "status": "データ化完了", "plan": "特急"}], "U-1025": [{"sid": "SV-10218", "title": "ものづくりワールド 来場者アンケート", "period": "07/02 10:00〜07/04 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1022": [{"sid": "SV-10214", "title": "フードテックジャパン 出展者アンケート", "period": "06/25 10:00〜06/27 17:00", "status": "データ化完了", "plan": "通常"}], "U-1021": [{"sid": "SV-10209", "title": "観光インバウンドサミット 来場者アンケート", "period": "06/19 09:30〜06/20 18:00", "status": "データ化完了", "plan": "特急"}], "U-1019": [{"sid": "SV-10205", "title": "デザイントレンド展 来場者アンケート", "period": "06/12 10:00〜06/14 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1017": [{"sid": "SV-10201", "title": "産業機械フェア 来場者アンケート", "period": "06/05 10:00〜06/07 17:00", "status": "データ化完了", "plan": "通常"}], "U-1016": [{"sid": "SV-10196", "title": "アグリビジネス展 出展者アンケート", "period": "05/28 10:00〜05/30 17:00", "status": "データ化完了", "plan": "お試し"}], "U-1014": [{"sid": "SV-10192", "title": "印刷・パッケージ総合展 来場者アンケート", "period": "05/21 10:00〜05/23 17:00", "status": "データ化完了", "plan": "通常"}], "U-1012": [{"sid": "SV-10188", "title": "SaaS Expo 2026 来場者アンケート", "period": "05/14 10:00〜05/16 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1009": [{"sid": "SV-10183", "title": "住宅リフォームフェア 来場者アンケート", "period": "05/08 10:00〜05/10 17:00", "status": "データ化完了", "plan": "特急"}], "U-1007": [{"sid": "SV-10179", "title": "環境ソリューション展 来場者アンケート", "period": "04/23 10:00〜04/25 17:00", "status": "データ化完了", "plan": "通常"}], "U-1002": [{"sid": "SV-10174", "title": "AI活用カンファレンス 参加者アンケート", "period": "04/15 13:00〜04/15 18:00", "status": "データ化完了", "plan": "超特急"}]};
+    var BILLS = {"U-1002": [{"sid": "SV-10174", "month": "2026年04月", "bill": "2026/04/23", "due": "2026/05/23", "amount": 77816, "paid": "2026/05/20", "title": "AI活用カンファレンス 参加者アンケート"}], "U-1007": [{"sid": "SV-10179", "month": "2026年05月", "bill": "2026/05/03", "due": "2026/06/02", "amount": 42842, "paid": "2026/05/29", "title": "環境ソリューション展 来場者アンケート"}], "U-1009": [{"sid": "SV-10183", "month": "2026年05月", "bill": "2026/05/16", "due": "2026/06/15", "amount": 121504, "paid": "2026/06/12", "title": "住宅リフォームフェア 来場者アンケート"}], "U-1012": [{"sid": "SV-10188", "month": "2026年05月", "bill": "2026/05/22", "due": "2026/06/21", "amount": 432166, "paid": "2026/06/18", "title": "SaaS Expo 2026 来場者アンケート"}], "U-1014": [{"sid": "SV-10192", "month": "2026年05月", "bill": "2026/05/29", "due": "2026/06/28", "amount": 89660, "paid": "2026/06/25", "title": "印刷・パッケージ総合展 来場者アンケート"}], "U-1017": [{"sid": "SV-10201", "month": "2026年06月", "bill": "2026/06/13", "due": "2026/07/13", "amount": 112814, "paid": "2026/07/10", "title": "産業機械フェア 来場者アンケート"}], "U-1019": [{"sid": "SV-10205", "month": "2026年06月", "bill": "2026/06/20", "due": "2026/07/20", "amount": 156638, "paid": "", "title": "デザイントレンド展 来場者アンケート"}], "U-1021": [{"sid": "SV-10209", "month": "2026年06月", "bill": "2026/06/27", "due": "2026/07/27", "amount": 93426, "paid": "", "title": "観光インバウンドサミット 来場者アンケート"}], "U-1022": [{"sid": "SV-10214", "month": "2026年07月", "bill": "2026/07/05", "due": "2026/08/04", "amount": 67475, "paid": "", "title": "フードテックジャパン 出展者アンケート"}], "U-1025": [{"sid": "SV-10218", "month": "2026年07月", "bill": "2026/07/10", "due": "2026/08/09", "amount": 624005, "paid": "", "title": "ものづくりワールド 来場者アンケート"}], "U-1026": [{"sid": "SV-10221", "month": "2026年07月", "bill": "2026/07/15", "due": "2026/08/14", "amount": 27539, "paid": "", "title": "医薬品研究セミナー 参加者アンケート"}], "U-1031": [{"sid": "SV-10229", "month": "2026年07月", "bill": "2026/07/22", "due": "2026/08/21", "amount": 298880, "paid": "", "title": "グリーンエネルギー展 来場者アンケート"}], "U-1035": [{"sid": "SV-10233", "month": "2026年07月", "bill": "2026/07/24", "due": "2026/08/23", "amount": 20912, "paid": "", "title": "地方創生フォーラム 参加者アンケート"}], "U-1050": [{"sid": "SV-10250", "month": "2026年08月", "bill": "2026/08/04", "due": "2026/09/03", "amount": 432050, "paid": "", "title": "食品・飲料展 出展者アンケート"}], "U-1033": [{"sid": "SV-10236", "month": "未発行", "bill": "", "due": "", "amount": 179175, "paid": "", "title": "スマート物流EXPO 来場者アンケート"}], "U-1038": [{"sid": "SV-10238", "month": "未発行", "bill": "", "due": "", "amount": 426020, "paid": "", "title": "BtoB EXPO 東京 2026 来場者アンケート"}], "U-1052": [{"sid": "SV-10244", "month": "未発行", "bill": "", "due": "", "amount": 112848, "paid": "", "title": "マーケティングサミット2026 来場者アンケート"}], "U-1049": [{"sid": "SV-10227", "month": "2026年07月", "bill": "2026/07/18", "due": "2026/08/17", "amount": 256, "paid": "", "title": "スタートアップピッチ2026 来場者アンケート"}], "U-1016": [{"sid": "SV-10196", "month": "2026年06月", "bill": "2026/06/08", "due": "2026/07/08", "amount": 584, "paid": "2026/07/05", "title": "アグリビジネス展 出展者アンケート"}]};
+    var BADGE = { '会期前': 'status-inactive', '会期中': 'status-info',
+                  'データ化中': 'status-limit_reached', 'データ化完了': 'status-active' };
+    function esc(t) {
+        return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+    function yen(n) { return Number(n).toLocaleString('en-US') + ' 円'; }
+    function uid() { return document.documentElement.getAttribute('data-current-id') || ''; }
+
+    var HEAD = 'display:grid;column-gap:10px;align-items:center;padding:0 14px;height:36px;'
+        + 'background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11px;font-weight:700;color:#5b6577';
+    var ROW = 'display:grid;column-gap:10px;align-items:center;padding:9px 14px;'
+        + 'border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums';
+    var EMPTY = '<div style="padding:22px 14px;font-size:12.5px;color:#8a93a5;text-align:center">{t}</div>';
+
+    // ---- 紐づくアンケート(§4.4) ----
+    var SV_COLS = '104px minmax(200px,1fr) 190px 116px 150px';
+    function paintSurveys() {
+        var box = document.getElementById('udSurveys');
+        var list = SURVEYS[uid()] || [];
+        var cnt = document.querySelector('[data-slot="svCount"]');
+        if (cnt) { cnt.textContent = '全 ' + list.length + ' 件'; }
+        if (!box) { return; }
+        if (!list.length) {
+            box.innerHTML = EMPTY.replace('{t}', 'この利用者が作成したアンケートはありません。');
+            return;
+        }
+        box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + SV_COLS + '">'
+            + '<span>アンケートID</span><span>タイトル</span><span>会期</span><span>状態</span>'
+            + '<span>データ化の申込</span></div>'
+            + list.map(function (v, i) {
+                return '<div tabindex="0" role="link" class="proto-row-hover" style="' + ROW
+                    + ';grid-template-columns:' + SV_COLS
+                    + (i === list.length - 1 ? ';border-bottom:none' : '') + ';cursor:pointer"'
+                    + ' onclick="location.href=\'survey-detail.html?id=' + v.sid + '\'">'
+                    + '<span style="font-weight:500">' + v.sid + '</span>'
+                    + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+                    + 'padding-right:10px">' + esc(v.title) + '</span>'
+                    + '<span style="font-size:12px;color:#5b6577">' + esc(v.period) + '</span>'
+                    + '<span><span class="status-badge ' + (BADGE[v.status] || 'status-inactive') + '">'
+                    + esc(v.status) + '</span></span>'
+                    + '<span style="font-size:12px">あり<span style="color:#8a93a5;margin-left:6px">'
+                    + esc(v.plan) + '</span></span></div>';
+            }).join('');
+    }
+
+    // ---- 請求状況(§4.5) ----
+    var BL_COLS = '132px minmax(180px,1fr) 130px 130px 140px';
+    var TODAY = '2026/07/31';   // モックの現在日(ヘッダーの表示に合わせる)
+    // 銀行振込のみのため入金は運営が手作業で消し込む。未記録＝未入金ではないので、
+    // 督促対象は「期日を過ぎて未記録」だけに絞る(15_admin_billing.md §4.7)
+    function payState(b) {
+        if (!b.bill) { return 'unissued'; }
+        if (b.paid) { return 'paid'; }
+        return (b.due && b.due < TODAY) ? 'overdue' : 'waiting';
+    }
+    var PAY_LABEL = {
+        unissued: '<span style="color:#8a93a5">—</span>',
+        waiting: '<span style="font-size:11.5px;color:#5b6577;background:#f2f4f8;border:1px solid #dde1e9;'
+            + 'border-radius:4px;padding:1px 8px">入金待ち</span>',
+        overdue: '<span style="font-size:11.5px;font-weight:700;color:#c23934;background:#fdecea;'
+            + 'border:1px solid #e3b6b3;border-radius:4px;padding:1px 8px">期日超過</span>'
+    };
+    function paintBills() {
+        var box = document.getElementById('udBills');
+        var list = BILLS[uid()] || [];
+        // 未発行の請求は入金の対象ではないので数に入れない
+        var unpaid = list.filter(function (b) { return payState(b) !== 'paid' && payState(b) !== 'unissued'; });
+        var overdue = list.filter(function (b) { return payState(b) === 'overdue'; });
+        var cnt = document.querySelector('[data-slot="blCount"]');
+        if (cnt) { cnt.textContent = '全 ' + list.length + ' 件'; }
+        var band = document.querySelector('[data-slot="unpaidBand"]');
+        if (band) {
+            band.hidden = !unpaid.length;
+            if (unpaid.length) {
+                var warn = overdue.length > 0;
+                band.innerHTML = '<div role="button" tabindex="0" onclick="pUdUnpaid()" '
+                    + 'style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:'
+                    + (warn ? '#fdecea' : '#f7f8fb') + ';border:1px solid '
+                    + (warn ? '#e3b6b3' : '#e2e6ed') + ';border-radius:6px;font-size:12px;color:'
+                    + (warn ? '#c23934' : '#5b6577') + ';cursor:pointer">'
+                    + '<span style="font-weight:700">入金未確認 ' + unpaid.length + ' 件</span>'
+                    + '<span>' + (warn ? 'うち期日超過 ' + overdue.length + ' 件。' : '支払期日前です。')
+                    + '請求管理でこの利用者の入金未確認だけを表示する →</span></div>';
+            }
+        }
+        if (!box) { return; }
+        if (!list.length) {
+            box.innerHTML = EMPTY.replace('{t}', 'この利用者に紐づく請求はありません。');
+            return;
+        }
+        box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + BL_COLS + '">'
+            + '<span>請求月</span><span>対象アンケート</span><span style="text-align:right;'
+            + 'padding-right:20px">請求金額</span><span>支払期日</span><span>入金確認日</span></div>'
+            + list.map(function (b, i) {
+                return '<div tabindex="0" role="link" class="proto-row-hover" style="' + ROW
+                    + ';grid-template-columns:' + BL_COLS
+                    + (i === list.length - 1 ? ';border-bottom:none' : '') + ';cursor:pointer"'
+                    + ' onclick="pUdBilling()">'
+                    + '<span style="font-weight:500">' + esc(b.month) + '</span>'
+                    + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+                    + 'padding-right:10px;font-size:12px">' + esc(b.title) + '</span>'
+                    + '<span style="text-align:right;padding-right:20px;font-weight:700">'
+                    + yen(b.amount) + '</span>'
+                    + '<span style="font-size:12px;color:#5b6577">' + (b.due || '—') + '</span>'
+                    + (b.paid
+                        ? '<span style="font-size:12px;color:#5b6577">' + b.paid + '</span>'
+                        : PAY_LABEL[payState(b)])
+                    + '</div>';
+            }).join('');
+    }
+    window.pUdUnpaid = function () {
+        location.href = 'billing-management.html?uid=' + uid() + '&unpaid=1';
+    };
+    window.pUdBilling = function () { location.href = 'billing-management.html?uid=' + uid(); };
+
+    // ---- アカウント状態ごとの出し分け(§4.6・§7.1) ----
+    // 送達状況は状態で変わる。招待中はまだ本登録が完了していない
+    function paintMail(status, created) {
+        var box = document.querySelector('[data-slot="mailBox"]');
+        if (!box) { return; }
+        var day = created.replace(/ .*$/, '');
+        var rows = [['招待メール', day + ' 10:02']];
+        if (status !== '招待中') { rows.push(['本登録完了メール', created]); }
+        box.innerHTML = rows.map(function (r) {
+            return '<div style="display:flex;justify-content:space-between;gap:10px"><span>' + esc(r[0])
+                + ' <span style="color:#8a93a5;font-variant-numeric:tabular-nums">' + esc(r[1])
+                + '</span></span><span style="color:#237a52;font-weight:700">送達</span></div>';
+        }).join('');
+    }
+    function paintState(status, mail) {
+        var band = document.querySelector('[data-slot="inviteBand"]');
+        var inviting = (status === '招待中');
+        if (band) {
+            band.hidden = !inviting;
+            var t = document.querySelector('[data-slot="inviteText"]');
+            if (t) {
+                t.textContent = '招待中です。リンクの有効期限は発行から 72 時間です。'
+                    + '本登録が完了するまでこの利用者はログインできません。';
+            }
+        }
+        ['mrTarget', 'mcTarget'].forEach(function (k) {
+            var e = document.querySelector('[data-slot="' + k + '"]');
+            if (e) { e.textContent = mail || uid(); }
+        });
+        // 招待中はパスワードがまだ存在しないため、パスワード操作は実行させない
+        var pw = document.querySelector('[data-slot="pwBox"]');
+        if (pw) {
+            pw.style.opacity = inviting ? '0.55' : '';
+            pw.style.pointerEvents = inviting ? 'none' : '';
+            pw.inert = inviting;
+        }
+        var note = document.querySelector('[data-slot="pwNote"]');
+        if (note) {
+            note.hidden = !inviting;
+            note.textContent = '招待中はパスワードが未設定のため実行できません。上の「招待を再送」を使います。';
+        }
+    }
+
+    // ---- 未保存で離れるときの確認(§4.2 / 01_admin_common_ui.md §8) ----
+    var dirty = false;
+    var leaveTo = '';
+    document.addEventListener('DOMContentLoaded', function () {
+        // 入力欄は2ブロック(アカウント情報と契約)ある。どちらの変更も未保存として扱う
+        document.querySelectorAll('[data-slot="acctFields"]').forEach(function (box) {
+            box.addEventListener('input', function () { dirty = true; });
+            box.addEventListener('change', function () { dirty = true; });
+        });
+        paintSurveys();
+        paintBills();
+    });
+    window.pUdGo = function (to) {
+        if (!dirty) { location.href = to; return; }
+        leaveTo = to;
+        window.pOpen('mLeaveUser');
+    };
+    window.pUdLeaveDo = function () {
+        dirty = false;
+        window.pClose('mLeaveUser');
+        location.href = leaveTo;
+    };
+    window.pUdClean = function () { dirty = false; };
+
+    // ---- 招待の再送・キャンセル(§4.6)。監査ログへ残す(§7.4) ----
+    window.pUdResend = function () {
+        window.pClose('mResendInvite');
+        window.pUdLog('招待メールを再送(有効期限を72時間で再発行)');
+        window.pToast('招待メールを再送しました(有効期限 72 時間)');
+    };
+    window.pUdCancelInvite = function () {
+        window.pClose('mCancelInvite');
+        window.pUdLog('招待をキャンセル');
+        window.pToast('招待をキャンセルしました');
+    };
+    window.pUdLog = function (title, reason) {
+        var log = document.getElementById('udLog');
+        if (!log) { return; }
+        var n = new Date(), p = function (v) { return String(v).padStart(2, '0'); };
+        var when = n.getFullYear() + '/' + p(n.getMonth() + 1) + '/' + p(n.getDate())
+            + ' ' + p(n.getHours()) + ':' + p(n.getMinutes());
+        var row = document.createElement('div');
+        row.setAttribute('style', 'display:flex;gap:10px');
+        row.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">'
+            + when + '</span><span>' + esc(title)
+            + '<br><span style="color:#8a93a5">実行者: admin@abroad-o.com'
+            + (reason ? '・理由: ' + esc(reason) : '') + '</span></span>';
+        log.insertBefore(row, log.firstChild);
+    };
+    // 操作ログの初期表示。招待中はまだ本登録が完了していない
+    function paintLog(status, created) {
+        var log = document.getElementById('udLog');
+        if (!log) { return; }
+        var rows = [];
+        if (status !== '招待中') {
+            rows.push([created, '招待から本登録が完了', '本人']);
+        }
+        rows.push([created.replace(/ .*$/, '') + ' 10:02', '招待を実行', 'admin@abroad-o.com']);
+        log.innerHTML = rows.map(function (r) {
+            return '<div style="display:flex;gap:10px">'
+                + '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + esc(r[0])
+                + '</span><span>' + esc(r[1])
+                + '<br><span style="color:#8a93a5">実行者: ' + esc(r[2]) + '</span></span></div>';
+        }).join('');
+    }
+    window.pUdPaint = function (status, mail, created, premium) {
+        // 招待中・本登録未了はまだログインしていない
+        var last = document.querySelector('[data-slot="lastLogin"]');
+        if (last && (status === '招待中' || status === '本登録未了')) { last.textContent = '—'; }
+        var plan = document.querySelector('[data-slot="planSelect"]');
+        if (plan) {
+            Array.prototype.forEach.call(plan.options, function (o) {
+                o.selected = premium ? /プレミアム/.test(o.textContent) : !/プレミアム/.test(o.textContent);
+            });
+        }
+        paintMail(status, created || '2026/07/29 14:20');
+        paintState(status, mail);
+        paintLog(status, created || '2026/07/29 14:20');
+        paintSurveys();
+        paintBills();
+    };
+})();
+</script>
+
 <script>
 // 詳細画面での操作を画面表示へ反映する(モックのため再読込で戻る)
 window.pUdStop = function () {
@@ -168,6 +428,7 @@ window.pUdStop = function () {
     window.pClose('mConfirmStopUser');
 };
 window.pUdSave = function () {
+    if (window.pUdClean) { window.pUdClean(); }
     window.pToast('変更を保存しました');
     window.pClose('mConfirmSaveUser');
 };
@@ -230,8 +491,10 @@ window.pUdSetPw = function () {
                'billing': 'billing-management.html?uid=' + id };
     document.querySelectorAll('[data-go]').forEach(function (el) {
         var to = GO[el.getAttribute('data-go')];
-        if (to) { el.onclick = function () { location.href = to; }; }
+        if (to) { el.onclick = function () { window.pUdGo(to); }; }
     });
+    // アカウント状態ごとの出し分けと、紐づくアンケート・請求状況の描画
+    if (window.pUdPaint) { window.pUdPaint(d.status, d.mail, d.created, d.premium); }
 })();
 </script>
 </body>

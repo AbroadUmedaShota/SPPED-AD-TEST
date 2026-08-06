@@ -152,6 +152,103 @@
         }
     };
 
+    // 一覧の並び替え(モック): 容器に data-sortable を付けると見出しの各セルが押せるようになる。
+    // 値は行の同じ位置のセルのテキストから取り、数値・件数(1,234)・日付は数として比較する。
+    // 並び替えたあとはページを振り直す(pPageSize が data-pg を付け直す)
+    var SORT_ARROW = 'margin-left:4px;font-size:10px;color:#3467d6';
+
+    function sortRows(list) {
+        // 見出しを除いた子のうち、ページングを持つならその行、無ければ子をそのまま扱う
+        var kids = Array.prototype.slice.call(list.children).slice(1);
+        var paged = kids.filter(function (r) { return r.hasAttribute('data-pg'); });
+        if (paged.length) { return paged; }
+        return kids.filter(function (r) { return r.id !== (list.id + '-empty'); });
+    }
+    function sortText(row, col) {
+        var c = row.children[col];
+        return c ? c.textContent.replace(/\s+/g, ' ').trim() : '';
+    }
+    function sortNum(t) {
+        // 値の全体が数値のときだけ数として扱う。U-1002 や 2026/07/31 09:12 を
+        // 数と誤認しないよう、部分一致では拾わない
+        var v = String(t).replace(/[,\s]/g, '');
+        var m = /^[-+]?\d+(\.\d+)?(%|円|件|名|通|回|人|分)?$/.exec(v);
+        return m ? parseFloat(m[0]) : null;
+    }
+    function paintSortHead(list) {
+        var head = list.firstElementChild;
+        if (!head) { return; }
+        var col = list.getAttribute('data-sort-col');
+        var dir = list.getAttribute('data-sort-dir') || 'asc';
+        Array.prototype.forEach.call(head.children, function (c) {
+            if (!c.hasAttribute('data-sort-html')) { return; }
+            var on = (c.getAttribute('data-sort-col') === col);
+            c.innerHTML = c.getAttribute('data-sort-html')
+                + (on ? '<span style="' + SORT_ARROW + '">' + (dir === 'asc' ? '▲' : '▼') + '</span>' : '');
+            c.setAttribute('aria-sort', on ? (dir === 'asc' ? 'ascending' : 'descending') : 'none');
+        });
+    }
+    window.pSort = function (listId, col) {
+        var list = document.getElementById(listId);
+        if (!list) { return; }
+        var same = (list.getAttribute('data-sort-col') === String(col));
+        var dir = (same && list.getAttribute('data-sort-dir') === 'asc') ? 'desc' : 'asc';
+        list.setAttribute('data-sort-col', String(col));
+        list.setAttribute('data-sort-dir', dir);
+        var rows = sortRows(list);
+        var numeric = rows.every(function (r) {
+            var t = sortText(r, col);
+            return !t || t === '—' || sortNum(t) !== null;
+        });
+        rows.sort(function (a, b) {
+            var x = sortText(a, col), y = sortText(b, col), d;
+            if (numeric) {
+                var nx = sortNum(x), ny = sortNum(y);
+                // 値が無い行(— や空)は末尾へ寄せる
+                if (nx === null && ny === null) { return 0; }
+                if (nx === null) { return 1; }
+                if (ny === null) { return -1; }
+                d = nx - ny;
+            } else {
+                d = x.localeCompare(y, 'ja');
+            }
+            return dir === 'asc' ? d : -d;
+        });
+        rows.forEach(function (r) { list.appendChild(r); });
+        // 行以外(該当なしの表示など)は末尾へ戻す
+        Array.prototype.filter.call(list.children, function (r) {
+            return r !== list.firstElementChild && !r.hasAttribute('data-pg');
+        }).forEach(function (r) { list.appendChild(r); });
+        paintSortHead(list);
+        if (list.querySelector('[data-pg]')) {
+            window.pPageSize(listId, parseInt(list.getAttribute('data-page-size') || '10', 10));
+        }
+    };
+    window.pSortable = function (listId) {
+        var list = document.getElementById(listId);
+        if (!list) { return; }
+        var head = list.firstElementChild;
+        if (!head) { return; }
+        Array.prototype.forEach.call(head.children, function (c, i) {
+            var base = c.innerHTML.replace(/\s*[▲▼]\s*/g, '');
+            if (!c.textContent.replace(/[▲▼\s]/g, '') || c.hasAttribute('data-no-sort')) { return; }
+            c.setAttribute('data-sort-html', base);
+            c.setAttribute('data-sort-col', String(i));
+            c.setAttribute('role', 'button');
+            c.setAttribute('tabindex', '0');
+            c.style.cursor = 'pointer';
+            c.style.userSelect = 'none';
+            c.title = c.textContent.replace(/[▲▼]/g, '').trim() + 'で並び替え';
+            c.onclick = function () { window.pSort(listId, i); };
+            // 既定の並び順が示されている列を初期状態にする
+            if (/[▲▼]/.test(c.textContent) && !list.hasAttribute('data-sort-col')) {
+                list.setAttribute('data-sort-col', String(i));
+                list.setAttribute('data-sort-dir', /▲/.test(c.textContent) ? 'asc' : 'desc');
+            }
+        });
+        paintSortHead(list);
+    };
+
     // 表示件数の切替。行を再分割してページ番号ボタンを作り直す
     // 絞り込みで外れた行(data-out)は数えない
     window.pPageSize = function (listId, size) {
@@ -587,6 +684,13 @@
             }
             inp.addEventListener('input', sync);
             sync();
+        });
+    });
+
+    // data-sortable が付いた一覧に並び替えを配線する
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-sortable]').forEach(function (l) {
+            if (l.id) { window.pSortable(l.id); }
         });
     });
 })();

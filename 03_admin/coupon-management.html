@@ -39,7 +39,7 @@
                 <button onclick="pSearch('couponList')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
                 <button onclick="pClearSearch('couponList')" style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
               </div>
-              <div id="couponList" data-filter-keys="cid,cname,code" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
+              <div id="couponList" data-sortable data-filter-keys="cid,cname,code" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
                 <div style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
                   <span>ID</span><span>クーポン名</span><span>コード</span><span class="c-opt" title="既定の並び順" style="color:#5b6577">作成日 ▼</span><span>使用可能期限</span><span style="text-align:right">割引率</span><span style="text-align:right">可能回数</span><span style="text-align:right">使用回数(率)</span><span class="c-opt">メモ</span><span style="padding-left:12px">操作</span>
                 </div>
