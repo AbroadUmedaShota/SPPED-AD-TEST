@@ -154,21 +154,22 @@ test.describe('R-05 〜 R-13 用語の統一', () => {
 
   test('R-07 サイドバーの項目名と、遷移先の画面名が一致する', async ({ page }) => {
     test.fail(); // 未修正: 「名刺入力画面」→「データ入力対象一覧」、「照合画面」→「照合結果一覧」
-    test.slow(); // サイドバーの全項目を順に開くので時間がかかる
     await openScreen(page, '/03_admin/index.html');
     const links = await page.evaluate(() => [...document.querySelectorAll('#sidebar-placeholder a')]
       .map((a) => ({ label: (a.textContent || '').trim(), href: a.getAttribute('href') }))
       .filter((x) => x.label && x.href && !x.href.startsWith('#')));
 
+    // 見出しは HTML に直書きなので、12画面を描画せず取得だけで足りる
+    // （全部開くと並列実行のときに時間切れになる）
     const mismatch = [];
     for (const l of links) {
-      await page.goto(new URL(l.href, page.url()).href, { waitUntil: 'domcontentloaded' });
-      // 見出しは HTML に直書きなので描画を待てば必ずある
-      await page.waitForSelector('#main-content h2', { timeout: 10000 });
-      const title = ((await page.locator('#main-content h2').first().textContent()) || '').trim();
+      const url = new URL(l.href, page.url()).href;
+      const body = await (await page.request.get(url)).text();
+      const m = /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(body);
+      const title = m ? m[1].replace(/<[^>]+>/g, '').trim() : '';
       if (title && title !== l.label) { mismatch.push(`${l.label} → ${title}`); }
     }
-    expect(mismatch, mismatch.join(' / ')).toEqual([]);
+    expect(mismatch.length, `サイドバーと画面名が違う: ${mismatch.join(' / ')}`).toBe(0);
   });
 });
 
@@ -181,7 +182,6 @@ test.describe('R-27 / R-28 モーダルのキーボード操作', () => {
 
   for (const m of MODALS) {
     test(`${m.screen}: Tab がモーダルの外へ出ない`, async ({ page }) => {
-      test.fail(); // 未修正: 数回の Tab で focus が body へ抜け、モーダルへ戻れなくなる
       await openScreen(page, m.path);
       await page.click(m.open);
       await page.waitForTimeout(300);

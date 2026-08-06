@@ -56,7 +56,11 @@ async function openScreen(page, path) {
   await page.waitForFunction(
     () => {
       const h = document.querySelector('#header-placeholder');
-      return !!(h && h.children.length) && typeof window.pLevel === 'function';
+      if (!h || !h.children.length) { return false; }
+      // サイドバーは全画面作業モードの2画面には無い。ある画面では注入まで待つ
+      const s = document.querySelector('#sidebar-placeholder');
+      if (s && !s.children.length) { return false; }
+      return typeof window.pLevel === 'function';
     },
     null,
     { timeout: 15000 },

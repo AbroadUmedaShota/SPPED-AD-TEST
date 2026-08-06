@@ -15,6 +15,21 @@
         });
     }
 
+    var FOCUSABLE = 'a[href], button, input:not([type="hidden"]), select, textarea, [tabindex]';
+
+    function openModal() {
+        return document.querySelector('.proto-modal:not([hidden])');
+    }
+
+    /** モーダル内で実際にフォーカスできる要素を、表示順に返す */
+    function focusable(m) {
+        return Array.prototype.filter.call(m.querySelectorAll(FOCUSABLE), function (el) {
+            if (el.disabled || el.getAttribute('tabindex') === '-1') { return false; }
+            if (el.closest('[hidden], [inert]')) { return false; }
+            return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+        });
+    }
+
     window.pOpen = function (id) {
         // 正本(prototype)は常に単一モーダル表示のため、開く前に他をすべて閉じる
         var wasOpen = document.querySelector('.proto-modal:not([hidden])');
@@ -652,7 +667,32 @@
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }
         if (e.key === 'Escape') { window.pCloseAll(); }
+        if (e.key === 'Tab') { trapTab(e); }
     });
+
+    // Tab をモーダルの中で循環させる。
+    // 背面は inert なのでフォーカスが背面の要素へ移ることはないが、そのままだと
+    // body へ抜けてしまい、キーボードだけではモーダルのボタンへ戻れなくなる
+    function trapTab(e) {
+        var m = openModal();
+        if (!m) { return; }
+        var items = focusable(m);
+        if (!items.length) { return; }
+        var at = items.indexOf(document.activeElement);
+        var next;
+        if (at < 0) {
+            // すでに外へ出ている場合は端から入れ直す
+            next = e.shiftKey ? items[items.length - 1] : items[0];
+        } else if (e.shiftKey && at === 0) {
+            next = items[items.length - 1];
+        } else if (!e.shiftKey && at === items.length - 1) {
+            next = items[0];
+        } else {
+            return;     // 中ほどの移動はブラウザに任せる
+        }
+        e.preventDefault();
+        next.focus();
+    }
 
     // オーバーレイ(背景)クリックで閉じる。ダイアログ内クリックは対象外
     document.addEventListener('click', function (e) {

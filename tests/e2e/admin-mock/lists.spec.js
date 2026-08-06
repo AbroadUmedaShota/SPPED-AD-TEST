@@ -77,12 +77,27 @@ test.describe('一覧の並び替え', () => {
       expect(await page.getAttribute(head, 'role'), '見出しが押せない（data-sortable の付け忘れ）')
         .toBe('button');
 
+      // 押下 → 並び替えが反映されるまで待つ。矢印が付いたら反映済み
+      const clickAndSettle = async (want) => {
+        await page.click(head);
+        await page.waitForFunction(
+          ([listId, col, prev]) => {
+            const t = document.getElementById(listId).firstElementChild.children[col].textContent;
+            const now = t.includes('▲') ? 'asc' : (t.includes('▼') ? 'desc' : '');
+            return now !== '' && now !== prev;
+          },
+          [list.id, list.sortCol, want],
+          { timeout: 5000 },
+        );
+      };
+
       // 既定の並び順が既にこの列のときは1回目の押下で降順になる。両方向を必ず通す
-      await page.click(head);
+      const before = await arrow();
+      await clickAndSettle(before);
       const dir1 = await arrow();
       const vals1 = await readCol();
       const rows1 = await visibleRows(page, list.id);
-      await page.click(head);
+      await clickAndSettle(dir1);
       const dir2 = await arrow();
       const vals2 = await readCol();
       const rows2 = await visibleRows(page, list.id);
