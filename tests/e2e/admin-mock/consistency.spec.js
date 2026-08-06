@@ -197,9 +197,6 @@ test.describe('R-27 / R-28 モーダルのキーボード操作', () => {
     });
 
     test(`${m.screen}: 開いた直後に実行系のボタンへフォーカスしない`, async ({ page }) => {
-      // 未修正: クーポン管理は「保存する」、オペレーター管理は「招待を送信」に当たる。
-      // ユーザー管理は入力欄に当たっていて正しいので、そちらは検査を有効のまま残す
-      test.fail(m.screen !== 'ユーザー管理');
       await openScreen(page, m.path);
       await page.click(m.open);
       await page.waitForTimeout(300);

@@ -45,8 +45,15 @@
         document.body.style.overflow = 'hidden';
         setBackgroundInert(true);
         // 初期フォーカス: data-initial-focus 指定を最優先(破壊的な既定アクションを避けたいモーダル用)。
-        // 無ければ主ボタン(最後のbutton)、それも無ければその他のフォーカス可能要素
+        // 次に入力欄。入力させるモーダルで「保存する」「招待を送信」に当たっていると、
+        // Enter を続けて押したときに意図せず実行されるため
+        // (確認だけのモーダルは入力欄が無いので、従来どおり主ボタン=最後のbutton に当てる)
         var first = m.querySelector('[data-initial-focus]');
+        if (!first) {
+            first = focusable(m).filter(function (el) {
+                return /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+            })[0];
+        }
         if (!first) {
             var btns = Array.prototype.filter.call(m.querySelectorAll('button'), function (b) { return !b.disabled; });
             first = btns.length ? btns[btns.length - 1] : m.querySelector('[href], input, textarea, select, [tabindex]');
