@@ -229,6 +229,44 @@ test.describe('R-27 / R-28 モーダルのキーボード操作', () => {
   });
 });
 
+test.describe('R-29 識別子のコントラスト', () => {
+  // 識別子は「読めないと困る情報」。補助テキストの淡さのままだと WCAG AA に届かない
+  for (const s of SCREENS) {
+    test(`${s.name}: 画面に出る ID が 4.5:1 以上ある`, async ({ page }) => {
+      await openScreen(page, s.path);
+      const bad = await page.evaluate(() => {
+        const lum = (c) => {
+          const [r, g, b] = c.match(/\d+/g).map(Number).map((v) => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const ID = /^(U|SV|OP|CP)-\d+$|^INV-[\d-]+$/;
+        const out = [];
+        document.querySelectorAll('#main-content *').forEach((el) => {
+          if (el.children.length) { return; }
+          const t = (el.textContent || '').trim();
+          if (!ID.test(t)) { return; }
+          const cs = getComputedStyle(el);
+          let bg = cs.backgroundColor;
+          let n = el;
+          while (bg === 'rgba(0, 0, 0, 0)' && n.parentElement) { n = n.parentElement; bg = getComputedStyle(n).backgroundColor; }
+          if (bg === 'rgba(0, 0, 0, 0)') { bg = 'rgb(255,255,255)'; }
+          const l1 = lum(cs.color);
+          const l2 = lum(bg);
+          const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          if (ratio < 4.5 && parseFloat(cs.opacity) === 1) {
+            out.push(`${t} ${Math.round(ratio * 100) / 100}:1`);
+          }
+        });
+        return [...new Set(out)].slice(0, 4);
+      });
+      expect(bad, `薄い識別子: ${bad.join(' / ')}`).toEqual([]);
+    });
+  }
+});
+
 test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
   for (const s of SCREENS.slice(0, 6)) {
     test(`${s.name}: 本文が 4.5:1 以上ある`, async ({ page }) => {

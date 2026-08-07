@@ -88,3 +88,25 @@ test('会社名で絞り込める（§4.3）', async ({ page }) => {
   await page.click('[data-filter-for="billingList"] button:has-text("条件をクリア")');
   expect(await visible(), 'クリアで戻らない').toBe(before);
 });
+
+test('アンケートのIDとタイトルで絞り込める（§4.3）', async ({ page }) => {
+  await openScreen(page, '/03_admin/billing-management.html');
+  const visible = () => page.evaluate(() => [...document.getElementById('billingList').children]
+    .slice(1).filter((r) => r.hasAttribute('data-pg') && getComputedStyle(r).display !== 'none').length);
+  const field = '[data-filter-for="billingList"] [data-f-key="survey"]';
+  await expect(page.locator(field), '一覧の主キーで探す欄が無い').toBeVisible();
+
+  const before = await visible();
+  // ID で
+  await page.fill(field, 'SV-10188');
+  await page.click('[data-filter-for="billingList"] button:has-text("検索")');
+  expect(await visible(), 'アンケートIDで1件に絞れない').toBe(1);
+
+  // タイトルの一部で
+  await page.fill(field, 'SaaS Expo');
+  await page.click('[data-filter-for="billingList"] button:has-text("検索")');
+  expect(await visible(), 'タイトルで絞れない').toBe(1);
+
+  await page.click('[data-filter-for="billingList"] button:has-text("条件をクリア")');
+  expect(await visible(), 'クリアで戻らない').toBe(before);
+});
