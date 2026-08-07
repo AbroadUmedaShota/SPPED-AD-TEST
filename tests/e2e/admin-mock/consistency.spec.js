@@ -12,6 +12,9 @@ const { SCREENS, openScreen } = require('./_screens');
 /** 画面に実際に出ている文字（タグの外側のテキスト） */
 async function visibleText(page, path) {
   await openScreen(page, path);
+  // 画面ごとのインラインスクリプトが data-slot を埋め終わるまで待つ。
+  // 埋まる前に読むと、検査が拾う文字列が変わって結果が揺れる
+  await page.waitForFunction(() => document.readyState === 'complete');
   return page.locator('#main-content').innerText();
 }
 
@@ -85,9 +88,10 @@ test.describe('R-14 日付の書式', () => {
       const withYear = t.match(/20\d\d\/\d\d?\/\d\d?/g) || [];
       const withoutYear = (t.match(/(?<![\d/])\d{2}\/\d{2}(?![\d/])/g) || []);
       expect(
-        withYear.length > 0 && withoutYear.length > 0,
-        `年あり(${withYear.length}件) と 年なし(${withoutYear.length}件) が同じ画面にある`,
-      ).toBe(false);
+        withoutYear,
+        `年あり(${withYear.length}件)と年なし(${withoutYear.length}件)が同じ画面にある: `
+        + `${withoutYear.slice(0, 5).join(', ')}`,
+      ).toEqual([]);
     });
   }
 
@@ -362,6 +366,31 @@ test.describe('R-19 〜 R-23 表示の読み取りやすさ', () => {
     const t = await page.locator('#main-content').innerText();
     expect(t, '色見本に「凡例」の断りが無く、押せる操作に見える').toContain('凡例');
   });
+});
+
+test.describe('入力欄の幅', () => {
+  for (const s of SCREENS) {
+    test(`${s.name}: プレースホルダが途中で切れない`, async ({ page }) => {
+      await openScreen(page, s.path);
+      // Web フォントが載る前に測ると幅が数 px ぶれるので、確定まで待つ
+      await page.evaluate(() => document.fonts.ready);
+      const cut = await page.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('#main-content input[placeholder]').forEach((el) => {
+          const probe = document.createElement('span');
+          const cs = getComputedStyle(el);
+          probe.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:${cs.font}`;
+          probe.textContent = el.getAttribute('placeholder');
+          document.body.appendChild(probe);
+          const need = probe.offsetWidth + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+          probe.remove();
+          if (need > el.offsetWidth + 1) { out.push(`${el.getAttribute('placeholder')} (要 ${Math.ceil(need)}px / 実 ${el.offsetWidth}px)`); }
+        });
+        return out;
+      });
+      expect(cut, `枠に収まっていない: ${cut.join(' / ')}`).toEqual([]);
+    });
+  }
 });
 
 test.describe('R-25 検索欄のラベル', () => {
