@@ -263,6 +263,67 @@ test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
   }
 });
 
+test.describe('R-19 〜 R-23 表示の読み取りやすさ', () => {
+  test('R-19 請求管理のクーポン操作が、押すと何が起きるか読める', async ({ page }) => {
+    await openScreen(page, '/03_admin/billing-management.html');
+    const labels = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('#billingList [data-pg]').forEach((r) => {
+        const coupon = (r.getAttribute('data-f-coupon') || '').trim();
+        const btn = [...r.querySelectorAll('button')].find((b) => /クーポン/.test(b.textContent));
+        if (btn) { out.push({ coupon, label: btn.textContent.trim() }); }
+      });
+      return out;
+    });
+    expect(labels.length).toBeGreaterThan(0);
+    for (const x of labels) {
+      // 名詞1語（「クーポン」だけ）では何が起きるか分からない
+      expect(x.label, 'ボタンが動詞になっていない').toMatch(/を(適用|変更)$/);
+      const applied = x.coupon && x.coupon !== '—';
+      expect(x.label, `クーポン=${x.coupon || 'なし'} の行のラベルが合っていない`)
+        .toBe(applied ? 'クーポンを変更' : 'クーポンを適用');
+    }
+  });
+
+  test('R-20 クーポン管理で使用回数とメモが離れている', async ({ page }) => {
+    await openScreen(page, '/03_admin/coupon-management.html');
+    const gap = await page.evaluate(() => {
+      const row = document.querySelector('#couponList [data-pg]');
+      const cells = [...row.children];
+      // 使用回数(率) は右揃え、メモは左揃えで隣り合う
+      const used = cells[7].getBoundingClientRect();
+      const memo = cells[8].getBoundingClientRect();
+      const usedText = cells[7].querySelector('span') ? cells[7] : cells[7];
+      return {
+        gap: Math.round(memo.left - used.right),
+        pad: parseFloat(getComputedStyle(cells[8]).paddingLeft),
+        used: usedText.textContent.trim(),
+        memo: cells[8].textContent.trim(),
+      };
+    });
+    expect(gap.pad + gap.gap, `使用回数「${gap.used}」とメモ「${gap.memo}」の間隔が狭い`)
+      .toBeGreaterThanOrEqual(12);
+  });
+
+  test('R-21 正答率の警告色にしきい値が書いてある', async ({ page }) => {
+    const t = await visibleText(page, '/03_admin/performance-management.html');
+    expect(t, 'しきい値の説明が画面に無い').toMatch(/95\s*%\s*未満/);
+  });
+
+  test('R-22 対応言語の制約の説明が1つだけ', async ({ page }) => {
+    await openScreen(page, '/03_admin/survey-detail.html?id=SV-10259');
+    const t = await page.locator('#main-content').innerText();
+    const hits = (t.match(/3\s*言語まで/g) || []).length;
+    expect(hits, `同じ制約が ${hits} 箇所に出ている`).toBe(1);
+  });
+
+  test('R-23 照合画面の色見本が凡例だと分かる', async ({ page }) => {
+    await openScreen(page, '/03_admin/reconciliation/detail.html');
+    const t = await page.locator('#main-content').innerText();
+    expect(t, '色見本に「凡例」の断りが無く、押せる操作に見える').toContain('凡例');
+  });
+});
+
 test.describe('R-25 検索欄のラベル', () => {
   for (const s of SCREENS) {
     test(`${s.name}: 入力欄に名前が付いている`, async ({ page }) => {
