@@ -111,7 +111,8 @@ test.describe('R-14 日付の書式', () => {
 
 test.describe('R-15 / R-16 記号', () => {
   test('日本語の文中では全角の括弧を使う', async ({ page }) => {
-    test.fail(); // 未修正: 半角が大多数、全角は7箇所だけ
+    // 未着手: 半角が大多数で全角は7箇所だけ。どちらへ寄せるかは表記の方針決定が要る
+    test.fail();
     test.slow();
     const texts = await allText(page);
     const hit = [];
@@ -124,13 +125,17 @@ test.describe('R-15 / R-16 記号', () => {
   });
 
   test('空欄の — と マイナスの − を取り違えない', async ({ page }) => {
-    test.fail(); // 未修正: 割引率が全角マイナス(U+2212)、空欄が em dash
     test.slow();
     const texts = await allText(page);
-    const hit = Object.entries(texts)
-      .filter(([, t]) => t.includes('−'))
-      .map(([n]) => n);
-    expect(hit, `全角マイナスを使っている画面: ${hit.join(', ')}`).toEqual([]);
+    // 金額・割合のマイナスは半角にする。全角マイナス(U+2212)は空欄の em dash と
+    // 見分けが付かず、値が無いのか負の数なのか読めない。
+    // 拡大縮小の「＋ / −」は全角のペアなので対象外（数字が続かない）
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      const m = t.match(/−\s?[\d]/g);
+      if (m) { hit.push(`${name}: ${m.join(' ')}`); }
+    }
+    expect(hit, `数値の前に全角マイナス: ${hit.join(' / ')}`).toEqual([]);
   });
 });
 
@@ -259,13 +264,8 @@ test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
 });
 
 test.describe('R-25 検索欄のラベル', () => {
-  // 未修正: プレースホルダだけで aria-label も label も無い欄が残っている画面
-  const UNNAMED = ['ユーザー管理', 'アンケート管理', '請求管理', '請求書管理', 'クーポン管理',
-    'オペレーター管理', '操作ログ', '名刺入力画面', '照合結果一覧'];
-
   for (const s of SCREENS) {
     test(`${s.name}: 入力欄に名前が付いている`, async ({ page }) => {
-      test.fail(UNNAMED.includes(s.name));
       await openScreen(page, s.path);
       const unnamed = await page.evaluate(() => {
         const out = [];

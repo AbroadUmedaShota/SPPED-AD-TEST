@@ -41,8 +41,8 @@
             </div>
           </div>
           <div data-filter-for="reconList" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input data-f-key="sid" placeholder="アンケートID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
-            <input data-f-key="uid" placeholder="ユーザーID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
+            <input aria-label="アンケートID" data-f-key="sid" placeholder="アンケートID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
+            <input aria-label="ユーザーID" data-f-key="uid" placeholder="ユーザーID(完全/前方一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:200px;font-family:inherit">
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5b6577">作業ステータス
               <select data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">すべて</option><option>会期前</option><option>会期中</option><option>データ化中</option><option>データ化完了</option></select>
             </label>
@@ -51,7 +51,7 @@
             
             <span style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap">
               <span style="width:1px;height:26px;background:#e2e6ed"></span>
-              <input id="reconGoId" placeholder="アンケートIDを指定して照合(例: SV-10236)" title="指定したアンケートの未照合名刺から照合を開始" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:230px;font-family:inherit">
+              <input aria-label="アンケートIDを指定して照合" id="reconGoId" placeholder="アンケートIDを指定して照合(例: SV-10236)" title="指定したアンケートの未照合名刺から照合を開始" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:230px;font-family:inherit">
               <button onclick="location.href='detail.html?id=' + encodeURIComponent((document.getElementById('reconGoId').value || '').trim())" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">指定して照合開始</button>
             </span>
           </div>
