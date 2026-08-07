@@ -142,12 +142,11 @@ test.describe('R-15 / R-16 記号', () => {
 test.describe('R-05 〜 R-13 用語の統一', () => {
   const CASES = [
     { id: 'R-05', label: '納期区分', words: ['納期区分', '申込プラン', 'データ化申込プラン', 'データ化の申込'] },
-    { id: 'R-06', label: '操作ログ', words: ['操作ログ', '監査ログ'] },
+    { id: 'R-06', label: 'ログの呼称', words: ['操作ログ', '監査ログ'] },
     { id: 'R-10', label: 'ユーザーの呼称', words: ['ユーザー', '利用者'] },
   ];
   for (const c of CASES) {
     test(`${c.id} ${c.label}: 呼び方を1つに絞る`, async ({ page }) => {
-      test.fail(); // 未着手: どの語を正とするかは事業側の判断（Phase 3 で確定させる）
       test.slow();
       const texts = await allText(page);
       const used = c.words.filter((w) => Object.values(texts).some((t) => t.includes(w)));
@@ -155,8 +154,17 @@ test.describe('R-05 〜 R-13 用語の統一', () => {
     });
   }
 
+  test('R-13 人を数える一覧は「名」で数える', async ({ page }) => {
+    for (const path of ['/03_admin/user-management.html', '/03_admin/operator-management.html',
+      '/03_admin/performance-management.html']) {
+      const t = await visibleText(page, path);
+      const m = /全\s*\d+\s*([件名])中\s*[\d〜]+\s*([件名])を表示/.exec(t);
+      expect(m, `件数表示が読めない: ${path}`).not.toBeNull();
+      expect([m[1], m[2]], `${path} が「件」で人を数えている`).toEqual(['名', '名']);
+    }
+  });
+
   test('R-07 サイドバーの項目名と、遷移先の画面名が一致する', async ({ page }) => {
-    test.fail(); // 未修正: 「名刺入力画面」→「データ入力対象一覧」、「照合画面」→「照合結果一覧」
     await openScreen(page, '/03_admin/index.html');
     const links = await page.evaluate(() => [...document.querySelectorAll('#sidebar-placeholder a')]
       .map((a) => ({ label: (a.textContent || '').trim(), href: a.getAttribute('href') }))
@@ -178,7 +186,7 @@ test.describe('R-05 〜 R-13 用語の統一', () => {
 
 test.describe('R-27 / R-28 モーダルのキーボード操作', () => {
   const MODALS = [
-    { screen: 'ユーザー管理', path: '/03_admin/user-management.html', open: 'button:has-text("利用者を招待")' },
+    { screen: 'ユーザー管理', path: '/03_admin/user-management.html', open: 'button:has-text("ユーザーを招待")' },
     { screen: 'クーポン管理', path: '/03_admin/coupon-management.html', open: 'button:has-text("クーポンを作成")' },
     { screen: 'オペレーター管理', path: '/03_admin/operator-management.html', open: 'button:has-text("新規招待")' },
   ];

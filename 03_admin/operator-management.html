@@ -69,7 +69,7 @@
               <div id="operatorsList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
-              <span style="font-variant-numeric:tabular-nums">全 <span id="operatorsList-total">6</span> 件中 <span id="operatorsList-range">1〜6</span> 件を表示</span>
+              <span style="font-variant-numeric:tabular-nums">全 <span id="operatorsList-total">6</span> 名中 <span id="operatorsList-range">1〜6</span> 名を表示</span>
               <div style="display:flex;align-items:center;gap:16px">
                 <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('operatorsList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
                 <div id="operatorsList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('operatorsList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜6" onclick="pPage('operatorsList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('operatorsList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">›</button></div>
@@ -174,7 +174,7 @@
           <button style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmResetPwOp')">初期化メールを送信</button>
           <button data-min-lv="4" onclick="pOpen('mSetPwOp')" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
           <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/29 14:02</span><span>権限レベルを Lv1 → Lv2 に変更<br><span style="color:#8a93a5">実行者: admin@abroad-o.com</span></span></div>
           <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/12 09:18</span><span>パスワード初期化メールを送信<br><span style="color:#8a93a5">実行者: y.sato@abroad-o.com</span></span></div>

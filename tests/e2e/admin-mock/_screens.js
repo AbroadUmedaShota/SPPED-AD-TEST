@@ -19,7 +19,7 @@ const SCREENS = [
   { name: '営業日カレンダー', path: '/03_admin/calendar-management.html' },
   { name: 'オペレーター管理', path: '/03_admin/operator-management.html' },
   { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html' },
-  { name: '操作ログ', path: '/03_admin/audit-log.html' },
+  { name: '監査ログ', path: '/03_admin/audit-log.html' },
   { name: 'データ入力対象一覧', path: '/03_admin/data-entry/index.html' },
   { name: '名刺入力画面', path: '/03_admin/data-entry/form.html' },
   { name: '照合結果一覧', path: '/03_admin/reconciliation/index.html' },
@@ -39,7 +39,7 @@ const LISTS = [
   { name: '照合結果一覧', path: '/03_admin/reconciliation/index.html', id: 'reconList', sortCol: 0, numeric: false },
   { name: 'オペレーター管理', path: '/03_admin/operator-management.html', id: 'operatorsList', sortCol: 0, numeric: false },
   { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html', id: 'perfList', sortCol: 3, numeric: true },
-  { name: '操作ログ', path: '/03_admin/audit-log.html', id: 'auditList', sortCol: 0, numeric: false },
+  { name: '監査ログ', path: '/03_admin/audit-log.html', id: 'auditList', sortCol: 0, numeric: false },
 ];
 
 /** 画面を開き、描画とシェル注入の完了まで待つ */

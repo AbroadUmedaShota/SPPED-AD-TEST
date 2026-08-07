@@ -54,9 +54,9 @@ test('招待は本登録より前の日時になる（時系列が逆転しな�
     `招待(${invited[1]})が本登録(${registered[1]})より後になっている`,
   ).toBeLessThan(new Date(registered[1]).getTime());
 
-  // 操作ログも同じ順序で並ぶ（新しいものが上）
+  // 監査ログも同じ順序で並ぶ（新しいものが上）
   const log = await page.locator('#udLog').innerText();
-  expect(log.indexOf('招待から本登録が完了'), '操作ログの並びが時系列と合わない')
+  expect(log.indexOf('招待から本登録が完了'), '監査ログの並びが時系列と合わない')
     .toBeLessThan(log.indexOf('招待を実行'));
 });
 
@@ -68,7 +68,7 @@ test('招待中は招待の再送とキャンセルができる（§4.6）', asy
   expect(await page.locator('#mResendInvite').innerText()).toMatch(/72/);
   await page.click('#mResendInvite button:has-text("再送する")');
   await expect(page.locator('#mResendInvite')).toBeHidden();
-  expect(await page.locator('#udLog').innerText(), '再送が操作ログに残らない').toMatch(/再送/);
+  expect(await page.locator('#udLog').innerText(), '再送が監査ログに残らない').toMatch(/再送/);
 
   await page.click('button:has-text("招待をキャンセル")');
   await expect(page.locator('#mCancelInvite')).toBeVisible();
@@ -108,14 +108,20 @@ test('未保存のまま離れようとすると確認する（§4.2）', async 
 
 test('§4.1 の配置順で並ぶ', async ({ page }) => {
   await open(page, USERS.有効);
-  // 見出しは入れ子（「紐づくアンケート」＋「全 1 件」）なので、
-  // 末端要素ではなく表示テキスト上の出現位置で順序を見る
-  const text = await page.locator('#main-content').innerText();
-  const wanted = ['アカウント情報', 'パスワード操作', '紐づくアンケート', '請求状況', '操作ログ'];
-  const at = wanted.map((w) => ({ w, i: text.indexOf(w) }));
-  for (const { w, i } of at) {
-    expect(i, `見出し「${w}」が見つからない`).toBeGreaterThanOrEqual(0);
-  }
-  const sorted = [...at].sort((a, b) => a.i - b.i).map((x) => x.w);
-  expect(sorted, '§4.1 の順序と違う').toEqual(wanted);
+  const wanted = ['アカウント情報', 'パスワード操作', '紐づくアンケート', '請求状況', '監査ログ'];
+  // 本文中にも同じ語が出る（「監査ログに記録されます」など）ので、
+  // 区切り線を持つ見出しの帯だけを文書順に拾う。
+  // 見出しは「アカウント情報 + 補足」「紐づくアンケート + 件数 + ボタン」のように
+  // 中身の作りが揃っていないため、太字かどうかではなく先頭の語で判定する
+  const found = await page.evaluate((labels) => {
+    const out = [];
+    document.querySelectorAll('#main-content div').forEach((el) => {
+      if (getComputedStyle(el).borderBottomStyle === 'none') { return; }
+      const t = (el.textContent || '').trim();
+      const hit = labels.find((w) => t.startsWith(w));
+      if (hit && !out.includes(hit)) { out.push(hit); }
+    });
+    return out;
+  }, wanted);
+  expect(found, '§4.1 の見出しが揃っていない、または順序が違う').toEqual(wanted);
 });

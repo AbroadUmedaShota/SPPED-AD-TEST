@@ -50,7 +50,7 @@
         <span style="color:#6b7484">作成日時</span><span style="font-variant-numeric:tabular-nums">2026/07/28 09:15</span>
         <span style="color:#6b7484">最終更新日時</span><span style="font-variant-numeric:tabular-nums">2026/07/30 15:41</span>
       </div>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。利用者側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。</div>
+      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。ユーザー側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:6px">
         <span style="font-size:12px;font-weight:700;color:#5b6577">設問構成<span data-slot="qNote" style="font-weight:400;color:#8a93a5;margin-left:8px">全4問・会期前は通常編集として変更できます</span></span>
         <button data-slot="qEditBtn" onclick="pQOpen()" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">設問を編集</button>
@@ -73,7 +73,7 @@
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
                   <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">名刺データ化設定<span style="font-weight:400;color:#8a93a5;margin-left:8px">確認のみ・変更は申込内容の変更として扱う</span></div>
                   <div style="display:grid;grid-template-columns:132px 1fr;gap:10px 12px;padding-top:14px;font-size:13px;align-items:center;color:#374151">
-                    <span style="color:#6b7484">データ化申込プラン</span><span><span data-slot="plan" style="font-weight:700">通常</span><span style="font-size:11.5px;color:#8a93a5;margin-left:8px">納期区分</span></span>
+                    <span style="color:#6b7484">納期区分</span><span><span data-slot="plan" style="font-weight:700">通常</span><span style="font-size:11.5px;color:#8a93a5;margin-left:8px">納期区分</span></span>
                     <span style="color:#6b7484">データ化対象の名刺</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizTotal">0</span> 件</span>
                     <span style="color:#6b7484">入力・照合の進捗</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizProgress">入力 0 件 / 照合 0 件</span></span>
                   </div>
@@ -103,7 +103,7 @@
                   <div data-slot="exPublish" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">公開後のアンケート変更</span>
-                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">利用者側では制限される公開後の変更を、管理者が代行して行う</span>
+                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">ユーザー側では制限される公開後の変更を、管理者が代行して行う</span>
                     </span>
                     <button onclick="pOpen('mDangerEdit')" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更する</button>
                   </div>
@@ -131,7 +131,7 @@
                   <div style="padding-top:10px;border-top:1px solid #e2e6ed;font-size:11.5px;color:#6b7484;line-height:1.7">いずれの操作も実行理由の入力が必須で、監査ログに記録されます。</div>
                 </div>
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアンケートに対する操作</span></div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアンケートに対する操作</span></div>
                   <div id="sdLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
                     <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(08/04→08/03開始)<br><span style="color:#8a93a5">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
                     <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:#8a93a5">実行者: 本人(U-1049)</span></span></div>
@@ -322,7 +322,7 @@
         <span id="qCount" style="font-size:11.5px;color:#6b7484"></span>
       </div>
       <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.8">
-        設問タイプは利用者側のアンケート編集画面と同じ12種です。名刺の撮影は設問ではなく、アンケート単位の名刺データ化設定が持ちます。<br>多言語アンケートでは第一言語が必須で、それ以外の言語が未入力のときの回答画面での扱いは要確認です。<br>
+        設問タイプはユーザー側のアンケート編集画面と同じ12種です。名刺の撮影は設問ではなく、アンケート単位の名刺データ化設定が持ちます。<br>多言語アンケートでは第一言語が必須で、それ以外の言語が未入力のときの回答画面での扱いは要確認です。<br>
         設問の編集を本画面内で行うか専用画面へ分離するかは要確定(<span style="font-family:ui-monospace,Consolas,monospace">14_admin_survey_detail.md §11 #5</span>)。
       </div>
     </div>
@@ -358,9 +358,9 @@
 (function () {
     'use strict';
 
-    // 設問タイプ・型別の設定・多言語の扱いは利用者側エディタ
+    // 設問タイプ・型別の設定・多言語の扱いはユーザー側エディタ
     // (02_dashboard/src/surveyCreation-v2.js) に合わせる。
-    // 要件書 §4.3 が「利用者側のアンケート編集画面と同一の機能構成」と定めているため。
+    // 要件書 §4.3 が「ユーザー側のアンケート編集画面と同一の機能構成」と定めているため。
     // 名刺は設問タイプではない(アンケート単位の bizcardEnabled / 名刺データ化設定が持つ)ので、ここには無い
     var TYPES = [
         { v: 'free_answer', label: 'フリーアンサー' },
@@ -380,7 +380,7 @@
     var MATRIX_TYPES = { matrix_sa: 1, matrix_ma: 1 };
     var HEIGHTS = [{ v: 150, label: '低め' }, { v: 200, label: '標準' }, { v: 320, label: '高め' }];
 
-    // 利用者側の SUPPORTED_LANGS と同じ5言語。先頭が第一言語で、選べるのは第一言語含め3言語まで
+    // ユーザー側の SUPPORTED_LANGS と同じ5言語。先頭が第一言語で、選べるのは第一言語含め3言語まで
     var LANGS = [
         { code: 'ja', name: '日本語' },
         { code: 'en', name: 'English' },
@@ -404,7 +404,7 @@
         return {};
     }
 
-    // 多言語の値は利用者側と同じく {ja:'…', en:'…'} の形で持つ
+    // 多言語の値はユーザー側と同じく {ja:'…', en:'…'} の形で持つ
     function mk(v) { return (v && typeof v === 'object') ? v : { ja: v || '' }; }
     function tv(o, lang) { return (o && o[lang]) || ''; }
     function cloneTv(o) {
@@ -1132,7 +1132,7 @@
     }, true);
 
     // ---- 回答画面でのプレビュー ----
-    // 利用者側と同じ受け渡し(localStorage の surveyPreviewData + survey-answer.html?preview=1)。
+    // ユーザー側と同じ受け渡し(localStorage の surveyPreviewData + survey-answer.html?preview=1)。
     // 請求書と違い ID に依存しないため、管理画面の下書きをそのまま渡せる
     window.pQPreview = function () {
         var qs = draft.map(function (q, i) {
@@ -1276,7 +1276,7 @@
 <script>
 // アンケート詳細での操作を画面表示へ反映する(モックのため再読込で戻る)
 
-// 操作ログへ1行足す。設問構成の変更もこれを使う
+// 監査ログへ1行足す。設問構成の変更もこれを使う
 window.pSdLog = function (title, reason, exception, detail) {
     var log = document.getElementById('sdLog');
     if (!log) { return; }
@@ -1476,7 +1476,7 @@ window.pSdUpload = function () {
 
 <script>
 // ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、
-// 集計値・操作ログ・モーダル本文の数値は固定のダミーのまま
+// 集計値・監査ログ・モーダル本文の数値は固定のダミーのまま
 (function () {
     var DATA = {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "08/03 10:00〜08/05 17:00", "status": "会期前", "plan": "通常", "answers": "0", "dataCount": "—"}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "07/30 10:00〜08/01 17:00", "status": "会期中", "plan": "特急", "answers": "3,842", "dataCount": "—"}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "07/29 10:00〜07/31 17:00", "status": "会期中", "plan": "通常", "answers": "926", "dataCount": "—"}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "company": "(株)イベントプラス", "period": "07/24 10:00〜07/26 17:00", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 08/03", "dataCount": "2,150"}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "07/22 09:30〜07/24 18:00", "status": "データ化中", "plan": "超特急", "answers": "納品予定 08/01", "dataCount": "1,208"}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "company": "(株)テックブリッジ", "period": "07/21 10:00〜07/23 17:00", "status": "データ化中", "plan": "オンデマンド", "answers": "納品予定 07/28", "dataCount": "3,420"}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "company": "(株)サンライトプロモーション", "period": "07/18 10:00〜07/20 17:00", "status": "データ化中", "plan": "特急", "answers": "納品予定 07/25", "dataCount": "2,864"}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "07/16 13:00〜07/16 18:00", "status": "データ化中", "plan": "通常", "answers": "納品済 07/23", "dataCount": "412"}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "company": "ミライ電装(株)", "period": "07/14 10:00〜07/16 17:00", "status": "データ化完了", "plan": "超特急", "answers": "納品済 07/21", "dataCount": "1,980"}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "07/10 11:00〜07/10 19:00", "status": "データ化完了", "plan": "お試し", "answers": "納品済 07/17", "dataCount": "356"}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "company": "(株)クレストメディカル", "period": "07/07 13:00〜07/07 17:30", "status": "データ化完了", "plan": "特急", "answers": "納品済 07/14", "dataCount": "288"}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "company": "東亜精密工業(株)", "period": "07/02 10:00〜07/04 17:00", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 07/09", "dataCount": "3,105"}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "company": "(株)ネオフーズ", "period": "06/25 10:00〜06/27 17:00", "status": "データ化完了", "plan": "通常", "answers": "納品済 07/04", "dataCount": "1,472"}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "company": "西日本トラベル(株)", "period": "06/19 09:30〜06/20 18:00", "status": "データ化完了", "plan": "特急", "answers": "納品済 06/26", "dataCount": "926"}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "company": "(株)アークデザイン", "period": "06/12 10:00〜06/14 17:00", "status": "データ化完了", "plan": "超特急", "answers": "納品済 06/19", "dataCount": "1,038"}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "company": "セントラル機器(株)", "period": "06/05 10:00〜06/07 17:00", "status": "データ化完了", "plan": "通常", "answers": "納品済 06/12", "dataCount": "2,214"}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "company": "(株)ハーベスト農園", "period": "05/28 10:00〜05/30 17:00", "status": "データ化完了", "plan": "お試し", "answers": "納品済 06/07", "dataCount": "684"}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "company": "光陽印刷(株)", "period": "05/21 10:00〜05/23 17:00", "status": "データ化完了", "plan": "通常", "answers": "納品済 05/28", "dataCount": "1,760"}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "company": "(株)ラピスソフト", "period": "05/14 10:00〜05/16 17:00", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 05/21", "dataCount": "2,530"}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "company": "大和ハウジング(株)", "period": "05/08 10:00〜05/10 17:00", "status": "データ化完了", "plan": "特急", "answers": "納品済 05/15", "dataCount": "1,204"}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "company": "(株)エコスタイル", "period": "04/23 10:00〜04/25 17:00", "status": "データ化完了", "plan": "通常", "answers": "納品済 05/02", "dataCount": "842"}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "company": "(株)テクノブレイン", "period": "04/15 13:00〜04/15 18:00", "status": "データ化完了", "plan": "超特急", "answers": "納品済 04/22", "dataCount": "516"}};
     var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};
@@ -1512,7 +1512,7 @@ window.pSdUpload = function () {
         b.textContent = d.status;
         b.className = 'status-badge ' + (BADGE[d.status] || 'status-inactive');
     });
-    // 申込プラン(納期区分)は名刺データ化設定に1箇所だけ置く(§4.4)。
+    // 納期区分は名刺データ化設定に1箇所だけ置く(§4.4)。
     // 文字列置換の対象にはしない — 「通常」「特急」は説明文にも出る短い一般語のため
     document.querySelectorAll('[data-slot="plan"]').forEach(function (e) { e.textContent = d.plan; });
 

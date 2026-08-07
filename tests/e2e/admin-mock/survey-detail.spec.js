@@ -64,13 +64,13 @@ test.describe('設問構成の編集ゲート（§2.1・§4.6）', () => {
     await expect(page.locator('#mQuestions'), '理由が空でも保存が通ってしまう').toBeVisible();
     expect(await page.locator('#qErr').textContent()).toMatch(/理由/);
 
-    // 入れ直せば通り、操作ログに要注意操作として残る
+    // 入れ直せば通り、監査ログに要注意操作として残る
     await page.fill('#qReason', '主催者からの依頼により設問文を修正');
     await page.click('#qSave');
     await expect(page.locator('#mQuestions')).toBeHidden();
     const log = await page.locator('#sdLog').textContent();
     expect(log).toMatch(/設問構成を変更/);
-    expect(log, '操作ログに要注意操作の印が無い').toMatch(/要注意操作/);
+    expect(log, '監査ログに要注意操作の印が無い').toMatch(/要注意操作/);
   });
 
   test('会期終了後は編集させない', async ({ page }) => {

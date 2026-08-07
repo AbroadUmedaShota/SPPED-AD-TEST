@@ -64,7 +64,7 @@
       <span style="font-size:15px;font-weight:700">請求書<span data-slot="ivHead" style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px"></span></span>
       <span role="button" onclick="pInvoiceClose()" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
-    <div style="font-size:11.5px;color:#6b7484;padding:8px 22px;background:#f7f8fb;border-bottom:1px solid #eef0f5;flex-shrink:0">利用者が見る請求書の画面をそのまま表示しています。</div>
+    <div style="font-size:11.5px;color:#6b7484;padding:8px 22px;background:#f7f8fb;border-bottom:1px solid #eef0f5;flex-shrink:0">ユーザーが見る請求書の画面をそのまま表示しています。</div>
     <iframe data-slot="ivFrame" title="請求書" style="flex:1 1 auto;width:100%;border:0;background:#fff"></iframe>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:12px 22px;border-top:1px solid #e2e6ed;flex-shrink:0">
       <a data-slot="ivTab" href="#" target="_blank" rel="noopener" style="align-self:center;font-size:12.5px;margin-right:auto">新規タブで開く ↗</a>
@@ -77,9 +77,9 @@
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
 <script>
-// 請求書の内訳(仕様書16 §4.4)。利用者側 02_dashboard/invoice-detail.html を読み込み、
-// 利用者が見るものと同じ請求書をそのまま表示する。
-// 枠(ヘッダー・サイドバー・パンくず)を隠すのは利用者側の ?embed=1 の役目で、
+// 請求書の内訳(仕様書16 §4.4)。ユーザー側 02_dashboard/invoice-detail.html を読み込み、
+// ユーザーが見るものと同じ請求書をそのまま表示する。
+// 枠(ヘッダー・サイドバー・パンくず)を隠すのはユーザー側の ?embed=1 の役目で、
 // こちら側から iframe の中身へ手を入れることはしない
 var INVOICE_META = {"INV-2026-08-001": {"company": "(株)イベントプラス", "month": "2026/08", "total": 475255}, "INV-2026-07-002": {"company": "東亜精密工業(株)", "month": "2026/07", "total": 686405}, "INV-2026-07-005": {"company": "地方創生機構", "month": "2026/07", "total": 23003}, "INV-2026-07-004": {"company": "ミライ電装(株)", "month": "2026/07", "total": 339768}, "INV-2026-07-006": {"company": "グロースパートナーズ(株)", "month": "2026/07", "total": 281}, "INV-2026-07-001": {"company": "(株)ネオフーズ", "month": "2026/07", "total": 74222}, "INV-2026-07-003": {"company": "(株)クレストメディカル", "month": "2026/07", "total": 41292}, "INV-2026-06-004": {"company": "西日本トラベル(株)", "month": "2026/06", "total": 102768}, "INV-2026-06-002": {"company": "セントラル機器(株)", "month": "2026/06", "total": 124095}, "INV-2026-06-001": {"company": "(株)ハーベスト農園", "month": "2026/06", "total": 642}, "INV-2026-06-003": {"company": "(株)アークデザイン", "month": "2026/06", "total": 183301}, "INV-2026-05-002": {"company": "大和ハウジング(株)", "month": "2026/05", "total": 133654}, "INV-2026-05-004": {"company": "光陽印刷(株)", "month": "2026/05", "total": 98626}, "INV-2026-05-003": {"company": "(株)ラピスソフト", "month": "2026/05", "total": 486382}, "INV-2026-05-001": {"company": "(株)エコスタイル", "month": "2026/05", "total": 47126}, "INV-2026-04-001": {"company": "(株)テクノブレイン", "month": "2026/04", "total": 96597}};
 
@@ -88,7 +88,7 @@ window.pInvoice = function (id) {
     var url = '../02_dashboard/invoice-detail.html?id=' + encodeURIComponent(id);
     var head = document.querySelector('#mInvoiceDetail [data-slot="ivHead"]');
     if (head) { head.textContent = m ? (m.company + '・' + m.month + '  ' + id) : id; }
-    // 新規タブは利用者が見るままの画面を出したいので embed は付けない
+    // 新規タブはユーザーが見るままの画面を出したいので embed は付けない
     var tab = document.querySelector('#mInvoiceDetail [data-slot="ivTab"]');
     if (tab) { tab.href = url; }
     var f = document.querySelector('#mInvoiceDetail [data-slot="ivFrame"]');
