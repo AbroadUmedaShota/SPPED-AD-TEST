@@ -52,6 +52,53 @@ test.describe('決着済みの用語（戻ったら落ちる）', () => {
 });
 
 test.describe('決着済みの配置（戻ったら落ちる）', () => {
+  test('アンケート詳細の日付が壊れていない', async ({ page }) => {
+    // 会期から時刻を取っていた箇所があり、書式を変えたときに 2026/2026/07 30 になった
+    for (const id of ['SV-10259', 'SV-10250', 'SV-10262']) {
+      await openScreen(page, `/03_admin/survey-detail.html?id=${id}`);
+      const t = await page.locator('#main-content').innerText();
+      // 年が二重になっていないか、日付の後ろに時刻でない数が付いていないか
+      const broken = t.match(/20\d\d\/20\d\d|\/\d\d \d\d(?!:)/g) || [];
+      expect(broken, `${id} に壊れた日付: ${broken.join(', ')}`).toEqual([]);
+    }
+  });
+
+  test('会期は日付のみで扱う（2026-08-06 決定）', async ({ page }) => {
+    // 利用者側は type="date" で、データも日付しか持たない。
+    // 管理側だけが時刻を持つと、代行編集で利用者が持てない値を入れられる
+    test.slow();
+    const texts = await allText(page);
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      const m = t.match(/20\d\d\/\d\d\/\d\d \d\d:\d\d\s*[〜~]/g);
+      if (m) { hit.push(`${name}: ${m.join(' ')}`); }
+    }
+    expect(hit, `会期に時刻が出ている: ${hit.join(' / ')}`).toEqual([]);
+  });
+
+  test('会期の入力欄は日付だけを選ばせる', async ({ page }) => {
+    for (const path of ['/03_admin/survey-detail.html?id=SV-10259', '/03_admin/survey-management.html']) {
+      await openScreen(page, path);
+      const types = await page.evaluate(() => [...document.querySelectorAll('#main-content input, .proto-modal input')]
+        .filter((el) => /会期/.test(el.getAttribute('aria-label') || '')
+          || /period/i.test(el.getAttribute('data-slot') || '')
+          || ['svFrom', 'svTo'].includes(el.id))
+        .map((el) => el.type));
+      expect(types.length, `会期の入力欄が見つからない: ${path}`).toBeGreaterThan(0);
+      expect([...new Set(types)], `${path} で時刻まで選べる`).toEqual(['date']);
+    }
+  });
+
+  test('アンケート詳細の会期入力が対象アンケートに追従する', async ({ page }) => {
+    // 表示に年を出すようにした時点で、追従の判定に使う正規表現が当たらなくなっていた
+    for (const [id, start, end] of [['SV-10262', '2026-08-03', '2026-08-05'],
+      ['SV-10259', '2026-07-30', '2026-08-01']]) {
+      await openScreen(page, `/03_admin/survey-detail.html?id=${id}`);
+      expect(await page.inputValue('[data-slot="periodStart"]'), `${id} の会期開始が追従しない`).toBe(start);
+      expect(await page.inputValue('[data-slot="periodEnd"]'), `${id} の会期終了が追従しない`).toBe(end);
+    }
+  });
+
   test('メールが届いたかどうかは画面に出さない（2026-08-06 決定）', async ({ page }) => {
     // 本人へ到達したかは本番の実装では取れないという報告がある。
     // 送信した記録は出してよいが、到達を示す表示は置かない
