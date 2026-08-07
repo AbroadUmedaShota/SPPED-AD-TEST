@@ -19,7 +19,7 @@ root.
 from __future__ import annotations
 
 import sys
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 
 DEFAULT_PORT = 8765
@@ -79,7 +79,10 @@ def parse_port(argv: list[str]) -> int:
 def main(argv: list[str]) -> None:
     """Start the development server bound to :data:`BIND_HOST`."""
     port = parse_port(argv)
-    server = HTTPServer((BIND_HOST, port), SupportRewriteHandler)
+    # Threading matters for the Playwright suite: parallel workers each request
+    # several files per page, and a single-threaded server serialises them until
+    # the tests time out waiting for the shared header/sidebar fragments.
+    server = ThreadingHTTPServer((BIND_HOST, port), SupportRewriteHandler)
     print(f"Dev server listening on http://{BIND_HOST}:{port}/")
     print("Rewriting prefixes -> /05_support/: " + ", ".join(REWRITE_PREFIXES))
     print("LOCAL DEVELOPMENT ONLY. Do not use in production.")

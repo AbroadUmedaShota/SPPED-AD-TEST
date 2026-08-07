@@ -80,13 +80,13 @@
         "date": "2026-08-06 (3)",
         "summary": "アンケート詳細のカラム構成を要件書の配置順へ揃え、設問構成の変更導線をモック化した",
         "corrections": [
-          "操作ログが左カラム（基本設定の下）にあり、要件書 §4.1「基本情報→設問構成→名刺データ化設定→回答状況→例外対応→操作ログ」の順序と逆だった",
+          "操作ログが左カラム（基本設定の下）にあり、要件書 §4.1「基本情報→設問構成→名刺データ化設定→回答状況→要注意操作→操作ログ」の順序と逆だった",
           "設問構成に「会期前のみ変更できます」と書かれているのに変更導線が無く、どう変えるのかがモックから読み取れなかった",
           "モックの設問タイプ4種（単一選択／複数選択／自由記述／名刺アップロード）は正本にない呼称だった。正本は12種で、名刺はそもそも設問タイプではなくアンケート単位の設定（bizcardEnabled）"
         ],
         "codeChanges": [
-          "survey-detail.html: 操作ログを右カラムの例外対応の下へ移動（左=対象アンケート／右=運営側の道具）",
-          "survey-detail.html: 設問構成に編集ボタンと mQuestions モーダルを追加。会期状態で通常編集／例外対応／変更不可を出し分け、保存で一覧・注記・操作ログへ反映",
+          "survey-detail.html: 操作ログを右カラムの要注意操作の下へ移動（左=対象アンケート／右=運営側の道具）",
+          "survey-detail.html: 設問構成に編集ボタンと mQuestions モーダルを追加。会期状態で通常編集／要注意操作／変更不可を出し分け、保存で一覧・注記・操作ログへ反映",
           "survey-detail.html: 設問タイプを正本12種（surveyCreation-v2.js の QUESTION_TYPES）へ揃え、選択肢・マトリックス行列・評定尺度の段階数を編集可能にし、設問と選択肢の削除に確認を挟んだ"
         ]
       },
@@ -123,7 +123,7 @@
         "date": "2026-08-06 (6)",
         "summary": "設問構成の編集を要件書 §4.6 の要求どおりにし、同じ機能が2箇所にある状態を解消した",
         "corrections": [
-          "例外対応「公開後のアンケート変更」の「変更する範囲」に「設問の修正（設問編集は別画面・本モック対象外）」と書いてあったが、設問編集は本画面のモーダルで実装済みだった。注記が事実と食い違っていた",
+          "要注意操作「公開後のアンケート変更」の「変更する範囲」に「設問の修正（設問編集は別画面・本モック対象外）」と書いてあったが、設問編集は本画面のモーダルで実装済みだった。注記が事実と食い違っていた",
           "会期中の設問変更に実行理由の入力が2箇所（mDangerEdit の rEdit と編集モーダルの qReason）にあり、同じ操作に対して別々のゲートが並んでいた",
           "納期区分が基本情報の編集用 select と見出し帯の「申込プラン」表示の2箇所にあった。要件書では §4.2 の表に無く、§4.4 名刺データ化設定が「確認に限る」項目として所管する",
           "見出し帯が作業ステータス・申込プラン・対応言語・対象ユーザーを繰り返していた。§4.1 は見出しを「アンケート ID とタイトル」の識別情報と定めている",
@@ -154,30 +154,30 @@
       },
       {
         "date": "2026-08-06 (7)",
-        "summary": "例外対応「公開後のアンケート変更」の3つの範囲をすべて実際の編集導線に繋いだ",
+        "summary": "要注意操作「公開後のアンケート変更」の3つの範囲をすべて実際の編集導線に繋いだ",
         "corrections": [
           "「変更する範囲」で基本設定・設問構成・お礼メール設定を選べるのに、繋がっていたのは設問構成だけだった。基本設定は選んでもトーストが出るだけ、お礼メール設定には変更UIが無かった",
-          "要件書 §2.1 は会期中の「タイトル・会期の変更」も例外対応と定めているが、モックは会期中でも基本情報をそのまま編集でき、確認も理由入力も通らずに保存できた",
+          "要件書 §2.1 は会期中の「タイトル・会期の変更」も要注意操作と定めているが、モックは会期中でも基本情報をそのまま編集でき、確認も理由入力も通らずに保存できた",
           "要件書 §2.1 は会期終了後を「不可」と定めているが、モックは編集も保存もできた",
           "要件書 §4.6 は確認画面に「既存回答への影響」を明示せよと定めているが、一般的な注意文だけで件数が出ていなかった"
         ],
         "codeChanges": [
-          "survey-detail.html: 基本情報に会期状態のゲートを入れた。会期中は編集不可で「変更を開始する」から§4.6 の確認へ送り、理由を入れると解除。保存すると例外対応として操作ログに残り、再びロックする",
+          "survey-detail.html: 基本情報に会期状態のゲートを入れた。会期中は編集不可で「変更を開始する」から§4.6 の確認へ送り、理由を入れると解除。保存すると要注意操作として操作ログに残り、再びロックする",
           "survey-detail.html: 会期終了後は基本情報を編集不可にし、保存ボタンを出さない(§2.1)",
-          "survey-detail.html: お礼メールに編集モードを足した。通常は閲覧のみで、例外対応で選んだときだけ件名・本文を編集でき、保存が操作ログに残る(§4.5 は確認、§4.6 は変更範囲に含む)",
+          "survey-detail.html: お礼メールに編集モードを足した。通常は閲覧のみで、要注意操作で選んだときだけ件名・本文を編集でき、保存が操作ログに残る(§4.5 は確認、§4.6 は変更範囲に含む)",
           "survey-detail.html: 確認画面に既存回答の件数と §11 #2 の未確定を出す",
           "survey-detail.html: 操作ログの書き込みを window.pSdLog に集約し、設問構成の変更もこれを使う",
           "survey-detail.html: 変更する範囲を1つも選ばずに実行したら差し戻す"
         ],
         "verification": [
-          "Playwright: 会期前=通常編集／会期中=ロック→確認→理由→解除→保存で例外対応記録→再ロック／会期終了後=編集も保存も不可（§2.1 の3状態）",
-          "Playwright: お礼メールが通常は閲覧のみ・例外対応でのみ編集できること、3範囲同時選択、範囲未選択の差し戻し",
+          "Playwright: 会期前=通常編集／会期中=ロック→確認→理由→解除→保存で要注意操作記録→再ロック／会期終了後=編集も保存も不可（§2.1 の3状態）",
+          "Playwright: お礼メールが通常は閲覧のみ・要注意操作でのみ編集できること、3範囲同時選択、範囲未選択の差し戻し",
           "Playwright: 既存スイート（アンケート詳細・設問編集・型別設定・多言語・共通シェル・F-04/F-08/F-09）と16画面の hidden 属性"
         ]
       },
       {
         "date": "2026-08-06 (8)",
-        "summary": "お礼メール編集の入口を画面上に出し、会期状態で例外対応の操作要素を出し分けるようにした",
+        "summary": "お礼メール編集の入口を画面上に出し、会期状態で要注意操作の操作要素を出し分けるようにした",
         "corrections": [
           "(7) でお礼メールを編集できるようにしたが、入口が「実行直後に1度開く」だけだった。設問構成と一緒に選ぶと設問編集が優先されて開かず、一度閉じたら戻る手段が無かった",
           "要件書 §7.2「会期の状態によって実行できない操作は、操作要素を表示しない」と §4.6「会期終了後は本領域の操作要素を表示しない」に対し、会期前でも会期終了後でも「公開後のアンケート変更」と「強制停止」が押せる状態だった",
@@ -185,13 +185,13 @@
           "モーダルの見出しが編集中でも「お礼メールの内容確認」のままだった"
         ],
         "codeChanges": [
-          "survey-detail.html: 回答状況のボタンを状態で切り替える。通常は「お礼メール内容の確認」(閲覧のみ)、例外対応を通すと「お礼メール内容を編集(例外対応)」に変わり、閉じても何度でも入り直せる。保存すると閲覧のみへ戻る",
-          "survey-detail.html: 例外対応の各行に印を付け、公開後のアンケート変更と強制停止は会期中だけ表示する。回答の削除と完了データの手動アップロードは会期に依らず残す(会期終了後の削除依頼で必要なため)",
+          "survey-detail.html: 回答状況のボタンを状態で切り替える。通常は「お礼メール内容の確認」(閲覧のみ)、要注意操作を通すと「お礼メール内容を編集(要注意操作)」に変わり、閉じても何度でも入り直せる。保存すると閲覧のみへ戻る",
+          "survey-detail.html: 要注意操作の各行に印を付け、公開後のアンケート変更と強制停止は会期中だけ表示する。回答の削除と完了データの手動アップロードは会期に依らず残す(会期終了後の削除依頼で必要なため)",
           "survey-detail.html: お礼メール本文の <br> を改行へ置き換えてから編集欄へ写す。見出しも編集中は「内容編集」にする"
         ],
         "verification": [
-          "Playwright: 例外対応の3範囲（基本情報・設問構成・お礼メール設定）を、実画面のクリックだけで最後まで通す。JS の直呼び（window.pOpen / checked への直代入）は排除",
-          "Playwright: 会期前・会期中・会期終了後で例外対応の操作要素の出方が変わること",
+          "Playwright: 要注意操作の3範囲（基本情報・設問構成・お礼メール設定）を、実画面のクリックだけで最後まで通す。JS の直呼び（window.pOpen / checked への直代入）は排除",
+          "Playwright: 会期前・会期中・会期終了後で要注意操作の操作要素の出方が変わること",
           "Playwright: 既存スイート一式と16画面の hidden 属性"
         ]
       },
@@ -225,6 +225,111 @@
           "Playwright: ユーザー詳細6項目、請求管理5項目、アカウント状態4種の整合",
           "Playwright: 既存スイート一式と16画面の hidden 属性",
           "check_refs.py: ノード/エッジ/フローの必須項目・id 参照・file:line の範囲・16画面のシェル一致"
+        ]
+      },
+      {
+        "date": "2026-08-06 (10)",
+        "summary": "管理画面16枚を通しでレビューし、画面の表示と実際が食い違う4件を直した。あわせて「例外対応」を「要注意操作」へ改めた",
+        "corrections": [
+          "請求書管理は16行すべてが data-pg=\"1\" で、表示件数10を選んでいるのに16行出ていた。件数表示だけ「全16件中1〜5件」と別の数を出しており、ページャにも2ページ目が無かった",
+          "オペレーター実績確認の見出し行に「集計最終更新 …」の span が2つ並んでいた（performance-management.html の32行目と33行目が同一）",
+          "ユーザー詳細で、招待メールの日時を「登録日の 10:02」に固定していたため、本登録完了（登録日時そのもの）より後ろに出ることがあった。U-1002 では招待 10:02 → 本登録完了 08:57 と時系列が逆転していた",
+          "照合・名刺入力が読む dummy_card_front/back.png は名前に反して実在の名刺写真で、表と裏が別人・照合表の値ともどこも一致していなかった。GitHub Pages が公開設定のため誰でも取得できる状態だった",
+          "F-03 の evidence が proto-ui.js:477-521 を指していたが、pSortable を足した際に約100行ずれ、実際には 574-596（pListCsv）と 601-617（pDlPick）だった。check_refs.py は行番号がファイルの行数の範囲内かしか見ないため通ってしまっていた"
+        ],
+        "codeChanges": [
+          "invoice-management.html: 11〜16行目を data-pg=\"2\" にし、ページャへ2ページ目を追加。件数表示の初期値も 1〜10 に揃えた",
+          "performance-management.html: 重複していた「集計最終更新」を1つにし、残した側へ margin-right:auto を付けてCSV出力ボタンを右端へ戻した",
+          "user-detail.html: inviteAt() を追加し、招待の日時を登録日時の前日として出す。メール送達状況と操作ログの両方が同じ値を使う",
+          "BY-221_照合画面/BY-223/dummy_card_front.png・dummy_card_back.png: 架空の名刺（アブロード株式会社 山田 太郎）へ差し替え。既存の assets/meishi_sample2.png と同じ作りで、reconciliation/detail.html の照合表が期待する値（会社名・役職・住所・FAX・URL）と一致させた",
+          "survey-detail.html と 13/14 の要件書: 「例外対応」を「要注意操作」へ改めた（計41箇所）"
+        ],
+        "verification": [
+          "Playwright: 9画面のページング（見えている行数と件数表示とページ数の一致）",
+          "Playwright: 既存スイート一式（設問編集・言語・ゲート・請求・ユーザー詳細・並び替え）",
+          "Playwright: 16画面の JSエラー・横はみ出し・hidden 属性",
+          "check_refs.py: ノード/エッジ/フローの必須項目・id 参照・file:line の範囲・16画面のシェル一致",
+          "差し替えた名刺画像を目視で確認（照合表の値と一致すること）"
+        ],
+        "openIssues": [
+          "レビューで挙げた表記ゆれ（納期区分まわりの6通り・操作ログ/監査ログ・サイドバーと画面名の不一致・言語名2系統・会社名の(株)表記）は未着手",
+          "モーダルのフォーカストラップが効いておらず、Tab でフォーカスが body へ抜ける（全画面）。クーポン管理とオペレーター管理は開いた直後のフォーカスが「保存する」「招待を送信」に当たる",
+          "補助テキストの #8a93a5 は白背景で 3.09:1 と WCAG AA に届かない。308箇所で使用、IDの表示も含む",
+          "差し替え前の名刺画像は git の履歴には残る。公開サイトからは消えるが、履歴からの完全な削除は履歴の書き換えが要るためユーザー判断"
+        ]
+      },
+      {
+        "date": "2026-08-06 (11)",
+        "summary": "レビュー30件を findings へ登録し、ループのキューにした。あわせて回帰ゲートを tests/e2e/admin-mock へ用意した",
+        "corrections": [
+          "check_refs.py が行番号の範囲しか見ていなかったため、中身が別物を指す参照を7件通していた（data-filter-keys が4画面で1行ずれ、proto-ui.js の from/to 比較が約100行、user-detail.html の DATA/replaceIn/GO が約270行、invoice の embed 付与が7行）",
+          "検証がセッション限りのスクリプトにあり、次のセッションでは何も残らなかった",
+          "scripts/dev-server.py が単一スレッドで、並列ワーカーからのリクエストが直列化していた"
+        ],
+        "codeChanges": [
+          "tests/e2e/admin-mock/: 6本の spec を追加。npx playwright test --project=local tests/e2e/admin-mock で回る",
+          "consistency.spec.js: レビュー指摘を検査にした。未修正は test.fail() で「落ちるのが正しい」状態にし、直すと赤くなって注釈外しを促す",
+          "check_refs.py: file:line の但し書きに書いた識別子が実際にその行にあるかを照合する",
+          "scripts/dev-server.py: ThreadingHTTPServer へ",
+          "findings に R-01〜R-30 を追加。R-01〜R-04 は是正済み、R-05 以降が残り（open 12件＝判断が要らないもの / deferred-要判断 14件）"
+        ],
+        "verification": [
+          "Playwright: local プロジェクト 147件（既存9件＋admin-mock 138件）",
+          "意図的に請求書管理のページングを壊し、ゲートが赤になることを確認",
+          "check_refs.py / build.py"
+        ]
+      },
+      {
+        "date": "2026-08-06 (12)",
+        "summary": "レビュー26件のうち24件を潰した。残りは R-08（言語名）と R-15（括弧）の2件",
+        "corrections": [
+          "モーダルの Tab が body へ抜け、キーボードだけでは実行もキャンセルもできなくなっていた",
+          "入力させるモーダルの初期フォーカスが「保存する」「招待を送信」に当たっていた",
+          "16画面すべてに h1 が無く、読み上げの見出しジャンプが働かなかった",
+          "名前の無い入力欄が9画面に29件あった",
+          "同じものを指す語が最大6通りあった（納期区分まわり・操作ログ/監査ログ・ユーザー/利用者）",
+          "サイドバーの項目名と遷移先の画面名が2つ食い違っていた",
+          "日付が年ありと年なしで混ざり、年をまたぐ会期が読めなかった",
+          "識別子が補助テキストと同じ淡さで WCAG AA に届いていなかった",
+          "名刺入力画面の OCR デモ値が差し替え前の実在名刺のままだった（初期表示に出ないため既存の検査では拾えなかった）"
+        ],
+        "codeChanges": [
+          "proto-ui.js: Tab の閉じ込めと、入力欄への初期フォーカス",
+          "16画面: h1 / aria-label / 用語の統一 / 日付に年 / 識別子の色",
+          "請求管理: アンケートでの絞り込みを追加（15_admin_billing.md §4.3 も4条件へ）",
+          "tests/e2e/admin-mock: 検査を 171 件へ。直すと注釈を外す運用で残りが見える"
+        ],
+        "verification": [
+          "Playwright: local プロジェクト 171 件",
+          "各項目とも、直す前に検査が赤になることを確認してから直した",
+          "check_refs.py / build.py / 16画面のスクリーンショット"
+        ],
+        "openIssues": [
+          "R-08 言語名の2系統（日本語/English/中文(简体) と 日本語/英語/中国語簡繁）は未決。表示言語と対応可能言語で用途が違うため、揃えるかどうかも含めて判断が要る",
+          "R-15 日本語の文中の括弧は半角が大多数（全角は7箇所）。どちらへ寄せるかは表記の方針決定が要る",
+          "R-18 請求管理の「完了予定日」が請求日より前。列が何を指すのかの確定待ち",
+          "用語の統一は 03_admin のみ。仕様書側の追従は未実施",
+          "差し替え前の名刺画像は git の履歴に残る。履歴からの削除は書き換えが要るため未実施"
+        ]
+      },
+      {
+        "date": "2026-08-06 (13)",
+        "summary": "ユーザー管理の一覧からプレミアム列を外し、契約状態の確認と変更をユーザー詳細に一本化した",
+        "corrections": [
+          "契約状態の値も、変更が請求へ与える影響（当月請求の扱い・日割りの有無）も未確定のまま、一覧から即時トグルできる形で置いていた。決まっているように見えてしまう",
+          "「招待をキャンセル」のラベルが長く、.row-act の 1fr が minmax(auto,1fr) のためトラックが押し広げられ、隣の「再送」と幅が揃っていなかった"
+        ],
+        "codeChanges": [
+          "user-management.html: プレミアム列（見出し・24行・招待行テンプレート）、data-f-premium、確認モーダル、切替処理を撤去。列トラックを8→7へ",
+          "user-management.html: 行内のボタンを「キャンセル」に短縮（確認ダイアログは「招待をキャンセルする」のまま）",
+          "admin-style.css: .row-act のトラックを minmax(0,1fr) にし、ラベルの長さでボタン幅がずれないようにした",
+          "11_admin_user_management.md: §3 の担当・§3.2 の対象範囲・§4.2 の表示項目・§4.4 の一覧編集・§4.5 の節・§10 の受入基準からプレミアムを外し、節番号を繰り上げ",
+          "12_admin_user_detail.md: §11 へプレミアムの未確定事項を移設（#8）",
+          "02_admin_common_audit_log.md: 監査対象の実行画面をユーザー詳細だけに"
+        ],
+        "verification": [
+          "Playwright: local プロジェクト 190 件",
+          "一覧にプレミアムが戻らないこと・ユーザー詳細には残ること・操作ボタンの幅が揃うことを検査に追加"
         ]
       }
     ]
@@ -488,7 +593,7 @@
         "#p-toast"
       ],
       "dependencies": [],
-      "evidence": "03_admin/src/proto-ui.js:1-592（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:227(pSortable)",
+      "evidence": "03_admin/src/proto-ui.js:596-639（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:249(pSortable)",
       "specDoc": "docs/リライト版仕様書/admin/01_admin_common_ui.md"
     },
     {
@@ -773,7 +878,7 @@
         "停止／有効へ戻す（行のステータスバッジと操作ボタンを pRowSet で差し替え）",
         "招待の取り消し（行をDOMから削除）・再送（送信日時と期限を更新）",
         "ユーザー詳細への遷移",
-        "一覧上でプレミアム契約状態を切り替える(確認ダイアログを挟む)"
+        "一覧上で行える編集はアカウントの停止だけに絞る（プレミアムの契約状態はユーザー詳細で扱う）"
       ],
       "filePaths": [
         "03_admin/user-management.html"
@@ -797,7 +902,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/user-management.html:36（data-filter-keys）, 234-359（inline script）",
+      "evidence": "03_admin/user-management.html:35（data-filter-keys）, 234-359（inline script）",
       "specDoc": "docs/リライト版仕様書/admin/11_admin_user_management.md",
       "dataSource": "HTML直書き25行"
     },
@@ -843,7 +948,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/user-detail.html:187-235（DATA/replaceIn/GO）",
+      "evidence": "03_admin/user-detail.html:459-502（DATA/replaceIn/GO）",
       "specDoc": "docs/リライト版仕様書/admin/12_admin_user_detail.md",
       "dataSource": "inline JS リテラル DATA（24ユーザー）"
     },
@@ -886,7 +991,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/survey-management.html:38（data-filter-keys）, 195-265（inline script: pSurveySave。pDlPick は 2026-08-06 に proto-ui.js へ移動）",
+      "evidence": "03_admin/survey-management.html:37（data-filter-keys）, 195-265（inline script: pSurveySave。pDlPick は 2026-08-06 に proto-ui.js へ移動）",
       "specDoc": "docs/リライト版仕様書/admin/13_admin_survey_management.md",
       "dataSource": "HTML直書き23行"
     },
@@ -899,10 +1004,10 @@
       "confidence": "verified",
       "minLevel": 3,
       "url": "/03_admin/survey-detail.html?id=SV-10262",
-      "description": "独立画面。?id= に応じた inline DATA（22件）でタイトル・契約ユーザー・会期・状態・申込プランを差し替える。レイアウトは左が対象アンケートそのもの（基本設定・設問構成）、右が運営側の道具（状態と数値・例外対応・操作ログ）で、要件書 §4.1 の配置順（基本情報→設問構成→回答状況→例外対応→操作ログ）を2カラムに割った形。危険操作（回答編集・回答削除・完了データ手動アップロード・会期強制終了）を確認モーダル付きで集約している画面。",
+      "description": "独立画面。?id= に応じた inline DATA（22件）でタイトル・契約ユーザー・会期・状態・申込プランを差し替える。レイアウトは左が対象アンケートそのもの（基本設定・設問構成）、右が運営側の道具（状態と数値・要注意操作・操作ログ）で、要件書 §4.1 の配置順（基本情報→設問構成→回答状況→要注意操作→操作ログ）を2カラムに割った形。危険操作（回答編集・回答削除・完了データ手動アップロード・会期強制終了）を確認モーダル付きで集約している画面。",
       "responsibilities": [
         "?id= による対象アンケートの表示差し替え",
-        "設問構成の編集（会期前=通常編集／会期中=例外対応ゲート／会期終了後=不可）。利用者側のアンケート編集画面と同じ機能構成: 12種の設問タイプ、型別の回答設定、設問の追加・途中挿入・複製・並び替え・削除、そして多言語アンケートでは編集言語タブで設問文と選択肢を言語ごとに編集する。削除と系統をまたぐ型変更は確認を挟む",
+        "設問構成の編集（会期前=通常編集／会期中=要注意操作ゲート／会期終了後=不可）。利用者側のアンケート編集画面と同じ機能構成: 12種の設問タイプ、型別の回答設定、設問の追加・途中挿入・複製・並び替え・削除、そして多言語アンケートでは編集言語タブで設問文と選択肢を言語ごとに編集する。削除と系統をまたぐ型変更は確認を挟む",
         "対応言語の表示と変更（ヘッダーのバッジと基本設定のチップ。先頭が第一言語・最大3言語・第一言語の入れ替えと除外に対応し、除外は確認を挟む）",
         "回答データDL（全件／確定分／名刺画像ZIP）",
         "お礼メール送信モーダル",
@@ -912,9 +1017,9 @@
         "設問構成の変更内容（追加・削除・並び替え・設問文/タイプ/必須/選択肢）を保存前に一覧で示す",
         "会期中は既存回答への影響を件数付きで示し、実行理由を必須にして監査ログへ残す",
         "名刺データ化の申込プラン（納期区分）と進捗を確認だけできる形で表示する",
-        "会期状態に応じて基本情報の編集可否を切り替える(会期前=通常編集／会期中=例外対応／会期終了後=確認のみ)",
-        "お礼メールは確認のみとし、変更は例外対応を通したときだけ受け付ける",
-        "会期状態によって実行できない例外対応の操作要素を表示しない"
+        "会期状態に応じて基本情報の編集可否を切り替える(会期前=通常編集／会期中=要注意操作／会期終了後=確認のみ)",
+        "お礼メールは確認のみとし、変更は要注意操作を通したときだけ受け付ける",
+        "会期状態によって実行できない要注意操作の操作要素を表示しない"
       ],
       "filePaths": [
         "03_admin/survey-detail.html"
@@ -1242,7 +1347,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/reconciliation/index.html:59（data-filter-keys）, 123（DLモーダル #mDl。処理は proto-ui.js の共有 pDlPick）",
+      "evidence": "03_admin/reconciliation/index.html:58（data-filter-keys）, 123（DLモーダル #mDl。処理は proto-ui.js の共有 pDlPick）",
       "specDoc": "docs/リライト版仕様書/admin/21_admin_matching_list.md",
       "dataSource": "HTML直書き6行"
     },
@@ -1379,7 +1484,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/performance-management.html:60（data-filter-keys）, 120-125（pPerfCsv ラッパ）, 128-216（inline script）",
+      "evidence": "03_admin/performance-management.html:58（data-filter-keys）, 119-122（pPerfCsv ラッパ）, 126-211（inline script）",
       "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
       "dataSource": "HTML直書き6行 + inline 集計セット"
     },
@@ -1417,7 +1522,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/audit-log.html:44（data-filter-keys）, 118-123（pAuditCsv ラッパ）/ 03_admin/src/proto-ui.js:264-268（from/to 比較）",
+      "evidence": "03_admin/audit-log.html:43（data-filter-keys）, 118-123（pAuditCsv ラッパ）/ 03_admin/src/proto-ui.js:360-364（from/to 比較）",
       "specDoc": "docs/リライト版仕様書/admin/25_admin_audit_log.md",
       "dataSource": "HTML直書き10行"
     },
@@ -1446,7 +1551,7 @@
         "請求書シートDOM"
       ],
       "dependencies": [],
-      "evidence": "03_admin/invoice-management.html:88（iframe.src に &embed=1）, 86-98（pInvoice）",
+      "evidence": "03_admin/invoice-management.html:95（f.src に &embed=1）, 86-98（pInvoice）",
       "specDoc": "docs/リライト版仕様書/admin/16_admin_invoice.md",
       "risk": "埋め込み時の見た目は利用者側の html[data-embed=\"1\"] のCSSが決める。管理側からは触らないため、崩れても管理画面の実装を追う必要はない"
     },
@@ -3609,7 +3714,7 @@
     },
     {
       "id": "flow-question-edit",
-      "name": "設問構成の変更（会期前=通常編集／会期中=例外対応）",
+      "name": "設問構成の変更（会期前=通常編集／会期中=要注意操作）",
       "category": "アンケート管理",
       "description": "要件書 §2.1 の会期状態別の扱いを導線に落としたもの。§4.3 が「利用者側のアンケート編集画面と同一の機能構成」と定めるため、編集UIは利用者側と同じアコーディオン構成にし、型別の回答設定・設問の複製・途中挿入まで機能をそろえた。",
       "trigger": "アンケート詳細の設問構成にある「設問を編集」ボタン",
@@ -3618,7 +3723,7 @@
           "order": 1,
           "node": "scr-survey-detail",
           "edge": null,
-          "action": "会期状態からボタンの文言と可否を決める（会期前=「設問を編集」／会期中=「設問を編集(例外対応)」赤字／会期終了後=無効化）",
+          "action": "会期状態からボタンの文言と可否を決める（会期前=「設問を編集」／会期中=「設問を編集(要注意操作)」赤字／会期終了後=無効化）",
           "evidence": "03_admin/survey-detail.html:1549-1584"
         },
         {
@@ -3632,7 +3737,7 @@
           "order": 3,
           "node": "scr-survey-detail",
           "edge": null,
-          "action": "会期中は警告帯と実行理由欄を出し、保存ボタンを「例外対応として保存する」（赤）に切り替える",
+          "action": "会期中は警告帯と実行理由欄を出し、保存ボタンを「要注意操作として保存する」（赤）に切り替える",
           "evidence": "03_admin/survey-detail.html:1072-1137"
         },
         {
@@ -3681,7 +3786,7 @@
           "order": 10,
           "node": "scr-survey-detail",
           "edge": null,
-          "action": "一覧テーブルと「全N問」の注記を書き換え、操作ログへ1件追記する（例外対応なら赤字の印と理由つき）",
+          "action": "一覧テーブルと「全N問」の注記を書き換え、操作ログへ1件追記する（要注意操作なら赤字の印と理由つき）",
           "evidence": "03_admin/survey-detail.html:364"
         },
         {
@@ -3765,7 +3870,7 @@
       "severity": "medium",
       "title": "同一機能が画面ごとに重複実装されている",
       "detail": "pDlPick（データDL）が survey-management / survey-detail / reconciliation-index の3画面に、pListCsv（一覧CSV出力）が audit-log / performance-management の2画面に、ほぼ同一内容で別々に定義されている。",
-      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:477-521 に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:119-122 / performance-management.html:121-124 のラッパのみ",
+      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:596-618（pListCsv）と 623-639（pDlPick）に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:118-121 / performance-management.html:119-122 のラッパのみ",
       "impact": "CSVの列定義やZIPの扱いを変えるとき、修正漏れが3〜2箇所に分散する",
       "recommendation": "proto-ui.js へ pDlPick / pListCsv を移し、画面側は列定義だけを渡す形にする",
       "status": "resolved-2026-08-06",
@@ -3858,6 +3963,306 @@
       "recommendation": "Tailwind CDN を admin-style.css 内の静的CSS（preflight 相当のリセット＋22ユーティリティ＋@tailwindcss/forms のベース相当）へ置き換え、到達16画面から script 行を削除した（2026-08-06）。Google Fonts は残置。到達不能な escalations.html / reconciliation/list.html は骨格が別世代のため CDN のまま。",
       "status": "resolved-2026-08-06",
       "resolution": "16画面＋モーダル5種の前後スクリーンショットをピクセル比較しながら、body margin・a の下線・フォーム要素の padding/appearance・select の line-height などの差を1つずつ潰した。差分ピクセルは 1,559,973 から 72,372 まで縮小し、ダッシュボードと営業日カレンダーは完全一致。残差は input[type=datetime-local] がシャドウDOM由来で2px高いことによるもので、アンケート詳細のページ高さが2px変わる（上流の ::-webkit-datetime-edit ルールを入れても Chrome では変化しなかった）。"
+    },
+    {
+      "id": "R-01",
+      "severity": "high",
+      "title": "請求書管理のページングが件数表示と合っていなかった",
+      "detail": "16行すべてが data-pg=\"1\" で、表示件数10を選んでいるのに16行出ていた。件数表示だけ「全16件中1〜5件」と別の数を出し、ページャにも2ページ目が無かった。",
+      "evidence": "03_admin/invoice-management.html:54（invoiceList-pager）",
+      "impact": "一覧の件数表示が信用できなくなる。他8画面は正しかったため、この画面だけ挙動が違った",
+      "recommendation": "10件ずつ2ページへ分けた。tests/e2e/admin-mock/lists.spec.js が9画面すべてで行数・件数表示・ページ数の一致を見る",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-02",
+      "severity": "medium",
+      "title": "オペレーター実績確認の「集計最終更新」が2つ並んでいた",
+      "detail": "performance-management.html の32行目と33行目が完全に同一だった。",
+      "evidence": "03_admin/performance-management.html:32（集計最終更新）",
+      "impact": "同じ情報が重複して出るだけでなく、CSV出力ボタンが右端から押し出されていた",
+      "recommendation": "1つにし、残した側へ margin-right:auto を付けた",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-03",
+      "severity": "high",
+      "title": "ユーザー詳細で招待が本登録より後の日時になっていた",
+      "detail": "招待メールの日時を「登録日の 10:02」で固定していたため、登録日時が10:02より前のアカウントで時系列が逆転した。U-1002 は招待 10:02 → 本登録完了 08:57 だった。",
+      "evidence": "03_admin/user-detail.html:296（inviteAt）",
+      "impact": "メール送達状況と操作ログの両方に出るため、運用者が実際の順序を誤解する",
+      "recommendation": "inviteAt() で登録日時の前日を返し、送達状況と操作ログが同じ値を使う",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-04",
+      "severity": "high",
+      "title": "実在の名刺画像が公開状態で置かれていた",
+      "detail": "dummy_card_front/back.png は名前に反して実物の名刺写真で、氏名・メール・電話・住所が写っていた。表と裏が別人で、照合表の値ともどこも一致していなかった。GitHub Pages が公開設定のため誰でも取得できた。",
+      "evidence": "03_admin/reconciliation/detail.html:47（dummy_card_front）",
+      "impact": "社外の個人情報がインターネットから取得できる状態だった。照合作業のデモとしても成立していなかった",
+      "recommendation": "架空の名刺へ差し替え、照合表が期待する値と一致させた。差し替え前の画像は git の履歴に残るため、履歴からの削除は別途判断が要る",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-05",
+      "severity": "high",
+      "title": "納期区分を指す言葉が6通りある",
+      "detail": "ダッシュボード=納期区分 / アンケート管理=申込プラン / アンケート詳細=データ化申込プラン（補足に納期区分）/ ユーザー詳細=データ化の申込 / 請求管理の脚注=プラン / 照合画面=納期。値はどれも 通常・特急・超特急・オンデマンド・お試し で同じ。さらに「プラン」はプレミアム契約の意味でも使われ、ユーザー詳細では1画面に2つの意味の「プラン」が出る。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-05 納期区分: 呼び方を1つに絞る」",
+      "impact": "運用者が別のものだと思って読む。仕様書と画面の対応も取りづらい",
+      "recommendation": "「納期区分」へ統一（2026-08-06 決定）。03_admin は反映済み。仕様書側の追従は未実施",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-06",
+      "severity": "medium",
+      "title": "「操作ログ」と「監査ログ」が混在している",
+      "detail": "本文中では監査ログ29回・操作ログ12回。画面名は「操作ログ・監査ログ」で両方を名乗り、サイドバーは「操作ログ」だけ。セクション見出しは「操作ログ」なのに説明文は「監査ログに記録されます」。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-06 操作ログ: 呼び方を1つに絞る」",
+      "impact": "2種類の記録があるのか1つなのかが読み取れない",
+      "recommendation": "「監査ログ」へ統一（2026-08-06 決定）。03_admin は反映済み。仕様書側の追従は未実施",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-07",
+      "severity": "medium",
+      "title": "サイドバーの項目名と遷移先の画面名が違う",
+      "detail": "サイドバー「名刺入力画面」→ 画面名「データ入力対象一覧」、「照合画面」→「照合結果一覧」。ダッシュボードのリンクは画面名側を使っているため、1つの画面に名前が2つある。この2項目だけ「〜画面」で終わっているのも他と揃っていない。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-07 サイドバーの項目名と、遷移先の画面名が一致する」",
+      "impact": "サイドバーで選んだ先に別の名前が出る。手順書を書くときにどちらを使うか決まらない",
+      "recommendation": "画面名側へ揃える（2026-08-06 決定）。サイドバーを「データ入力対象一覧」「照合結果一覧」へ。仕様書側の追従は未実施",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-08",
+      "severity": "low",
+      "title": "言語名の書き方が2系統ある",
+      "detail": "アンケート詳細は 日本語 / English / 中文(简体)、オペレーター管理は 日本語 / 英語 / 中国語簡繁 / 韓国語。同じ言語を別の表記で書いている。",
+      "evidence": "03_admin/operator-management.html / 03_admin/survey-detail.html",
+      "impact": "対応言語で絞り込むときに一致しない",
+      "recommendation": "表示言語（利用者が回答する言語）と対応可能言語（オペレーターが扱える言語）で用途が違うため、揃えるかどうかも含めて判断が要る",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-09",
+      "severity": "low",
+      "title": "会社名の株式会社表記が揃っていない",
+      "detail": "(株) が265回、株式会社が57回。前株13社・後株10社。同じ会社が両方の表記で出ている（アブロード(株) と アブロード株式会社、(株)サンプル商事 と 株式会社サンプル商事）。半角の (株) が「三浦 沙織((株)マーケットビジョン)」のような二重括弧も生んでいる。",
+      "evidence": "03_admin/billing-management.html / 03_admin/invoice-management.html",
+      "impact": "同じ取引先が別会社に見える。検索でも一致しない",
+      "recommendation": "同じ会社が2通りで出ていた分を揃えた。照合画面の入力2の略記は不一致の演出として残す",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-10",
+      "severity": "low",
+      "title": "「ユーザー」と「利用者」が混ざっている",
+      "detail": "画面名は「ユーザー管理」だがボタンは「＋ 利用者を招待」。ユーザー詳細の中ではユーザー7回・利用者5回。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-10 ユーザーの呼称: 呼び方を1つに絞る」",
+      "impact": "同じ相手を指しているか判断できない",
+      "recommendation": "「ユーザー」へ統一（2026-08-06 決定）。03_admin は反映済み。仕様書側の追従は未実施",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-11",
+      "severity": "low",
+      "title": "同じ画面で文末が言い切りとです・ますで混ざる",
+      "detail": "アンケート詳細に「会期中のため要注意操作として扱う」と「会期中のため変更は要注意操作として扱います」が並んでいる。",
+      "evidence": "03_admin/survey-detail.html",
+      "impact": "読み手には書き手が複数いるように見える",
+      "recommendation": "見出し横の補足は言い切り、本文の案内はです・ます",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-12",
+      "severity": "low",
+      "title": "同じ操作のボタン名が4通りある",
+      "detail": "招待をキャンセル / 招待をキャンセルする / 招待を取り消す / 取り消し。ほかにも 削除↔削除する、停止↔停止する、再送↔再送する、変更を保存↔保存する。",
+      "evidence": "03_admin/user-detail.html / 03_admin/operator-management.html",
+      "impact": "同じ結果になる操作が別物に見える",
+      "recommendation": "一覧から開くボタンは動詞、確認ダイアログの実行ボタンは「〜する」",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-13",
+      "severity": "low",
+      "title": "同じ対象を「件」と「名」で数えている",
+      "detail": "オペレーター管理は「全 6 件中 1〜6 件を表示」、オペレーター実績確認は「全 6 名中 1〜6 名を表示」。数えているのは同じ6人。",
+      "evidence": "03_admin/operator-management.html / 03_admin/performance-management.html",
+      "impact": "別の集計に見える",
+      "recommendation": "人を数える一覧は「名」（2026-08-06 決定）。ユーザー管理・オペレーター管理・実績確認に反映。仕様書側の追従は未実施",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-14",
+      "severity": "medium",
+      "title": "日付の書式が画面によって違う",
+      "detail": "会期・最終ログイン・操作ログは 07/30 10:00（年なし）、請求管理・作成日時は 2026/07/30（年あり）。オペレーター管理は同じ行に両方出る。営業日カレンダーに 2026-08-08 が2件、ユーザー詳細の請求月だけ 2026年04月。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-14 日付の書式」",
+      "impact": "年をまたぐ会期（12月→1月）が読めない。ISO と和式は他のどことも揃っていない",
+      "recommendation": "年を常に出す（2026-08-06 決定）。9画面 231 箇所",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-15",
+      "severity": "low",
+      "title": "日本語の文中で半角の括弧を使っている",
+      "detail": "全角は7箇所だけで、他は半角。(株) の半角と重なって「三浦 沙織((株)マーケットビジョン)」のような二重括弧になる。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「日本語の文中では全角の括弧を使う」",
+      "impact": "和文の中で括弧の前後が詰まって読みにくい",
+      "recommendation": "半角が大多数（全角は7箇所）。全角へ揃えるか半角へ揃えるかは表記の方針決定が要る。決まれば置換は機械的に行える",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-16",
+      "severity": "low",
+      "title": "空欄の em dash と全角マイナスが見分けられない",
+      "detail": "クーポンの割引率が −15%（U+2212）、空欄が —（em dash）。請求管理と操作ログで両方が同じ列の近くに出る。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「空欄の — と マイナスの − を取り違えない」",
+      "impact": "値が入っていないのか負の数なのか判断できない",
+      "recommendation": "マイナスは半角の - に寄せ、空欄は — のままにする",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-17",
+      "severity": "medium",
+      "title": "請求管理でアンケートを検索できない",
+      "detail": "1行=1アンケートに直したのに、検索欄は ユーザーID と 会社名 だけ。アンケートタイトルもIDも打てない。",
+      "evidence": "docs/リライト版仕様書/admin/15_admin_billing.md",
+      "impact": "一覧の主キーで探せない。件数が増えると目視で追うことになる",
+      "recommendation": "検索条件に「アンケート」を足し、15_admin_billing.md §4.3 も4条件へ",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-18",
+      "severity": "medium",
+      "title": "請求管理の「完了予定日」が請求日より前になっている",
+      "detail": "全19行で 完了予定日 = 請求日 − 1日。作業ステータスは「データ化完了」なのに「予定日」が出ている。",
+      "evidence": "03_admin/billing-management.html",
+      "impact": "完了しているのに予定日が出る、または過去日の予定が出る。どちらの読み方でも成立しない",
+      "recommendation": "列が何を指すのか（データ化の完了か、請求処理の完了か）を決めてから、列名かデータのどちらを直すか判断する",
+      "status": "deferred-要判断"
+    },
+    {
+      "id": "R-19",
+      "severity": "low",
+      "title": "請求管理の「クーポン」ボタンが何をするか読めない",
+      "detail": "操作列のボタン名が名詞1語。クーポン列にすでに値がある行にも同じボタンが出る。他画面のボタンはすべて動詞。",
+      "evidence": "03_admin/billing-management.html",
+      "impact": "適用するのか変更するのか外すのか、押すまで分からない",
+      "recommendation": "「クーポンを適用」など動詞にし、適用済みの行では文言を変える",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-20",
+      "severity": "low",
+      "title": "クーポン管理で数値とメモがくっついて見える",
+      "detail": "列としては「使用回数(率)」と「メモ」に分かれているが、幅の配分で 18 (36%)夏季販促 のように詰まる。列見出しも「使用回数(率)メモ」と読める。",
+      "evidence": "03_admin/coupon-management.html:44（使用回数）",
+      "impact": "数値がどこで終わってメモがどこから始まるか読めない",
+      "recommendation": "列の幅を配分し直す",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-21",
+      "severity": "low",
+      "title": "警告色のオレンジに凡例がない",
+      "detail": "オペレーター実績確認は正答率95%未満をオレンジにしているが画面に説明がない。ダッシュボードとアンケート管理の「オンデマンド」「超特急」がオレンジ太字なのも理由が読めない。",
+      "evidence": "03_admin/performance-management.html:166（warn）",
+      "impact": "色が付いている理由が分からず、良いのか悪いのかも判断できない",
+      "recommendation": "しきい値を注記に出す。プランの色分けは意味があるなら凡例、無いなら外す",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-22",
+      "severity": "low",
+      "title": "対応言語の説明が同じ画面に2回出る",
+      "detail": "見出し横に「先頭が第一言語・最大3言語まで」、チップの右に「第一言語を含め3言語までです」。同じことを違う語尾で書いている。",
+      "evidence": "03_admin/survey-detail.html",
+      "impact": "2つの制約があるように読める",
+      "recommendation": "片方に寄せる",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-23",
+      "severity": "low",
+      "title": "照合画面の凡例がチェックボックスに見える",
+      "detail": "下部の「一致 / 不一致(修正対象) / 不一致(確定済み)」は色見本だが、四角が押せそうに見える。項目名の後ろの丸数字にも凡例がない。「DB値」は運用者向けの語ではない。",
+      "evidence": "03_admin/reconciliation/detail.html",
+      "impact": "絞り込みできると思って押す。丸数字の意味が分からない",
+      "recommendation": "色見本と分かる形にし、丸数字の意味を書く",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-24",
+      "severity": "low",
+      "title": "画面内の遷移に矢印を使っている",
+      "detail": "請求書管理の「請求書を表示 →」が16件。本サービスでは矢印付きが外部リンクを想起させるという判断で、アンケート管理からは既に撤去済み。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「請求書管理の一覧に → が出ない」",
+      "impact": "同一タブで開くのに外部へ出ると思わせる",
+      "recommendation": "→ を外す。実際に新規タブで開く2箇所（回答画面のプレビュー、請求書の新規タブ）は ↗ のままでよい",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-25",
+      "severity": "low",
+      "title": "検索欄にラベルが無い",
+      "detail": "プレースホルダだけの入力欄が9画面にある。入力すると何の欄だったか分からなくなる。オペレーター管理は幅が足りず「氏名・メールアドレス・オペレーターID(部:」で切れ、言語のセレクトも枠に収まっていない。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-25 検索欄のラベル」",
+      "impact": "入力後に欄の意味が消える。読み上げでも何の欄か分からない",
+      "recommendation": "aria-label を付ける。見た目を変えずに直せる",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-26",
+      "severity": "info",
+      "title": "開発用のメモが画面に出ている",
+      "detail": "クーポン管理の「請求管理(SCR-A-006)で実行」、アンケート管理の「15_admin_billing.md §7.2」など、画面IDや仕様書のファイル名が本文に出ている。",
+      "evidence": "03_admin/coupon-management.html / 03_admin/survey-management.html",
+      "impact": "レビューに出す画面としてはノイズになる",
+      "recommendation": "画面に出る画面ID・仕様書のファイル名を落とす。コード内のコメントは残す",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-27",
+      "severity": "medium",
+      "title": "モーダルのフォーカスが外へ抜ける",
+      "detail": "Tab を1〜5回押すとフォーカスが body に落ちる。背景は inert なので背景の要素には行かないが、そこから先へ進めずモーダル内のボタンにも戻れない。Esc で閉じることと、閉じた後に元のボタンへ戻ることは正しく動く。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「Tab がモーダルの外へ出ない」",
+      "impact": "キーボードだけで操作すると、モーダルを開いた時点で実行もキャンセルもできなくなる",
+      "recommendation": "proto-ui.js の1箇所で全画面に効く",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-28",
+      "severity": "medium",
+      "title": "開いた直後のフォーカスが実行ボタンに当たる",
+      "detail": "クーポン管理は「保存する」、オペレーター管理は「招待を送信」にフォーカスが当たる。ユーザー管理は入力欄で正しい。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「開いた直後に実行系のボタンへフォーカスしない」",
+      "impact": "Enter を続けて押すと意図せず送信される",
+      "recommendation": "data-initial-focus を最初の入力欄へ付け替える",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-29",
+      "severity": "medium",
+      "title": "補助テキストのコントラストが足りない",
+      "detail": "#8a93a5 が白背景で 3.09:1（WCAG AA は 4.5:1）。308箇所で使われ、その中に U-1049 や SV-10174 のような識別子も含まれる。ページャの無効な ‹ は 1.66:1。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-29 文字色のコントラスト（WCAG AA）」",
+      "impact": "読めないと困る情報が読みにくい。明るい場所や低品質のモニタで消える",
+      "recommendation": "識別子だけ #5b6577（5.6:1）へ。補助テキスト全体の色は据え置き",
+      "status": "resolved-2026-08-06"
+    },
+    {
+      "id": "R-30",
+      "severity": "low",
+      "title": "どの画面にも h1 が無い",
+      "detail": "見出しが h2 から始まっている。16画面すべて。",
+      "evidence": "tests/e2e/admin-mock/consistency.spec.js の「R-30 見出し階層」",
+      "impact": "読み上げの見出しジャンプが働かない",
+      "recommendation": "画面名の h2 を h1 にする。見た目は font-size の指定で変わらない",
+      "status": "resolved-2026-08-06"
     }
   ]
 }

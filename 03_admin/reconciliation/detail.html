@@ -19,7 +19,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
-              <h2 style="margin:0;font-size:18px;font-weight:700">名刺情報照合</h2>
+              <h1 style="margin:0;font-size:18px;font-weight:700">名刺情報照合</h1>
               <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums"><span id="svBadgeM">アンケートID SV-10236</span></span>
               <span style="font-size:12px;color:#5b6577"><span id="titleM">製造業DXセミナー2026</span></span>
               <span style="font-size:12px;color:#c23934;font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span><span id="rcMismatch" tabindex="0" role="button" title="押すと次の不一致へ移動します(N キー)" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:999px;padding:3px 12px;cursor:pointer;font-variant-numeric:tabular-nums"></span><span id="rcAllMatch" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#237a52;background:#edf7f1;border:1px solid #9fceb6;border-radius:999px;padding:3px 12px">全 16 項目が一致</span>
@@ -112,7 +112,7 @@
 </div>
               </div>
               <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
-                <span style="font-size:11.5px;color:#5b6577"><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#eef2fb;border:1px solid #b9caee;border-radius:3px"></span>不一致(確定済み)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
+                <span style="font-size:11.5px;color:#5b6577"><span style="font-size:11px;color:#8a93a5;margin-right:2px">凡例</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#eef2fb;border:1px solid #b9caee;border-radius:3px"></span>不一致(確定済み)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
                 <div style="display:flex;gap:10px">
                   <button id="btnMatchConfirm" disabled onclick="pMatchConfirm()" style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
@@ -241,7 +241,7 @@
 
     // 修正入力の定義: 対応する完成内容セル・確定後の初期値・入力1〜3の候補値
     var FIX = [
-        { fix: 'fixCompany', done: 'doneCompany', initial: 'アブロード株式会社', cands: ['アブロード株式会社', 'アブロード(株)', 'アブロード株式会社'] },
+        { fix: 'fixCompany', done: 'doneCompany', initial: 'アブロード株式会社', cands: ['アブロード株式会社', 'アブロード株式会社', 'アブロード株式会社'] },
         { fix: 'fixRole', done: 'doneRole', initial: '', cands: ['課長', '部長', '課長'] },
         { fix: 'fixAddr2', done: 'doneAddr2', initial: 'アブロードビル7F', cands: ['アブロードビル7F', 'アブロードビル7階', 'アブロードビル7F'] },
         { fix: 'fixFax', done: 'doneFax', initial: '', cands: ['03-1234-5679', '03-1234-5670', '03-1234-5679'] },

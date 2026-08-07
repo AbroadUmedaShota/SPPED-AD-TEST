@@ -20,7 +20,7 @@
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:#6b7484">ホーム › <a href="user-management.html">ユーザー管理</a> › <span style="color:#1f2733">ユーザー詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
-              <h2 style="margin:0;font-size:20px;font-weight:700">ユーザー詳細</h2>
+              <h1 style="margin:0;font-size:20px;font-weight:700">ユーザー詳細</h1>
               <button onclick="pUdGo('user-management.html')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
             </div>
             <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px">
@@ -77,7 +77,7 @@
                   <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden"></div>
                 </div>
                 <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">操作ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
                   <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
                 </div>
               </div>
@@ -150,7 +150,7 @@
 <div id="mCancelInvite" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待をキャンセルしますか?</span><span role="button" onclick="pClose('mCancelInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mcTarget"></span> への招待を取り消します。発行済みのリンクは無効になり、この利用者は登録できなくなります。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mcTarget"></span> への招待を取り消します。発行済みのリンクは無効になり、このユーザーは登録できなくなります。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mCancelInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">やめる</button><button onclick="pUdCancelInvite()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待をキャンセルする</button></div>
   </div>
 </div>
@@ -171,7 +171,7 @@
 // 一覧の元データはアンケート詳細と請求管理のモックから取り込んだもの
 (function () {
     'use strict';
-    var SURVEYS = {"U-1049": [{"sid": "SV-10262", "title": "人事・労務フォーラム 来場者アンケート", "period": "08/03 10:00〜08/05 17:00", "status": "会期前", "plan": "通常"}, {"sid": "SV-10227", "title": "スタートアップピッチ2026 来場者アンケート", "period": "07/10 11:00〜07/10 19:00", "status": "データ化完了", "plan": "お試し"}], "U-1052": [{"sid": "SV-10259", "title": "ITインフラEXPO 2026 来場者アンケート", "period": "07/30 10:00〜08/01 17:00", "status": "会期中", "plan": "特急"}, {"sid": "SV-10244", "title": "マーケティングサミット2026 来場者アンケート", "period": "07/22 09:30〜07/24 18:00", "status": "データ化中", "plan": "超特急"}], "U-1035": [{"sid": "SV-10257", "title": "医療機器・ヘルスケア展 来場者アンケート", "period": "07/29 10:00〜07/31 17:00", "status": "会期中", "plan": "通常"}, {"sid": "SV-10233", "title": "地方創生フォーラム 参加者アンケート", "period": "07/16 13:00〜07/16 18:00", "status": "データ化中", "plan": "通常"}], "U-1050": [{"sid": "SV-10250", "title": "食品・飲料展 出展者アンケート", "period": "07/24 10:00〜07/26 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1038": [{"sid": "SV-10238", "title": "BtoB EXPO 東京 2026 来場者アンケート", "period": "07/21 10:00〜07/23 17:00", "status": "データ化中", "plan": "オンデマンド"}], "U-1033": [{"sid": "SV-10236", "title": "スマート物流EXPO 来場者アンケート", "period": "07/18 10:00〜07/20 17:00", "status": "データ化中", "plan": "特急"}], "U-1031": [{"sid": "SV-10229", "title": "グリーンエネルギー展 来場者アンケート", "period": "07/14 10:00〜07/16 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1026": [{"sid": "SV-10221", "title": "医薬品研究セミナー 参加者アンケート", "period": "07/07 13:00〜07/07 17:30", "status": "データ化完了", "plan": "特急"}], "U-1025": [{"sid": "SV-10218", "title": "ものづくりワールド 来場者アンケート", "period": "07/02 10:00〜07/04 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1022": [{"sid": "SV-10214", "title": "フードテックジャパン 出展者アンケート", "period": "06/25 10:00〜06/27 17:00", "status": "データ化完了", "plan": "通常"}], "U-1021": [{"sid": "SV-10209", "title": "観光インバウンドサミット 来場者アンケート", "period": "06/19 09:30〜06/20 18:00", "status": "データ化完了", "plan": "特急"}], "U-1019": [{"sid": "SV-10205", "title": "デザイントレンド展 来場者アンケート", "period": "06/12 10:00〜06/14 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1017": [{"sid": "SV-10201", "title": "産業機械フェア 来場者アンケート", "period": "06/05 10:00〜06/07 17:00", "status": "データ化完了", "plan": "通常"}], "U-1016": [{"sid": "SV-10196", "title": "アグリビジネス展 出展者アンケート", "period": "05/28 10:00〜05/30 17:00", "status": "データ化完了", "plan": "お試し"}], "U-1014": [{"sid": "SV-10192", "title": "印刷・パッケージ総合展 来場者アンケート", "period": "05/21 10:00〜05/23 17:00", "status": "データ化完了", "plan": "通常"}], "U-1012": [{"sid": "SV-10188", "title": "SaaS Expo 2026 来場者アンケート", "period": "05/14 10:00〜05/16 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1009": [{"sid": "SV-10183", "title": "住宅リフォームフェア 来場者アンケート", "period": "05/08 10:00〜05/10 17:00", "status": "データ化完了", "plan": "特急"}], "U-1007": [{"sid": "SV-10179", "title": "環境ソリューション展 来場者アンケート", "period": "04/23 10:00〜04/25 17:00", "status": "データ化完了", "plan": "通常"}], "U-1002": [{"sid": "SV-10174", "title": "AI活用カンファレンス 参加者アンケート", "period": "04/15 13:00〜04/15 18:00", "status": "データ化完了", "plan": "超特急"}]};
+    var SURVEYS = {"U-1049": [{"sid": "SV-10262", "title": "人事・労務フォーラム 来場者アンケート", "period": "2026/08/03 10:00〜2026/08/05 17:00", "status": "会期前", "plan": "通常"}, {"sid": "SV-10227", "title": "スタートアップピッチ2026 来場者アンケート", "period": "2026/07/10 11:00〜2026/07/10 19:00", "status": "データ化完了", "plan": "お試し"}], "U-1052": [{"sid": "SV-10259", "title": "ITインフラEXPO 2026 来場者アンケート", "period": "2026/07/30 10:00〜2026/08/01 17:00", "status": "会期中", "plan": "特急"}, {"sid": "SV-10244", "title": "マーケティングサミット2026 来場者アンケート", "period": "2026/07/22 09:30〜2026/07/24 18:00", "status": "データ化中", "plan": "超特急"}], "U-1035": [{"sid": "SV-10257", "title": "医療機器・ヘルスケア展 来場者アンケート", "period": "2026/07/29 10:00〜2026/07/31 17:00", "status": "会期中", "plan": "通常"}, {"sid": "SV-10233", "title": "地方創生フォーラム 参加者アンケート", "period": "2026/07/16 13:00〜2026/07/16 18:00", "status": "データ化中", "plan": "通常"}], "U-1050": [{"sid": "SV-10250", "title": "食品・飲料展 出展者アンケート", "period": "2026/07/24 10:00〜2026/07/26 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1038": [{"sid": "SV-10238", "title": "BtoB EXPO 東京 2026 来場者アンケート", "period": "2026/07/21 10:00〜2026/07/23 17:00", "status": "データ化中", "plan": "オンデマンド"}], "U-1033": [{"sid": "SV-10236", "title": "スマート物流EXPO 来場者アンケート", "period": "2026/07/18 10:00〜2026/07/20 17:00", "status": "データ化中", "plan": "特急"}], "U-1031": [{"sid": "SV-10229", "title": "グリーンエネルギー展 来場者アンケート", "period": "2026/07/14 10:00〜2026/07/16 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1026": [{"sid": "SV-10221", "title": "医薬品研究セミナー 参加者アンケート", "period": "2026/07/07 13:00〜2026/07/07 17:30", "status": "データ化完了", "plan": "特急"}], "U-1025": [{"sid": "SV-10218", "title": "ものづくりワールド 来場者アンケート", "period": "2026/07/02 10:00〜2026/07/04 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1022": [{"sid": "SV-10214", "title": "フードテックジャパン 出展者アンケート", "period": "2026/06/25 10:00〜2026/06/27 17:00", "status": "データ化完了", "plan": "通常"}], "U-1021": [{"sid": "SV-10209", "title": "観光インバウンドサミット 来場者アンケート", "period": "2026/06/19 09:30〜2026/06/20 18:00", "status": "データ化完了", "plan": "特急"}], "U-1019": [{"sid": "SV-10205", "title": "デザイントレンド展 来場者アンケート", "period": "2026/06/12 10:00〜2026/06/14 17:00", "status": "データ化完了", "plan": "超特急"}], "U-1017": [{"sid": "SV-10201", "title": "産業機械フェア 来場者アンケート", "period": "2026/06/05 10:00〜2026/06/07 17:00", "status": "データ化完了", "plan": "通常"}], "U-1016": [{"sid": "SV-10196", "title": "アグリビジネス展 出展者アンケート", "period": "2026/05/28 10:00〜2026/05/30 17:00", "status": "データ化完了", "plan": "お試し"}], "U-1014": [{"sid": "SV-10192", "title": "印刷・パッケージ総合展 来場者アンケート", "period": "2026/05/21 10:00〜2026/05/23 17:00", "status": "データ化完了", "plan": "通常"}], "U-1012": [{"sid": "SV-10188", "title": "SaaS Expo 2026 来場者アンケート", "period": "2026/05/14 10:00〜2026/05/16 17:00", "status": "データ化完了", "plan": "オンデマンド"}], "U-1009": [{"sid": "SV-10183", "title": "住宅リフォームフェア 来場者アンケート", "period": "2026/05/08 10:00〜2026/05/10 17:00", "status": "データ化完了", "plan": "特急"}], "U-1007": [{"sid": "SV-10179", "title": "環境ソリューション展 来場者アンケート", "period": "2026/04/23 10:00〜2026/04/25 17:00", "status": "データ化完了", "plan": "通常"}], "U-1002": [{"sid": "SV-10174", "title": "AI活用カンファレンス 参加者アンケート", "period": "2026/04/15 13:00〜2026/04/15 18:00", "status": "データ化完了", "plan": "超特急"}]};
     var BILLS = {"U-1002": [{"sid": "SV-10174", "month": "2026年04月", "bill": "2026/04/23", "due": "2026/05/23", "amount": 77816, "paid": "2026/05/20", "title": "AI活用カンファレンス 参加者アンケート"}], "U-1007": [{"sid": "SV-10179", "month": "2026年05月", "bill": "2026/05/03", "due": "2026/06/02", "amount": 42842, "paid": "2026/05/29", "title": "環境ソリューション展 来場者アンケート"}], "U-1009": [{"sid": "SV-10183", "month": "2026年05月", "bill": "2026/05/16", "due": "2026/06/15", "amount": 121504, "paid": "2026/06/12", "title": "住宅リフォームフェア 来場者アンケート"}], "U-1012": [{"sid": "SV-10188", "month": "2026年05月", "bill": "2026/05/22", "due": "2026/06/21", "amount": 432166, "paid": "2026/06/18", "title": "SaaS Expo 2026 来場者アンケート"}], "U-1014": [{"sid": "SV-10192", "month": "2026年05月", "bill": "2026/05/29", "due": "2026/06/28", "amount": 89660, "paid": "2026/06/25", "title": "印刷・パッケージ総合展 来場者アンケート"}], "U-1017": [{"sid": "SV-10201", "month": "2026年06月", "bill": "2026/06/13", "due": "2026/07/13", "amount": 112814, "paid": "2026/07/10", "title": "産業機械フェア 来場者アンケート"}], "U-1019": [{"sid": "SV-10205", "month": "2026年06月", "bill": "2026/06/20", "due": "2026/07/20", "amount": 156638, "paid": "", "title": "デザイントレンド展 来場者アンケート"}], "U-1021": [{"sid": "SV-10209", "month": "2026年06月", "bill": "2026/06/27", "due": "2026/07/27", "amount": 93426, "paid": "", "title": "観光インバウンドサミット 来場者アンケート"}], "U-1022": [{"sid": "SV-10214", "month": "2026年07月", "bill": "2026/07/05", "due": "2026/08/04", "amount": 67475, "paid": "", "title": "フードテックジャパン 出展者アンケート"}], "U-1025": [{"sid": "SV-10218", "month": "2026年07月", "bill": "2026/07/10", "due": "2026/08/09", "amount": 624005, "paid": "", "title": "ものづくりワールド 来場者アンケート"}], "U-1026": [{"sid": "SV-10221", "month": "2026年07月", "bill": "2026/07/15", "due": "2026/08/14", "amount": 27539, "paid": "", "title": "医薬品研究セミナー 参加者アンケート"}], "U-1031": [{"sid": "SV-10229", "month": "2026年07月", "bill": "2026/07/22", "due": "2026/08/21", "amount": 298880, "paid": "", "title": "グリーンエネルギー展 来場者アンケート"}], "U-1035": [{"sid": "SV-10233", "month": "2026年07月", "bill": "2026/07/24", "due": "2026/08/23", "amount": 20912, "paid": "", "title": "地方創生フォーラム 参加者アンケート"}], "U-1050": [{"sid": "SV-10250", "month": "2026年08月", "bill": "2026/08/04", "due": "2026/09/03", "amount": 432050, "paid": "", "title": "食品・飲料展 出展者アンケート"}], "U-1033": [{"sid": "SV-10236", "month": "未発行", "bill": "", "due": "", "amount": 179175, "paid": "", "title": "スマート物流EXPO 来場者アンケート"}], "U-1038": [{"sid": "SV-10238", "month": "未発行", "bill": "", "due": "", "amount": 426020, "paid": "", "title": "BtoB EXPO 東京 2026 来場者アンケート"}], "U-1052": [{"sid": "SV-10244", "month": "未発行", "bill": "", "due": "", "amount": 112848, "paid": "", "title": "マーケティングサミット2026 来場者アンケート"}], "U-1049": [{"sid": "SV-10227", "month": "2026年07月", "bill": "2026/07/18", "due": "2026/08/17", "amount": 256, "paid": "", "title": "スタートアップピッチ2026 来場者アンケート"}], "U-1016": [{"sid": "SV-10196", "month": "2026年06月", "bill": "2026/06/08", "due": "2026/07/08", "amount": 584, "paid": "2026/07/05", "title": "アグリビジネス展 出展者アンケート"}]};
     var BADGE = { '会期前': 'status-inactive', '会期中': 'status-info',
                   'データ化中': 'status-limit_reached', 'データ化完了': 'status-active' };
@@ -198,12 +198,12 @@
         if (cnt) { cnt.textContent = '全 ' + list.length + ' 件'; }
         if (!box) { return; }
         if (!list.length) {
-            box.innerHTML = EMPTY.replace('{t}', 'この利用者が作成したアンケートはありません。');
+            box.innerHTML = EMPTY.replace('{t}', 'このユーザーが作成したアンケートはありません。');
             return;
         }
         box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + SV_COLS + '">'
             + '<span>アンケートID</span><span>タイトル</span><span>会期</span><span>状態</span>'
-            + '<span>データ化の申込</span></div>'
+            + '<span>納期区分</span></div>'
             + list.map(function (v, i) {
                 return '<div tabindex="0" role="link" class="proto-row-hover" style="' + ROW
                     + ';grid-template-columns:' + SV_COLS
@@ -257,12 +257,12 @@
                     + (warn ? '#c23934' : '#5b6577') + ';cursor:pointer">'
                     + '<span style="font-weight:700">入金未確認 ' + unpaid.length + ' 件</span>'
                     + '<span>' + (warn ? 'うち期日超過 ' + overdue.length + ' 件。' : '支払期日前です。')
-                    + '請求管理でこの利用者の入金未確認だけを表示する →</span></div>';
+                    + '請求管理でこのユーザーの入金未確認だけを表示する →</span></div>';
             }
         }
         if (!box) { return; }
         if (!list.length) {
-            box.innerHTML = EMPTY.replace('{t}', 'この利用者に紐づく請求はありません。');
+            box.innerHTML = EMPTY.replace('{t}', 'このユーザーに紐づく請求はありません。');
             return;
         }
         box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + BL_COLS + '">'
@@ -291,12 +291,20 @@
     window.pUdBilling = function () { location.href = 'billing-management.html?uid=' + uid(); };
 
     // ---- アカウント状態ごとの出し分け(§4.6・§7.1) ----
+    // 招待は本登録より前に起こる。登録日時から前日へ戻した値を招待の日時として扱う
+    // (月初でも Date が前月末へ繰り下げる)
+    function inviteAt(created) {
+        var m = /^(\d{4})\/(\d{2})\/(\d{2})/.exec(created || '');
+        if (!m) { return created; }
+        var d = new Date(+m[1], +m[2] - 1, +m[3] - 1);
+        var p = function (n) { return (n < 10 ? '0' : '') + n; };
+        return d.getFullYear() + '/' + p(d.getMonth() + 1) + '/' + p(d.getDate()) + ' 10:02';
+    }
     // 送達状況は状態で変わる。招待中はまだ本登録が完了していない
     function paintMail(status, created) {
         var box = document.querySelector('[data-slot="mailBox"]');
         if (!box) { return; }
-        var day = created.replace(/ .*$/, '');
-        var rows = [['招待メール', day + ' 10:02']];
+        var rows = [['招待メール', inviteAt(created)]];
         if (status !== '招待中') { rows.push(['本登録完了メール', created]); }
         box.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;justify-content:space-between;gap:10px"><span>' + esc(r[0])
@@ -312,7 +320,7 @@
             var t = document.querySelector('[data-slot="inviteText"]');
             if (t) {
                 t.textContent = '招待中です。リンクの有効期限は発行から 72 時間です。'
-                    + '本登録が完了するまでこの利用者はログインできません。';
+                    + '本登録が完了するまでこのユーザーはログインできません。';
             }
         }
         ['mrTarget', 'mcTarget'].forEach(function (k) {
@@ -382,7 +390,7 @@
             + (reason ? '・理由: ' + esc(reason) : '') + '</span></span>';
         log.insertBefore(row, log.firstChild);
     };
-    // 操作ログの初期表示。招待中はまだ本登録が完了していない
+    // 監査ログの初期表示。招待中はまだ本登録が完了していない
     function paintLog(status, created) {
         var log = document.getElementById('udLog');
         if (!log) { return; }
@@ -390,7 +398,7 @@
         if (status !== '招待中') {
             rows.push([created, '招待から本登録が完了', '本人']);
         }
-        rows.push([created.replace(/ .*$/, '') + ' 10:02', '招待を実行', 'admin@abroad-o.com']);
+        rows.push([inviteAt(created), '招待を実行', 'admin@abroad-o.com']);
         log.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;gap:10px">'
                 + '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + esc(r[0])
@@ -446,7 +454,7 @@ window.pUdSetPw = function () {
 
 <script>
 // ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、
-// 集計値・操作ログ・モーダル本文の数値は固定のダミーのまま
+// 集計値・監査ログ・モーダル本文の数値は固定のダミーのまま
 (function () {
     var DATA = {"U-1052": {"company": "(株)マーケットビジョン", "name": "岡田 健一", "mail": "k.okada@market-v.co.jp", "status": "有効", "premium": true, "created": "2026/07/29 14:20", "surveys": 2, "bills": 1, "tel": "03-5152-8364"}, "U-1051": {"company": "—", "name": "—", "mail": "info@newcorp.example.jp", "status": "招待中", "premium": false, "created": "2026/07/28 11:02", "surveys": 0, "bills": 0, "tel": "—"}, "U-1050": {"company": "(株)イベントプラス", "name": "中山 亮", "mail": "r.nakayama@eventplus.co.jp", "status": "本登録未了", "premium": false, "created": "2026/07/27 16:48", "surveys": 1, "bills": 1, "tel": "03-5150-8350"}, "U-1049": {"company": "グロースパートナーズ(株)", "name": "三浦 沙織", "mail": "s.miura@growthp.co.jp", "status": "有効", "premium": false, "created": "2026/07/27 09:15", "surveys": 2, "bills": 1, "tel": "03-5149-8343"}, "U-1038": {"company": "(株)テックブリッジ", "name": "森田 優子", "mail": "y.morita@techbridge.co.jp", "status": "停止", "premium": true, "created": "2026/07/02 10:40", "surveys": 1, "bills": 1, "tel": "03-5138-8266"}, "U-1035": {"company": "地方創生機構", "name": "川口 誠", "mail": "m.kawaguchi@chihososei.or.jp", "status": "有効", "premium": false, "created": "2026/06/28 13:33", "surveys": 2, "bills": 1, "tel": "03-5135-8245"}, "U-1033": {"company": "(株)サンライトプロモーション", "name": "高橋 恵美", "mail": "e.takahashi@sunlight-pr.co.jp", "status": "有効", "premium": false, "created": "2026/06/21 10:05", "surveys": 1, "bills": 1, "tel": "03-5133-8231"}, "U-1031": {"company": "ミライ電装(株)", "name": "佐々木 剛", "mail": "t.sasaki@mirai-denso.co.jp", "status": "有効", "premium": true, "created": "2026/06/18 15:42", "surveys": 1, "bills": 1, "tel": "03-5131-8217"}, "U-1030": {"company": "(株)フィールドワークス", "name": "井上 真央", "mail": "m.inoue@fieldworks.co.jp", "status": "停止", "premium": false, "created": "2026/06/15 09:30", "surveys": 0, "bills": 0, "tel": "03-5130-8210"}, "U-1028": {"company": "北都物産(株)", "name": "山崎 亮太", "mail": "r.yamazaki@hokuto-b.co.jp", "status": "有効", "premium": false, "created": "2026/06/10 13:18", "surveys": 0, "bills": 0, "tel": "03-5128-8196"}, "U-1026": {"company": "(株)クレストメディカル", "name": "平野 沙耶", "mail": "s.hirano@crest-med.co.jp", "status": "有効", "premium": true, "created": "2026/06/05 11:22", "surveys": 1, "bills": 1, "tel": "03-5126-8182"}, "U-1025": {"company": "東亜精密工業(株)", "name": "大森 一樹", "mail": "k.omori@toa-seimitsu.co.jp", "status": "有効", "premium": false, "created": "2026/06/02 16:40", "surveys": 1, "bills": 1, "tel": "03-5125-8175"}, "U-1024": {"company": "—", "name": "—", "mail": "contact@brightlabo.example.jp", "status": "招待中", "premium": false, "created": "2026/05/30 10:11", "surveys": 0, "bills": 0, "tel": "—"}, "U-1022": {"company": "(株)ネオフーズ", "name": "村上 千尋", "mail": "c.murakami@neofoods.co.jp", "status": "有効", "premium": false, "created": "2026/05/27 14:03", "surveys": 1, "bills": 1, "tel": "03-5122-8154"}, "U-1021": {"company": "西日本トラベル(株)", "name": "藤田 大地", "mail": "d.fujita@nishinihon-tv.co.jp", "status": "本登録未了", "premium": false, "created": "2026/05/24 09:55", "surveys": 1, "bills": 1, "tel": "03-5121-8147"}, "U-1019": {"company": "(株)アークデザイン", "name": "小林 玲奈", "mail": "r.kobayashi@arc-design.co.jp", "status": "有効", "premium": true, "created": "2026/05/20 18:27", "surveys": 1, "bills": 1, "tel": "03-5119-8133"}, "U-1017": {"company": "セントラル機器(株)", "name": "岡本 修平", "mail": "s.okamoto@central-kiki.co.jp", "status": "停止", "premium": false, "created": "2026/05/15 12:48", "surveys": 1, "bills": 1, "tel": "03-5117-8119"}, "U-1016": {"company": "(株)ハーベスト農園", "name": "石川 美咲", "mail": "m.ishikawa@harvest-farm.co.jp", "status": "有効", "premium": false, "created": "2026/05/12 10:36", "surveys": 1, "bills": 1, "tel": "03-5116-8112"}, "U-1014": {"company": "光陽印刷(株)", "name": "近藤 貴文", "mail": "t.kondo@koyo-print.co.jp", "status": "有効", "premium": false, "created": "2026/05/08 15:14", "surveys": 1, "bills": 1, "tel": "03-5114-8098"}, "U-1012": {"company": "(株)ラピスソフト", "name": "中島 亜衣", "mail": "a.nakajima@lapis-soft.co.jp", "status": "有効", "premium": true, "created": "2026/05/02 09:41", "surveys": 1, "bills": 1, "tel": "03-5112-8084"}, "U-1009": {"company": "大和ハウジング(株)", "name": "三宅 健", "mail": "k.miyake@yamato-housing.co.jp", "status": "有効", "premium": false, "created": "2026/04/25 13:52", "surveys": 1, "bills": 1, "tel": "03-5109-8063"}, "U-1007": {"company": "(株)エコスタイル", "name": "長谷川 純", "mail": "j.hasegawa@ecostyle.co.jp", "status": "停止", "premium": false, "created": "2026/04/18 17:09", "surveys": 1, "bills": 1, "tel": "03-5107-8049"}, "U-1004": {"company": "青葉商事(株)", "name": "森本 直子", "mail": "n.morimoto@aoba-shoji.co.jp", "status": "有効", "premium": false, "created": "2026/04/10 11:33", "surveys": 0, "bills": 0, "tel": "03-5104-8028"}, "U-1002": {"company": "(株)テクノブレイン", "name": "川村 聡", "mail": "s.kawamura@technobrain.co.jp", "status": "有効", "premium": true, "created": "2026/04/02 08:57", "surveys": 1, "bills": 1, "tel": "03-5102-8014"}};
     var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};

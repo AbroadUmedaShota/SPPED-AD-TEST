@@ -19,7 +19,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
             <div style="display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap">
               <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">‹ 一覧へ戻る</button>
-              <h2 style="margin:0;font-size:18px;font-weight:700;white-space:nowrap">名刺入力画面</h2>
+              <h1 style="margin:0;font-size:18px;font-weight:700;white-space:nowrap">名刺入力画面</h1>
               <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums;white-space:nowrap" title="入力対象が属するアンケート(オペレーターへ見せる情報はIDのみ)"><span id="svBadge">アンケートID SV-10238</span></span>
               <span style="font-size:11px;font-weight:700;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:2px 8px;background:#fdf6ec;white-space:nowrap"><span id="planBadge">オンデマンド</span></span>
               <span id="groupBadge" style="font-size:11px;font-weight:700;color:#2b57b8;border:1px solid #b9caee;border-radius:4px;padding:2px 8px;background:#eef2fb;white-space:nowrap">作業中: グループ③ 会社・部署・役職</span>
@@ -280,25 +280,25 @@
     var ROLE = ['代表取締役', '部長', '課長', '係長', '主任'];
     var GROUP_DEFS = {
         1: { label: 'グループ① メールアドレス', fields: [
-            { id: 'f1', label: 'メールアドレス', ph: 'xxx@example.co.jp', ocr: ['mano@repinc.co.jp', 'taro.yamada@example.com'], chips: ['@', '.co.jp', '.com'] }] },
+            { id: 'f1', label: 'メールアドレス', ph: 'xxx@example.co.jp', ocr: ['t.yamada@abroad.co.jp', 'taro.yamada@example.com'], chips: ['@', '.co.jp', '.com'] }] },
         2: { label: 'グループ② 姓・名', fields: [
-            { id: 'f1', label: '姓', ph: '山田', ocr: ['間野', '山田'] },
-            { id: 'f2', label: '名', ph: '太郎', ocr: ['健介', '太郎'] }] },
+            { id: 'f1', label: '姓', ph: '山田', ocr: ['山田', '山田'] },
+            { id: 'f2', label: '名', ph: '太郎', ocr: ['太郎', '太郎'] }] },
         3: { label: 'グループ③ 会社・部署・役職', fields: [
-            { id: 'f1', label: '会社名', ph: '◯◯株式会社', ocr: ['レップ株式会社', '株式会社サンプル商事'], chips: ['株式会社', '(株)', '有限会社', '(有)'], ex: CORP, exMode: 'sub' },
-            { id: 'f2', label: '部署名', ph: '◯◯部', ocr: [null, '営業企画部'], chips: ['営業部', '総務部', '人事部'], ex: DEPT, exMode: 'exact' },
-            { id: 'f3', label: '役職名', ph: '◯◯部長', ocr: ['代表取締役', '課長'], chips: ['代表取締役', '部長', '課長'], ex: ROLE, exMode: 'exact' }] },
+            { id: 'f1', label: '会社名', ph: '◯◯株式会社', ocr: ['アブロード株式会社', '株式会社サンプル商事'], chips: ['株式会社', '(株)', '有限会社', '(有)'], ex: CORP, exMode: 'sub' },
+            { id: 'f2', label: '部署名', ph: '◯◯部', ocr: ['営業部', '営業企画部'], chips: ['営業部', '総務部', '人事部'], ex: DEPT, exMode: 'exact' },
+            { id: 'f3', label: '役職名', ph: '◯◯部長', ocr: ['課長', '課長'], chips: ['代表取締役', '部長', '課長'], ex: ROLE, exMode: 'exact' }] },
         4: { label: 'グループ④ 郵便番号・住所', fields: [
-            { id: 'f1', label: '郵便番号', ph: '100-0001', ocr: ['101-0052', '100-0001'] },
-            { id: 'f2', label: '住所1', ph: '東京都◯◯区…', ocr: ['東京都千代田区神田小川町3-7-5', '東京都千代田区千代田1-2-3'], chips: ['東京都'] },
-            { id: 'f3', label: '住所2(建物名)', ph: '◯◯ビル◯F', ocr: ['VORT神保町3F', 'サンプルビル5F'] }] },
+            { id: 'f1', label: '郵便番号', ph: '100-0001', ocr: ['150-0001', '100-0001'] },
+            { id: 'f2', label: '住所1', ph: '東京都◯◯区…', ocr: ['東京都渋谷区神宮前1-2-3', '東京都千代田区千代田1-2-3'], chips: ['東京都'] },
+            { id: 'f3', label: '住所2(建物名)', ph: '◯◯ビル◯F', ocr: ['アブロードビル7F', 'サンプルビル5F'] }] },
         5: { label: 'グループ⑤ 電話番号・FAX', fields: [
-            { id: 'f1', label: '電話番号1', ph: '03-xxxx-xxxx', ocr: ['03-6895-3811', '03-1234-5678'], chips: ['03-'] },
+            { id: 'f1', label: '電話番号1', ph: '03-xxxx-xxxx', ocr: ['03-1234-5678', '03-1234-5678'], chips: ['03-'] },
             { id: 'f2', label: '電話番号2', ph: '', ocr: [null, null] },
-            { id: 'f3', label: '携帯電話', ph: '090-xxxx-xxxx', ocr: [null, '090-1234-5678'], chips: ['090-', '080-'] },
-            { id: 'f4', label: 'FAX', ph: '', ocr: [null, '03-1234-5679'] }] },
+            { id: 'f3', label: '携帯電話', ph: '090-xxxx-xxxx', ocr: ['090-8765-4321', '090-1234-5678'], chips: ['090-', '080-'] },
+            { id: 'f4', label: 'FAX', ph: '', ocr: ['03-1234-5679', '03-1234-5679'] }] },
         6: { label: 'グループ⑥ URL', fields: [
-            { id: 'f1', label: 'URL', ph: 'https://…', ocr: ['https://www.repinc.co.jp/', 'https://www.example.co.jp'], chips: ['https://', 'www.'] }] },
+            { id: 'f1', label: 'URL', ph: 'https://…', ocr: ['https://www.abroad.co.jp', 'https://www.example.co.jp'], chips: ['https://', 'www.'] }] },
         7: { label: 'グループ⑦ その他メモ', fields: [
             { id: 'f1', label: 'その他メモ', ph: '名刺記載のメモ・肩書補足など', ocr: [null, null], multiline: true }] },
         8: { label: 'グループ⑧ フリー入力', fields: [
@@ -333,7 +333,7 @@
             if (fd.multiline) {
                 html += '<textarea id="' + fd.id + '" rows="4" placeholder="' + (fd.ph || '') + '" spellcheck="false" title="Enterで改行 / 確定は Ctrl+Enter / 読み取れない文字は「〓」" style="' + INPUT_STYLE + ';resize:vertical"></textarea>';
             } else {
-                html += '<input id="' + fd.id + '" placeholder="' + (fd.ph || '') + '" spellcheck="false" title="Enterで次の欄へ / 読み取れない文字は「〓」" style="' + INPUT_STYLE + '">';
+                html += '<input id="' + fd.id + '" aria-label="' + fd.label + '" placeholder="' + (fd.ph || '') + '" spellcheck="false" title="Enterで次の欄へ / 読み取れない文字は「〓」" style="' + INPUT_STYLE + '">';
             }
             var ocr = fd.ocr && fd.ocr[cardIdx];
             html += '<div style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b7484;flex-wrap:wrap">OCR候補: ';

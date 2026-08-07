@@ -39,6 +39,12 @@ REQUIRED_NODE = ["id", "name", "type", "description", "responsibilities",
 REQUIRED_EDGE = ["source", "target", "relationship", "protocol", "description"]
 REF = re.compile(r"([\w./぀-ヿ一-鿿-]*?[\w-]+\.(?:js|html|py|json|md)):"
                  r"((?:\d+)(?:\s*[-,]\s*\d+)*)")
+# file:line のすぐ後ろに付く「（pDlPick）」のような但し書き
+NOTE = re.compile(r"^\s*[（(]([^）)]{1,60})[）)]")
+# 但し書きから拾う識別子。「inline script なし」のような散文を識別子と誤認しないよう、
+# 大文字・ハイフン・ドットのどれかを含む「コードらしい」語だけを対象にする
+IDENT = re.compile(r"[A-Za-z_$][\w$.-]{2,}")
+CODEISH = re.compile(r"[A-Z]|[-.]")
 
 
 def collect_strings(obj, out):
@@ -127,8 +133,9 @@ def main() -> int:
 
     strings: list[str] = []
     collect_strings(data, strings)
-    line_counts: dict[pathlib.Path, int] = {}
+    lines_of: dict[pathlib.Path, list[str]] = {}
     checked = 0
+    anchored = 0
     for s in strings:
         for m in REF.finditer(s):
             ref, nums = m.group(1), m.group(2)
@@ -138,17 +145,39 @@ def main() -> int:
                 if len(cands) != 1:
                     continue          # 同名が複数 or 不明。プロジェクト外の記述として見送る
                 target = cands[0]
-            if target not in line_counts:
-                line_counts[target] = len(target.read_text(encoding="utf-8").splitlines())
-            for n in re.findall(r"\d+", nums):
-                checked += 1
-                if int(n) > line_counts[target]:
+            if target not in lines_of:
+                lines_of[target] = target.read_text(encoding="utf-8").splitlines()
+            body = lines_of[target]
+            found = [int(n) for n in re.findall(r"\d+", nums)]
+            checked += len(found)
+            for n in found:
+                if n > len(body):
                     problems.append(
                         f'{ref}:{n} は範囲外'
-                        f'（{target.relative_to(ROOT).as_posix()} は全 {line_counts[target]} 行）')
+                        f'（{target.relative_to(ROOT).as_posix()} は全 {len(body)} 行）')
+            if any(n > len(body) for n in found):
+                continue
+
+            # 行番号が範囲内でも、コードが動けば別のものを指すようになる。
+            # 「（pDlPick）」のような但し書きがあれば、その識別子が実際にその行にあるか見る
+            note = NOTE.match(s[m.end():])
+            if not note:
+                continue
+            idents = [t for t in IDENT.findall(note.group(1)) if CODEISH.search(t)]
+            if not idents:
+                continue
+            lo, hi = min(found), max(found)
+            window = "\n".join(body[lo - 1:hi])
+            anchored += 1
+            if not any(t in window for t in idents):
+                where = f'{lo}' if lo == hi else f'{lo}-{hi}'
+                problems.append(
+                    f'{ref}:{where} に「{note.group(1)}」が見当たらない'
+                    f'（行がずれた可能性。実際の中身: {body[lo - 1].strip()[:56]}）')
 
     print(f"ノード {len(data['nodes'])} / エッジ {len(data['edges'])} / フロー {len(data['flows'])}"
-          f" / file:line 参照 {checked} 件 / 到達16画面のシェル{'一致' if shell_groups == 1 else f'{shell_groups}種'} を検査")
+          f" / file:line 参照 {checked} 件（うち中身まで照合 {anchored} 件）"
+          f" / 到達16画面のシェル{'一致' if shell_groups == 1 else f'{shell_groups}種'} を検査")
     if problems:
         print("問題:")
         for p in sorted(set(problems)):

@@ -28,9 +28,8 @@
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">オペレーター実績確認</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
-              <h2 style="margin:0;font-size:20px;font-weight:700">オペレーター実績確認</h2>
-              <span style="font-size:12px;color:#6b7484;margin-left:14px">集計最終更新 <span style="font-variant-numeric:tabular-nums">2026/07/31 09:45</span>(最大5分の遅延)</span>
-              <span style="font-size:12px;color:#6b7484;margin-left:14px">集計最終更新 <span style="font-variant-numeric:tabular-nums">2026/07/31 09:45</span>(最大5分の遅延)</span>
+              <h1 style="margin:0;font-size:20px;font-weight:700">オペレーター実績確認</h1>
+              <span style="font-size:12px;color:#6b7484;margin-left:14px;margin-right:auto">集計最終更新 <span style="font-variant-numeric:tabular-nums">2026/07/31 09:45</span>(最大5分の遅延)</span>
               <button onclick="pOpen('mPerfCsv')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
             <div data-filter-for="perfList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -85,7 +84,7 @@
               <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="perfList-total">6</span> 名中 <span id="perfList-range">1〜6</span> 名を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('perfList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div id="perfList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('perfList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜6" onclick="pPage('perfList',1)" style="border:1px solid #3467d6;background:#3467d6;color:#fff;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('perfList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
             </div>
-            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">チーム単位の集計はグループ(会社単位)との関係整理が必要なため未掲載。</div>
+            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">正答率は 95% 未満を<span style="color:#8a6414;font-weight:700">この色</span>で示す。チーム単位の集計はグループ(会社単位)との関係整理が必要なため未掲載。</div>
           </div>
         </main>
     </div>
