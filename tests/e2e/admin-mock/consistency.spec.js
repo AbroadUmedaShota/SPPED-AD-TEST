@@ -79,13 +79,8 @@ test.describe('R-24 画面内の遷移に矢印を使わない', () => {
 });
 
 test.describe('R-14 日付の書式', () => {
-  // 未修正: 会期・最終ログインは年なし、作成日時・請求日は年あり。
-  // 実際に混ざっているのはこの6画面だけ。他の画面は検査を有効にしたまま残す（退行を拾うため）
-  const MIXED = ['ダッシュボード', 'ユーザー管理', 'ユーザー詳細', 'アンケート詳細', 'オペレーター管理', '照合結果一覧'];
-
   for (const s of SCREENS) {
     test(`${s.name}: 年ありと年なしの日付が混ざらない`, async ({ page }) => {
-      test.fail(MIXED.includes(s.name));
       const t = await visibleText(page, s.path);
       const withYear = t.match(/20\d\d\/\d\d?\/\d\d?/g) || [];
       const withoutYear = (t.match(/(?<![\d/])\d{2}\/\d{2}(?![\d/])/g) || []);
