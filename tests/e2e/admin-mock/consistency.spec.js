@@ -52,6 +52,19 @@ test.describe('決着済みの用語（戻ったら落ちる）', () => {
 });
 
 test.describe('決着済みの配置（戻ったら落ちる）', () => {
+  test('メールが届いたかどうかは画面に出さない（2026-08-06 決定）', async ({ page }) => {
+    // 本人へ到達したかは本番の実装では取れないという報告がある。
+    // 送信した記録は出してよいが、到達を示す表示は置かない
+    test.slow();
+    const texts = await allText(page);
+    const banned = ['送達', '本人到達', '到達確認', '開封'];
+    const hit = [];
+    for (const [name, t] of Object.entries(texts)) {
+      banned.filter((w) => t.includes(w)).forEach((w) => hit.push(`${name}: ${w}`));
+    }
+    expect(hit, `到達を示す表示が戻っている: ${hit.join(' / ')}`).toEqual([]);
+  });
+
   test('プレミアムはユーザー管理の一覧に置かない（2026-08-06 決定）', async ({ page }) => {
     // 契約状態の値も請求への影響も 12_admin_user_detail.md §11 #8 で未確定。
     // 未確定の機能を一覧から即時トグルできる形で置くと、決まっているように見える
