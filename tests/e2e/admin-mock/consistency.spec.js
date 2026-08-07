@@ -51,6 +51,32 @@ test.describe('決着済みの用語（戻ったら落ちる）', () => {
   });
 });
 
+test.describe('決着済みの配置（戻ったら落ちる）', () => {
+  test('プレミアムはユーザー管理の一覧に置かない（2026-08-06 決定）', async ({ page }) => {
+    // 契約状態の値も請求への影響も 12_admin_user_detail.md §11 #8 で未確定。
+    // 未確定の機能を一覧から即時トグルできる形で置くと、決まっているように見える
+    const t = await visibleText(page, '/03_admin/user-management.html');
+    expect(t, '一覧にプレミアムが戻っている').not.toContain('プレミアム');
+  });
+
+  test('プレミアムの確認と変更はユーザー詳細に残る', async ({ page }) => {
+    const t = await visibleText(page, '/03_admin/user-detail.html?id=U-1002');
+    expect(t, 'ユーザー詳細からプレミアムが消えている').toContain('プレミアム');
+  });
+
+  test('一覧の操作ボタンは幅が揃う', async ({ page }) => {
+    await openScreen(page, '/03_admin/user-management.html');
+    // ラベルが長いとトラックが広がって、行ごとにボタンの右端がずれる
+    const rows = await page.evaluate(() => [...document.querySelectorAll('#usersList [data-pg] .row-act')]
+      .map((el) => [...el.querySelectorAll('button')]
+        .filter((b) => b.getBoundingClientRect().width > 0)   // 状態で隠している側は除く
+        .map((b) => Math.round(b.getBoundingClientRect().width))));
+    const widths = [...new Set(rows.flat())];
+    expect(rows.length).toBeGreaterThan(0);
+    expect(widths, `ボタンの幅が揃っていない: ${widths.join(', ')}px`).toHaveLength(1);
+  });
+});
+
 test.describe('R-30 見出し階層', () => {
   for (const s of SCREENS) {
     test(`${s.name}: h1 がちょうど1つある`, async ({ page }) => {

@@ -415,6 +415,6 @@ main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { f
 /* 一覧の操作列。ボタンを等幅のスロットへ入れ、ラベルの文字数で行ごとに右端がずれないようにする。
    同じ役割のボタンは行が変わっても同じスロットに来る（左=参照、右=状態操作/取得） */
 .row-act { display: grid; column-gap: 8px; align-items: center; }
-.row-act > button { width: 100%; box-sizing: border-box; }
-.row-act.slots-1 { grid-template-columns: 1fr; }
-.row-act.slots-2 { grid-template-columns: 1fr 1fr; }
+.row-act > button { width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-act.slots-1 { grid-template-columns: minmax(0, 1fr); }
+.row-act.slots-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
