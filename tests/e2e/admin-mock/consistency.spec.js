@@ -287,22 +287,21 @@ test.describe('R-19 〜 R-23 表示の読み取りやすさ', () => {
 
   test('R-20 クーポン管理で使用回数とメモが離れている', async ({ page }) => {
     await openScreen(page, '/03_admin/coupon-management.html');
-    const gap = await page.evaluate(() => {
-      const row = document.querySelector('#couponList [data-pg]');
-      const cells = [...row.children];
-      // 使用回数(率) は右揃え、メモは左揃えで隣り合う
+    // 淡色の期限切れ行だけ書き方が違って余白が当たらない、ということがあったので全行見る
+    const rows = await page.evaluate(() => [...document.querySelectorAll('#couponList [data-pg]')].map((r) => {
+      const cells = [...r.children];
       const used = cells[7].getBoundingClientRect();
       const memo = cells[8].getBoundingClientRect();
-      const usedText = cells[7].querySelector('span') ? cells[7] : cells[7];
       return {
-        gap: Math.round(memo.left - used.right),
-        pad: parseFloat(getComputedStyle(cells[8]).paddingLeft),
-        used: usedText.textContent.trim(),
+        id: cells[0].textContent.trim(),
+        space: Math.round(memo.left - used.right) + parseFloat(getComputedStyle(cells[8]).paddingLeft),
+        used: cells[7].textContent.trim(),
         memo: cells[8].textContent.trim(),
       };
-    });
-    expect(gap.pad + gap.gap, `使用回数「${gap.used}」とメモ「${gap.memo}」の間隔が狭い`)
-      .toBeGreaterThanOrEqual(12);
+    }));
+    expect(rows.length).toBeGreaterThan(0);
+    const tight = rows.filter((r) => r.space < 12);
+    expect(tight.map((r) => `${r.id}「${r.used}${r.memo}」`), '使用回数とメモの間隔が狭い行').toEqual([]);
   });
 
   test('R-21 正答率の警告色にしきい値が書いてある', async ({ page }) => {
