@@ -235,7 +235,7 @@
       </div>
       <div style="border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.9;background:#f7f8fb">
         <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">回答日時</span><span style="font-variant-numeric:tabular-nums">2026/08/03 14:02</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">名刺</span><span>山田 太郎((株)サンプル商事・営業部)</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">名刺</span><span>山田 太郎(株式会社サンプル商事・営業部)</span></div>
         <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">データ化</span><span>完了(照合済み)</span></div>
       </div>
       <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">名刺データの削除依頼対応を想定した操作です(この検索結果は会期後アンケートの場合の表示例)。過去DB・名刺画像への波及削除の要否と方式は開発へ要確認。削除した回答は復元できません。</div>
@@ -323,7 +323,7 @@
       </div>
       <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.8">
         設問タイプはユーザー側のアンケート編集画面と同じ12種です。名刺の撮影は設問ではなく、アンケート単位の名刺データ化設定が持ちます。<br>多言語アンケートでは第一言語が必須で、それ以外の言語が未入力のときの回答画面での扱いは要確認です。<br>
-        設問の編集を本画面内で行うか専用画面へ分離するかは要確定(<span style="font-family:ui-monospace,Consolas,monospace">14_admin_survey_detail.md §11 #5</span>)。
+        設問の編集を本画面内で行うか専用画面へ分離するかは要確定。
       </div>
     </div>
     <div id="qDiffWrap" style="padding:12px 22px 0;flex-shrink:0">
@@ -1574,7 +1574,7 @@ window.pSdUpload = function () {
     if (qNote) {
         qNote.textContent = '全' + qCount + '問・'
             + (closed ? '会期終了後のため変更できません'
-                      : live ? '会期中のため変更は要注意操作として扱います'
+                      : live ? '会期中のため変更は要注意操作として扱う'
                              : '会期前は通常編集として変更できます');
     }
     var qTarget = document.querySelector('#mQuestions [data-slot="qTarget"]');
@@ -1603,7 +1603,7 @@ window.pSdUpload = function () {
         if (de) {
             de.textContent = n > 0
                 ? 'このアンケートは既に ' + n.toLocaleString('en-US') + ' 件の回答を受け付けています。'
-                    + '既存の回答との対応関係は未確定です(14_admin_survey_detail.md §11 #2)。'
+                    + '既存の回答との対応関係は未確定です。'
                 : 'このアンケートはまだ回答を受け付けていません。';
         }
     }
