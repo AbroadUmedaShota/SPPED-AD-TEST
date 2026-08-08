@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="初期費用0円・月額基本料0円。展示会のアンケート作成から名刺データ化、御礼メールまで、SPEED ADを無料で始められます。">
+  <title>無料ですぐ始められる | SPEED AD</title>
+  <link rel="icon" href="../../img/logo2.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へスキップ</a>
+
+  <header class="site-header" data-header>
+    <div class="site-header__inner shell">
+      <a class="brand" href="../../" aria-label="SPEED AD トップへ">
+        <img class="brand__mark" src="../../02_dashboard/assets/svg/speedad_emblem_silhouette.svg" alt="">
+        <span class="brand__name">SPEED <strong>AD</strong></span>
+      </a>
+
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-menu-button>
+        <span class="visually-hidden">メニューを開く</span>
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="メインナビゲーション" data-nav>
+        <a href="#benefits">できること</a>
+        <a href="#free-scope">無料で試せる範囲</a>
+        <a href="#steps">使い方</a>
+        <a class="button button--header" href="../../?intent=signup#top">無料アカウントを作成</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__inner shell">
+        <div class="hero__copy">
+          <h1 id="hero-title">展示会の追客、<br><span class="hero__nowrap">まずは無料で<br class="hero__mobile-break">始めよう。</span></h1>
+          <p class="hero__lead">初期費用0円・月額基本料0円。アンケート作成から名刺データ化、御礼メールまで、必要なときだけ使えます。</p>
+          <div class="hero__actions">
+            <a class="button button--primary" href="../../?intent=signup#top">
+              無料アカウントを作成
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            </a>
+            <a class="text-link" href="https://support.speed-ad.com/plans/" target="_blank" rel="noopener noreferrer">料金プランを見る</a>
+          </div>
+          <p class="hero__assurance">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            クレジットカード登録不要
+          </p>
+        </div>
+
+        <div class="product-flow" aria-label="QRアンケートから御礼メールまでの流れ">
+          <article class="product-flow__item">
+            <div class="product-flow__label"><span>01</span> QRアンケート</div>
+            <div class="device device--survey">
+              <div class="device__bar">SPEED AD</div>
+              <p class="device__title">アンケートに<br>ご協力ください</p>
+              <label>会社名</label>
+              <div class="device__field">例）スピード株式会社</div>
+              <label>お名前</label>
+              <div class="device__field">例）山田 太郎</div>
+              <div class="device__button">送信する</div>
+              <p class="device__success">✓ 回答が完了しました</p>
+            </div>
+          </article>
+
+          <svg class="product-flow__arrow" viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12h32m-8-8 8 8-8 8"/></svg>
+
+          <article class="product-flow__item product-flow__item--raised">
+            <div class="product-flow__label"><span>02</span> 名刺を撮影</div>
+            <div class="device device--card">
+              <div class="scan-frame">
+                <span class="scan-frame__corner scan-frame__corner--tl"></span>
+                <span class="scan-frame__corner scan-frame__corner--tr"></span>
+                <span class="scan-frame__corner scan-frame__corner--bl"></span>
+                <span class="scan-frame__corner scan-frame__corner--br"></span>
+                <small>SPEED株式会社<br>営業部</small>
+                <strong>山田 太郎</strong>
+                <small>taro.yamada@speed.co.jp</small>
+              </div>
+              <p class="device__success device__success--card">✓ 名刺データを読み取りました</p>
+              <dl class="data-list">
+                <div><dt>会社名</dt><dd>スピード株式会社</dd></div>
+                <div><dt>氏名</dt><dd>山田 太郎</dd></div>
+                <div><dt>メール</dt><dd>taro.yamada@speed.co.jp</dd></div>
+              </dl>
+            </div>
+          </article>
+
+          <svg class="product-flow__arrow" viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12h32m-8-8 8 8-8 8"/></svg>
+
+          <article class="product-flow__item">
+            <div class="product-flow__label"><span>03</span> 御礼メール</div>
+            <div class="device device--mail">
+              <div class="mail-row"><span>To</span> taro.yamada@example.com</div>
+              <div class="mail-row"><span>件名</span> 展示会ご来場のお礼</div>
+              <div class="mail-brand">SPEED <strong>AD</strong></div>
+              <p>山田 太郎 様</p>
+              <p>本日は弊社ブースへお立ち寄りいただき、ありがとうございました。</p>
+              <p>ご案内した資料をお送りします。</p>
+              <div class="mail-cta">資料を見る</div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <dl class="fact-rail" aria-label="無料で使える内容">
+        <div><dt>初期費用</dt><dd><strong>0</strong>円</dd></div>
+        <div><dt>月額基本料</dt><dd><strong>0</strong>円</dd></div>
+        <div><dt>御礼メール</dt><dd><strong>100</strong>通まで無料</dd></div>
+      </dl>
+    </section>
+
+    <section class="benefits section" id="benefits" aria-labelledby="benefits-title">
+      <div class="benefits__inner shell">
+        <div class="section-heading section-heading--left">
+          <h2 id="benefits-title">無料だから、<br>展示会ごとに<br>気軽に試せます。</h2>
+          <p>必要な機能だけを、必要な分だけ。<br>固定費を気にせず、小さく始められます。</p>
+        </div>
+
+        <ol class="benefit-list">
+          <li>
+            <span class="benefit-list__number">01</span>
+            <div><h3>初期費用なし</h3><p>導入費用やシステム設定費はかかりません。</p></div>
+          </li>
+          <li>
+            <span class="benefit-list__number">02</span>
+            <div><h3>月額基本料なし</h3><p>スタンダードプランは使わない月も0円です。</p></div>
+          </li>
+          <li>
+            <span class="benefit-list__number">03</span>
+            <div><h3>実数精算</h3><p>名刺データ化は処理した枚数分だけ。</p></div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="steps section" id="steps" aria-labelledby="steps-title">
+      <div class="shell">
+        <div class="section-heading">
+          <h2 id="steps-title">始め方は、たった<span>3</span>ステップ。</h2>
+          <p>登録したその日から、アンケートの準備を始められます。</p>
+        </div>
+
+        <ol class="step-list">
+          <li>
+            <div class="step-list__heading"><span>01</span><h3>無料アカウント作成</h3></div>
+            <div class="step-visual step-visual--account" aria-hidden="true">
+              <div class="mini-logo">SPEED <strong>AD</strong></div>
+              <div class="mini-title">無料アカウント作成</div>
+              <div class="mini-input"></div><div class="mini-input"></div><div class="mini-button"></div>
+            </div>
+            <p>メールアドレスとパスワードを入力。カード登録は不要です。</p>
+          </li>
+          <li>
+            <div class="step-list__heading"><span>02</span><h3>アンケートを作成</h3></div>
+            <div class="step-visual step-visual--editor" aria-hidden="true">
+              <div class="editor-side"><i></i><i></i><i></i><i></i></div>
+              <div class="editor-main"><div class="editor-title"></div><div class="editor-question"></div><div class="editor-question editor-question--short"></div></div>
+            </div>
+            <p>選択式や自由記述など、必要な設問を画面上で作成します。</p>
+          </li>
+          <li>
+            <div class="step-list__heading"><span>03</span><h3>QRを配布して回答受付</h3></div>
+            <div class="step-visual step-visual--qr" aria-hidden="true">
+              <div class="qr-code"></div>
+              <div class="phone"><div class="phone__bar">SPEED AD</div><div class="phone__line"></div><div class="phone__line phone__line--short"></div><div class="phone__button"></div></div>
+            </div>
+            <p>発行したQRを掲示。来場者が自分のスマートフォンから回答できます。</p>
+          </li>
+        </ol>
+
+        <div class="center-action">
+          <a class="button button--primary" href="../../?intent=signup#top">無料アカウントを作成<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="free-scope section" id="free-scope" aria-labelledby="free-scope-title">
+      <div class="shell shell--narrow">
+        <div class="section-heading section-heading--split">
+          <span class="section-number" aria-hidden="true">03</span>
+          <div>
+            <h2 id="free-scope-title">0円で、ここまで試せます。</h2>
+            <p>SPEED ADは、初めての方でも安心して試せるよう、展示会の基本機能を無料で用意しています。</p>
+          </div>
+        </div>
+
+        <div class="scope-table" role="table" aria-label="無料で試せる機能">
+          <div class="scope-table__header" role="row">
+            <span role="columnheader">無料でできること</span>
+            <span role="columnheader">無料の範囲</span>
+          </div>
+          <div class="scope-table__row" role="row"><span role="cell">WEBアンケート作成</span><strong role="cell">無料</strong></div>
+          <div class="scope-table__row" role="row"><span role="cell">QRコード発行</span><strong role="cell">無料</strong></div>
+          <div class="scope-table__row" role="row"><span role="cell">回答結果の確認・CSV出力</span><strong role="cell">無料</strong></div>
+          <div class="scope-table__row" role="row"><span role="cell">御礼メール</span><strong role="cell">100通まで無料</strong></div>
+          <div class="scope-table__row" role="row"><span role="cell">名刺データ化</span><strong role="cell">お試し0円／2項目</strong></div>
+        </div>
+
+        <p class="scope-note">名刺データ化は速度・入力項目に応じて料金が発生します。</p>
+        <p class="scope-link"><a class="text-link" href="https://support.speed-ad.com/plans/" target="_blank" rel="noopener noreferrer">詳しい料金を見る</a></p>
+      </div>
+    </section>
+
+    <section class="faq section" aria-labelledby="faq-title">
+      <div class="shell shell--narrow">
+        <div class="section-heading section-heading--split">
+          <span class="section-number" aria-hidden="true">04</span>
+          <div><h2 id="faq-title">始める前の、よくある不安。</h2></div>
+        </div>
+
+        <div class="faq-list">
+          <details open>
+            <summary><span>本当に月額0円ですか？</span><span class="faq-list__icon" aria-hidden="true"></span></summary>
+            <p>はい。スタンダードプランは月額基本料0円です。</p>
+          </details>
+          <details>
+            <summary><span>クレジットカードは必要ですか？</span><span class="faq-list__icon" aria-hidden="true"></span></summary>
+            <p>無料登録時のカード入力は不要です。</p>
+          </details>
+          <details>
+            <summary><span>使わない月も料金がかかりますか？</span><span class="faq-list__icon" aria-hidden="true"></span></summary>
+            <p>月額基本料はかかりません。利用した有料処理分のみです。</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="closing__inner shell">
+        <h2 id="closing-title">次の展示会は、<br><span class="closing__nowrap">もっと速く、もっと身軽に。</span></h2>
+        <div class="closing__action">
+          <p>無料アカウントで、まずはアンケートを1つ作ってみませんか。</p>
+          <a class="button button--primary" href="../../?intent=signup#top">無料アカウントを作成<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner shell">
+      <a class="brand brand--footer" href="../../" aria-label="SPEED AD トップへ">
+        <span class="brand__name">SPEED <strong>AD</strong></span>
+      </a>
+      <nav aria-label="フッターナビゲーション">
+        <a href="https://support.speed-ad.com/plans/" target="_blank" rel="noopener noreferrer">料金プラン</a>
+        <a href="https://support.speed-ad.com/terms/" target="_blank" rel="noopener noreferrer">利用規約</a>
+        <a href="https://support.speed-ad.com/privacy/" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>
+        <a href="../../#top">ログイン</a>
+      </nav>
+      <p>© 2026 Abroad Outsourcing Co.,Inc.</p>
+    </div>
+  </footer>
+</body>
+</html>
