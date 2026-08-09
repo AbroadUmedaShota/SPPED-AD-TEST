@@ -82,8 +82,12 @@ def check_shell(problems: list) -> int:
             problems.append(f"シェル検査: {rel} は全画面作業モードのはずだが #sidebar-placeholder がある")
         if rel not in NO_SIDEBAR and not has_sidebar:
             problems.append(f"シェル検査: {rel} に #sidebar-placeholder が無い")
-        if 'id="footer-placeholder"' in html:
-            problems.append(f"シェル検査: {rel} に #footer-placeholder がある（到達16画面はフッターを出さない）")
+        # フッターは `01_admin_common_ui.md` §2。個票・作業画面は 1 画面に収める制約があるため置かない
+        has_footer = 'id="footer-placeholder"' in html
+        if rel in NO_SIDEBAR and has_footer:
+            problems.append(f"シェル検査: {rel} は個票・作業画面のはずだが #footer-placeholder がある")
+        if rel not in NO_SIDEBAR and not has_footer:
+            problems.append(f"シェル検査: {rel} に #footer-placeholder が無い")
 
     if len(signatures) > 1:
         problems.append("シェル検査: script/link の並びが画面ごとに食い違っている")
