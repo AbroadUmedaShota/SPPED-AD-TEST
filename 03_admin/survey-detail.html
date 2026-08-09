@@ -162,7 +162,7 @@
 <div id="mDl" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:480px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
-      <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム</span></span>
+      <span style="font-size:15px;font-weight:700">データのダウンロード<span data-slot="dlSid" style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム</span></span>
       <span role="button" onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px;display:flex;flex-direction:column;gap:10px">
@@ -1521,6 +1521,11 @@ window.pSdUpload = function () {
     var base = DATA[DEF] || d;
     if (!d || !base) { return; }
     document.documentElement.setAttribute('data-current-id', id);
+
+    // データDLの見出しは略記のタイトルを持っており、一括置換では対象に追随しない。
+    // 開く経路がどれでも正しい対象を出すよう、ここで入れておく
+    var dlSlot = document.querySelector('#mDl [data-slot="dlSid"]');
+    if (dlSlot) { dlSlot.textContent = id + ' ' + d.title; }
 
     // 既定ダミーの語をこの対象の語へ置き換える。
     // プラン名・状態名のような短い一般語は対象にしない(本文の説明文や選択肢まで巻き込むため)。
