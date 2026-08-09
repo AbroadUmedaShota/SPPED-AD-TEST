@@ -1,12 +1,9 @@
-<!-- 現行の到達16画面はフッターを表示しないため注入先(#footer-placeholder)を持たない(2026-08-06 時点)。
-     このパーツを読み込むのは escalations.html と reconciliation/list.html のみ。 -->
-<footer class="w-full bg-gray-800 text-white py-4 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto flex justify-between items-center text-sm">
-        <p>&copy; 2025 Speed AD. All rights reserved. (Admin Panel)</p>
-        <div>
-            <a href="#" class="hover:text-gray-300 transition-colors">利用規約</a>
-            <span class="mx-2">|</span>
-            <a href="#" class="hover:text-gray-300 transition-colors">プライバシーポリシー</a>
-        </div>
-    </div>
+<!-- 画面下部のフッター（`01_admin_common_ui.md` §2）。
+     個票・作業画面（名刺入力画面・名刺情報照合）は 1 画面に収める制約があるため置かない。
+     旧画面(escalations.html / reconciliation/list.html)も同じパーツを読む。
+     このパーツを読む画面はすべて admin-style.css を読むため、配色はトークンだけで足りる。 -->
+<!-- 左右 24px は本文の器（padding: 18px 24px 40px）に合わせた値。ずらすと端に貼り付いて見える -->
+<footer style="padding:14px 24px 24px;border-top:1px solid var(--a-border-soft);font-size:12px;color:var(--a-fg-muted2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <span>&copy; 2026 SPEED AD 管理画面</span>
+    <span style="font-variant-numeric:tabular-nums">モックアップ / レビュー用</span>
 </footer>

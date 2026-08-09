@@ -51,6 +51,7 @@
               <div id="calPanel" style="width:320px;flex:none;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 18px"></div>
             </div>
           </div>
+          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>
@@ -260,7 +261,7 @@ window.pCalImport = function () {
             if (d < 1 || d > dim) {
                 var od = new Date(y, m - 1, d);
                 var lab = (d === 1 - first || d === dim + 1) ? (od.getMonth() + 1) + '/' + od.getDate() : String(od.getDate());
-                cells.push('<div style="min-height:86px;padding:6px 8px;' + bd + 'background:var(--a-surface);color:var(--a-fg-disabled);font-size:12px">' + lab + '</div>');
+                cells.push('<div style="min-height:86px;padding:6px 8px;' + bd + 'background:var(--a-surface);color:var(--a-fg-faint);font-size:12px">' + lab + '</div>');
                 continue;
             }
             var is = y + '-' + pad2(m) + '-' + pad2(d);

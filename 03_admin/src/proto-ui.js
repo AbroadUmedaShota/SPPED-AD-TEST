@@ -181,8 +181,17 @@
         var nums = Array.prototype.map.call(pager.querySelectorAll('button[data-page]'), function (b) { return parseInt(b.getAttribute('data-page'), 10); });
         var steppers = Array.prototype.filter.call(pager.querySelectorAll('button'), function (b) { return !b.hasAttribute('data-page'); });
         if (steppers.length === 2 && nums.length) {
-            steppers[0].style.color = (n <= Math.min.apply(null, nums)) ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
-            steppers[1].style.color = (n >= Math.max.apply(null, nums)) ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
+            // 端では色を薄くするだけでなく実際に非活性にする。
+            // 見た目だけ薄いと押せると思わせるうえ、薄い文字色は読めない濃さになる
+            [[steppers[0], n <= Math.min.apply(null, nums), 'これより前のページはありません'],
+                [steppers[1], n >= Math.max.apply(null, nums), 'これより後のページはありません']]
+                .forEach(function (p) {
+                    var el = p[0], off = p[1];
+                    el.disabled = off;
+                    el.style.color = off ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
+                    el.style.cursor = off ? 'default' : 'pointer';
+                    if (off) { el.setAttribute('title', p[2]); } else { el.removeAttribute('title'); }
+                });
         }
     };
 
