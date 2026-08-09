@@ -30,6 +30,39 @@
         });
     }
 
+    /**
+     * モーダルに役割と名前を付ける。
+     * 支援技術は role="dialog" が無いとただの div として読み上げ、名前が無いと
+     * 「何のダイアログか」が伝わらない。45 個の markup に個別で書くと付け忘れるため、
+     * 開くときにこの1箇所で当てる。見出しは .proto-dialog 内の最初の h1〜h3 とする。
+     */
+    function labelDialog(m) {
+        var d = m.querySelector('.proto-dialog') || m;
+        if (d.getAttribute('role') !== 'dialog') {
+            d.setAttribute('role', 'dialog');
+            d.setAttribute('aria-modal', 'true');
+        }
+        if (d.getAttribute('aria-labelledby') || d.getAttribute('aria-label')) { return; }
+        var h = d.querySelector('h1, h2, h3, [data-dialog-title]');
+        if (h) {
+            if (!h.id) { h.id = m.id + '-title'; }
+            d.setAttribute('aria-labelledby', h.id);
+            return;
+        }
+        // 見出し要素を持たないモーダルは、先頭行(タイトル行)を名前にする。
+        // 本文まで拾うと「変更を保存しますか? × U-1002 川村 聡の…」のように長くなり、
+        // 読み上げで何のダイアログか分からなくなる
+        var head = d.firstElementChild;
+        if (head) {
+            var clone = head.cloneNode(true);
+            // 閉じるボタンの「×」は名前に含めない
+            clone.querySelectorAll('button, a').forEach(function (b) { b.remove(); });
+            var t = (clone.textContent || '').trim().replace(/[×✕✖]\s*$/, '').trim()
+                .replace(/\s+/g, ' ').slice(0, 60);
+            if (t) { d.setAttribute('aria-label', t); }
+        }
+    }
+
     window.pOpen = function (id) {
         // 正本(prototype)は常に単一モーダル表示のため、開く前に他をすべて閉じる
         var wasOpen = document.querySelector('.proto-modal:not([hidden])');
@@ -41,6 +74,7 @@
             return;
         }
         if (!wasOpen) { lastFocused = document.activeElement; }
+        labelDialog(m);
         m.hidden = false;
         document.body.style.overflow = 'hidden';
         setBackgroundInert(true);
