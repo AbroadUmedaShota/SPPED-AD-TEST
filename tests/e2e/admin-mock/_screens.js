@@ -63,6 +63,9 @@ async function openScreen(page, path) {
       // サイドバーは全画面作業モードの2画面には無い。ある画面では注入まで待つ
       const s = document.querySelector('#sidebar-placeholder');
       if (s && !s.children.length) { return false; }
+      // フッターも同じ。注入前に検査を始めると、後から入る分の再描画と競合する
+      const f = document.querySelector('#footer-placeholder');
+      if (f && !f.children.length) { return false; }
       return typeof window.pLevel === 'function';
     },
     null,

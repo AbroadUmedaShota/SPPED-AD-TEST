@@ -593,7 +593,7 @@
         "#p-toast"
       ],
       "dependencies": [],
-      "evidence": "03_admin/src/proto-ui.js:596-639（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:249(pSortable)",
+      "evidence": "03_admin/src/proto-ui.js:708-751（pListCsv / pDlPick は 2026-08-06 に3画面・2画面の重複実装から集約） / 03_admin/src/proto-ui.js:270(pSortable)",
       "specDoc": "docs/リライト版仕様書/admin/01_admin_common_ui.md"
     },
     {
@@ -740,14 +740,14 @@
     },
     {
       "id": "common-footer",
-      "name": "common/footer.html — フッター（到達範囲では注入先なし）",
+      "name": "common/footer.html — フッター",
       "type": "layout-partial",
       "layer": "chrome",
       "reachable": true,
       "confidence": "verified",
-      "description": "到達16画面のいずれも #footer-placeholder を持たないため、フッターは1枚も表示されない。注入先を持つのは到達不能な escalations.html / reconciliation/list.html / sample/data_entry_admin_form.html の3枚のみ。2026-08-06 に admin.js 側へ注入先の事前確認を入れ、到達16画面での無駄な取得をやめた。",
+      "description": "フッター（`01_admin_common_ui.md` §2）。到達16画面のうち、1 画面に収める制約がある個票・作業画面2枚（data-entry/form.html・reconciliation/detail.html）を除く14画面が #footer-placeholder を持つ。admin.js が注入先の有無を見てから取得する。到達不能な escalations.html / reconciliation/list.html / sample/data_entry_admin_form.html も同じパーツを読む。配色は var(--a-*) を通し、フォールバック値を添えてトークン未読込でも色が消えないようにしている（2026-08-09 に14画面へ配置）。",
       "responsibilities": [
-        "フッター表示（注入先を持つ到達不能3枚のみ）"
+        "フッター表示（到達14画面 + 到達不能3枚）"
       ],
       "filePaths": [
         "03_admin/common/footer.html"
@@ -902,7 +902,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/user-management.html:35（data-filter-keys）, 234-359（inline script）",
+      "evidence": "03_admin/user-management.html:36（data-filter-keys）, 234-359（inline script）",
       "specDoc": "docs/リライト版仕様書/admin/11_admin_user_management.md",
       "dataSource": "HTML直書き25行"
     },
@@ -948,7 +948,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/user-detail.html:459-502（DATA/replaceIn/GO）",
+      "evidence": "03_admin/user-detail.html:537-580（DATA/replaceIn/GO）",
       "specDoc": "docs/リライト版仕様書/admin/12_admin_user_detail.md",
       "dataSource": "inline JS リテラル DATA（24ユーザー）"
     },
@@ -991,7 +991,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/survey-management.html:37（data-filter-keys）, 195-265（inline script: pSurveySave。pDlPick は 2026-08-06 に proto-ui.js へ移動）",
+      "evidence": "03_admin/survey-management.html:38（data-filter-keys）, 195-265（inline script: pSurveySave。pDlPick は 2026-08-06 に proto-ui.js へ移動）",
       "specDoc": "docs/リライト版仕様書/admin/13_admin_survey_management.md",
       "dataSource": "HTML直書き23行"
     },
@@ -1347,7 +1347,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/reconciliation/index.html:58（data-filter-keys）, 123（DLモーダル #mDl。処理は proto-ui.js の共有 pDlPick）",
+      "evidence": "03_admin/reconciliation/index.html:104（data-filter-keys）, 123（DLモーダル #mDl。処理は proto-ui.js の共有 pDlPick）",
       "specDoc": "docs/リライト版仕様書/admin/21_admin_matching_list.md",
       "dataSource": "HTML直書き6行"
     },
@@ -1396,7 +1396,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/reconciliation/detail.html:172-502",
+      "evidence": "03_admin/reconciliation/detail.html:172-470",
       "specDoc": "docs/リライト版仕様書/admin/22_admin_matching_form.md",
       "dataSource": "inline JS リテラル FIX / TARGETS / DATA（22アンケート）"
     },
@@ -1484,7 +1484,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/performance-management.html:58（data-filter-keys）, 119-122（pPerfCsv ラッパ）, 126-211（inline script）",
+      "evidence": "03_admin/performance-management.html:59（data-filter-keys）, 119-122（pPerfCsv ラッパ）, 126-211（inline script）",
       "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
       "dataSource": "HTML直書き6行 + inline 集計セット"
     },
@@ -1522,7 +1522,7 @@
         "proto-ui-js",
         "proto-level-js"
       ],
-      "evidence": "03_admin/audit-log.html:43（data-filter-keys）, 118-123（pAuditCsv ラッパ）/ 03_admin/src/proto-ui.js:360-364（from/to 比較）",
+      "evidence": "03_admin/audit-log.html:44（data-filter-keys）, 118-123（pAuditCsv ラッパ）/ 03_admin/src/proto-ui.js:360-364（from/to 比較）",
       "specDoc": "docs/リライト版仕様書/admin/25_admin_audit_log.md",
       "dataSource": "HTML直書き10行"
     },
@@ -1551,7 +1551,7 @@
         "請求書シートDOM"
       ],
       "dependencies": [],
-      "evidence": "03_admin/invoice-management.html:95（f.src に &embed=1）, 86-98（pInvoice）",
+      "evidence": "03_admin/invoice-management.html:97（f.src に &embed=1）, 86-98（pInvoice）",
       "specDoc": "docs/リライト版仕様書/admin/16_admin_invoice.md",
       "risk": "埋め込み時の見た目は利用者側の html[data-embed=\"1\"] のCSSが決める。管理側からは触らないため、崩れても管理画面の実装を追う必要はない"
     },
@@ -2824,7 +2824,7 @@
           "order": 8,
           "node": "common-footer",
           "edge": "e-adminjs-footer",
-          "action": "admin.js が注入先(#footer-placeholder)を確認し、到達16画面には無いため取得しない",
+          "action": "admin.js が注入先(#footer-placeholder)を確認し、ある14画面だけ取得して注入する",
           "evidence": "03_admin/src/admin.js:72-77"
         },
         {
@@ -3745,14 +3745,14 @@
           "node": "scr-survey-detail",
           "edge": null,
           "action": "多言語アンケートなら「編集言語」タブを出す（第一言語には第一言語バッジ、他言語には未入力の件数）。タブを切り替えると設問文と選択肢の入力が言語ごとに切り替わり、第一言語の内容を各入力の下に参照表示する",
-          "evidence": "03_admin/survey-detail.html:726-743（paintLangBar / pQLang / itemEditor の参照表示）"
+          "evidence": "03_admin/survey-detail.html:757-774（paintLangBar / pQLang / itemEditor の参照表示）"
         },
         {
           "order": 5,
           "node": "scr-survey-detail",
           "edge": null,
           "action": "設問カードを押して開き、設問文・設問タイプ（12種）・必須を編集する。開くのは常に1問だけで、閉じているカードには「シングルアンサー · 必須 · 選択肢 5」のサマリが出る。型に応じて選択肢／行と列／段階数と両端ラベル／文字数制限／数値の範囲と単位／日付と時刻の別／手書きの高さを編集する",
-          "evidence": "03_admin/survey-detail.html:365-384（TYPES 12種）, 848-1072（paintEditor のアコーディオン / itemEditor）"
+          "evidence": "03_admin/survey-detail.html:395-414（TYPES 12種）, 848-1072（paintEditor のアコーディオン / itemEditor）"
         },
         {
           "order": 6,
@@ -3870,7 +3870,7 @@
       "severity": "medium",
       "title": "同一機能が画面ごとに重複実装されている",
       "detail": "pDlPick（データDL）が survey-management / survey-detail / reconciliation-index の3画面に、pListCsv（一覧CSV出力）が audit-log / performance-management の2画面に、ほぼ同一内容で別々に定義されている。",
-      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:596-618（pListCsv）と 623-639（pDlPick）に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:118-121 / performance-management.html:119-122 のラッパのみ",
+      "evidence": "修正前は pDlPick の同一17行が survey-management.html / survey-detail.html / reconciliation/index.html の3画面に、pListCsv の同一26行が audit-log.html / performance-management.html の2画面にあった（diff で差分0を確認）。現在は 03_admin/src/proto-ui.js:708-730（pListCsv）と 623-639（pDlPick）に1本ずつで、画面側は onclick=\"pDlPick(...)\" と audit-log.html:118-121 / performance-management.html:119-122 のラッパのみ",
       "impact": "CSVの列定義やZIPの扱いを変えるとき、修正漏れが3〜2箇所に分散する",
       "recommendation": "proto-ui.js へ pDlPick / pListCsv を移し、画面側は列定義だけを渡す形にする",
       "status": "resolved-2026-08-06",
@@ -3881,7 +3881,7 @@
       "severity": "medium",
       "title": "詳細画面の内容差し替えがテキストノードの文字列置換に依存している",
       "detail": "ユーザー詳細・アンケート詳細・照合個票は、既定IDのダミーで書かれたテンプレートに対し、document.body 配下の全テキストノードを走査して既定値の文字列を対象値へ split/join 置換する。 実害が確認できたのは survey-detail.html の plan で、値「通常」が本文テキストに4回現れ、別プランのアンケートを開くと納期区分 select の選択肢1つと説明文2箇所まで書き換わっていた。",
-      "evidence": "user-detail.html:202-216 / survey-detail.html:1494-1517 / reconciliation/detail.html:488-500",
+      "evidence": "user-detail.html:552-566 / survey-detail.html:1535-1558。照合個票は SURVEYS / TARGETS の対応表へ移行済みで、テキストノード置換は使っていない",
       "impact": "既定値の文字列（例: 会社名『(株)マーケットビジョン』）が本文の別の場所に出てくると巻き込みで置換される。逆に集計値・操作ログ・モーダル本文の数値は置換対象外のため、対象を変えても固定ダミーのまま残り、画面内で整合しない",
       "recommendation": "モックの範囲では現状で足りるが、本番実装では data-slot 方式（既に部分的に併用されている）へ寄せる。少なくとも置換対象の文字列が本文に単独で出現しないことを確認する",
       "status": "resolved-2026-08-06",
@@ -3969,7 +3969,7 @@
       "severity": "high",
       "title": "請求書管理のページングが件数表示と合っていなかった",
       "detail": "16行すべてが data-pg=\"1\" で、表示件数10を選んでいるのに16行出ていた。件数表示だけ「全16件中1〜5件」と別の数を出し、ページャにも2ページ目が無かった。",
-      "evidence": "03_admin/invoice-management.html:54（invoiceList-pager）",
+      "evidence": "03_admin/invoice-management.html:55（invoiceList-pager）",
       "impact": "一覧の件数表示が信用できなくなる。他8画面は正しかったため、この画面だけ挙動が違った",
       "recommendation": "10件ずつ2ページへ分けた。tests/e2e/admin-mock/lists.spec.js が9画面すべてで行数・件数表示・ページ数の一致を見る",
       "status": "resolved-2026-08-06"
@@ -3989,7 +3989,7 @@
       "severity": "high",
       "title": "ユーザー詳細で招待が本登録より後の日時になっていた",
       "detail": "招待メールの日時を「登録日の 10:02」で固定していたため、登録日時が10:02より前のアカウントで時系列が逆転した。U-1002 は招待 10:02 → 本登録完了 08:57 だった。",
-      "evidence": "03_admin/user-detail.html:296（inviteAt）",
+      "evidence": "03_admin/user-detail.html:373（inviteAt）",
       "impact": "メール送達状況と操作ログの両方に出るため、運用者が実際の順序を誤解する",
       "recommendation": "inviteAt() で登録日時の前日を返し、送達状況と操作ログが同じ値を使う",
       "status": "resolved-2026-08-06"
