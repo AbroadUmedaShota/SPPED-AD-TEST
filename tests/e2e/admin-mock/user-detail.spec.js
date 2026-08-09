@@ -108,7 +108,7 @@ test('未保存のまま離れようとすると確認する（§4.2）', async 
 
 test('§4.1 の配置順で並ぶ', async ({ page }) => {
   await open(page, USERS.有効);
-  const wanted = ['アカウント情報', 'パスワード操作', '紐づくアンケート', '請求状況', '監査ログ'];
+  const wanted = ['アカウント情報', '所属グループ', 'パスワード操作', '紐づくアンケート', '請求状況', '監査ログ'];
   // 本文中にも同じ語が出る（「監査ログに記録されます」など）ので、
   // 区切り線を持つ見出しの帯だけを文書順に拾う。
   // 見出しは「アカウント情報 + 補足」「紐づくアンケート + 件数 + ボタン」のように
@@ -124,4 +124,35 @@ test('§4.1 の配置順で並ぶ', async ({ page }) => {
     return out;
   }, wanted);
   expect(found, '§4.1 の見出しが揃っていない、または順序が違う').toEqual(wanted);
+});
+
+test.describe('所属グループ（§4.4）', () => {
+  test('参加しているグループを権限・状態つきで並べる', async ({ page }) => {
+    await open(page, USERS.有効);
+    expect(await page.locator('[data-slot="grCount"]').textContent()).toMatch(/全 \d+ 件/);
+    const head = await page.$$eval('#udGroups > div:first-child span', (e) => e.map((x) => x.textContent.trim()));
+    expect(head).toEqual(['グループ名', '権限', '状態', 'メンバー', '請求先']);
+    const rows = await page.$$eval('#udGroups > div:not(:first-child)', (e) => e.map((x) => x.textContent.replace(/\s+/g, ' ').trim()));
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows[0]).toMatch(/管理者|一般/);
+    expect(rows[0]).toMatch(/加入済|招待中|アドレスエラー/);
+  });
+
+  test('複数のグループに参加している利用者は全件出る', async ({ page }) => {
+    await open(page, 'U-1052');
+    const rows = await page.$$eval('#udGroups > div:not(:first-child)', (e) => e.length);
+    expect(rows).toBe(2);
+    expect(await page.locator('[data-slot="grCount"]').textContent()).toContain('全 2 件');
+  });
+
+  test('参加していない利用者にはその旨を出す', async ({ page }) => {
+    await open(page, USERS.招待中);
+    expect(await page.locator('#udGroups').textContent()).toContain('参加しているグループはありません');
+    expect(await page.locator('[data-slot="grCount"]').textContent()).toContain('全 0 件');
+  });
+
+  test('参照のみで、編集の操作要素を置かない', async ({ page }) => {
+    await open(page, 'U-1052');
+    expect(await page.locator('#udGroups button, #udGroups select, #udGroups input').count()).toBe(0);
+  });
 });

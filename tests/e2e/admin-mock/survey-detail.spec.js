@@ -188,3 +188,32 @@ test('お礼メールは通常は閲覧のみで、要注意操作を通すと�
   await page.click('[data-slot="thanksBtn"]');
   expect(await page.locator('[data-slot="tmEdit"]').isVisible(), '閉じたら編集に戻れない').toBe(true);
 });
+
+test.describe('基本情報のグループ（§4.2）', () => {
+  test('グループ契約は名前と請求先を出し、ユーザー詳細へ繋ぐ', async ({ page }) => {
+    await open(page, 'SV-10244');
+    const t = (await page.locator('[data-slot="grp"]').textContent()).replace(/\s+/g, ' ');
+    expect(t).toContain('イベント企画部');
+    expect(t, '請求先の設定が併記されていない').toMatch(/請求先: (グループ専用|作成者の登録情報)/);
+    // 作成者のユーザー詳細（所属グループ）へ繋ぐ
+    expect(await page.locator('[data-slot="grp"] a').getAttribute('href')).toBe('user-detail.html?id=U-1052');
+  });
+
+  test('グループに属さないアンケートは個人契約と出す', async ({ page }) => {
+    await open(page, 'SV-10262');
+    expect(await page.locator('[data-slot="grp"]').textContent()).toContain('個人契約');
+    expect(await page.locator('[data-slot="grp"] a').count()).toBe(0);
+  });
+
+  test('対象を切り替えると作成者の氏名も追随する（ユーザー詳細と食い違わない）', async ({ page }) => {
+    await open(page, 'SV-10244');
+    const creator = await page.locator('[data-slot="creator"]').textContent();
+    expect(creator).toContain('U-1052');
+    expect(creator, '既定の氏名が残っている').not.toContain('三浦 沙織');
+
+    // ユーザー詳細側の氏名と一致すること
+    await openScreen(page, '/03_admin/user-detail.html?id=U-1052');
+    const name = await page.locator('[data-slot="acctFields"] input').nth(1).inputValue();
+    expect(creator).toContain(name);
+  });
+});
