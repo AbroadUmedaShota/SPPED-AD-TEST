@@ -7,8 +7,21 @@
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
+    <script src="src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 画面本体の2カラム。幅が足りなくなったら右カラムを下へ送って1カラムにする。
+   2カラムのままだと中の表が枠を超え、overflow-x-hidden で黙って切れる（スクロールバーも出ない）。
+
+   1カラムに必要な幅はカードの中身で決まり、実測で1カラムあたり682px。
+   2カラム = 682×2 + 間隔16 = 1380px（本文）+ サイドバー232px + ページ余白48px = 1660px。
+   閾値は余裕を見て1700pxに置く。 */
+.admin-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 1700px) {
+  .admin-2col { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -18,66 +31,71 @@
         <div id="sidebar-placeholder"></div>
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
           <div style="padding:18px 24px 40px">
-            <div style="font-size:12px;color:#6b7484">ホーム › <a href="user-management.html">ユーザー管理</a> › <span style="color:#1f2733">ユーザー詳細</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+            <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="user-management.html">ユーザー管理</a> › <span style="color:var(--a-fg-strong)">ユーザー詳細</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700">ユーザー詳細</h1>
-              <button onclick="pUdGo('user-management.html')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+              <button onclick="pUdGo('user-management.html')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
             </div>
-            <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px">
+            <div style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px">
               <span style="font-size:16px;font-weight:700">岡田 健一</span>
-              <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">U-1052</span>
-              <span style="background:#fdf6ec;color:#8a5a10;border:1px solid #e8cf9e;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700" data-slot="premium">プレミアム</span>
+              <span style="font-size:12px;color:var(--a-fg-muted2);font-variant-numeric:tabular-nums">U-1052</span>
+              <span style="background:var(--a-warn-bg);color:var(--a-warn-deep);border:1px solid var(--a-warn-border);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700" data-slot="premium">プレミアム</span>
               <span data-slot="status" class="status-badge status-active">有効</span>
             </div>
-            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+            <div class="admin-2col" style="margin-top:16px">
               <div style="display:flex;flex-direction:column;gap:16px">
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">アカウント情報 <span style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
-                  <div data-slot="inviteBand" hidden style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#eef2fb;border:1px solid #b9caee;border-radius:6px;font-size:11.5px;color:#1f3d80;line-height:1.7"><span data-slot="inviteText" style="min-width:0"></span><span style="flex-shrink:0;display:flex;gap:8px"><button onclick="pOpen('mResendInvite')" style="background:#fff;color:#2b57b8;border:1px solid #b9caee;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待を再送</button><button onclick="pOpen('mCancelInvite')" style="background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待をキャンセル</button></span></div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">アカウント情報 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">管理者による編集(代行)が可能</span></div>
+                  <div data-slot="inviteBand" hidden style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:6px;font-size:11.5px;color:var(--a-info-fg);line-height:1.7"><span data-slot="inviteText" style="min-width:0"></span><span style="flex-shrink:0;display:flex;gap:8px"><button onclick="pOpen('mResendInvite')" style="background:var(--a-surface);color:var(--a-accent-deep);border:1px solid var(--a-info-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待を再送</button><button onclick="pOpen('mCancelInvite')" style="background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待をキャンセル</button></span></div>
                   <div data-slot="acctFields" style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
-                  <span style="color:#6b7484">会社名</span><input aria-label="会社名" value="(株)マーケットビジョン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-                  <span style="color:#6b7484">氏名</span><input aria-label="氏名" value="岡田 健一" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-                  <span style="color:#6b7484">メール</span><input aria-label="メール" value="k.okada@market-v.co.jp" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
-                  <span style="color:#6b7484">電話番号</span><input aria-label="電話番号" value="03-5152-8364" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;font-variant-numeric:tabular-nums">
-                  <span style="color:#6b7484">ユーザーID</span><span style="font-variant-numeric:tabular-nums">U-1052</span>
-                  <span style="color:#6b7484">アカウント状態</span><span><span data-slot="status" class="status-badge status-active">有効</span> <span style="font-size:11.5px;color:#8a93a5">変更はユーザー管理から</span></span>
-                  <span style="color:#6b7484">登録日時</span><span style="font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
-                  <span style="color:#6b7484">最終ログイン</span><span data-slot="lastLogin" style="font-variant-numeric:tabular-nums">2026/08/01 18:22</span>
+                  <span style="color:var(--a-fg-muted2)">会社名</span><input aria-label="会社名" value="(株)マーケットビジョン" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:var(--a-fg-muted2)">氏名</span><input aria-label="氏名" value="岡田 健一" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:var(--a-fg-muted2)">メール</span><input aria-label="メール" value="k.okada@market-v.co.jp" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
+                  <span style="color:var(--a-fg-muted2)">電話番号</span><input aria-label="電話番号" value="03-5152-8364" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;font-variant-numeric:tabular-nums">
+                  <span style="color:var(--a-fg-muted2)">ユーザーID</span><span style="font-variant-numeric:tabular-nums">U-1052</span>
+                  <span style="color:var(--a-fg-muted2)">アカウント状態</span><span><span data-slot="status" class="status-badge status-active">有効</span> <span style="font-size:11.5px;color:var(--a-fg-faint)">変更はユーザー管理から</span></span>
+                  <span style="color:var(--a-fg-muted2)">登録日時</span><span style="font-variant-numeric:tabular-nums">2026/07/29 14:20</span>
+                  <span style="color:var(--a-fg-muted2)">最終ログイン</span><span data-slot="lastLogin" style="font-variant-numeric:tabular-nums">2026/08/01 18:22</span>
                   </div>
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">契約(プレミアム関連)</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:18px">契約(プレミアム関連)</div>
                   <div data-slot="acctFields" style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
-                  <span style="color:#6b7484">プラン</span><select data-slot="planSelect" aria-label="プラン" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>プレミアム(月額 10,000円・税別)</option><option>通常</option></select>
-                  <span style="color:#6b7484">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
+                  <span style="color:var(--a-fg-muted2)">プラン</span><select data-slot="planSelect" aria-label="プラン" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>プレミアム(月額 10,000円・税別)</option><option>通常</option></select>
+                  <span style="color:var(--a-fg-muted2)">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
                   </div>
                   <div style="display:flex;justify-content:flex-end;margin-top:12px">
-                  <button onclick="pOpen('mConfirmSaveUser')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                  <button onclick="pOpen('mConfirmSaveUser')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
                   </div>
-                  <div style="margin-top:14px;font-size:11.5px;color:#6b7484">代行操作・変更はすべて監査ログに記録されます。アカウントの停止・再開はユーザー管理で行います。</div>
+                  <div style="margin-top:14px;font-size:11.5px;color:var(--a-fg-muted2)">代行操作・変更はすべて監査ログに記録されます。アカウントの停止・再開はユーザー管理で行います。</div>
+                </div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">所属グループ<span data-slot="grCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></div>
+                  <div id="udGroups" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
+                  <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">グループはアンケートを複数名で共同編集する単位です(名刺データ化の作業グループ①〜⑧とは別の概念)。グループの作成・メンバーの追加・権限の変更はユーザー側の画面で行い、本画面では参照のみとします。</div>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:16px">
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">パスワード操作</div>
                   <div data-slot="pwBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
-                  <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
-                  <button data-min-lv="4" onclick="pOpen('mSetPwUser')" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
+                  <button onclick="pOpen('mConfirmResetPwUser')" style="align-self:flex-start;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">初期化メールを送信</button>
+                  <button data-min-lv="4" onclick="pOpen('mSetPwUser')" style="align-self:flex-start;background:var(--a-surface);color:var(--a-warn-deep);border:1px solid var(--a-warn-border);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
 
                   </div>
-                  <div data-slot="pwNote" hidden style="margin-top:8px;font-size:11.5px;color:#8a6414;line-height:1.7"></div>
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:18px">メール送信履歴 <span style="font-weight:400;color:#8a93a5;margin-left:6px">送信した記録のみ。到達の確認は行わない</span></div>
+                  <div data-slot="pwNote" hidden style="margin-top:8px;font-size:11.5px;color:var(--a-warn);line-height:1.7"></div>
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:18px">メール送信履歴 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">送信した記録のみ。到達の確認は行わない</span></div>
                   <div data-slot="mailBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid #e2e6ed"><span style="font-size:12px;font-weight:700;color:#5b6577">紐づくアンケート<span data-slot="svCount" style="font-weight:400;color:#8a93a5;margin-left:8px"></span></span><button data-go="surveys" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">アンケート管理で絞り込む</button></div>
-                  <div id="udSurveys" data-page-size="5" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden"></div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">紐づくアンケート<span data-slot="svCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="surveys" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">アンケート管理で絞り込む</button></div>
+                  <div id="udSurveys" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid #e2e6ed"><span style="font-size:12px;font-weight:700;color:#5b6577">請求状況<span data-slot="blCount" style="font-weight:400;color:#8a93a5;margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">請求状況<span data-slot="blCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
                   <div data-slot="unpaidBand" hidden style="margin-top:10px"></div>
-                  <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden"></div>
+                  <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアカウントに対する操作</span></div>
                   <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
                 </div>
               </div>
@@ -93,12 +111,12 @@
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
       <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
-      <span role="button" onclick="pClose('mConfirmSaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmSaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button onclick="pClose('mConfirmSaveUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="pClose('mConfirmSaveUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pUdSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -107,59 +125,59 @@
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
       <span style="font-size:15px;font-weight:700">初期化メールを送信しますか?</span>
-      <span role="button" onclick="pClose('mConfirmResetPwUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmResetPwUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">k.okada@market-v.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">k.okada@market-v.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmResetPwUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdResetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
+      <button data-initial-focus onclick="pClose('mConfirmResetPwUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pUdResetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
     </div>
   </div>
 </div>
 
 <div id="mSetPwUser" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:520px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">パスワードを直接設定</span>
-      <span role="button" onclick="pClose('mSetPwUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mSetPwUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div style="font-size:13px;color:#5b6577;line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)のパスワードを管理者が設定します。本人が初期化メールを受け取れない場合の代替手段です。</div>
+      <div style="font-size:13px;color:var(--a-fg-muted);line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)のパスワードを管理者が設定します。本人が初期化メールを受け取れない場合の代替手段です。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">新しいパスワード <span style="color:#c23934">必須</span></span><input data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">確認のため再入力 <span style="color:#c23934">必須</span></span><input type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">新しいパスワード <span style="color:var(--a-danger)">必須</span></span><input data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">確認のため再入力 <span style="color:var(--a-danger)">必須</span></span><input type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">設定する理由 <span style="color:#c23934">必須</span></span><textarea rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">設定すると k.okada@market-v.co.jp へパスワードを変更した旨の通知メールが送信されます。入力した理由は実行者とあわせて監査ログに記録されます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">設定する理由 <span style="color:var(--a-danger)">必須</span></span><textarea rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">設定すると k.okada@market-v.co.jp へパスワードを変更した旨の通知メールが送信されます。入力した理由は実行者とあわせて監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mSetPwUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdSetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
+      <button onclick="pClose('mSetPwUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pUdSetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
     </div>
   </div>
 </div>
 
 <div id="mResendInvite" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待を再送しますか?</span><span role="button" onclick="pClose('mResendInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mrTarget"></span> へ招待メールを再送します。新しいリンクを発行し、有効期限は再度 72 時間になります。以前のリンクは無効になります。</div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mResendInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button><button onclick="pUdResend()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">再送する</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待を再送しますか?</span><span role="button" onclick="pClose('mResendInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8"><span data-slot="mrTarget"></span> へ招待メールを再送します。新しいリンクを発行し、有効期限は再度 72 時間になります。以前のリンクは無効になります。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mResendInvite')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button><button onclick="pUdResend()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">再送する</button></div>
   </div>
 </div>
 
 <div id="mCancelInvite" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待をキャンセルしますか?</span><span role="button" onclick="pClose('mCancelInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8"><span data-slot="mcTarget"></span> への招待を取り消します。発行済みのリンクは無効になり、このユーザーは登録できなくなります。</div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mCancelInvite')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">やめる</button><button onclick="pUdCancelInvite()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待をキャンセルする</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">招待をキャンセルしますか?</span><span role="button" onclick="pClose('mCancelInvite')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8"><span data-slot="mcTarget"></span> への招待を取り消します。発行済みのリンクは無効になり、このユーザーは登録できなくなります。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mCancelInvite')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">やめる</button><button onclick="pUdCancelInvite()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待をキャンセルする</button></div>
   </div>
 </div>
 
 <div id="mLeaveUser" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">保存していない変更があります</span><span role="button" onclick="pClose('mLeaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">アカウント情報の変更が保存されていません。このまま移動すると入力した内容は失われます。</div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mLeaveUser')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集に戻る</button><button onclick="pUdLeaveDo()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">破棄して移動</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0"><span style="font-size:15px;font-weight:700">保存していない変更があります</span><span role="button" onclick="pClose('mLeaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span></div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">アカウント情報の変更が保存されていません。このまま移動すると入力した内容は失われます。</div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px"><button data-initial-focus onclick="pClose('mLeaveUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集に戻る</button><button onclick="pUdLeaveDo()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">破棄して移動</button></div>
   </div>
 </div>
 
@@ -171,6 +189,21 @@
 // 一覧の元データはアンケート詳細と請求管理のモックから取り込んだもの
 (function () {
     'use strict';
+    // 指定された対象が無いときは、黙って既定の対象を出さない。
+    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため
+    window.pNotFound = function (kind, wanted, backHref, backLabel) {
+        var main = document.getElementById('main-content');
+        if (!main) { return; }
+        main.innerHTML =
+            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
+            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
+            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
+            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
+            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
+            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
+            '</div></div>';
+    };
+
     var SURVEYS = {"U-1049": [{"sid": "SV-10262", "title": "人事・労務フォーラム 来場者アンケート", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常"}, {"sid": "SV-10227", "title": "スタートアップピッチ2026 来場者アンケート", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し"}], "U-1052": [{"sid": "SV-10259", "title": "ITインフラEXPO 2026 来場者アンケート", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急"}, {"sid": "SV-10244", "title": "マーケティングサミット2026 来場者アンケート", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急"}], "U-1035": [{"sid": "SV-10257", "title": "医療機器・ヘルスケア展 来場者アンケート", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常"}, {"sid": "SV-10233", "title": "地方創生フォーラム 参加者アンケート", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常"}], "U-1050": [{"sid": "SV-10250", "title": "食品・飲料展 出展者アンケート", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド"}], "U-1038": [{"sid": "SV-10238", "title": "BtoB EXPO 東京 2026 来場者アンケート", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド"}], "U-1033": [{"sid": "SV-10236", "title": "スマート物流EXPO 来場者アンケート", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急"}], "U-1031": [{"sid": "SV-10229", "title": "グリーンエネルギー展 来場者アンケート", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急"}], "U-1026": [{"sid": "SV-10221", "title": "医薬品研究セミナー 参加者アンケート", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急"}], "U-1025": [{"sid": "SV-10218", "title": "ものづくりワールド 来場者アンケート", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド"}], "U-1022": [{"sid": "SV-10214", "title": "フードテックジャパン 出展者アンケート", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常"}], "U-1021": [{"sid": "SV-10209", "title": "観光インバウンドサミット 来場者アンケート", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急"}], "U-1019": [{"sid": "SV-10205", "title": "デザイントレンド展 来場者アンケート", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急"}], "U-1017": [{"sid": "SV-10201", "title": "産業機械フェア 来場者アンケート", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常"}], "U-1016": [{"sid": "SV-10196", "title": "アグリビジネス展 出展者アンケート", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し"}], "U-1014": [{"sid": "SV-10192", "title": "印刷・パッケージ総合展 来場者アンケート", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常"}], "U-1012": [{"sid": "SV-10188", "title": "SaaS Expo 2026 来場者アンケート", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド"}], "U-1009": [{"sid": "SV-10183", "title": "住宅リフォームフェア 来場者アンケート", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急"}], "U-1007": [{"sid": "SV-10179", "title": "環境ソリューション展 来場者アンケート", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常"}], "U-1002": [{"sid": "SV-10174", "title": "AI活用カンファレンス 参加者アンケート", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急"}]};
     var BILLS = {"U-1002": [{"sid": "SV-10174", "month": "2026年04月", "bill": "2026/04/23", "due": "2026/05/23", "amount": 77816, "paid": "2026/05/20", "title": "AI活用カンファレンス 参加者アンケート"}], "U-1007": [{"sid": "SV-10179", "month": "2026年05月", "bill": "2026/05/03", "due": "2026/06/02", "amount": 42842, "paid": "2026/05/29", "title": "環境ソリューション展 来場者アンケート"}], "U-1009": [{"sid": "SV-10183", "month": "2026年05月", "bill": "2026/05/16", "due": "2026/06/15", "amount": 121504, "paid": "2026/06/12", "title": "住宅リフォームフェア 来場者アンケート"}], "U-1012": [{"sid": "SV-10188", "month": "2026年05月", "bill": "2026/05/22", "due": "2026/06/21", "amount": 432166, "paid": "2026/06/18", "title": "SaaS Expo 2026 来場者アンケート"}], "U-1014": [{"sid": "SV-10192", "month": "2026年05月", "bill": "2026/05/29", "due": "2026/06/28", "amount": 89660, "paid": "2026/06/25", "title": "印刷・パッケージ総合展 来場者アンケート"}], "U-1017": [{"sid": "SV-10201", "month": "2026年06月", "bill": "2026/06/13", "due": "2026/07/13", "amount": 112814, "paid": "2026/07/10", "title": "産業機械フェア 来場者アンケート"}], "U-1019": [{"sid": "SV-10205", "month": "2026年06月", "bill": "2026/06/20", "due": "2026/07/20", "amount": 156638, "paid": "", "title": "デザイントレンド展 来場者アンケート"}], "U-1021": [{"sid": "SV-10209", "month": "2026年06月", "bill": "2026/06/27", "due": "2026/07/27", "amount": 93426, "paid": "", "title": "観光インバウンドサミット 来場者アンケート"}], "U-1022": [{"sid": "SV-10214", "month": "2026年07月", "bill": "2026/07/05", "due": "2026/08/04", "amount": 67475, "paid": "", "title": "フードテックジャパン 出展者アンケート"}], "U-1025": [{"sid": "SV-10218", "month": "2026年07月", "bill": "2026/07/10", "due": "2026/08/09", "amount": 624005, "paid": "", "title": "ものづくりワールド 来場者アンケート"}], "U-1026": [{"sid": "SV-10221", "month": "2026年07月", "bill": "2026/07/15", "due": "2026/08/14", "amount": 27539, "paid": "", "title": "医薬品研究セミナー 参加者アンケート"}], "U-1031": [{"sid": "SV-10229", "month": "2026年07月", "bill": "2026/07/22", "due": "2026/08/21", "amount": 298880, "paid": "", "title": "グリーンエネルギー展 来場者アンケート"}], "U-1035": [{"sid": "SV-10233", "month": "2026年07月", "bill": "2026/07/24", "due": "2026/08/23", "amount": 20912, "paid": "", "title": "地方創生フォーラム 参加者アンケート"}], "U-1050": [{"sid": "SV-10250", "month": "2026年08月", "bill": "2026/08/04", "due": "2026/09/03", "amount": 432050, "paid": "", "title": "食品・飲料展 出展者アンケート"}], "U-1033": [{"sid": "SV-10236", "month": "未発行", "bill": "", "due": "", "amount": 179175, "paid": "", "title": "スマート物流EXPO 来場者アンケート"}], "U-1038": [{"sid": "SV-10238", "month": "未発行", "bill": "", "due": "", "amount": 426020, "paid": "", "title": "BtoB EXPO 東京 2026 来場者アンケート"}], "U-1052": [{"sid": "SV-10244", "month": "未発行", "bill": "", "due": "", "amount": 112848, "paid": "", "title": "マーケティングサミット2026 来場者アンケート"}], "U-1049": [{"sid": "SV-10227", "month": "2026年07月", "bill": "2026/07/18", "due": "2026/08/17", "amount": 256, "paid": "", "title": "スタートアップピッチ2026 来場者アンケート"}], "U-1016": [{"sid": "SV-10196", "month": "2026年06月", "bill": "2026/06/08", "due": "2026/07/08", "amount": 584, "paid": "2026/07/05", "title": "アグリビジネス展 出展者アンケート"}]};
     var BADGE = { '会期前': 'status-inactive', '会期中': 'status-info',
@@ -184,13 +217,56 @@
     function uid() { return document.documentElement.getAttribute('data-current-id') || ''; }
 
     var HEAD = 'display:grid;column-gap:10px;align-items:center;padding:0 14px;height:36px;'
-        + 'background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11px;font-weight:700;color:#5b6577';
+        + 'background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11px;font-weight:700;color:var(--a-fg-muted)';
     var ROW = 'display:grid;column-gap:10px;align-items:center;padding:9px 14px;'
-        + 'border-bottom:1px solid #eef0f5;font-size:12.5px;font-variant-numeric:tabular-nums';
-    var EMPTY = '<div style="padding:22px 14px;font-size:12.5px;color:#8a93a5;text-align:center">{t}</div>';
+        + 'border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums';
+    var EMPTY = '<div style="padding:22px 14px;font-size:12.5px;color:var(--a-fg-faint);text-align:center">{t}</div>';
+
+    // ---- 所属グループ(§4.4) ----
+    // グループは利用者側の共同編集の単位(user/05_group_edit_requirements.md)。
+    // 権限は 管理者/一般、状態は 加入済/招待中/アドレスエラー を正とする
+    var GROUPS = {
+        'U-1052': [
+            { name: 'イベント企画部', role: '管理者', status: '加入済', members: 6, billing: 'グループ専用' },
+            { name: '全社マーケ横断', role: '一般', status: '加入済', members: 12, billing: '作成者情報' }
+        ],
+        'U-1038': [{ name: '営業推進部', role: '管理者', status: '加入済', members: 4, billing: '作成者情報' }],
+        'U-1012': [{ name: 'マーケティング部', role: '一般', status: '加入済', members: 9, billing: 'グループ専用' }],
+        'U-1021': [{ name: 'インバウンド事業部', role: '一般', status: 'アドレスエラー', members: 3, billing: '作成者情報' }],
+        'U-1050': [{ name: '出展企画チーム', role: '一般', status: '招待中', members: 5, billing: '作成者情報' }],
+        'U-1002': [{ name: '技術広報グループ', role: '管理者', status: '加入済', members: 3, billing: '作成者情報' }],
+        'U-1035': [{ name: '地域連携プロジェクト', role: '一般', status: '加入済', members: 7, billing: 'グループ専用' }]
+    };
+    var GR_BADGE = { '加入済': 'status-active', '招待中': 'status-info', 'アドレスエラー': 'status-expired' };
+    var GR_COLS = 'minmax(150px,1fr) 84px 116px 88px 112px';
+    function paintGroups() {
+        var box = document.getElementById('udGroups');
+        var list = GROUPS[uid()] || [];
+        var cnt = document.querySelector('[data-slot="grCount"]');
+        if (cnt) { cnt.textContent = '全 ' + list.length + ' 件'; }
+        if (!box) { return; }
+        if (!list.length) {
+            box.innerHTML = EMPTY.replace('{t}', 'このユーザーが参加しているグループはありません。');
+            return;
+        }
+        box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + GR_COLS + '">'
+            + '<span>グループ名</span><span>権限</span><span>状態</span>'
+            + '<span style="text-align:right;padding-right:16px">メンバー</span><span>請求先</span></div>'
+            + list.map(function (g, i) {
+                return '<div style="' + ROW + ';grid-template-columns:' + GR_COLS
+                    + (i === list.length - 1 ? ';border-bottom:none' : '') + '">'
+                    + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+                    + 'padding-right:10px;font-weight:500">' + esc(g.name) + '</span>'
+                    + '<span style="font-size:12px">' + esc(g.role) + '</span>'
+                    + '<span><span class="status-badge ' + (GR_BADGE[g.status] || 'status-inactive')
+                    + '">' + esc(g.status) + '</span></span>'
+                    + '<span style="text-align:right;padding-right:16px">' + g.members + ' 名</span>'
+                    + '<span style="font-size:12px;color:var(--a-fg-muted)">' + esc(g.billing) + '</span></div>';
+            }).join('');
+    }
 
     // ---- 紐づくアンケート(§4.4) ----
-    var SV_COLS = '104px minmax(200px,1fr) 190px 116px 150px';
+    var SV_COLS = '92px minmax(150px,1fr) 132px 96px 96px';
     function paintSurveys() {
         var box = document.getElementById('udSurveys');
         var list = SURVEYS[uid()] || [];
@@ -212,16 +288,16 @@
                     + '<span style="font-weight:500">' + v.sid + '</span>'
                     + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
                     + 'padding-right:10px">' + esc(v.title) + '</span>'
-                    + '<span style="font-size:12px;color:#5b6577">' + esc(v.period) + '</span>'
+                    + '<span style="font-size:12px;color:var(--a-fg-muted)">' + esc(v.period) + '</span>'
                     + '<span><span class="status-badge ' + (BADGE[v.status] || 'status-inactive') + '">'
                     + esc(v.status) + '</span></span>'
-                    + '<span style="font-size:12px">あり<span style="color:#8a93a5;margin-left:6px">'
+                    + '<span style="font-size:12px">あり<span style="color:var(--a-fg-faint);margin-left:6px">'
                     + esc(v.plan) + '</span></span></div>';
             }).join('');
     }
 
     // ---- 請求状況(§4.5) ----
-    var BL_COLS = '132px minmax(180px,1fr) 130px 130px 140px';
+    var BL_COLS = '100px minmax(140px,1fr) 100px 100px 108px';
     var TODAY = '2026/07/31';   // モックの現在日(ヘッダーの表示に合わせる)
     // 銀行振込のみのため入金は運営が手作業で消し込む。未記録＝未入金ではないので、
     // 督促対象は「期日を過ぎて未記録」だけに絞る(15_admin_billing.md §4.7)
@@ -231,11 +307,11 @@
         return (b.due && b.due < TODAY) ? 'overdue' : 'waiting';
     }
     var PAY_LABEL = {
-        unissued: '<span style="color:#8a93a5">—</span>',
-        waiting: '<span style="font-size:11.5px;color:#5b6577;background:#f2f4f8;border:1px solid #dde1e9;'
+        unissued: '<span style="color:var(--a-fg-faint)">—</span>',
+        waiting: '<span style="font-size:11.5px;color:var(--a-fg-muted);background:var(--a-surface-2);border:1px solid var(--a-border);'
             + 'border-radius:4px;padding:1px 8px">入金待ち</span>',
-        overdue: '<span style="font-size:11.5px;font-weight:700;color:#c23934;background:#fdecea;'
-            + 'border:1px solid #e3b6b3;border-radius:4px;padding:1px 8px">期日超過</span>'
+        overdue: '<span style="font-size:11.5px;font-weight:700;color:var(--a-danger);background:var(--a-danger-bg);'
+            + 'border:1px solid var(--a-danger-border);border-radius:4px;padding:1px 8px">期日超過</span>'
     };
     function paintBills() {
         var box = document.getElementById('udBills');
@@ -252,9 +328,9 @@
                 var warn = overdue.length > 0;
                 band.innerHTML = '<div role="button" tabindex="0" onclick="pUdUnpaid()" '
                     + 'style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:'
-                    + (warn ? '#fdecea' : '#f7f8fb') + ';border:1px solid '
-                    + (warn ? '#e3b6b3' : '#e2e6ed') + ';border-radius:6px;font-size:12px;color:'
-                    + (warn ? '#c23934' : '#5b6577') + ';cursor:pointer">'
+                    + (warn ? 'var(--a-danger-bg)' : 'var(--a-surface-2)') + ';border:1px solid '
+                    + (warn ? 'var(--a-danger-border)' : 'var(--a-border)') + ';border-radius:6px;font-size:12px;color:'
+                    + (warn ? 'var(--a-danger)' : 'var(--a-fg-muted)') + ';cursor:pointer">'
                     + '<span style="font-weight:700">入金未確認 ' + unpaid.length + ' 件</span>'
                     + '<span>' + (warn ? 'うち期日超過 ' + overdue.length + ' 件。' : '支払期日前です。')
                     + '請求管理でこのユーザーの入金未確認だけを表示する →</span></div>';
@@ -278,9 +354,9 @@
                     + 'padding-right:10px;font-size:12px">' + esc(b.title) + '</span>'
                     + '<span style="text-align:right;padding-right:20px;font-weight:700">'
                     + yen(b.amount) + '</span>'
-                    + '<span style="font-size:12px;color:#5b6577">' + (b.due || '—') + '</span>'
+                    + '<span style="font-size:12px;color:var(--a-fg-muted)">' + (b.due || '—') + '</span>'
                     + (b.paid
-                        ? '<span style="font-size:12px;color:#5b6577">' + b.paid + '</span>'
+                        ? '<span style="font-size:12px;color:var(--a-fg-muted)">' + b.paid + '</span>'
                         : PAY_LABEL[payState(b)])
                     + '</div>';
             }).join('');
@@ -308,7 +384,7 @@
         if (status !== '招待中') { rows.push(['本登録完了メール', created]); }
         box.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;justify-content:space-between;gap:10px"><span>' + esc(r[0])
-                + '</span><span style="color:#5b6577;font-variant-numeric:tabular-nums">' + esc(r[1])
+                + '</span><span style="color:var(--a-fg-muted);font-variant-numeric:tabular-nums">' + esc(r[1])
                 + '</span></div>';
         }).join('');
     }
@@ -384,9 +460,9 @@
             + ' ' + p(n.getHours()) + ':' + p(n.getMinutes());
         var row = document.createElement('div');
         row.setAttribute('style', 'display:flex;gap:10px');
-        row.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">'
+        row.innerHTML = '<span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">'
             + when + '</span><span>' + esc(title)
-            + '<br><span style="color:#8a93a5">実行者: admin@abroad-o.com'
+            + '<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com'
             + (reason ? '・理由: ' + esc(reason) : '') + '</span></span>';
         log.insertBefore(row, log.firstChild);
     };
@@ -401,9 +477,9 @@
         rows.push([inviteAt(created), '招待を実行', 'admin@abroad-o.com']);
         log.innerHTML = rows.map(function (r) {
             return '<div style="display:flex;gap:10px">'
-                + '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + esc(r[0])
+                + '<span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">' + esc(r[0])
                 + '</span><span>' + esc(r[1])
-                + '<br><span style="color:#8a93a5">実行者: ' + esc(r[2]) + '</span></span></div>';
+                + '<br><span style="color:var(--a-fg-faint)">実行者: ' + esc(r[2]) + '</span></span></div>';
         }).join('');
     }
     window.pUdPaint = function (status, mail, created, premium) {
@@ -419,6 +495,7 @@
         paintMail(status, created || '2026/07/29 14:20');
         paintState(status, mail);
         paintLog(status, created || '2026/07/29 14:20');
+        paintGroups();
         paintSurveys();
         paintBills();
     };
@@ -460,6 +537,7 @@ window.pUdSetPw = function () {
     var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};
     var DEF = 'U-1052';
     var id = new URLSearchParams(location.search).get('id');
+    if (id && !DATA[id]) { window.pNotFound('ユーザー', id, 'user-management.html', 'ユーザー管理へ戻る'); return; }
     if (!DATA[id]) { id = DEF; }
     var d = DATA[id] || DATA[DEF];
     var base = DATA[DEF] || d;

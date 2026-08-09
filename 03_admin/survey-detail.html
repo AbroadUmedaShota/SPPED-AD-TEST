@@ -7,8 +7,21 @@
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
+    <script src="src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 画面本体の2カラム。幅が足りなくなったら右カラムを下へ送って1カラムにする。
+   2カラムのままだと中の表が枠を超え、overflow-x-hidden で黙って切れる（スクロールバーも出ない）。
+
+   1カラムに必要な幅はカードの中身で決まり、実測で1カラムあたり682px。
+   2カラム = 682×2 + 間隔16 = 1380px（本文）+ サイドバー232px + ページ余白48px = 1660px。
+   閾値は余裕を見て1700pxに置く。 */
+.admin-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 1700px) {
+  .admin-2col { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -18,123 +31,124 @@
         <div id="sidebar-placeholder"></div>
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
           <div style="padding:18px 24px 40px">
-            <div style="font-size:12px;color:#6b7484">ホーム › <a href="survey-management.html">アンケート管理</a> › <span style="color:#1f2733">アンケート詳細</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+            <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="survey-management.html">アンケート管理</a> › <span style="color:var(--a-fg-strong)">アンケート詳細</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700">アンケート詳細</h1>
-              <button onclick="location.href='survey-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+              <button onclick="location.href='survey-management.html'" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
             </div>
-            <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <span style="font-size:16px;font-weight:700">人事・労務フォーラム 来場者アンケート</span>
-              <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">アンケートID SV-10262</span>
+              <span style="font-size:12px;color:var(--a-fg-muted2);font-variant-numeric:tabular-nums">アンケートID SV-10262</span>
             </div>
-            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+            <div class="admin-2col" style="margin-top:16px">
               <div style="display:flex;flex-direction:column;gap:16px">
-              <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">基本情報 <span data-slot="basicHeadNote" style="font-weight:400;color:#8a93a5;margin-left:6px">管理者による編集(代行)が可能</span></div>
+              <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">基本情報 <span data-slot="basicHeadNote" style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">管理者による編集(代行)が可能</span></div>
                 <div style="padding-top:14px;display:flex;flex-direction:column;gap:14px">
-      <div data-slot="basicGate" hidden style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;font-size:11.5px;color:#8a6414;line-height:1.7"><span data-slot="basicGateText" style="min-width:0"></span><button data-slot="basicGateBtn" onclick="pSdAskBasic()" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更を開始する</button></div>
+      <div data-slot="basicGate" hidden style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;font-size:11.5px;color:var(--a-warn);line-height:1.7"><span data-slot="basicGateText" style="min-width:0"></span><button data-slot="basicGateBtn" onclick="pSdAskBasic()" style="flex-shrink:0;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更を開始する</button></div>
       <div data-slot="basicFields" style="display:flex;flex-direction:column;gap:14px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">タイトル <span style="color:#c23934">必須</span></span><input data-slot="title" value="人事・労務フォーラム 来場者アンケート" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">タイトル <span style="color:var(--a-danger)">必須</span></span><input data-slot="title" value="人事・労務フォーラム 来場者アンケート" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期開始</span><input data-slot="periodStart" type="date" value="2026-08-03" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">会期終了</span><input data-slot="periodEnd" type="date" value="2026-08-05" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">会期開始</span><input data-slot="periodStart" type="date" value="2026-08-03" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">会期終了</span><input data-slot="periodEnd" type="date" value="2026-08-05" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"></label>
       </div>
       <div>
-        <div style="font-size:11.5px;font-weight:700;color:#5b6577">対応言語</div>
+        <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">対応言語</div>
         <div id="svLangs" style="margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
       </div>
       </div>
-      <div style="display:grid;grid-template-columns:110px 1fr;gap:10px 12px;padding-top:4px;font-size:13px;align-items:center;color:#374151">
-        <span style="color:#6b7484">作業ステータス</span><span><span data-slot="status" class="status-badge status-inactive">会期前</span><span data-slot="delivery" style="font-size:11.5px;color:#6b7484;margin-left:8px"></span></span>
-        <span style="color:#6b7484">作成者</span><span><a data-go="user" href="user-detail.html">U-1049 三浦 沙織(グロースパートナーズ(株))</a></span>
-        <span style="color:#6b7484">作成日時</span><span style="font-variant-numeric:tabular-nums">2026/07/28 09:15</span>
-        <span style="color:#6b7484">最終更新日時</span><span style="font-variant-numeric:tabular-nums">2026/07/30 15:41</span>
+      <div style="display:grid;grid-template-columns:110px 1fr;gap:10px 12px;padding-top:4px;font-size:13px;align-items:center;color:var(--a-fg)">
+        <span style="color:var(--a-fg-muted2)">作業ステータス</span><span><span data-slot="status" class="status-badge status-inactive">会期前</span><span data-slot="delivery" style="font-size:11.5px;color:var(--a-fg-muted2);margin-left:8px"></span></span>
+        <span style="color:var(--a-fg-muted2)">作成者</span><span><a data-go="user" data-slot="creator" href="user-detail.html">U-1049 三浦 沙織(グロースパートナーズ(株))</a></span>
+        <span style="color:var(--a-fg-muted2)">グループ</span><span data-slot="grp"></span>
+        <span style="color:var(--a-fg-muted2)">作成日時</span><span style="font-variant-numeric:tabular-nums">2026/07/28 09:15</span>
+        <span style="color:var(--a-fg-muted2)">最終更新日時</span><span style="font-variant-numeric:tabular-nums">2026/07/30 15:41</span>
       </div>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。ユーザー側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:6px">
-        <span style="font-size:12px;font-weight:700;color:#5b6577">設問構成<span data-slot="qNote" style="font-weight:400;color:#8a93a5;margin-left:8px">全4問・会期前は通常編集として変更できます</span></span>
-        <button data-slot="qEditBtn" onclick="pQOpen()" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">設問を編集</button>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。ユーザー側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:6px">
+        <span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">設問構成<span data-slot="qNote" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">全4問・会期前は通常編集として変更できます</span></span>
+        <button data-slot="qEditBtn" onclick="pQOpen()" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">設問を編集</button>
       </div>
-      <div id="qList" style="margin-top:10px;border:1px solid #e2e6ed;border-radius:6px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11px;font-weight:700;color:#5b6577"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">1</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">本日のご来場のきっかけを教えてください</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">2</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご興味のある製品分野</span><span style="font-size:11.5px;color:#5b6577">複数選択</span><span style="font-size:11px;color:#c23934;font-weight:700">必須</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:#5b6577">単一選択</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums">4</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご意見・ご要望</span><span style="font-size:11.5px;color:#5b6577">自由記述</span><span style="font-size:11px;color:#8a93a5">任意</span></div>
+      <div id="qList" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11px;font-weight:700;color:var(--a-fg-muted)"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">1</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">本日のご来場のきっかけを教えてください</span><span style="font-size:11.5px;color:var(--a-fg-muted)">単一選択</span><span style="font-size:11px;color:var(--a-danger);font-weight:700">必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">2</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご興味のある製品分野</span><span style="font-size:11.5px;color:var(--a-fg-muted)">複数選択</span><span style="font-size:11px;color:var(--a-danger);font-weight:700">必須</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:var(--a-fg-muted)">単一選択</span><span style="font-size:11px;color:var(--a-fg-faint)">任意</span></div>
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">4</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご意見・ご要望</span><span style="font-size:11.5px;color:var(--a-fg-muted)">自由記述</span><span style="font-size:11px;color:var(--a-fg-faint)">任意</span></div>
       </div>
-      <div style="margin-top:8px;font-size:11.5px;color:#6b7484;line-height:1.7">会期開始後の設問構成の変更は要注意操作として扱います。会期終了後は変更できません。</div>
+      <div style="margin-top:8px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">会期開始後の設問構成の変更は要注意操作として扱います。会期終了後は変更できません。</div>
                 </div>
                 <div style="display:flex;justify-content:flex-end;margin-top:14px">
-                  <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                  <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
                 </div>
               </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:16px">
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">名刺データ化設定<span style="font-weight:400;color:#8a93a5;margin-left:8px">確認のみ・変更は申込内容の変更として扱う</span></div>
-                  <div style="display:grid;grid-template-columns:132px 1fr;gap:10px 12px;padding-top:14px;font-size:13px;align-items:center;color:#374151">
-                    <span style="color:#6b7484">納期区分</span><span><span data-slot="plan" style="font-weight:700">通常</span><span style="font-size:11.5px;color:#8a93a5;margin-left:8px">納期区分</span></span>
-                    <span style="color:#6b7484">データ化対象の名刺</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizTotal">0</span> 件</span>
-                    <span style="color:#6b7484">入力・照合の進捗</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizProgress">入力 0 件 / 照合 0 件</span></span>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">名刺データ化設定<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">確認のみ・変更は申込内容の変更として扱う</span></div>
+                  <div style="display:grid;grid-template-columns:132px 1fr;gap:10px 12px;padding-top:14px;font-size:13px;align-items:center;color:var(--a-fg)">
+                    <span style="color:var(--a-fg-muted2)">納期区分</span><span><span data-slot="plan" style="font-weight:700">通常</span><span style="font-size:11.5px;color:var(--a-fg-faint);margin-left:8px">納期区分</span></span>
+                    <span style="color:var(--a-fg-muted2)">データ化対象の名刺</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizTotal">0</span> 件</span>
+                    <span style="color:var(--a-fg-muted2)">入力・照合の進捗</span><span style="font-variant-numeric:tabular-nums"><span data-slot="bizProgress">入力 0 件 / 照合 0 件</span></span>
                   </div>
                   <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-                    <button data-min-lv="2" onclick="location.href='reconciliation/index.html?sid=' + (document.documentElement.getAttribute('data-current-id') || 'SV-10262')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合結果を表示</button>
+                    <button data-min-lv="2" onclick="location.href='reconciliation/index.html?sid=' + (document.documentElement.getAttribute('data-current-id') || 'SV-10262')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">照合結果を表示</button>
                   </div>
-                  <div style="margin-top:8px;font-size:11.5px;color:#8a93a5">データ化作業そのものは名刺入力・照合の作業画面で行います。本画面では確認だけを行います。</div>
+                  <div style="margin-top:8px;font-size:11.5px;color:var(--a-fg-faint)">データ化作業そのものは名刺入力・照合の作業画面で行います。本画面では確認だけを行います。</div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">回答状況</div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">回答状況</div>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px">
-                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">回答数</div><div data-slot="answers" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">0</div></div>
-                    <div style="background:#f7f8fb;border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:#6b7484">直近の回答日</div><div data-slot="lastAnswer" style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.6">—</div></div>
+                    <div style="background:var(--a-surface-2);border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:var(--a-fg-muted2)">回答数</div><div data-slot="answers" style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">0</div></div>
+                    <div style="background:var(--a-surface-2);border-radius:6px;padding:10px 14px"><div style="font-size:11.5px;color:var(--a-fg-muted2)">直近の回答日</div><div data-slot="lastAnswer" style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.6">—</div></div>
                   </div>
                   <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-                    <button onclick="pOpen('mDl')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">データDL ▾</button>
-                    <button data-slot="thanksBtn" onclick="pSdThanks()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">お礼メール内容の確認</button>
+                    <button onclick="pOpen('mDl')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">データDL ▾</button>
+                    <button data-slot="thanksBtn" onclick="pSdThanks()" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">お礼メール内容の確認</button>
                   </div>
-                  <div style="margin-top:8px;font-size:11.5px;color:#8a93a5">照合が完了したデータは自動で完成データへ反映されます(公開の手動操作はなし)。現行実装が自動反映かは開発側へ現状開示を要求中。</div>
-                  <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #eef0f5;margin-top:12px">
-                    <button data-go="billing" onclick="location.href='billing-management.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
-                    <button data-go="user" onclick="location.href='user-detail.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">アカウント情報を表示</button>
+                  <div style="margin-top:8px;font-size:11.5px;color:var(--a-fg-faint)">照合が完了したデータは自動で完成データへ反映されます(公開の手動操作はなし)。現行実装が自動反映かは開発側へ現状開示を要求中。</div>
+                  <div style="padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--a-border-soft);margin-top:12px">
+                    <button data-go="billing" onclick="location.href='billing-management.html'" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">請求情報を表示</button>
+                    <button data-go="user" onclick="location.href='user-detail.html'" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">アカウント情報を表示</button>
                   </div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">要注意操作<span style="font-weight:400;color:#8a93a5;margin-left:8px">所定の運用フローの外で行う操作</span></div>
-                  <div data-slot="exPublish" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">要注意操作<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">所定の運用フローの外で行う操作</span></div>
+                  <div data-slot="exPublish" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--a-border-soft)">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">公開後のアンケート変更</span>
-                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">ユーザー側では制限される公開後の変更を、管理者が代行して行う</span>
+                      <span style="display:block;font-size:11.5px;color:var(--a-fg-muted2);margin-top:2px;line-height:1.6">ユーザー側では制限される公開後の変更を、管理者が代行して行う</span>
                     </span>
-                    <button onclick="pOpen('mDangerEdit')" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更する</button>
+                    <button onclick="pOpen('mDangerEdit')" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更する</button>
                   </div>
-                  <div data-slot="exUpload" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                  <div data-slot="exUpload" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--a-border-soft)">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">完了データの手動アップロード</span>
-                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">照合完了データの自動反映に障害が起きた際、ファイルを直接取り込む代替手段</span>
+                      <span style="display:block;font-size:11.5px;color:var(--a-fg-muted2);margin-top:2px;line-height:1.6">照合完了データの自動反映に障害が起きた際、ファイルを直接取り込む代替手段</span>
                     </span>
-                    <button onclick="pOpen('mDangerUpload')" style="flex-shrink:0;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">取り込む</button>
+                    <button onclick="pOpen('mDangerUpload')" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">取り込む</button>
                   </div>
-                  <div data-slot="exDelete" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef0f5">
+                  <div data-slot="exDelete" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--a-border-soft)">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">個別回答の削除</span>
-                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">回答者からの削除依頼などに応じて、特定の回答を削除する</span>
+                      <span style="display:block;font-size:11.5px;color:var(--a-fg-muted2);margin-top:2px;line-height:1.6">回答者からの削除依頼などに応じて、特定の回答を削除する</span>
                     </span>
-                    <button onclick="pOpen('mDangerDeleteAnswer')" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">削除する</button>
+                    <button onclick="pOpen('mDangerDeleteAnswer')" style="flex-shrink:0;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">削除する</button>
                   </div>
                   <div data-slot="exStop" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0">
                     <span style="min-width:0">
                       <span style="display:block;font-size:13px;font-weight:700">強制停止</span>
-                      <span style="display:block;font-size:11.5px;color:#6b7484;margin-top:2px;line-height:1.6">トラブル発生時に、会期中の回答受付を直ちに停止する</span>
+                      <span style="display:block;font-size:11.5px;color:var(--a-fg-muted2);margin-top:2px;line-height:1.6">トラブル発生時に、会期中の回答受付を直ちに停止する</span>
                     </span>
-                    <button onclick="pOpen('mConfirmForceStop')" style="flex-shrink:0;background:#fff;color:#c23934;border:1px solid #e3b6b3;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">停止する</button>
+                    <button onclick="pOpen('mConfirmForceStop')" style="flex-shrink:0;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">停止する</button>
                   </div>
-                  <div style="padding-top:10px;border-top:1px solid #e2e6ed;font-size:11.5px;color:#6b7484;line-height:1.7">いずれの操作も実行理由の入力が必須で、監査ログに記録されます。</div>
+                  <div style="padding-top:10px;border-top:1px solid var(--a-border);font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">いずれの操作も実行理由の入力が必須で、監査ログに記録されます。</div>
                 </div>
-                <div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアンケートに対する操作</span></div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアンケートに対する操作</span></div>
                   <div id="sdLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
-                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(2026/08/04→2026/08/03開始)<br><span style="color:#8a93a5">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
-                    <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:#8a93a5">実行者: 本人(U-1049)</span></span></div>
+                    <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(2026/08/04→2026/08/03開始)<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
+                    <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:var(--a-fg-faint)">実行者: 本人(U-1049)</span></span></div>
                   </div>
                 </div>
               </div>
@@ -147,138 +161,138 @@
 <!-- モーダル群 -->
 <div id="mDl" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:480px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム</span></span>
-      <span role="button" onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">データのダウンロード<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム</span></span>
+      <span role="button" onclick="pClose('mDl')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px;display:flex;flex-direction:column;gap:10px">
-      <button onclick="pDlPick('final')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
-        <span><strong style="font-weight:700">完成データCSV</strong><br><span style="font-size:11.5px;color:#6b7484">照合確定済みのレコードのみ(納品用)</span></span><span style="color:#3467d6;font-weight:700">↓</span>
+      <button onclick="pDlPick('final')" style="display:flex;align-items:center;justify-content:space-between;background:var(--a-surface);border:1px solid var(--a-border-strong);border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
+        <span><strong style="font-weight:700">完成データCSV</strong><br><span style="font-size:11.5px;color:var(--a-fg-muted2)">照合確定済みのレコードのみ(納品用)</span></span><span style="color:var(--a-accent);font-weight:700">↓</span>
       </button>
-      <button onclick="pDlPick('all')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
-        <span><strong style="font-weight:700">全レコードCSV</strong><br><span style="font-size:11.5px;color:#6b7484">未確定を含む全レコード(作業確認用)</span></span><span style="color:#3467d6;font-weight:700">↓</span>
+      <button onclick="pDlPick('all')" style="display:flex;align-items:center;justify-content:space-between;background:var(--a-surface);border:1px solid var(--a-border-strong);border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
+        <span><strong style="font-weight:700">全レコードCSV</strong><br><span style="font-size:11.5px;color:var(--a-fg-muted2)">未確定を含む全レコード(作業確認用)</span></span><span style="color:var(--a-accent);font-weight:700">↓</span>
       </button>
-      <button onclick="pDlPick('zip')" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #c8cdd8;border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
-        <span><strong style="font-weight:700">名刺画像(ZIP)</strong><br><span style="font-size:11.5px;color:#6b7484">回答に添付された名刺画像の一括ダウンロード</span></span><span style="color:#3467d6;font-weight:700">↓</span>
+      <button onclick="pDlPick('zip')" style="display:flex;align-items:center;justify-content:space-between;background:var(--a-surface);border:1px solid var(--a-border-strong);border-radius:8px;padding:12px 16px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left">
+        <span><strong style="font-weight:700">名刺画像(ZIP)</strong><br><span style="font-size:11.5px;color:var(--a-fg-muted2)">回答に添付された名刺画像の一括ダウンロード</span></span><span style="color:var(--a-accent);font-weight:700">↓</span>
       </button>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">ダウンロードは「データ持ち出し」として監査ログに記録されます。</div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">ダウンロードは「データ持ち出し」として監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
-      <button data-initial-focus onclick="pClose('mDl')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      <button data-initial-focus onclick="pClose('mDl')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
     </div>
   </div>
 </div>
 
 <div id="mThanksMail" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700"><span data-slot="tmTitle">お礼メールの内容確認</span><span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
-      <span role="button" onclick="pClose('mThanksMail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700"><span data-slot="tmTitle">お礼メールの内容確認</span><span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mThanksMail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px">
       <div data-slot="tmView">
-      <div style="font-size:11.5px;font-weight:700;color:#5b6577">件名</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:13px" data-slot="tmValue">【人事・労務フォーラム】ご来場ありがとうございました</div>
-      <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-top:14px">本文</div>
-      <div style="margin-top:6px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#374151" data-slot="tmValue">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.7">本画面は閲覧のみです。変更は要注意操作「公開後のアンケート変更」から行います。</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">件名</div>
+      <div style="margin-top:6px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:10px 14px;font-size:13px" data-slot="tmValue">【人事・労務フォーラム】ご来場ありがとうございました</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted);margin-top:14px">本文</div>
+      <div style="margin-top:6px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:var(--a-fg)" data-slot="tmValue">{回答者名} 様<br><br>このたびは当社ブースへお立ち寄りいただき、誠にありがとうございました。<br>アンケートへのご回答を受け付けました。後日、担当者よりご連絡差し上げる場合がございます。<br><br>人事・労務フォーラム 出展事務局</div>
+      <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">本画面は閲覧のみです。変更は要注意操作「公開後のアンケート変更」から行います。</div>
       </div>
       <div data-slot="tmEdit" hidden style="display:flex;flex-direction:column;gap:12px">
-        <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後のアンケート変更として編集しています。<span data-slot="tmReason" style="font-weight:700"></span></div>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">件名</span><input id="tmSubject" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">本文</span><textarea id="tmBody" rows="8" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.8;resize:vertical"></textarea></label>
+        <div style="font-size:11.5px;color:var(--a-warn);line-height:1.7;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:10px 12px">公開後のアンケート変更として編集しています。<span data-slot="tmReason" style="font-weight:700"></span></div>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">件名</span><input id="tmSubject" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">本文</span><textarea id="tmBody" rows="8" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.8;resize:vertical"></textarea></label>
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
-      <button data-initial-focus onclick="pClose('mThanksMail')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
-      <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">要注意操作として保存する</button>
+      <button data-initial-focus onclick="pClose('mThanksMail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">要注意操作として保存する</button>
     </div>
   </div>
 </div>
 
 <div id="mDangerEdit" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">公開後のアンケート変更<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
-      <span role="button" onclick="pClose('mDangerEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">公開後のアンケート変更<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mDangerEdit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">公開後(データ化完了・ユーザー公開済み)のアンケートを変更すると、回答済みデータ・完成データとの不整合が生じる可能性があります。<span data-slot="deAnswers" style="display:block;margin-top:6px;font-weight:700"></span></div>
+      <div style="font-size:11.5px;color:var(--a-warn);line-height:1.7;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:10px 12px">公開後(データ化完了・ユーザー公開済み)のアンケートを変更すると、回答済みデータ・完成データとの不整合が生じる可能性があります。<span data-slot="deAnswers" style="display:block;margin-top:6px;font-weight:700"></span></div>
       <div>
-        <span style="font-size:11.5px;font-weight:700;color:#5b6577">変更する範囲</span>
+        <span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">変更する範囲</span>
         <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:13px">
           <label style="display:flex;align-items:center;gap:8px"><input id="rEditBasic" type="checkbox" checked>基本情報(タイトル・会期・対応言語)</label>
-          <label style="display:flex;align-items:center;gap:8px"><input id="rEditQ" type="checkbox">設問構成の修正 <span style="font-size:11.5px;color:#8a93a5">(実行すると設問の編集画面を開きます)</span></label>
-          <label style="display:flex;align-items:center;gap:8px"><input id="rEditMail" type="checkbox">お礼メール設定 <span style="font-size:11.5px;color:#8a93a5">(実行すると件名・本文を編集できます)</span></label>
+          <label style="display:flex;align-items:center;gap:8px"><input id="rEditQ" type="checkbox">設問構成の修正 <span style="font-size:11.5px;color:var(--a-fg-faint)">(実行すると設問の編集画面を開きます)</span></label>
+          <label style="display:flex;align-items:center;gap:8px"><input id="rEditMail" type="checkbox">お礼メール設定 <span style="font-size:11.5px;color:var(--a-fg-faint)">(実行すると件名・本文を編集できます)</span></label>
         </div>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rEdit" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">選んだ範囲だけが編集可能になります(通常編集とは別の「公開後変更」として監査ログに記録)。設問構成・お礼メール設定を選んだ場合は続けてその編集画面を開き、入力した理由をそのまま引き継ぎます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span><input id="rEdit" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">選んだ範囲だけが編集可能になります(通常編集とは別の「公開後変更」として監査ログに記録)。設問構成・お礼メール設定を選んだ場合は続けてその編集画面を開き、入力した理由をそのまま引き継ぎます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button data-initial-focus onclick="pClose('mDangerEdit')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-requires="rEdit" onclick="pSdStartEdit()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
+      <button data-initial-focus onclick="pClose('mDangerEdit')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rEdit" onclick="pSdStartEdit()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">編集を開始する</button>
     </div>
   </div>
 </div>
 
 <div id="mDangerDeleteAnswer" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">個別回答の削除<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
-      <span role="button" onclick="pClose('mDangerDeleteAnswer')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">個別回答の削除<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mDangerDeleteAnswer')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;gap:8px;align-items:flex-end">
-        <label style="display:block;flex:1"><span style="font-size:11.5px;font-weight:700;color:#5b6577">回答ID</span><input value="#8821" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <button style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="モック: 検索結果は下に固定表示">検索</button>
+        <label style="display:block;flex:1"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">回答ID</span><input value="#8821" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <button style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" title="モック: 検索結果は下に固定表示">検索</button>
       </div>
-      <div style="border:1px solid #e2e6ed;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.9;background:#f7f8fb">
-        <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">回答日時</span><span style="font-variant-numeric:tabular-nums">2026/08/03 14:02</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">名刺</span><span>山田 太郎(株式会社サンプル商事・営業部)</span></div>
-        <div style="display:flex;justify-content:space-between"><span style="color:#6b7484">データ化</span><span>完了(照合済み)</span></div>
+      <div style="border:1px solid var(--a-border);border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.9;background:var(--a-surface-2)">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--a-fg-muted2)">回答日時</span><span style="font-variant-numeric:tabular-nums">2026/08/03 14:02</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--a-fg-muted2)">名刺</span><span>山田 太郎(株式会社サンプル商事・営業部)</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--a-fg-muted2)">データ化</span><span>完了(照合済み)</span></div>
       </div>
-      <div style="font-size:11.5px;color:#8a6414;line-height:1.7;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:10px 12px">名刺データの削除依頼対応を想定した操作です(この検索結果は会期後アンケートの場合の表示例)。過去DB・名刺画像への波及削除の要否と方式は開発へ要確認。削除した回答は復元できません。</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rDel" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:var(--a-warn);line-height:1.7;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:10px 12px">名刺データの削除依頼対応を想定した操作です(この検索結果は会期後アンケートの場合の表示例)。過去DB・名刺画像への波及削除の要否と方式は開発へ要確認。削除した回答は復元できません。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span><input id="rDel" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button data-initial-focus onclick="pClose('mDangerDeleteAnswer')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-requires="rDel" onclick="pSdDeleteAnswer()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答を削除する</button>
+      <button data-initial-focus onclick="pClose('mDangerDeleteAnswer')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rDel" onclick="pSdDeleteAnswer()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答を削除する</button>
     </div>
   </div>
 </div>
 
 <div id="mDangerUpload" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">完了データの手動アップロード<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
-      <span role="button" onclick="pClose('mDangerUpload')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">完了データの手動アップロード<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mDangerUpload')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div style="font-size:12.5px;color:#5b6577;line-height:1.8">入力画面が使えない等の不具合時に、Excel等で直接作成した完成データを取り込む非常口です。通常は照合完了で自動反映されるため、平常時は使用しません。</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">完成データファイル(CSV)</span><input type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit"></label>
-      <label style="display:block;max-width:260px"><span style="font-size:11.5px;font-weight:700;color:#5b6577">取込モード</span><select style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>全件置換</option><option>差分追記</option></select></label>
-      <div style="border:1px solid #e2e6ed;border-radius:6px;padding:10px 14px;font-size:12px;color:#5b6577;background:#f7f8fb">取込プレビュー(モック): 412件を検出・ヘッダー整合OK・重複0件</div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rUp" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:12.5px;color:var(--a-fg-muted);line-height:1.8">入力画面が使えない等の不具合時に、Excel等で直接作成した完成データを取り込む非常口です。通常は照合完了で自動反映されるため、平常時は使用しません。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">完成データファイル(CSV)</span><input type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block;max-width:260px"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">取込モード</span><select style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>全件置換</option><option>差分追記</option></select></label>
+      <div style="border:1px solid var(--a-border);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--a-fg-muted);background:var(--a-surface-2)">取込プレビュー(モック): 412件を検出・ヘッダー整合OK・重複0件</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span><input id="rUp" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button data-initial-focus onclick="pClose('mDangerUpload')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-requires="rUp" onclick="pSdUpload()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取込を実行する</button>
+      <button data-initial-focus onclick="pClose('mDangerUpload')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rUp" onclick="pSdUpload()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">取込を実行する</button>
     </div>
   </div>
 </div>
 
 <div id="mConfirmForceStop" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
-      <span style="font-size:15px;font-weight:700">アンケートを強制停止しますか?<span style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
-      <span role="button" onclick="pClose('mConfirmForceStop')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">アンケートを強制停止しますか?<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mConfirmForceStop')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
-    <div style="padding:18px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">対象アンケートの回答受付を即時停止します。トラブル時の緊急措置です。再開には管理者の操作が必要で、操作は理由とあわせて監査ログに記録されます。</div>
-    <div style="padding:14px 22px 0"><label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span><input id="rStop" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label></div>
+    <div style="padding:18px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">対象アンケートの回答受付を即時停止します。トラブル時の緊急措置です。再開には管理者の操作が必要で、操作は理由とあわせて監査ログに記録されます。</div>
+    <div style="padding:14px 22px 0"><label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span><input id="rStop" placeholder="実行理由を入力(監査ログに記録されます)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label></div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmForceStop')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button data-requires="rStop" onclick="pSdForceStop()" style="background:#c23934;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">強制停止する</button>
+      <button data-initial-focus onclick="pClose('mConfirmForceStop')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button data-requires="rStop" onclick="pSdForceStop()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">強制停止する</button>
     </div>
   </div>
 </div>
@@ -288,12 +302,12 @@
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
       <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
-      <span role="button" onclick="pClose('mConfirmSaveSurvey')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmSaveSurvey')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートの基本情報(タイトル・会期・対応言語)を更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">SV-10262 人事・労務フォーラム 来場者アンケートの基本情報(タイトル・会期・対応言語)を更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button onclick="pClose('mConfirmSaveSurvey')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pSdSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button onclick="pClose('mConfirmSaveSurvey')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pSdSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -301,47 +315,47 @@
 <div id="mQuestions" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:840px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0;flex-shrink:0">
-      <span style="font-size:15px;font-weight:700">設問構成の編集<span data-slot="qTarget" style="font-weight:400;font-size:12px;color:#6b7484;margin-left:10px"></span></span>
-      <span role="button" onclick="pQClose()" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span style="font-size:15px;font-weight:700">設問構成の編集<span data-slot="qTarget" style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px"></span></span>
+      <span role="button" onclick="pQClose()" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div id="qGate" hidden style="margin:12px 22px 0;flex-shrink:0;font-size:12px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:8px 12px;line-height:1.7">
+    <div id="qGate" hidden style="margin:12px 22px 0;flex-shrink:0;font-size:12px;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:8px 12px;line-height:1.7">
       会期中の設問変更は<strong>要注意操作</strong>です。<span id="qAnswerNote"></span>既に受け付けた回答と変更後の設問構成の対応関係は要確定(<span style="font-family:ui-monospace,Consolas,monospace">§11 #2</span>)のため、実行前に主催者との合意を取ってください。
     </div>
     <div style="flex:1;min-height:0;overflow-y:auto;padding:12px 22px 0">
-      <div id="qLangBar" hidden style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px 12px;background:#f7f9fd;border:1px solid #b9caee;border-radius:6px">
-        <span style="font-size:11px;font-weight:700;color:#5b6577">編集言語</span>
+      <div id="qLangBar" hidden style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px 12px;background:var(--a-surface-hover);border:1px solid var(--a-info-border);border-radius:6px">
+        <span style="font-size:11px;font-weight:700;color:var(--a-fg-muted)">編集言語</span>
         <span id="qLangTabs" style="display:flex;gap:6px"></span>
-        <span id="qLangHint" style="font-size:11px;color:#6b7484;margin-left:auto"></span>
+        <span id="qLangHint" style="font-size:11px;color:var(--a-fg-muted2);margin-left:auto"></span>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;height:32px;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px 6px 0 0;font-size:11px;font-weight:700;color:#5b6577">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;height:32px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px 6px 0 0;font-size:11px;font-weight:700;color:var(--a-fg-muted)">
         <span>設問（押すと開いて編集できます）</span><span>並び / 削除</span>
       </div>
-      <div id="qEdit" style="border:1px solid #e2e6ed;border-top:none;border-radius:0 0 6px 6px;padding:4px 8px 8px"></div>
+      <div id="qEdit" style="border:1px solid var(--a-border);border-top:none;border-radius:0 0 6px 6px;padding:4px 8px 8px"></div>
       <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <button onclick="pQAdd()" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">＋ 設問を追加</button>
-        <span id="qCount" style="font-size:11.5px;color:#6b7484"></span>
+        <button onclick="pQAdd()" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">＋ 設問を追加</button>
+        <span id="qCount" style="font-size:11.5px;color:var(--a-fg-muted2)"></span>
       </div>
-      <div style="margin-top:12px;font-size:11.5px;color:#6b7484;line-height:1.8">
+      <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.8">
         設問タイプはユーザー側のアンケート編集画面と同じ12種です。名刺の撮影は設問ではなく、アンケート単位の名刺データ化設定が持ちます。<br>多言語アンケートでは第一言語が必須で、それ以外の言語が未入力のときの回答画面での扱いは要確認です。<br>
         設問の編集を本画面内で行うか専用画面へ分離するかは要確定。
       </div>
     </div>
     <div id="qDiffWrap" style="padding:12px 22px 0;flex-shrink:0">
-      <div style="font-size:11.5px;font-weight:700;color:#5b6577;margin-bottom:5px">変更内容</div>
-      <div id="qDiff" style="max-height:112px;overflow-y:auto;font-size:12px;line-height:1.8;color:#374151;background:#f7f8fb;border:1px solid #e2e6ed;border-radius:6px;padding:8px 12px"></div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted);margin-bottom:5px">変更内容</div>
+      <div id="qDiff" style="max-height:112px;overflow-y:auto;font-size:12px;line-height:1.8;color:var(--a-fg);background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:8px 12px"></div>
     </div>
     <div id="qReasonWrap" hidden style="padding:12px 22px 0;flex-shrink:0">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">実行理由 <span style="color:#c23934">必須</span></span>
-        <input id="qReason" placeholder="例: 主催者からの依頼により設問3を削除" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div id="qErr" hidden style="margin-top:6px;font-size:12px;color:#c23934">実行理由を入力してください</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span>
+        <input id="qReason" placeholder="例: 主催者からの依頼により設問3を削除" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div id="qErr" hidden style="margin-top:6px;font-size:12px;color:var(--a-danger)">実行理由を入力してください</div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;flex-shrink:0;border-top:1px solid #e2e6ed;margin-top:12px">
-      <button onclick="pQPreview()" style="margin-right:auto;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答画面でプレビュー ↗</button>
-      <span id="qCloseAsk" hidden style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c23934;white-space:nowrap">保存していない変更があります。破棄しますか?
-        <button onclick="pQCloseDo(1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">破棄して閉じる</button>
-        <button onclick="pQCloseDo(0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit">編集に戻る</button></span>
-      <button id="qCancel" data-initial-focus onclick="pQClose()" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button id="qSave" onclick="pQSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;flex-shrink:0;border-top:1px solid var(--a-border);margin-top:12px">
+      <button onclick="pQPreview()" style="margin-right:auto;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答画面でプレビュー ↗</button>
+      <span id="qCloseAsk" hidden style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--a-danger);white-space:nowrap">保存していない変更があります。破棄しますか?
+        <button onclick="pQCloseDo(1)" style="border:1px solid var(--a-danger);background:var(--a-danger-bg-solid);color:var(--a-on-accent);border-radius:5px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">破棄して閉じる</button>
+        <button onclick="pQCloseDo(0)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:5px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:inherit">編集に戻る</button></span>
+      <button id="qCancel" data-initial-focus onclick="pQClose()" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button id="qSave" onclick="pQSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -357,6 +371,21 @@
 //   会期終了後        … 変更できない(確認のみ)
 (function () {
     'use strict';
+    // 指定された対象が無いときは、黙って既定の対象を出さない。
+    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため
+    window.pNotFound = function (kind, wanted, backHref, backLabel) {
+        var main = document.getElementById('main-content');
+        if (!main) { return; }
+        main.innerHTML =
+            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
+            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
+            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
+            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
+            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
+            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
+            '</div></div>';
+    };
+
 
     // 設問タイプ・型別の設定・多言語の扱いはユーザー側エディタ
     // (02_dashboard/src/surveyCreation-v2.js) に合わせる。
@@ -434,6 +463,7 @@
     var activeLang = 'ja';
 
     var draft = [];
+    var draftReady = false;   // pQOpen が draft を用意したか。用意前を未保存と見なさない
     var openIdx = -1;
     var pendingDel = -1;
     var pendingItemDel = null;
@@ -496,8 +526,8 @@
     }
 
     // ---- 対応言語(アンケート単位) ----
-    var CHIP = 'display:inline-flex;align-items:center;gap:6px;border:1px solid #b9caee;background:#eef2fb;'
-        + 'color:#1f3d80;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700';
+    var CHIP = 'display:inline-flex;align-items:center;gap:6px;border:1px solid var(--a-info-border);background:var(--a-info-bg);'
+        + 'color:var(--a-info-fg);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700';
     function paintLangs() {
         var box = document.getElementById('svLangs');
         var badge = document.getElementById('svLangBadge');
@@ -506,20 +536,20 @@
         var html = surveyLangs.map(function (c, i) {
             return '<span data-lang="' + c + '" style="' + CHIP + '">' + esc(langName(c))
                 + (i === 0
-                    ? '<span style="font-size:10px;font-weight:700;background:#3467d6;color:#fff;border-radius:4px;padding:1px 6px">第一言語</span>'
-                    : '<button title="第一言語にする" onclick="pLangFirst(\'' + c + '\')" style="border:none;background:none;color:#2b57b8;font-size:12px;cursor:pointer;padding:0 2px">↑</button>'
-                      + '<button title="この言語を外す" onclick="pLangAsk(\'' + c + '\')" style="border:none;background:none;color:#c23934;font-size:13px;cursor:pointer;padding:0 2px">×</button>')
+                    ? '<span style="font-size:10px;font-weight:700;background:var(--a-accent-bg);color:var(--a-on-accent);border-radius:4px;padding:1px 6px">第一言語</span>'
+                    : '<button title="第一言語にする" onclick="pLangFirst(\'' + c + '\')" style="border:none;background:none;color:var(--a-accent-deep);font-size:12px;cursor:pointer;padding:0 2px">↑</button>'
+                      + '<button title="この言語を外す" onclick="pLangAsk(\'' + c + '\')" style="border:none;background:none;color:var(--a-danger);font-size:13px;cursor:pointer;padding:0 2px">×</button>')
                 + '</span>';
         }).join('');
         var rest = LANGS.filter(function (l) { return surveyLangs.indexOf(l.code) < 0; });
         if (surveyLangs.length < MAX_LANGS && rest.length) {
-            html += '<select onchange="pLangAdd(this.value);this.selectedIndex=0" style="border:1px solid #c8cdd8;'
-                + 'border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;color:#1f2733">'
+            html += '<select onchange="pLangAdd(this.value);this.selectedIndex=0" style="border:1px solid var(--a-border-strong);'
+                + 'border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;color:var(--a-fg-strong)">'
                 + '<option value="">＋ 言語を追加</option>'
                 + rest.map(function (l) { return '<option value="' + l.code + '">' + l.name + '</option>'; }).join('')
                 + '</select>';
         } else if (surveyLangs.length >= MAX_LANGS) {
-            html += '<span style="font-size:11px;color:#8a93a5">第一言語を含め' + MAX_LANGS + '言語までです</span>';
+            html += '<span style="font-size:11px;color:var(--a-fg-faint)">第一言語を含め' + MAX_LANGS + '言語までです</span>';
         }
         box.innerHTML = html;
     }
@@ -549,13 +579,13 @@
         var box = document.getElementById('svLangs');
         if (!box) { return; }
         var used = QUESTIONS.reduce(function (a, q) { return a + (missingFor(q, code) ? 0 : 1); }, 0);
-        box.innerHTML = '<span style="font-size:12px;color:#c23934">'
+        box.innerHTML = '<span style="font-size:12px;color:var(--a-danger)">'
             + esc(langName(code)) + ' を対応言語から外しますか?'
             + (used ? '（この言語で入力済みの設問が ' + used + ' 件あります）' : '')
             + '</span>'
-            + '<button onclick="pLangDel(\'' + code + '\',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;'
+            + '<button onclick="pLangDel(\'' + code + '\',1)" style="border:1px solid var(--a-danger);background:var(--a-danger-bg-solid);color:var(--a-on-accent);'
             + 'border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">外す</button>'
-            + '<button onclick="pLangDel(\'' + code + '\',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;'
+            + '<button onclick="pLangDel(\'' + code + '\',0)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);'
             + 'border-radius:5px;padding:4px 12px;font-size:11.5px;cursor:pointer;font-family:inherit">やめる</button>';
     };
     window.pLangDel = function (code, run) {
@@ -641,7 +671,7 @@
         var list = diffOf(QUESTIONS.map(clone), draft);
         var save = document.getElementById('qSave');
         if (!list.length) {
-            box.innerHTML = '<span style="color:#8a93a5">変更はありません</span>';
+            box.innerHTML = '<span style="color:var(--a-fg-faint)">変更はありません</span>';
             if (save) { save.disabled = true; save.style.opacity = '0.55'; save.style.cursor = 'default'; }
             return;
         }
@@ -650,11 +680,11 @@
         var touches = answerCount > 0 && list.some(function (c) { return c.answered; });
         box.innerHTML = list.map(function (c) {
             var mark = { add: '＋', del: '－', move: '⇅', edit: '✎' }[c.kind] || '・';
-            var color = c.kind === 'del' ? '#c23934' : (c.kind === 'add' ? '#237a52' : '#374151');
+            var color = c.kind === 'del' ? 'var(--a-danger)' : (c.kind === 'add' ? 'var(--a-ok)' : 'var(--a-fg)');
             return '<div style="color:' + color + '">' + mark + ' ' + esc(c.text) + '</div>';
         }).join('')
             + (touches
-                ? '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #c8cdd8;color:#8a6414">'
+                ? '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--a-border-strong);color:var(--a-warn)">'
                   + '既存の回答 ' + answerCount.toLocaleString('en-US') + ' 件が影響を受けます。'
                   + '変更後の対応関係は要確定(§11 #2)のため、実行前に主催者と扱いを合意してください。</div>'
                 : '');
@@ -664,7 +694,7 @@
 
     // ---- 一覧(読み取り専用・第一言語で表示) ----
     var ROW = 'display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;'
-        + 'align-items:center;padding:7px 12px;border-bottom:1px solid #eef0f5;font-size:12.5px';
+        + 'align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px';
 
     function paintList() {
         var list = document.getElementById('qList');
@@ -685,21 +715,21 @@
             var miss = missingBadge(q);
             var d = document.createElement('div');
             d.setAttribute('style', ROW + (i === QUESTIONS.length - 1 ? ';border-bottom:none' : ''));
-            d.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;align-self:start;padding-top:2px">'
+            d.innerHTML = '<span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;align-self:start;padding-top:2px">'
                 + (i + 1) + '</span>'
                 + '<span style="min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;'
-                + 'white-space:nowrap"><span data-qtext' + (tv(q.text, L) ? '' : ' style="color:#a3aab8"')
+                + 'white-space:nowrap"><span data-qtext' + (tv(q.text, L) ? '' : ' style="color:var(--a-fg-faint)"')
                 + '>' + esc(tv(q.text, L) || '(設問文なし)') + '</span>'
-                + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:#8a6414;background:#fdf6ec;'
-                    + 'border:1px solid #e8cf9e;border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
+                + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:var(--a-warn);background:var(--a-warn-bg);'
+                    + 'border:1px solid var(--a-warn-border);border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
                 + '</span>'
-                + (sub ? '<span style="display:block;font-size:11px;color:#8a93a5;margin-top:2px;overflow:hidden;'
+                + (sub ? '<span style="display:block;font-size:11px;color:var(--a-fg-faint);margin-top:2px;overflow:hidden;'
                     + 'text-overflow:ellipsis;white-space:nowrap">' + esc(sub) + '</span>' : '')
                 + '</span>'
-                + '<span style="font-size:11.5px;color:#5b6577;align-self:start;padding-top:2px">' + esc(label(q.type)) + '</span>'
+                + '<span style="font-size:11.5px;color:var(--a-fg-muted);align-self:start;padding-top:2px">' + esc(label(q.type)) + '</span>'
                 + (q.required
-                    ? '<span style="font-size:11px;color:#c23934;font-weight:700;align-self:start;padding-top:2px">必須</span>'
-                    : '<span style="font-size:11px;color:#8a93a5;align-self:start;padding-top:2px">任意</span>');
+                    ? '<span style="font-size:11px;color:var(--a-danger);font-weight:700;align-self:start;padding-top:2px">必須</span>'
+                    : '<span style="font-size:11px;color:var(--a-fg-faint);align-self:start;padding-top:2px">任意</span>');
             list.appendChild(d);
         });
         var note = document.querySelector('[data-slot="qNote"]');
@@ -707,20 +737,20 @@
     }
 
     // ---- 編集 ----
-    var ICON = 'width:26px;height:26px;border:1px solid #c8cdd8;border-radius:5px;background:#fff;font-size:11px';
-    var TXT = 'width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;'
+    var ICON = 'width:26px;height:26px;border:1px solid var(--a-border-strong);border-radius:5px;background:var(--a-surface);font-size:11px';
+    var TXT = 'width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;'
         + 'padding:7px 10px;font-size:12.5px;font-family:inherit';
-    var NUM = 'width:110px;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;'
+    var NUM = 'width:110px;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;'
         + 'padding:7px 10px;font-size:12.5px;font-family:inherit';
-    var FIELD = 'font-size:11px;font-weight:700;color:#5b6577;margin-bottom:5px';
+    var FIELD = 'font-size:11px;font-weight:700;color:var(--a-fg-muted);margin-bottom:5px';
     function seg(on) {
-        return 'padding:6px 14px;border:1px solid ' + (on ? '#3467d6' : '#c8cdd8') + ';border-radius:6px;'
-            + 'background:' + (on ? '#eef2fb' : '#fff') + ';color:' + (on ? '#2b57b8' : '#374151')
+        return 'padding:6px 14px;border:1px solid ' + (on ? 'var(--a-accent)' : 'var(--a-border-strong)') + ';border-radius:6px;'
+            + 'background:' + (on ? 'var(--a-info-bg)' : 'var(--a-surface)') + ';color:' + (on ? 'var(--a-accent-deep)' : 'var(--a-fg)')
             + ';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit';
     }
     function cfgSet(i, k, v) { return 'pQCfg(' + i + ',\'' + k + '\',' + JSON.stringify(v) + ')'; }
     function langSuffix() {
-        return surveyLangs.length > 1 ? ' <span style="font-weight:400;color:#8a93a5">(' + esc(langName(activeLang)) + ')</span>' : '';
+        return surveyLangs.length > 1 ? ' <span style="font-weight:400;color:var(--a-fg-faint)">(' + esc(langName(activeLang)) + ')</span>' : '';
     }
 
     function paintLangBar() {
@@ -732,7 +762,7 @@
             var n = draft.reduce(function (a, q) { return a + missingFor(q, c); }, 0);
             return '<button onclick="pQLang(\'' + c + '\')" style="' + seg(c === activeLang) + '">'
                 + esc(langName(c)) + (i === 0 ? '（第一言語）' : '')
-                + (i > 0 && n ? '<span style="margin-left:6px;font-size:10px;color:#8a6414">未入力' + n + '</span>' : '')
+                + (i > 0 && n ? '<span style="margin-left:6px;font-size:10px;color:var(--a-warn)">未入力' + n + '</span>' : '')
                 + '</button>';
         }).join('');
         document.getElementById('qLangHint').textContent =
@@ -749,23 +779,23 @@
                     + '<span style="flex:1;min-width:0">'
                     + '<input value="' + esc(tv(o, activeLang)) + '" placeholder="' + (other ? esc(other) : '')
                     + '" oninput="pQItemSet(' + qi + ',\'' + kind + '\',' + oi + ',this.value)" style="' + TXT + '">'
-                    + (other ? '<span style="display:block;font-size:10.5px;color:#8a93a5;margin-top:2px">'
+                    + (other ? '<span style="display:block;font-size:10.5px;color:var(--a-fg-faint);margin-top:2px">'
                         + esc(langName(primary())) + ': ' + esc(other) + '</span>' : '')
                     + '</span>'
                     + (mine
-                        ? '<span style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:11px;color:#c23934">削除しますか?'
-                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700">削除</button>'
-                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:3px 9px;font-size:11px">やめる</button></span>'
+                        ? '<span style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:11px;color:var(--a-danger)">削除しますか?'
+                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',1)" style="border:1px solid var(--a-danger);background:var(--a-danger-bg-solid);color:var(--a-on-accent);border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700">削除</button>'
+                          + '<button onclick="pQItemDel(' + qi + ',\'' + kind + '\',' + oi + ',0)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:5px;padding:3px 9px;font-size:11px">やめる</button></span>'
                         : '<button title="上へ" onclick="pQItemMove(' + qi + ',\'' + kind + '\',' + oi + ',-1)"' + (oi === 0 ? ' disabled' : '')
-                          + ' style="' + ICON + ';color:' + (oi === 0 ? '#c3c9d4' : '#374151') + '">↑</button>'
+                          + ' style="' + ICON + ';color:' + (oi === 0 ? 'var(--a-fg-disabled)' : 'var(--a-fg)') + '">↑</button>'
                           + '<button title="下へ" onclick="pQItemMove(' + qi + ',\'' + kind + '\',' + oi + ',1)"' + (oi === items.length - 1 ? ' disabled' : '')
-                          + ' style="' + ICON + ';color:' + (oi === items.length - 1 ? '#c3c9d4' : '#374151') + '">↓</button>'
+                          + ' style="' + ICON + ';color:' + (oi === items.length - 1 ? 'var(--a-fg-disabled)' : 'var(--a-fg)') + '">↓</button>'
                           + '<button title="削除" onclick="pQItemAsk(' + qi + ',\'' + kind + '\',' + oi + ')" style="' + ICON
-                          + ';border-color:#e3b6b3;color:#c23934">×</button>')
+                          + ';border-color:var(--a-danger-border);color:var(--a-danger)">×</button>')
                     + '</div>';
             }).join('')
-            + '<button onclick="pQItemAdd(' + qi + ',\'' + kind + '\')" style="background:#fff;color:#3467d6;'
-            + 'border:1px solid #b9caee;border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;'
+            + '<button onclick="pQItemAdd(' + qi + ',\'' + kind + '\')" style="background:var(--a-surface);color:var(--a-accent);'
+            + 'border:1px solid var(--a-info-border);border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;'
             + 'cursor:pointer;font-family:inherit">＋ ' + name + 'を追加</button></div>';
     }
 
@@ -837,10 +867,10 @@
                 + '</div>';
         }
         if (q.type === 'image') {
-            return '<div style="font-size:11.5px;color:#6b7484;line-height:1.7">回答画面では写真の撮影またはファイルの選択で回答します。設定項目はありません。</div>';
+            return '<div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">回答画面では写真の撮影またはファイルの選択で回答します。設定項目はありません。</div>';
         }
         if (q.type === 'explanation_card') {
-            return '<div style="font-size:11.5px;color:#6b7484;line-height:1.7">回答欄を持たない設問です。本文は設問文に入力します。</div>';
+            return '<div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">回答欄を持たない設問です。本文は設問文に入力します。</div>';
         }
         return '';
     }
@@ -858,7 +888,7 @@
     function separator(at) {
         return '<div data-sep="' + at + '" style="display:flex;align-items:center;justify-content:center;height:18px">'
             + '<button onclick="pQAdd(' + at + ')" title="ここに設問を追加" '
-            + 'style="font-size:10.5px;color:#8a93a5;background:#fff;border:1px dashed #c8cdd8;border-radius:999px;'
+            + 'style="font-size:10.5px;color:var(--a-fg-faint);background:var(--a-surface);border:1px dashed var(--a-border-strong);border-radius:999px;'
             + 'padding:1px 10px;cursor:pointer;font-family:inherit">＋ ここに設問を追加</button></div>';
     }
 
@@ -870,55 +900,55 @@
         var L = primary();
 
         var actions = del
-            ? '<span style="display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:11.5px;color:#c23934">削除しますか?'
-              + '<button onclick="event.stopPropagation();pQDel(' + i + ',1)" style="border:1px solid #c23934;background:#c23934;color:#fff;border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700">削除する</button>'
-              + '<button onclick="event.stopPropagation();pQDel(' + i + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:5px;padding:4px 12px;font-size:11.5px">やめる</button></span>'
+            ? '<span style="display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:11.5px;color:var(--a-danger)">削除しますか?'
+              + '<button onclick="event.stopPropagation();pQDel(' + i + ',1)" style="border:1px solid var(--a-danger);background:var(--a-danger-bg-solid);color:var(--a-on-accent);border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700">削除する</button>'
+              + '<button onclick="event.stopPropagation();pQDel(' + i + ',0)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:5px;padding:4px 12px;font-size:11.5px">やめる</button></span>'
             : '<span style="display:flex;gap:4px">'
               + '<button title="上へ" onclick="event.stopPropagation();pQMove(' + i + ',-1)"' + (i === 0 ? ' disabled' : '')
-              + ' style="' + ICON + ';color:' + (i === 0 ? '#c3c9d4' : '#374151') + '">↑</button>'
+              + ' style="' + ICON + ';color:' + (i === 0 ? 'var(--a-fg-disabled)' : 'var(--a-fg)') + '">↑</button>'
               + '<button title="下へ" onclick="event.stopPropagation();pQMove(' + i + ',1)"' + (i === draft.length - 1 ? ' disabled' : '')
-              + ' style="' + ICON + ';color:' + (i === draft.length - 1 ? '#c3c9d4' : '#374151') + '">↓</button>'
-              + '<button title="設問を複製" onclick="event.stopPropagation();pQDup(' + i + ')" style="' + ICON + ';color:#374151">⧉</button>'
+              + ' style="' + ICON + ';color:' + (i === draft.length - 1 ? 'var(--a-fg-disabled)' : 'var(--a-fg)') + '">↓</button>'
+              + '<button title="設問を複製" onclick="event.stopPropagation();pQDup(' + i + ')" style="' + ICON + ';color:var(--a-fg)">⧉</button>'
               + '<button title="設問を削除" onclick="event.stopPropagation();pQAsk(' + i + ')" style="' + ICON
-              + ';border-color:#e3b6b3;color:#c23934">×</button></span>';
+              + ';border-color:var(--a-danger-border);color:var(--a-danger)">×</button></span>';
 
         var header = '<div onclick="pQToggle(' + i + ')" tabindex="0" role="button" aria-expanded="' + open + '" '
             + 'style="display:grid;grid-template-columns:20px 28px minmax(160px,1fr) auto;column-gap:10px;'
-            + 'align-items:center;padding:10px 12px;cursor:pointer;user-select:none' + (open ? ';background:#f7f9fd' : '') + '">'
-            + '<span style="color:#8a93a5;font-size:11px;display:inline-block' + (open ? ';transform:rotate(90deg)' : '') + '">▶</span>'
-            + '<span style="font-size:12px;color:#8a93a5;font-variant-numeric:tabular-nums">' + (i + 1) + '</span>'
+            + 'align-items:center;padding:10px 12px;cursor:pointer;user-select:none' + (open ? ';background:var(--a-surface-hover)' : '') + '">'
+            + '<span style="color:var(--a-fg-faint);font-size:11px;display:inline-block' + (open ? ';transform:rotate(90deg)' : '') + '">▶</span>'
+            + '<span style="font-size:12px;color:var(--a-fg-faint);font-variant-numeric:tabular-nums">' + (i + 1) + '</span>'
             + '<span style="min-width:0">'
             + '<span style="display:block;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-            + '<span data-qtext>' + (tv(q.text, L).trim() ? esc(tv(q.text, L)) : '<span style="color:#c23934;font-weight:400">(設問文が未入力)</span>') + '</span>'
-            + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:#8a6414;background:#fdf6ec;'
-                + 'border:1px solid #e8cf9e;border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
+            + '<span data-qtext>' + (tv(q.text, L).trim() ? esc(tv(q.text, L)) : '<span style="color:var(--a-danger);font-weight:400">(設問文が未入力)</span>') + '</span>'
+            + (miss ? '<span data-qmiss style="margin-left:8px;font-size:10px;font-weight:700;color:var(--a-warn);background:var(--a-warn-bg);'
+                + 'border:1px solid var(--a-warn-border);border-radius:4px;padding:1px 6px">' + esc(miss) + '</span>' : '')
             + '</span>'
-            + '<span style="display:block;font-size:11px;color:#8a93a5;margin-top:2px">' + esc(label(q.type))
+            + '<span style="display:block;font-size:11px;color:var(--a-fg-faint);margin-top:2px">' + esc(label(q.type))
             + ' · ' + (q.required ? '必須' : '任意') + (sum ? ' · ' + esc(sum) : '') + '</span></span>'
             + actions + '</div>';
 
         var warn = '';
         if (pendingType && pendingType.i === i) {
-            warn = '<div style="margin-top:8px;font-size:11.5px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;'
+            warn = '<div style="margin-top:8px;font-size:11.5px;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);'
                 + 'border-radius:6px;padding:8px 11px;line-height:1.7;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
                 + '<span style="flex:1;min-width:200px">' + esc(label(pendingType.to))
                 + ' へ変更すると、入力済みの' + (family(q.type) === 'choice' ? '選択肢' : family(q.type) === 'matrix' ? '行・列' : '詳細設定')
                 + 'はリセットされます。</span>'
-                + '<button onclick="pQTypeConfirm(' + i + ',1)" style="border:1px solid #8a6414;background:#8a6414;color:#fff;'
+                + '<button onclick="pQTypeConfirm(' + i + ',1)" style="border:1px solid var(--a-warn-bg-solid);background:var(--a-warn-bg-solid);color:var(--a-on-accent);'
                 + 'border-radius:5px;padding:4px 12px;font-size:11.5px;font-weight:700">変更する</button>'
-                + '<button onclick="pQTypeConfirm(' + i + ',0)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;'
+                + '<button onclick="pQTypeConfirm(' + i + ',0)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);'
                 + 'border-radius:5px;padding:4px 12px;font-size:11.5px">やめる</button></div>';
         }
 
         var otherText = (surveyLangs.length > 1 && activeLang !== L) ? tv(q.text, L) : '';
         var settings = typeSettings(q, i);
         var detail = !open ? '' :
-            '<div style="border-top:1px solid #eef0f5;background:#fbfcfe;padding:14px 12px 14px 50px;'
+            '<div style="border-top:1px solid var(--a-border-soft);background:var(--a-surface);padding:14px 12px 14px 50px;'
             + 'display:flex;flex-direction:column;gap:14px">'
             + '<div><div style="' + FIELD + '">設問文' + langSuffix() + '</div>'
             + '<input value="' + esc(tv(q.text, activeLang)) + '" placeholder="' + (otherText ? esc(otherText) : '')
             + '" oninput="pQSet(' + i + ',\'text\',this.value)" style="' + TXT + '">'
-            + (otherText ? '<div style="font-size:10.5px;color:#8a93a5;margin-top:3px">' + esc(langName(L)) + ': '
+            + (otherText ? '<div style="font-size:10.5px;color:var(--a-fg-faint);margin-top:3px">' + esc(langName(L)) + ': '
                 + esc(otherText) + '</div>' : '') + '</div>'
             + '<div><div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">'
             + '<div style="flex:0 0 220px"><div style="' + FIELD + '">設問タイプ</div>'
@@ -931,12 +961,12 @@
             + (q.type === 'explanation_card' ? ' disabled' : '')
             + ' onchange="pQSet(' + i + ',\'required\',this.checked)">回答を必須にする'
             + (q.type === 'explanation_card'
-                ? '<span style="font-size:11px;color:#8a93a5">説明カードは回答欄を持たないため対象外</span>' : '')
+                ? '<span style="font-size:11px;color:var(--a-fg-faint)">説明カードは回答欄を持たないため対象外</span>' : '')
             + '</label></div>' + warn + '</div>'
             + (settings || '') + '</div>';
 
-        return '<div data-q="' + i + '" style="border:1px solid #e2e6ed;border-radius:8px;background:'
-            + (del ? '#fdf6f5' : '#fff') + '">' + header + detail + '</div>';
+        return '<div data-q="' + i + '" style="border:1px solid var(--a-border);border-radius:8px;background:'
+            + (del ? 'var(--a-danger-bg)' : 'var(--a-surface)') + '">' + header + detail + '</div>';
     }
 
     window.pQToggle = function (i) {
@@ -1080,6 +1110,7 @@
             return;
         }
         draft = QUESTIONS.map(clone);
+        draftReady = true;
         openIdx = -1; pendingDel = -1; pendingItemDel = null; pendingType = null;
         activeLang = primary();
         var exception = document.body.getAttribute('data-survey-live') === '1';
@@ -1090,7 +1121,7 @@
         document.getElementById('qErr').hidden = true;
         var save = document.getElementById('qSave');
         save.textContent = exception ? '要注意操作として保存する' : '保存する';
-        save.style.background = exception ? '#c23934' : '#3467d6';
+        save.style.background = exception ? 'var(--a-danger-bg-solid)' : 'var(--a-accent-bg)';
         var note = document.getElementById('qAnswerNote');
         if (note) {
             note.innerHTML = answerCount > 0
@@ -1105,7 +1136,8 @@
     };
 
     // ---- 未保存のまま閉じない ----
-    function isDirty() { return diffOf(QUESTIONS.map(clone), draft).length > 0; }
+    // 編集を開く前は draft が空で、そのままだと「未保存」と誤判定して Esc が効かなくなる
+    function isDirty() { return draftReady && diffOf(QUESTIONS.map(clone), draft).length > 0; }
     window.pQClose = function () {
         if (!isDirty()) { window.pClose('mQuestions'); return; }
         document.getElementById('qCloseAsk').hidden = false;
@@ -1290,11 +1322,11 @@ window.pSdLog = function (title, reason, exception, detail) {
         + ' ' + p(n.getHours()) + ':' + p(n.getMinutes());
     var row = document.createElement('div');
     row.setAttribute('style', 'display:flex;gap:10px');
-    row.innerHTML = '<span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">' + when + '</span>'
+    row.innerHTML = '<span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">' + when + '</span>'
         + '<span>' + e(title)
-        + (detail ? '<br><span style="color:#5b6577;font-size:11.5px">' + e(detail) + '</span>' : '')
-        + (exception ? '<span style="color:#c23934;font-weight:700;margin-left:6px">要注意操作</span>' : '')
-        + '<br><span style="color:#8a93a5">実行者: admin@abroad-o.com'
+        + (detail ? '<br><span style="color:var(--a-fg-muted);font-size:11.5px">' + e(detail) + '</span>' : '')
+        + (exception ? '<span style="color:var(--a-danger);font-weight:700;margin-left:6px">要注意操作</span>' : '')
+        + '<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com'
         + (reason ? '・理由: ' + e(reason) : '') + '</span></span>';
     log.insertBefore(row, log.firstChild);
 };
@@ -1319,9 +1351,10 @@ function paintBasic() {
     if (save) {
         save.hidden = (basicState === 'closed');
         save.disabled = locked;
-        save.style.background = locked ? '#eceef3' : (basicState === 'unlocked' ? '#c23934' : '#3467d6');
-        save.style.color = locked ? '#8a93a5' : '#fff';
+        save.style.background = locked ? 'var(--a-disabled-bg)' : (basicState === 'unlocked' ? 'var(--a-danger-bg-solid)' : 'var(--a-accent-bg)');
+        save.style.color = locked ? 'var(--a-fg-faint)' : 'var(--a-on-accent)';
         save.style.cursor = locked ? 'default' : 'pointer';
+        save.title = locked ? '会期中のため、先に「要注意操作として編集」を通す必要があります' : '';
         save.textContent = basicState === 'unlocked' ? '要注意操作として保存' : '変更を保存';
     }
     var head = q('basicHeadNote');
@@ -1415,8 +1448,8 @@ function paintThanks() {
     var b = document.querySelector('[data-slot="thanksBtn"]');
     if (!b) { return; }
     b.textContent = thanksUnlocked ? 'お礼メール内容を編集(要注意操作)' : 'お礼メール内容の確認';
-    b.style.color = thanksUnlocked ? '#c23934' : '#374151';
-    b.style.borderColor = thanksUnlocked ? '#e3b6b3' : '#c8cdd8';
+    b.style.color = thanksUnlocked ? 'var(--a-danger)' : 'var(--a-fg)';
+    b.style.borderColor = thanksUnlocked ? 'var(--a-danger-border)' : 'var(--a-border-strong)';
     b.title = thanksUnlocked
         ? '公開後のアンケート変更として編集できます。理由: ' + thanksReason
         : '変更は要注意操作「公開後のアンケート変更」から開始します';
@@ -1478,10 +1511,11 @@ window.pSdUpload = function () {
 // ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、
 // 集計値・監査ログ・モーダル本文の数値は固定のダミーのまま
 (function () {
-    var DATA = {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常", "answers": "0", "dataCount": "—"}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急", "answers": "3,842", "dataCount": "—"}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常", "answers": "926", "dataCount": "—"}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "company": "(株)イベントプラス", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/08/03", "dataCount": "2,150"}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急", "answers": "納品予定 2026/08/01", "dataCount": "1,208"}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "company": "(株)テックブリッジ", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド", "answers": "納品予定 2026/07/28", "dataCount": "3,420"}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "company": "(株)サンライトプロモーション", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急", "answers": "納品予定 2026/07/25", "dataCount": "2,864"}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常", "answers": "納品済 2026/07/23", "dataCount": "412"}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "company": "ミライ電装(株)", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/07/21", "dataCount": "1,980"}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/07/17", "dataCount": "356"}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "company": "(株)クレストメディカル", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/07/14", "dataCount": "288"}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "company": "東亜精密工業(株)", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/07/09", "dataCount": "3,105"}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "company": "(株)ネオフーズ", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/07/04", "dataCount": "1,472"}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "company": "西日本トラベル(株)", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/06/26", "dataCount": "926"}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "company": "(株)アークデザイン", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/06/19", "dataCount": "1,038"}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "company": "セントラル機器(株)", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/06/12", "dataCount": "2,214"}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "company": "(株)ハーベスト農園", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/06/07", "dataCount": "684"}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "company": "光陽印刷(株)", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/28", "dataCount": "1,760"}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "company": "(株)ラピスソフト", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/05/21", "dataCount": "2,530"}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "company": "大和ハウジング(株)", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/05/15", "dataCount": "1,204"}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "company": "(株)エコスタイル", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/02", "dataCount": "842"}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "company": "(株)テクノブレイン", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/04/22", "dataCount": "516"}};
+    var DATA = {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常", "answers": "0", "dataCount": "—"}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急", "answers": "3,842", "dataCount": "—"}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常", "answers": "926", "dataCount": "—"}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "company": "(株)イベントプラス", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/08/03", "dataCount": "2,150"}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急", "answers": "納品予定 2026/08/01", "dataCount": "1,208"}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "company": "(株)テックブリッジ", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド", "answers": "納品予定 2026/07/28", "dataCount": "3,420"}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "company": "(株)サンライトプロモーション", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急", "answers": "納品予定 2026/07/25", "dataCount": "2,180"}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常", "answers": "納品済 2026/07/23", "dataCount": "486"}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "company": "ミライ電装(株)", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/07/21", "dataCount": "1,980"}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/07/17", "dataCount": "356"}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "company": "(株)クレストメディカル", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/07/14", "dataCount": "288"}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "company": "東亜精密工業(株)", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/07/09", "dataCount": "3,105"}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "company": "(株)ネオフーズ", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/07/04", "dataCount": "1,472"}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "company": "西日本トラベル(株)", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/06/26", "dataCount": "926"}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "company": "(株)アークデザイン", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/06/19", "dataCount": "1,038"}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "company": "セントラル機器(株)", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/06/12", "dataCount": "2,214"}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "company": "(株)ハーベスト農園", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/06/07", "dataCount": "684"}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "company": "光陽印刷(株)", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/28", "dataCount": "1,760"}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "company": "(株)ラピスソフト", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/05/21", "dataCount": "2,530"}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "company": "大和ハウジング(株)", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/05/15", "dataCount": "1,204"}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "company": "(株)エコスタイル", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/02", "dataCount": "842"}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "company": "(株)テクノブレイン", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/04/22", "dataCount": "516"}};
     var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};
     var DEF = 'SV-10262';
     var id = new URLSearchParams(location.search).get('id');
+    if (id && !DATA[id]) { window.pNotFound('アンケート', id, 'survey-management.html', 'アンケート管理へ戻る'); return; }
     if (!DATA[id]) { id = DEF; }
     var d = DATA[id] || DATA[DEF];
     var base = DATA[DEF] || d;
@@ -1515,6 +1549,45 @@ window.pSdUpload = function () {
     // 納期区分は名刺データ化設定に1箇所だけ置く(§4.4)。
     // 文字列置換の対象にはしない — 「通常」「特急」は説明文にも出る短い一般語のため
     document.querySelectorAll('[data-slot="plan"]').forEach(function (e) { e.textContent = d.plan; });
+
+    // 作成者の氏名。DATA はユーザーIDと会社名しか持たないため、氏名だけ別表から引く。
+    // ここを入れないと、対象を切り替えても既定の氏名が残りユーザー詳細と食い違う
+    var UNAME = {
+        'U-1002': '川村 聡', 'U-1007': '長谷川 純', 'U-1009': '三宅 健', 'U-1012': '中島 亜衣',
+        'U-1014': '近藤 貴文', 'U-1016': '石川 美咲', 'U-1017': '岡本 修平', 'U-1019': '小林 玲奈',
+        'U-1021': '藤田 大地', 'U-1022': '村上 千尋', 'U-1025': '大森 一樹', 'U-1026': '平野 沙耶',
+        'U-1031': '佐々木 剛', 'U-1033': '高橋 恵美', 'U-1035': '川口 誠', 'U-1038': '森田 優子',
+        'U-1049': '三浦 沙織', 'U-1050': '中山 亮', 'U-1052': '岡田 健一'
+    };
+    document.querySelectorAll('[data-slot="creator"]').forEach(function (e) {
+        e.textContent = d.uid + ' ' + (UNAME[d.uid] || '—') + '(' + d.company + ')';
+    });
+
+    // グループ(アンケートを複数名で共同編集する単位)。グループ契約のアンケートだけ名前を出す。
+    // グループ名と請求先の設定は請求管理・ユーザー詳細の所属グループと同じ値を使う
+    var GRP = {
+        'SV-10188': { name: 'マーケティング部', billing: 'グループ専用' },
+        'SV-10209': { name: 'インバウンド事業部', billing: '作成者情報' },
+        'SV-10238': { name: '営業推進部', billing: '作成者情報' },
+        'SV-10244': { name: 'イベント企画部', billing: 'グループ専用' }
+    };
+    (function () {
+        var el = document.querySelector('[data-slot="grp"]');
+        if (!el) { return; }
+        var g = GRP[id];
+        if (!g) {
+            el.innerHTML = '<span style="color:var(--a-fg-muted2)">個人契約</span>'
+                + '<span style="font-size:11.5px;color:var(--a-fg-faint);margin-left:8px">共同編集のグループには属していません</span>';
+            return;
+        }
+        var own = (g.billing === 'グループ専用');
+        el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap">'
+            + '<a href="user-detail.html?id=' + d.uid + '" title="作成者のユーザー詳細で所属グループを確認する">' + g.name + '</a>'
+            + '<span style="flex:none;background:var(--a-info-bg);color:var(--a-accent);border:1px solid var(--a-info-border);border-radius:4px;'
+            + 'padding:1px 6px;font-size:10px;font-weight:700">グループ</span>'
+            + '<span style="font-size:11.5px;color:' + (own ? 'var(--a-warn)' : 'var(--a-fg-faint)') + '">請求先: '
+            + (own ? 'グループ専用(作成者と別)' : '作成者の登録情報') + '</span></span>';
+    })();
 
     // 名刺データ化設定(§4.4)と回答状況(§4.5)の値。いずれもモックのダミー。
     // 入力・照合の内訳件数と直近の回答日時は元データを持たないため、会期状態から粗い表現で出す
@@ -1560,15 +1633,15 @@ window.pSdUpload = function () {
         if (closed) {
             qBtn.disabled = true;
             qBtn.textContent = '変更できません';
-            qBtn.style.background = '#eceef3';
-            qBtn.style.color = '#8a93a5';
-            qBtn.style.borderColor = '#eceef3';
+            qBtn.style.background = 'var(--a-disabled-bg)';
+            qBtn.style.color = 'var(--a-fg-faint)';
+            qBtn.style.borderColor = 'var(--a-disabled-bg)';
             qBtn.style.cursor = 'default';
             qBtn.title = '会期終了後は設問構成を変更できません';
         } else if (live) {
             qBtn.textContent = '設問を編集(要注意操作)';
-            qBtn.style.color = '#c23934';
-            qBtn.style.borderColor = '#e3b6b3';
+            qBtn.style.color = 'var(--a-danger)';
+            qBtn.style.borderColor = 'var(--a-danger-border)';
             qBtn.title = '会期中の変更は要注意操作です。実行理由の入力が必要です';
         }
     }

@@ -7,119 +7,85 @@
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
+    <script src="../src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 比較表の列定義。行が16項目あるため、1920x1080で8行が収まる高さに固定する(残りは画像へ回す) */
+.rc-grid {
+  display: grid;
+  grid-template-columns: 116px repeat(5, minmax(92px,1fr)) minmax(140px,1.2fr) minmax(120px,1.05fr) 56px;
+  align-items: center;
+}
+#rcScroll { height: 318px; }   /* 見出し36px + 6行 × 47px */
+</style>
 </head>
 <body>
 <div class="relative flex flex-col overflow-x-hidden admin-workscreen" style="height:100vh;overflow:hidden">
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="min-height:0">
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:0;min-height:0;display:flex;flex-direction:column">
-        <div class="workscreen-body" style="flex:1;min-height:0;padding:12px 20px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid #e2e6ed">
-            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-              <button onclick="location.href='index.html'" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+        <div class="workscreen-body" style="flex:1;min-height:0;padding:12px 20px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:10px;border-bottom:2px solid var(--a-border)">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <button onclick="location.href='index.html'" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
               <h1 style="margin:0;font-size:18px;font-weight:700">名刺情報照合</h1>
-              <span style="font-size:12px;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:2px 8px;background:#fff;font-variant-numeric:tabular-nums"><span id="svBadgeM">アンケートID SV-10236</span></span>
-              <span style="font-size:12px;color:#5b6577"><span id="titleM">製造業DXセミナー2026</span></span>
-              <span style="font-size:12px;color:#c23934;font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:#c23934;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span><span id="rcMismatch" tabindex="0" role="button" title="押すと次の不一致へ移動します(N キー)" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:999px;padding:3px 12px;cursor:pointer;font-variant-numeric:tabular-nums"></span><span id="rcAllMatch" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#237a52;background:#edf7f1;border:1px solid #9fceb6;border-radius:999px;padding:3px 12px">全 16 項目が一致</span>
+              <span style="font-size:12px;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:2px 8px;background:var(--a-surface);font-variant-numeric:tabular-nums"><span id="svBadgeM">アンケートID SV-10236</span></span>
+              <span id="companyM" data-min-lv="3" data-lv-display="inline" title="会社名の表示は Lv3 以上" style="font-size:12px;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:2px 8px;background:var(--a-surface)">(株)サンライトプロモーション</span>
+              <span id="planM" style="font-size:11px;font-weight:700;color:var(--a-warn-deep);border:1px solid var(--a-warn-border);border-radius:4px;padding:2px 8px;background:var(--a-warn-bg)">特急</span>
+              <span style="font-size:12px;color:var(--a-fg-muted)"><span id="titleM">製造業DXセミナー2026</span></span>
+              <span style="font-size:12px;color:var(--a-danger);font-weight:700">納期 <span id="dueM">2026/07/30 15:00</span> <span id="overdueM" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border-radius:4px;padding:1px 6px;font-size:11px">超過</span></span><span id="rcMismatch" tabindex="0" role="button" title="押すと次の不一致へ移動します(N キー)" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:999px;padding:3px 12px;cursor:pointer;font-variant-numeric:tabular-nums"></span><span id="rcAllMatch" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--a-ok);background:var(--a-ok-bg);border:1px solid var(--a-ok-border);border-radius:999px;padding:3px 12px">全 16 項目が一致</span>
             </div>
             <div style="display:flex;align-items:center;gap:14px;font-size:12px">
-              <span id="lockBadge" style="color:#2b57b8;background:#eef2fb;border:1px solid #b9caee;border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums">照合ロック中(自動解除まで <span id="lockSec">182</span>秒)</span>
-              <span tabindex="0" role="button" title="クリックまたは?キーでショートカット一覧を表示" onclick="pOpen('mShortcuts')" style="color:#8a93a5;cursor:pointer;border-bottom:1px dotted #c8cdd8;white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
+              <span id="lockBadge" style="color:var(--a-accent-deep);background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:999px;padding:3px 12px;font-weight:700;font-variant-numeric:tabular-nums"></span>
+              <span tabindex="0" role="button" title="クリックまたは?キーでショートカット一覧を表示" onclick="pOpen('mShortcuts')" style="color:var(--a-fg-faint);cursor:pointer;border-bottom:1px dotted var(--a-border-strong);white-space:nowrap">⌨ ショートカット一覧(?キー)</span>
             </div>
           </div>
-          <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px">
-            <div style="flex:1 1 auto;min-height:300px;background:#1f2733;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #303c4f">
-                <span style="color:#c3ccdb;font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px">
+            <div style="flex:1 1 auto;min-height:220px;background:var(--a-work-bg);border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--a-work-border)">
+                <span style="color:var(--a-work-fg);font-size:12px;font-weight:700">名刺画像 — 表・裏 同時表示</span>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <span id="zoomLabel" style="color:#98a3b8;font-size:11px;margin-right:4px">ホバー拡大・クリック固定 ×2.0</span>
-                  <span tabindex="0" role="button" title="拡大率を上げる (+ / 入力中は Alt++)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">＋</span>
-                  <span tabindex="0" role="button" title="拡大率を下げる (− / 入力中は Alt+−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:14px">−</span>
-                  <span tabindex="0" role="button" title="回転 (R / 入力中は Alt+R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#c3ccdb;border:1px solid #3c4a61;border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
+                  <span id="zoomLabel" style="color:var(--a-work-fg-muted);font-size:11px;margin-right:4px">ホバー拡大・クリック固定 ×2.0</span>
+                  <span tabindex="0" role="button" title="拡大率を上げる (+ / 入力中は Alt++)" onclick="pZoomDelta(0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--a-work-fg);border:1px solid var(--a-work-border);border-radius:5px;cursor:pointer;font-size:14px">＋</span>
+                  <span tabindex="0" role="button" title="拡大率を下げる (− / 入力中は Alt+−)" onclick="pZoomDelta(-0.5)" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--a-work-fg);border:1px solid var(--a-work-border);border-radius:5px;cursor:pointer;font-size:14px">−</span>
+                  <span tabindex="0" role="button" title="回転 (R / 入力中は Alt+R)" onclick="pRotate()" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--a-work-fg);border:1px solid var(--a-work-border);border-radius:5px;cursor:pointer;font-size:13px">⟳</span>
                 </div>
               </div>
-              <div style="flex:1;min-height:0;display:flex;gap:28px;justify-content:center;padding:12px 24px">
-                <div style="width:46%;max-width:620px;min-width:0;display:flex;flex-direction:column">
-                  <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">表</div>
-                  <div class="card-zoom" style="flex:1;min-height:0;background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+              <div style="flex:1;min-height:0;display:flex;gap:12px;padding:8px 12px">
+                <div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column">
+                  <div style="font-size:11px;font-weight:700;color:var(--a-work-fg-muted);letter-spacing:1px;margin-bottom:5px">表</div>
+                  <div class="card-zoom" style="flex:1;min-height:0;background:var(--a-work-bg-inner);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden;position:relative">
+                    <img src="../assets/dummy_card_front.png" alt="名刺画像(表) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
-                <div style="width:46%;max-width:620px;min-width:0;display:flex;flex-direction:column">
-                  <div style="font-size:11px;font-weight:700;color:#98a3b8;letter-spacing:1px;margin-bottom:6px">裏</div>
-                  <div class="card-zoom" style="flex:1;min-height:0;background:#141b26;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden">
-                    <img src="../BY-221_照合画面/BY-223/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
+                <div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column">
+                  <div style="font-size:11px;font-weight:700;color:var(--a-work-fg-muted);letter-spacing:1px;margin-bottom:5px">裏</div>
+                  <div class="card-zoom" style="flex:1;min-height:0;background:var(--a-work-bg-inner);border-radius:6px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden;position:relative">
+                    <img src="../assets/dummy_card_back.png" alt="名刺画像(裏) サンプル" style="max-width:100%;max-height:100%;border-radius:4px;display:block;cursor:zoom-in;transition:transform .08s ease-out" title="ホバーで拡大 / クリックで拡大位置を固定(再クリックで解除) / ＋−で倍率 / Rで回転">
                   </div>
                 </div>
               </div>
             </div>
-            <div style="flex:0 1 auto;min-height:160px;max-height:44%;background:#fff;border:1px solid #e2e6ed;border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
-              <div style="flex:1;min-height:0;overflow-x:auto;overflow-y:auto">
-                <div style="min-width:840px">
-                  <div style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:0 14px;height:36px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:11.5px;font-weight:700;color:#5b6577">
+            <div style="flex:none;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden">
+              <div id="rcScroll" style="overflow-x:auto;overflow-y:auto">
+                <div style="min-width:900px">
+                  <div class="rc-grid" style="padding:0 14px;height:36px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11.5px;font-weight:700;color:var(--a-fg-muted);position:sticky;top:0;z-index:1">
                     <span>項目</span><span>OCR結果</span><span>DB値</span><span>入力1</span><span>入力2</span><span>入力3</span><span>修正入力</span><span>完成内容</span>
+                    <span style="text-align:center" title="すべての項目の確定チェックをまとめて切り替えます">確定<br><input type="checkbox" id="rcAllCheck" aria-label="すべての項目を確定"></span>
                   </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">メールアドレス <span style="font-size:10.5px;color:#8a93a5;font-weight:400">①</span></span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="overflow-wrap:anywhere">t.yamada@abroad.co.jp</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">t.yamada@abroad.co.jp</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">姓 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">②</span></span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="overflow-wrap:anywhere">山田</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">山田</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">②</span></span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="overflow-wrap:anywhere">太郎</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">太郎</span>
-                  </div>
-                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
-                    <span style="font-weight:700">会社名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロ一ド株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロ一ド株式会社</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード株式会社</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード(株)')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード(株)</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixCompany','アブロード株式会社')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロード株式会社</span><span style="padding-right:10px"><input id="fixCompany" aria-label="会社名の完成内容" spellcheck="false" value="アブロード株式会社" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneCompany" style="font-weight:700">アブロード株式会社</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">部署名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span></span><span style="overflow-wrap:anywhere">営業部</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">営業部</span><span style="overflow-wrap:anywhere">営業部</span><span style="overflow-wrap:anywhere">営業部</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">営業部</span>
-                  </div>
-                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
-                    <span style="font-weight:700">役職名 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">③</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','部長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">部長</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixRole','課長')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">課長</span><span style="padding-right:10px"><input id="fixRole" aria-label="役職名の完成内容" spellcheck="false" value="" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneRole" style="font-weight:700;color:#8a6414">未確定</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">郵便番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span></span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="overflow-wrap:anywhere">150-0001</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">150-0001</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">住所1 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span></span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">東京都渋谷区神宮前1-2-3</span>
-                  </div>
-                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
-                    <span style="font-weight:700">住所2 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">④</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7階')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7階</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixAddr2','アブロードビル7F')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">アブロードビル7F</span><span style="padding-right:10px"><input id="fixAddr2" aria-label="住所2の完成内容" spellcheck="false" value="アブロードビル7F" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneAddr2" style="font-weight:700">アブロードビル7F</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">電話番号1 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="overflow-wrap:anywhere">03-1234-5678</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">03-1234-5678</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">電話番号2 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">〓</span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">〓</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">携帯番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span></span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="overflow-wrap:anywhere">090-8765-4321</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">090-8765-4321</span>
-                  </div>
-                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
-                    <span style="font-weight:700">FAX番号 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑤</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5670')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5670</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixFax','03-1234-5679')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">03-1234-5679</span><span style="padding-right:10px"><input id="fixFax" aria-label="FAX番号の完成内容" spellcheck="false" value="" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneFax" style="font-weight:700;color:#8a6414">未確定</span>
-                  </div>
-                  <div class="rc-row" data-rc="mismatch" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:52px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#fdf6ec">
-                    <span style="font-weight:700">URL <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑥</span> <span style="color:#8a6414;font-size:11px;font-weight:700">!不一致</span></span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span style="color:#8a93a5">—</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','http://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">http://www.abroad.co.jp</span><span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFix('fixUrl','https://www.abroad.co.jp')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">https://www.abroad.co.jp</span><span style="padding-right:10px"><input id="fixUrl" aria-label="URLの完成内容" spellcheck="false" value="https://www.abroad.co.jp" style="width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:6px 8px;font-size:12.5px;font-family:inherit"></span><span id="doneUrl" style="font-weight:700">https://www.abroad.co.jp</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">その他メモ <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑦</span></span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">展示会ブースA-12にて名刺交換</span>
-                  </div>
-                  <div class="rc-row" data-rc="match" style="display:grid;grid-template-columns:110px repeat(5,minmax(96px,1fr)) minmax(130px,1.15fr) minmax(120px,1.1fr);align-items:center;padding:6px 14px;min-height:38px;border-bottom:1px solid #eef0f5;font-size:12.5px;background:#edf7f1">
-                    <span style="font-weight:700">フリー入力 <span style="font-size:10.5px;color:#8a93a5;font-weight:400">⑧</span></span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="overflow-wrap:anywhere">〓</span><span style="overflow-wrap:anywhere">〓</span><span style="color:#8a93a5">—</span><span style="color:#8a93a5">—</span><span style="font-weight:700;overflow-wrap:anywhere">〓</span>
-                  </div>
-</div>
+                  <div id="rcBody"></div>
+                </div>
               </div>
-              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid #e2e6ed;background:#f7f8fb">
-                <span style="font-size:11.5px;color:#5b6577"><span style="font-size:11px;color:#8a93a5;margin-right:2px">凡例</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#edf7f1;border:1px solid #bfe0cd;border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:3px"></span>不一致(修正対象)</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:#eef2fb;border:1px solid #b9caee;border-radius:3px"></span>不一致(確定済み)</span><span id="matchState">不一致 2項目のうち 1項目が未確定。全項目の完成内容が決まると確定できます。</span></span>
+              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;border-top:1px solid var(--a-border);background:var(--a-surface-2)">
+                <span style="font-size:11.5px;color:var(--a-fg-muted)"><span style="font-size:11px;color:var(--a-fg-faint);margin-right:2px">凡例</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:var(--a-ok-bg);border:1px solid var(--a-ok-border-soft);border-radius:3px"></span>一致</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:3px"></span>不一致(修正対象)</span><span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px"><span style="width:12px;height:12px;background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:3px"></span>確定済み</span><span id="matchState"></span></span>
                 <div style="display:flex;gap:10px">
-                  <button id="btnMatchConfirm" disabled onclick="pMatchConfirm()" style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
+                  <button id="btnMatchConfirm" disabled title="確定チェックが付いていない項目が残っています" onclick="pMatchConfirm()" style="background:var(--a-disabled-bg);color:var(--a-fg-faint);border:none;border-radius:6px;padding:9px 22px;font-size:13px;font-weight:700;cursor:default;font-family:inherit">確定して次へ <span style="font-weight:400;font-size:11px">Ctrl+Enter</span></button>
                 </div>
               </div>
             </div>
           </div>
-          <div style="font-size:11.5px;color:#8a93a5">ロックは無操作で自動解除。解除後に確定した場合も修正入力は破棄されず、対象を再取得して再確定できます。OCR・入力1〜3の値はクリックで修正入力へ複写。</div>
+          <div style="font-size:11.5px;color:var(--a-fg-faint)">確定チェックを外すと修正入力を編集し直せます。修正入力を空のまま確定すると「(記載なし)」として扱います。ロックは無操作で自動解除し、解除中は名刺画像を伏せます(修正入力は保持)。OCR・入力1〜3の値はクリックで修正入力へ複写。</div>
         </div>
         </main>
     </div>
@@ -128,14 +94,14 @@
 <!-- 照合確定 -->
 <div id="mConfirmMatch" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">完成内容で確定しますか?</span>
-      <span role="button" onclick="pClose('mConfirmMatch')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmMatch')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">全項目の完成内容を確定し、次の照合対象へ進みます。確定した内容は完成データへ反映されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">全項目の完成内容を確定し、次の照合対象へ進みます。確定した内容は完成データへ反映されます。<span id="blankNote" hidden style="display:block;margin-top:8px;color:var(--a-warn);font-weight:700"></span></div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button onclick="pClose('mConfirmMatch')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pClose('mConfirmMatch');pMatchDone()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確定する</button>
+      <button onclick="pClose('mConfirmMatch')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pClose('mConfirmMatch');pMatchDone()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確定する</button>
     </div>
   </div>
 </div>
@@ -143,24 +109,25 @@
 
 <!-- ショートカット一覧 -->
 <div id="mShortcuts" class="proto-modal" hidden>
-  <div class="proto-dialog" style="width:480px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+  <div class="proto-dialog" style="width:500px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">ショートカット一覧</span>
-      <span role="button" onclick="pClose('mShortcuts')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mShortcuts')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:16px 22px;display:grid;grid-template-columns:150px 1fr;gap:9px 14px;font-size:12.5px;align-items:center">
       <span style="font-weight:700">Ctrl + Enter</span><span>確定して次へ(確認画面ではそのまま実行)</span>
-      <span style="font-weight:700">Enter</span><span>次の未確定の修正入力へ(すべて確定済みなら確定ボタンへ)</span>
+      <span style="font-weight:700">Enter</span><span>確定チェックが付いていない次の修正入力へ(すべて確定済みなら確定ボタンへ)</span>
+      <span style="font-weight:700">Alt + Enter</span><span>フォーカス中の行の確定チェックを切り替え</span>
+      <span style="font-weight:700">Space</span><span>確定チェックにフォーカスがある状態で切り替え</span>
       <span style="font-weight:700">Alt + 1〜3</span><span>フォーカス中の行の入力1〜3を修正入力へ複写</span>
-      <span style="font-weight:700">Ctrl + Z</span><span>複写を直前の値に戻す</span>
       <span style="font-weight:700">N</span><span>次の不一致の項目へ移動(入力中は不一致の件数バッジを押す)</span>
-          <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
+      <span style="font-weight:700">＋ / −</span><span>画像の拡大率(入力中は Alt を併用)</span>
       <span style="font-weight:700">R</span><span>画像を90度回転(入力中は Alt+R)</span>
       <span style="font-weight:700">画像ホバー / クリック</span><span>カーソル位置を拡大 / その位置で固定(再クリックで解除)</span>
       <span style="font-weight:700">?</span><span>この一覧を表示</span>
     </div>
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
-      <button onclick="pClose('mShortcuts')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
+      <button onclick="pClose('mShortcuts')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
     </div>
   </div>
 </div>
@@ -169,103 +136,98 @@
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
 <script>
-// 比較表は縦にスクロールするため、不一致の件数を見出しへ出して見落としを防ぐ。
-// バッジ(または N キー)で次の不一致へ送る
-(function () {
-    var idx = -1;
-
-    function rows() {
-        return document.querySelectorAll('.rc-row[data-rc="mismatch"]');
-    }
-
-    function paint() {
-        var m = rows();
-        var total = document.querySelectorAll('.rc-row').length;
-        var bad = document.getElementById('rcMismatch');
-        var good = document.getElementById('rcAllMatch');
-        if (!bad || !good) { return; }
-        if (m.length) {
-            bad.textContent = '!不一致 ' + m.length + ' / ' + total + ' 項目';
-            bad.style.display = 'inline-flex';
-            good.style.display = 'none';
-        } else {
-            good.textContent = '全 ' + total + ' 項目が一致';
-            good.style.display = 'inline-flex';
-            bad.style.display = 'none';
-        }
-    }
-
-    // 次の不一致へ送り、行を一瞬強調する
-    window.pNextMismatch = function () {
-        var m = rows();
-        if (!m.length) { return; }
-        idx = (idx + 1) % m.length;
-        var r = m[idx];
-        r.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        var keep = r.style.outline;
-        r.style.outline = '2px solid #c8951a';
-        r.style.outlineOffset = '-2px';
-        setTimeout(function () { r.style.outline = keep; }, 900);
-        var inp = r.querySelector('input');
-        if (inp) { inp.focus({ preventScroll: true }); }
-    };
-
-    document.addEventListener('DOMContentLoaded', function () {
-        paint();
-        var bad = document.getElementById('rcMismatch');
-        if (bad) {
-            bad.addEventListener('click', window.pNextMismatch);
-            bad.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.pNextMismatch(); }
-            });
-        }
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'n' && e.key !== 'N') { return; }
-        var t = e.target;
-        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) { return; }
-        if (document.querySelector('.proto-modal:not([hidden])')) { return; }
-        e.preventDefault();
-        window.pNextMismatch();
-    });
-}());
-</script>
-
-<script>
-// 照合フロー(モック): 修正入力の監視・確定・候補複写・ロック管理
+// 照合フロー(モック): 比較表の描画・確定チェック・候補複写・表示面の切替・ロック管理
 // 画像操作(ホバー拡大・クリック固定・回転)は proto-ui.js の pInitCardZoom を使用
 (function () {
     'use strict';
-    window.pInitCardZoom();
+    // 指定された対象が無いときは、黙って既定の対象を出さない。
+    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため
+    window.pNotFound = function (kind, wanted, backHref, backLabel) {
+        var main = document.getElementById('main-content');
+        if (!main) { return; }
+        main.innerHTML =
+            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
+            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
+            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
+            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
+            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
+            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
+            '</div></div>';
+    };
 
-    // 修正入力の定義: 対応する完成内容セル・確定後の初期値・入力1〜3の候補値
-    var FIX = [
-        { fix: 'fixCompany', done: 'doneCompany', initial: 'アブロード株式会社', cands: ['アブロード株式会社', 'アブロード株式会社', 'アブロード株式会社'] },
-        { fix: 'fixRole', done: 'doneRole', initial: '', cands: ['課長', '部長', '課長'] },
-        { fix: 'fixAddr2', done: 'doneAddr2', initial: 'アブロードビル7F', cands: ['アブロードビル7F', 'アブロードビル7階', 'アブロードビル7F'] },
-        { fix: 'fixFax', done: 'doneFax', initial: '', cands: ['03-1234-5679', '03-1234-5670', '03-1234-5679'] },
-        { fix: 'fixUrl', done: 'doneUrl', initial: 'https://www.abroad.co.jp', cands: ['https://www.abroad.co.jp', 'http://www.abroad.co.jp', 'https://www.abroad.co.jp'] }
+
+    // アンケートに紐づく識別情報(会社名・納期区分)。?id= で対象を切り替える
+    var SURVEYS = {"SV-10262": {"company": "グロースパートナーズ(株)", "plan": "通常"}, "SV-10259": {"company": "(株)マーケットビジョン", "plan": "特急"}, "SV-10257": {"company": "地方創生機構", "plan": "通常"}, "SV-10250": {"company": "(株)イベントプラス", "plan": "オンデマンド"}, "SV-10244": {"company": "(株)マーケットビジョン", "plan": "超特急"}, "SV-10238": {"company": "(株)テックブリッジ", "plan": "オンデマンド"}, "SV-10236": {"company": "(株)サンライトプロモーション", "plan": "特急"}, "SV-10233": {"company": "地方創生機構", "plan": "通常"}, "SV-10229": {"company": "ミライ電装(株)", "plan": "超特急"}, "SV-10227": {"company": "グロースパートナーズ(株)", "plan": "お試し"}, "SV-10221": {"company": "(株)クレストメディカル", "plan": "特急"}, "SV-10218": {"company": "東亜精密工業(株)", "plan": "オンデマンド"}, "SV-10214": {"company": "(株)ネオフーズ", "plan": "通常"}, "SV-10209": {"company": "西日本トラベル(株)", "plan": "特急"}, "SV-10205": {"company": "(株)アークデザイン", "plan": "超特急"}, "SV-10201": {"company": "セントラル機器(株)", "plan": "通常"}, "SV-10196": {"company": "(株)ハーベスト農園", "plan": "お試し"}, "SV-10192": {"company": "光陽印刷(株)", "plan": "通常"}, "SV-10188": {"company": "(株)ラピスソフト", "plan": "オンデマンド"}, "SV-10183": {"company": "大和ハウジング(株)", "plan": "特急"}, "SV-10179": {"company": "(株)エコスタイル", "plan": "通常"}, "SV-10174": {"company": "(株)テクノブレイン", "plan": "超特急"}};
+
+    // 照合対象の16項目。mismatch は入力1〜3が割れている項目、fix は修正入力の初期値。
+    // blank は名刺に記載が無い項目(空欄のまま確定して「(記載なし)」として扱う)
+    var ROWS = [
+        { k: 'mail',    label: 'メールアドレス', g: '①', ocr: 't.yamada@abroad.co.jp', db: 't.yamada@abroad.co.jp', i1: 't.yamada@abroad.co.jp', i2: 't.yamada@abroad.co.jp', i3: '', fix: 't.yamada@abroad.co.jp' },
+        { k: 'sei',     label: '姓', g: '②', ocr: '山田', db: '山田', i1: '山田', i2: '山田', i3: '', fix: '山田' },
+        { k: 'mei',     label: '名', g: '②', ocr: '太郎', db: '太郎', i1: '太郎', i2: '太郎', i3: '', fix: '太郎' },
+        { k: 'company', label: '会社名', g: '③', mismatch: true, ocr: 'アブロ一ド株式会社', db: '', i1: 'アブロード株式会社', i2: 'アブロード(株)', i3: 'アブロード株式会社', fix: 'アブロード株式会社' },
+        { k: 'dept',    label: '部署名', g: '③', ocr: '営業部', db: '', i1: '営業部', i2: '営業部', i3: '営業部', fix: '営業部' },
+        { k: 'role',    label: '役職名', g: '③', mismatch: true, ocr: '課長', db: '', i1: '課長', i2: '部長', i3: '課長', fix: '' },
+        { k: 'zip',     label: '郵便番号', g: '④', ocr: '150-0001', db: '150-0001', i1: '150-0001', i2: '150-0001', i3: '', fix: '150-0001' },
+        { k: 'addr1',   label: '住所1', g: '④', ocr: '東京都渋谷区神宮前1-2-3', db: '', i1: '東京都渋谷区神宮前1-2-3', i2: '東京都渋谷区神宮前1-2-3', i3: '', fix: '東京都渋谷区神宮前1-2-3' },
+        { k: 'addr2',   label: '住所2', g: '④', mismatch: true, ocr: 'アブロードビル7F', db: '', i1: 'アブロードビル7F', i2: 'アブロードビル7階', i3: 'アブロードビル7F', fix: 'アブロードビル7F' },
+        { k: 'tel1',    label: '電話番号1', g: '⑤', ocr: '03-1234-5678', db: '03-1234-5678', i1: '03-1234-5678', i2: '03-1234-5678', i3: '', fix: '03-1234-5678' },
+        { k: 'tel2',    label: '電話番号2', g: '⑤', blank: true, ocr: '', db: '', i1: '', i2: '', i3: '', fix: '' },
+        { k: 'mobile',  label: '携帯番号', g: '⑤', ocr: '090-8765-4321', db: '', i1: '090-8765-4321', i2: '090-8765-4321', i3: '', fix: '090-8765-4321' },
+        { k: 'fax',     label: 'FAX番号', g: '⑤', mismatch: true, ocr: '03-1234-5679', db: '', i1: '03-1234-5679', i2: '03-1234-5670', i3: '03-1234-5679', fix: '' },
+        { k: 'url',     label: 'URL', g: '⑥', mismatch: true, ocr: 'https://www.abroad.co.jp', db: '', i1: 'https://www.abroad.co.jp', i2: 'http://www.abroad.co.jp', i3: 'https://www.abroad.co.jp', fix: 'https://www.abroad.co.jp' },
+        { k: 'memo',    label: 'その他メモ', g: '⑦', ocr: '展示会ブースA-12にて名刺交換', db: '', i1: '展示会ブースA-12にて名刺交換', i2: '展示会ブースA-12にて名刺交換', i3: '', fix: '展示会ブースA-12にて名刺交換' },
+        { k: 'free',    label: 'フリー入力', g: '⑧', ocr: '〓', db: '', i1: '〓', i2: '〓', i3: '', fix: '〓' }
     ];
+    var BLANK_LABEL = '(記載なし)';
     var stateTimer = null;
+    var lock = null;
 
-    // 照合対象(モック2件)。確定すると次の対象へヘッダーを切り替える(照合内容は同一サンプル)
-    var TARGETS = [
-        { sv: 'SV-10236', title: '製造業DXセミナー2026', due: '2026/07/30 15:00', overdue: true },
-        { sv: 'SV-10238', title: 'BtoB EXPO 東京 2026', due: '2026/07/31 18:00', overdue: false }
-    ];
-    var targetIdx = 0;
-    function applyTarget() {
-        var t = TARGETS[targetIdx];
-        var sv = document.getElementById('svBadgeM');
-        if (sv) { sv.textContent = 'アンケートID ' + t.sv; }
-        var ti = document.getElementById('titleM');
-        if (ti) { ti.textContent = t.title; }
-        var du = document.getElementById('dueM');
-        if (du) { du.textContent = t.due; }
-        var ov = document.getElementById('overdueM');
-        if (ov) { ov.style.display = t.overdue ? '' : 'none'; }
+    function esc(t) {
+        return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
+
+    // 候補セル。値があればクリックで修正入力へ複写でき、無ければ「—」を淡色で置く
+    function cand(r, v) {
+        if (!v) { return '<span style="color:var(--a-fg-faint)">—</span>'; }
+        return '<span tabindex="0" role="button" title="クリック(またはEnter)で修正入力へ複写" onclick="pFixRow(\'' + r.k + '\',\'' + esc(v).replace(/'/g, "\\'") + '\')" style="cursor:pointer;text-decoration:underline dotted;padding-right:6px;overflow-wrap:anywhere">' + esc(v) + '</span>';
+    }
+
+    function render() {
+        var html = '';
+        ROWS.forEach(function (r) {
+            var tag = r.mismatch ? ' <span style="color:var(--a-warn);font-size:11px;font-weight:700">!不一致</span>' : '';
+            html += '<div class="rc-grid rc-row" data-k="' + r.k + '"' + (r.mismatch ? ' data-rc="mismatch"' : ' data-rc="match"') + ' style="padding:5px 14px;min-height:42px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px">'
+                + '<span style="font-weight:700">' + r.label + ' <span style="font-size:10.5px;color:var(--a-fg-faint);font-weight:400">' + r.g + '</span>' + tag + '</span>'
+                + cand(r, r.ocr) + cand(r, r.db) + cand(r, r.i1) + cand(r, r.i2) + cand(r, r.i3)
+                + '<span style="padding-right:10px"><input id="fix_' + r.k + '" aria-label="' + esc(r.label) + 'の修正入力" spellcheck="false" value="' + esc(r.fix) + '" style="width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"></span>'
+                + '<span id="done_' + r.k + '" style="font-weight:700;overflow-wrap:anywhere"></span>'
+                + '<span style="text-align:center"><input type="checkbox" id="ok_' + r.k + '" data-ok aria-label="' + esc(r.label) + 'を確定"></span>'
+                + '</div>';
+        });
+        document.getElementById('rcBody').innerHTML = html;
+        // 一致した項目と記載なしの項目は既定で確定済みにする(不一致だけを人が見る)
+        ROWS.forEach(function (r) {
+            document.getElementById('ok_' + r.k).checked = !r.mismatch;
+        });
+    }
+
+    // 候補の複写。確定チェックが付いた行は編集できないため、先にチェックを外す
+    window.pFixRow = function (k, value) {
+        var el = document.getElementById('fix_' + k);
+        var ok = document.getElementById('ok_' + k);
+        if (!el) { return; }
+        if (ok && ok.checked) { ok.checked = false; }
+        var prev = el.value;
+        if (prev && prev !== value) {
+            el.style.transition = 'background .15s';
+            el.style.background = 'var(--a-copy-flash)';
+            setTimeout(function () { el.style.background = 'var(--a-surface)'; }, 650);
+        }
+        window.pApplyValue(el, value);
+        el.focus();
+        refreshState();
+    };
 
     function setState(text, color, weight) {
         var st = document.getElementById('matchState');
@@ -276,123 +238,154 @@
         st.style.fontWeight = weight || '';
     }
 
-    // 候補クリックの複写。既入力を置き換えた場合はハイライトし、元の値をツールチップへ保持(Ctrl+Zでも戻せる)
-    window.pFix = function (inputId, value) {
-        var el = document.getElementById(inputId);
-        if (!el) { return; }
-        var prev = el.value;
-        if (prev && prev !== value) {
-            el.title = 'クリック前の値: ' + prev;
-            el.style.transition = 'background .15s';
-            el.style.background = '#fff7d6';
-            setTimeout(function () { el.style.background = '#fff'; }, 650);
-        }
-        window.pApplyValue(el, value);
-        el.focus();
-    };
-
-    // 未確定数に応じて、状態文言・完成内容セル・行と入力欄の状態色・確定ボタンを連動させる
+    // 確定チェックの状態に合わせて、行の色・完成内容・修正入力の編集可否・確定ボタンを揃える
     function refreshState() {
-        var unresolved = 0;
-        FIX.forEach(function (fx) {
-            var el = document.getElementById(fx.fix);
-            var done = document.getElementById(fx.done);
-            var val = el ? el.value.trim() : '';
-            if (!val) { unresolved += 1; }
-            if (done) {
-                done.textContent = val || '未確定';
-                done.style.color = val ? '#1f2733' : '#8a93a5';
-                done.style.fontWeight = val ? '700' : '400';
-            }
-            if (el) {
-                el.style.borderColor = val ? '#b9caee' : '#c99b3f';
-                var row = el.closest('div[style*="grid-template-columns"]');
-                if (row) {
-                    row.style.background = val ? '#eef2fb' : '#fdf6ec';
-                    var badge = Array.prototype.find.call(row.querySelectorAll('span'), function (b) { return b.textContent.trim() === '!不一致'; });
-                    if (badge) { badge.style.color = val ? '#2b57b8' : '#8a6414'; }
-                }
+        var done = 0;
+        var blanks = 0;
+        ROWS.forEach(function (r) {
+            var el = document.getElementById('fix_' + r.k);
+            var ok = document.getElementById('ok_' + r.k);
+            var out = document.getElementById('done_' + r.k);
+            var row = el.closest('.rc-row');
+            var val = el.value.trim();
+            el.readOnly = ok.checked;
+            el.style.background = ok.checked ? 'var(--a-surface-2)' : 'var(--a-surface)';
+            el.style.borderColor = ok.checked ? 'var(--a-info-border)' : (r.mismatch ? 'var(--a-warn-border-strong)' : 'var(--a-border-strong)');
+            if (ok.checked) {
+                done += 1;
+                if (!val) { blanks += 1; }
+                out.textContent = val || BLANK_LABEL;
+                out.style.color = val ? 'var(--a-fg-strong)' : 'var(--a-warn)';
+                row.style.background = 'var(--a-info-bg)';
+            } else {
+                out.textContent = '未確定';
+                out.style.color = 'var(--a-fg-faint)';
+                row.style.background = r.mismatch ? 'var(--a-warn-bg)' : 'var(--a-ok-bg)';
             }
         });
-        setState(unresolved
-            ? '不一致 ' + FIX.length + '項目のうち ' + unresolved + '項目が未確定。全項目の完成内容が決まると確定できます。'
-            : '全項目の完成内容が決まりました。確定できます。',
-            unresolved ? '' : '#237a52', unresolved ? '' : '700');
+        var all = document.getElementById('rcAllCheck');
+        all.checked = (done === ROWS.length);
+        all.indeterminate = (done > 0 && done < ROWS.length);
+        var rest = ROWS.length - done;
+        setState(rest
+            ? '確定 ' + done + ' / ' + ROWS.length + ' 項目。残り ' + rest + ' 項目に確定チェックが付くと確定できます。'
+            : '全 ' + ROWS.length + ' 項目が確定済み。確定できます。'
+                + (blanks ? '(うち ' + blanks + ' 項目は記載なし)' : ''),
+            rest ? '' : 'var(--a-ok)', rest ? '' : '700');
         var btn = document.getElementById('btnMatchConfirm');
-        if (btn) {
-            btn.disabled = !!unresolved;
-            btn.style.background = unresolved ? '#eceef3' : '#3467d6';
-            btn.style.color = unresolved ? '#8a93a5' : '#fff';
-            btn.style.cursor = unresolved ? 'default' : 'pointer';
-        }
-        return unresolved;
+        btn.disabled = !!rest;
+        btn.title = rest ? '確定チェックが付いていない項目が ' + rest + ' 件あります' : 'ショートカット: Ctrl+Enter';
+        btn.style.background = rest ? 'var(--a-disabled-bg)' : 'var(--a-accent-bg)';
+        btn.style.color = rest ? 'var(--a-fg-faint)' : 'var(--a-on-accent)';
+        btn.style.cursor = rest ? 'default' : 'pointer';
+        return { rest: rest, blanks: blanks };
     }
-    FIX.forEach(function (fx) {
-        var el = document.getElementById(fx.fix);
-        if (el) {
-            el.addEventListener('input', function (e) {
-                if (e.isTrusted) { el.title = ''; }
-                refreshState();
-            });
+
+    function paintMismatchBadge() {
+        var m = document.querySelectorAll('.rc-row[data-rc="mismatch"]');
+        var bad = document.getElementById('rcMismatch');
+        var good = document.getElementById('rcAllMatch');
+        if (m.length) {
+            bad.textContent = '!不一致 ' + m.length + ' / ' + ROWS.length + ' 項目';
+            bad.style.display = 'inline-flex';
+            good.style.display = 'none';
+        } else {
+            good.textContent = '全 ' + ROWS.length + ' 項目が一致';
+            good.style.display = 'inline-flex';
+            bad.style.display = 'none';
         }
-    });
-    refreshState();
+    }
+
+    // 次の不一致へ送り、行を一瞬強調する
+    var mmIdx = -1;
+    window.pNextMismatch = function () {
+        var m = document.querySelectorAll('.rc-row[data-rc="mismatch"]');
+        if (!m.length) { return; }
+        mmIdx = (mmIdx + 1) % m.length;
+        var r = m[mmIdx];
+        r.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        var keep = r.style.outline;
+        r.style.outline = '2px solid var(--a-focus-ring)';
+        r.style.outlineOffset = '-2px';
+        setTimeout(function () { r.style.outline = keep; }, 900);
+        var inp = r.querySelector('input[type="text"], input:not([type])');
+        if (inp) { inp.focus({ preventScroll: true }); }
+    };
 
     window.pMatchConfirm = function () {
         var btn = document.getElementById('btnMatchConfirm');
-        if (btn && btn.disabled) { return; }
-        if (lockExpired) {
-            setState('ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています)。', '#c23934', '700');
+        if (btn.disabled) { return; }
+        if (lock && lock.expired()) {
+            setState('ロックが解除されています。「対象を再取得」してから確定してください(修正入力は保持されています)。', 'var(--a-danger)', '700');
             stateTimer = setTimeout(refreshState, 2200);
             return;
         }
+        var s = refreshState();
+        var note = document.getElementById('blankNote');
+        note.hidden = !s.blanks;
+        if (s.blanks) { note.textContent = s.blanks + ' 項目を「' + BLANK_LABEL + '」として確定します。'; }
         window.pOpen('mConfirmMatch');
     };
 
-    // 確定後: 次の対象を取得した体で初期状態へ戻す(モックは同一サンプルを再表示)
+    // 照合対象(モック2件)。確定すると次の対象へヘッダーを切り替える(照合内容は同一サンプル)。
+    // 会社名・納期区分はアンケートに紐づくため、対象が変わればヘッダーも入れ替える
+    var reqId = new URLSearchParams(location.search).get('id');
+    if (reqId && !SURVEYS[reqId]) { window.pNotFound('アンケート', reqId, 'index.html', '照合結果一覧へ戻る'); return; }
+    if (!SURVEYS[reqId]) { reqId = 'SV-10236'; }
+    var TARGETS = [
+        { sv: reqId, title: '製造業DXセミナー2026', due: '2026/07/30 15:00', overdue: true },
+        { sv: reqId === 'SV-10238' ? 'SV-10236' : 'SV-10238', title: 'BtoB EXPO 東京 2026', due: '2026/07/31 18:00', overdue: false }
+    ];
+    var targetIdx = 0;
+    function applyTarget() {
+        var t = TARGETS[targetIdx];
+        var s = SURVEYS[t.sv] || {};
+        document.getElementById('svBadgeM').textContent = 'アンケートID ' + t.sv;
+        document.getElementById('companyM').textContent = s.company || '—';
+        document.getElementById('planM').textContent = s.plan || '—';
+        document.getElementById('titleM').textContent = t.title;
+        document.getElementById('dueM').textContent = t.due;
+        document.getElementById('overdueM').style.display = t.overdue ? '' : 'none';
+    }
+
+    // 確定後: 次の対象を取得した体で初期状態へ戻し、比較表を先頭まで巻き戻す
     window.pMatchDone = function () {
-        if (lockExpired) {
-            setState('ロックが解除されています。「対象を再取得」してから確定してください(入力内容は保持されています)。', '#c23934', '700');
+        if (lock && lock.expired()) {
+            setState('ロックが解除されています。「対象を再取得」してから確定してください(修正入力は保持されています)。', 'var(--a-danger)', '700');
             stateTimer = setTimeout(refreshState, 2200);
             return;
         }
-        FIX.forEach(function (fx) {
-            var el = document.getElementById(fx.fix);
-            if (el) { el.value = fx.initial; el.title = ''; delete el.dataset.prevUndo; }
-        });
+        render();
+        mmIdx = -1;
         targetIdx = (targetIdx + 1) % TARGETS.length;
         applyTarget();
-        resetLock();
+        if (lock) { lock.reset(); }
         refreshState();
-        setState('確定しました。次の照合対象を取得しました(モックでは照合内容は同一サンプル)。', '#237a52', '700');
+        document.getElementById('rcScroll').scrollTop = 0;
+        setState('確定しました。次の照合対象を取得しました(モックでは照合内容は同一サンプル)。', 'var(--a-ok)', '700');
         stateTimer = setTimeout(refreshState, 2200);
     };
 
     document.addEventListener('keydown', function (e) {
         if (e.isComposing || e.keyCode === 229) { return; }
         var modalOpen = document.querySelector('.proto-modal:not([hidden])');
-        var activeId = document.activeElement && document.activeElement.id;
-        var inField = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
-        var fixIds = FIX.map(function (fx) { return fx.fix; });
+        var t = e.target;
+        var inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && t.type !== 'checkbox';
+        var row = t && t.closest ? t.closest('.rc-row') : null;
+        var k = row && row.getAttribute('data-k');
 
         if (e.key === 'Enter' && e.ctrlKey) {
             e.preventDefault();
-            var confirmModal = document.getElementById('mConfirmMatch');
-            if (confirmModal && !confirmModal.hidden) {
-                window.pClose('mConfirmMatch');
-                window.pMatchDone();
-                return;
-            }
+            var cm = document.getElementById('mConfirmMatch');
+            if (cm && !cm.hidden) { window.pClose('mConfirmMatch'); window.pMatchDone(); return; }
             if (modalOpen) { return; }
             var btn = document.getElementById('btnMatchConfirm');
-            if (btn && !btn.disabled) {
+            if (!btn.disabled) {
                 window.pMatchConfirm();
             } else {
-                var stEl = document.getElementById('matchState');
-                if (stEl) {
-                    setState(stEl.textContent, '#c23934', '700');
-                    stateTimer = setTimeout(refreshState, 900);
-                }
+                var st = document.getElementById('matchState');
+                setState(st.textContent, 'var(--a-danger)', '700');
+                stateTimer = setTimeout(refreshState, 900);
             }
             return;
         }
@@ -403,102 +396,78 @@
             return;
         }
         if (modalOpen) { return; }
-        // 仮割当: Alt+1〜3でフォーカス中の修正入力へ入力1〜3を複写
-        if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0 && fixIds.indexOf(activeId) >= 0) {
+        // 次の不一致へ
+        if ((e.key === 'n' || e.key === 'N') && !inField && !e.ctrlKey && !e.metaKey && !e.altKey) {
             e.preventDefault();
-            var fx = FIX.filter(function (x) { return x.fix === activeId; })[0];
-            window.pFix(activeId, fx.cands[parseInt(e.key, 10) - 1]);
+            window.pNextMismatch();
             return;
         }
-        // Enter: 次の未確定の修正入力へ。すべて確定済みなら確定ボタンへ
-        if (e.key === 'Enter' && fixIds.indexOf(e.target && e.target.id) >= 0) {
+        // フォーカス中の行の確定チェックを切り替え
+        if (e.key === 'Enter' && e.altKey && k) {
             e.preventDefault();
-            var idx = fixIds.indexOf(e.target.id);
-            for (var k = 1; k <= fixIds.length; k++) {
-                var cand = document.getElementById(fixIds[(idx + k) % fixIds.length]);
-                if (cand && !cand.value.trim()) { cand.focus(); return; }
+            var ok = document.getElementById('ok_' + k);
+            ok.checked = !ok.checked;
+            refreshState();
+            return;
+        }
+        // Alt+1〜3で入力1〜3を修正入力へ複写
+        if (e.altKey && ['1', '2', '3'].indexOf(e.key) >= 0 && k) {
+            e.preventDefault();
+            var r = ROWS.filter(function (x) { return x.k === k; })[0];
+            var v = r['i' + e.key];
+            if (v) { window.pFixRow(k, v); }
+            return;
+        }
+        // Enter: 確定チェックが付いていない次の修正入力へ。すべて確定済みなら確定ボタンへ
+        if (e.key === 'Enter' && k && inField) {
+            e.preventDefault();
+            var keys = ROWS.map(function (x) { return x.k; });
+            var at = keys.indexOf(k);
+            for (var i = 1; i <= keys.length; i++) {
+                var nk = keys[(at + i) % keys.length];
+                if (!document.getElementById('ok_' + nk).checked) {
+                    document.getElementById('fix_' + nk).focus();
+                    return;
+                }
             }
-            var cbtn = document.getElementById('btnMatchConfirm');
-            if (cbtn) { cbtn.focus(); }
+            document.getElementById('btnMatchConfirm').focus();
             return;
         }
     });
 
-    // 照合ロック: 無操作で残秒が減り、操作すると182秒へ戻る。0で解除状態を表示し、再取得でロックし直す
-    var lockTimer = null;
-    var lockExpired = false;
-    var lockSec = 182;
-    function paintLock() {
-        var badge = document.getElementById('lockBadge');
-        var el = document.getElementById('lockSec');
-        if (!badge) { return; }
-        if (el) { el.textContent = String(lockSec); }
-        if (lockSec <= 30) {
-            badge.style.color = '#8a6414'; badge.style.background = '#fdf6ec'; badge.style.borderColor = '#e8cf9e';
-        } else {
-            badge.style.color = '#2b57b8'; badge.style.background = '#eef2fb'; badge.style.borderColor = '#b9caee';
-        }
-    }
-    function resetLock() {
-        lockExpired = false;
-        lockSec = 182;
-        var badge = document.getElementById('lockBadge');
-        if (!badge) { return; }
-        if (lockTimer) { clearInterval(lockTimer); }
-        badge.innerHTML = '照合ロック中(自動解除まで <span id="lockSec">' + lockSec + '</span>秒)';
-        paintLock();
-        lockTimer = setInterval(function () {
-            if (!document.body.contains(badge)) { clearInterval(lockTimer); return; }
-            lockSec -= 1;
-            if (lockSec > 0) {
-                paintLock();
-            } else {
-                clearInterval(lockTimer);
-                lockExpired = true;
-                badge.innerHTML = 'ロック解除済み — <span role="button" tabindex="0" onclick="pRelock()" style="font-weight:700;text-decoration:underline;cursor:pointer">対象を再取得</span>(入力内容は保持されます)';
-                badge.style.color = '#c23934';
-                badge.style.background = '#fdf6f5';
-                badge.style.borderColor = '#e3b6b3';
-            }
-        }, 1000);
-    }
-    // 操作があればロックを保持(無操作タイマー)
-    ['keydown', 'input', 'mousedown'].forEach(function (ev) {
-        document.addEventListener(ev, function () {
-            if (!lockExpired && lockTimer) { lockSec = 182; paintLock(); }
-        });
+    render();
+    paintMismatchBadge();
+    applyTarget();
+    window.pInitCardZoom();
+
+
+    document.getElementById('rcBody').addEventListener('change', function (e) {
+        if (e.target.hasAttribute('data-ok')) { refreshState(); }
     });
-    window.pRelock = function () { resetLock(); };
-    applyTarget();  // ヘッダーをTARGETS[0]で初期化(HTML側リテラルとの二重管理を避ける)
-    resetLock();
+    document.getElementById('rcBody').addEventListener('input', function (e) {
+        if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { refreshState(); }
+    });
+    document.getElementById('rcAllCheck').addEventListener('change', function () {
+        var on = this.checked;
+        ROWS.forEach(function (r) { document.getElementById('ok_' + r.k).checked = on; });
+        refreshState();
+    });
+    document.getElementById('rcMismatch').addEventListener('click', window.pNextMismatch);
+
+    refreshState();
+    lock = window.pInitWorkLock({ badgeId: 'lockBadge', seconds: 180 });
+
+    // 初期表示では最初の未確定(=不一致)の修正入力へフォーカスを置く
+    (function () {
+        for (var i = 0; i < ROWS.length; i++) {
+            if (!document.getElementById('ok_' + ROWS[i].k).checked) {
+                document.getElementById('fix_' + ROWS[i].k).focus();
+                return;
+            }
+        }
+    })();
 })();
 </script>
 
-<script>
-// ?id= で対象アンケートを切り替える(モック)。差し替えるのは識別情報のみ。
-// 状態名のような短い一般語は置換対象にしない(本文の説明文や選択肢まで巻き込むため)
-(function () {
-    var DATA = {"SV-10262": {"uid": "U-1049", "company": "グロースパートナーズ(株)", "title": "SV-10262"}, "SV-10259": {"uid": "U-1052", "company": "(株)マーケットビジョン", "title": "SV-10259"}, "SV-10257": {"uid": "U-1035", "company": "地方創生機構", "title": "SV-10257"}, "SV-10250": {"uid": "U-1050", "company": "(株)イベントプラス", "title": "SV-10250"}, "SV-10244": {"uid": "U-1052", "company": "(株)マーケットビジョン", "title": "SV-10244"}, "SV-10238": {"uid": "U-1038", "company": "(株)テックブリッジ", "title": "SV-10238"}, "SV-10236": {"uid": "U-1033", "company": "(株)サンライトプロモーション", "title": "SV-10236"}, "SV-10233": {"uid": "U-1035", "company": "地方創生機構", "title": "SV-10233"}, "SV-10229": {"uid": "U-1031", "company": "ミライ電装(株)", "title": "SV-10229"}, "SV-10227": {"uid": "U-1049", "company": "グロースパートナーズ(株)", "title": "SV-10227"}, "SV-10221": {"uid": "U-1026", "company": "(株)クレストメディカル", "title": "SV-10221"}, "SV-10218": {"uid": "U-1025", "company": "東亜精密工業(株)", "title": "SV-10218"}, "SV-10214": {"uid": "U-1022", "company": "(株)ネオフーズ", "title": "SV-10214"}, "SV-10209": {"uid": "U-1021", "company": "西日本トラベル(株)", "title": "SV-10209"}, "SV-10205": {"uid": "U-1019", "company": "(株)アークデザイン", "title": "SV-10205"}, "SV-10201": {"uid": "U-1017", "company": "セントラル機器(株)", "title": "SV-10201"}, "SV-10196": {"uid": "U-1016", "company": "(株)ハーベスト農園", "title": "SV-10196"}, "SV-10192": {"uid": "U-1014", "company": "光陽印刷(株)", "title": "SV-10192"}, "SV-10188": {"uid": "U-1012", "company": "(株)ラピスソフト", "title": "SV-10188"}, "SV-10183": {"uid": "U-1009", "company": "大和ハウジング(株)", "title": "SV-10183"}, "SV-10179": {"uid": "U-1007", "company": "(株)エコスタイル", "title": "SV-10179"}, "SV-10174": {"uid": "U-1002", "company": "(株)テクノブレイン", "title": "SV-10174"}};
-    var DEF = 'SV-10236';
-    var id = new URLSearchParams(location.search).get('id');
-    if (!DATA[id]) { id = DEF; }
-    var d = DATA[id] || DATA[DEF];
-    var base = DATA[DEF] || d;
-    if (!d || !base) { return; }
-    var swap = [[DEF, id], [base.title, d.title]];
-    (function walk(node) {
-        for (var i = 0; i < node.childNodes.length; i++) {
-            var c = node.childNodes[i];
-            if (c.nodeType === 3) {
-                var t = c.nodeValue;
-                swap.forEach(function (pair) {
-                    if (pair[0] && pair[0] !== pair[1]) { t = t.split(pair[0]).join(pair[1]); }
-                });
-                if (t !== c.nodeValue) { c.nodeValue = t; }
-            } else if (c.nodeType === 1) { walk(c); }
-        }
-    })(document.body);
-})();
-</script>
 </body>
 </html>

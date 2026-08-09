@@ -7,8 +7,13 @@
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
+    <script src="../src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+.dg-row { display:grid; grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px; align-items:center; padding:0 20px; height:54px; border-bottom:1px solid var(--a-border-soft); font-size:13px; font-variant-numeric:tabular-nums }
+.dg-row.is-stuck { background:var(--a-warn-bg) }
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -18,67 +23,73 @@
         <div id="sidebar-placeholder"></div>
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1">
         <div style="padding:18px 24px 40px">
-          <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">データ入力対象一覧</span></div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+          <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">データ入力対象一覧</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
             <h1 style="margin:0;font-size:20px;font-weight:700">データ入力対象一覧</h1>
             <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:12px;color:#6b7484">集計最終更新 2026/07/31 09:45</span>
+              <span style="font-size:12px;color:var(--a-fg-muted2)">集計最終更新 2026/07/31 09:45</span>
             </div>
           </div>
-          <div style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:18px 22px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+          <div style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:18px 22px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
             <div style="flex:none">
-              <div style="font-size:12px;color:#5b6577;font-weight:500">あなたの作業可能件数</div>
-              <div style="font-size:36px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums">1,284<span style="font-size:14px;font-weight:500;color:#5b6577;margin-left:4px">件</span></div>
+              <div style="font-size:12px;color:var(--a-fg-muted);font-weight:500">あなたの作業可能件数</div>
+              <div style="font-size:36px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums">1,284<span style="font-size:14px;font-weight:500;color:var(--a-fg-muted);margin-left:4px">件</span></div>
             </div>
-            <div style="width:1px;align-self:stretch;background:#e2e6ed"></div>
-            <div style="flex:1;min-width:280px;font-size:12px;color:#6b7484;line-height:1.9">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。スキップした名刺は全体キューへ戻ります。<br>入力する作業グループは下の一覧から選びます。</div>
+            <div style="width:1px;align-self:stretch;background:var(--a-border)"></div>
+            <div style="flex:1;min-width:280px;font-size:12px;color:var(--a-fg-muted2);line-height:1.9">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。スキップした名刺は全体キューへ戻ります。<br>入力する作業グループは下の一覧から選びます。</div>
+            <div data-min-lv="4" data-lv-display="flex" style="align-self:stretch;width:1px;background:var(--a-border)"></div>
+            <div data-min-lv="4" data-lv-display="flex" style="flex:none;max-width:280px;display:flex;flex-direction:column;align-items:flex-start;gap:8px">
+              <div style="font-size:12px;color:var(--a-fg-muted);font-weight:700">全グループ入力</div>
+              <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.8">1枚の名刺の①〜⑧をまとめて入力します。</div>
+              <button onclick="location.href='form.html?g=all'" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">全グループ入力画面へ</button>
+            </div>
           </div>
-          <div style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
+          <div id="groupList" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
+            <div class="dg-row" style="height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
               <span>作業グループ</span><span style="text-align:right">総件数</span><span style="text-align:right">入力済み</span><span style="text-align:right">未入力</span><span style="text-align:right;padding-right:36px">進捗</span><span></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ①<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">メールアドレス</span></span><span style="text-align:right">2,480</span><span style="text-align:right">1,933</span><span style="text-align:right">547</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">78%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">1,933 / 2,480</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=1'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="78">
+              <span style="font-weight:700">グループ①<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">メールアドレス</span></span><span style="text-align:right">2,480</span><span style="text-align:right">1,933</span><span style="text-align:right">547</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">78%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,933 / 2,480</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=1'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ②<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">姓・名</span></span><span style="text-align:right">1,860</span><span style="text-align:right">1,562</span><span style="text-align:right">298</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">84%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">1,562 / 1,860</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=2'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="84">
+              <span style="font-weight:700">グループ②<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">姓・名</span></span><span style="text-align:right">1,860</span><span style="text-align:right">1,562</span><span style="text-align:right">298</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">84%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,562 / 1,860</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=2'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ③<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">会社・部署・役職</span></span><span style="text-align:right">3,120</span><span style="text-align:right">1,206</span><span style="text-align:right">1,914</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">39%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">1,206 / 3,120</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=3'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="39">
+              <span style="font-weight:700">グループ③<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">会社・部署・役職</span></span><span style="text-align:right">3,120</span><span style="text-align:right">1,206</span><span style="text-align:right">1,914</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">39%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,206 / 3,120</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=3'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ④<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">郵便番号・住所</span></span><span style="text-align:right">926</span><span style="text-align:right">812</span><span style="text-align:right">114</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">88%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">812 / 926</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=4'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="88">
+              <span style="font-weight:700">グループ④<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">郵便番号・住所</span></span><span style="text-align:right">926</span><span style="text-align:right">812</span><span style="text-align:right">114</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">88%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">812 / 926</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=4'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ⑤<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">電話番号・FAX</span></span><span style="text-align:right">1,540</span><span style="text-align:right">462</span><span style="text-align:right">1,078</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">30%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">462 / 1,540</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=5'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="30">
+              <span style="font-weight:700">グループ⑤<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">電話番号・FAX</span></span><span style="text-align:right">1,540</span><span style="text-align:right">462</span><span style="text-align:right">1,078</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">30%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">462 / 1,540</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=5'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ⑥<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">URL</span></span><span style="text-align:right">2,072</span><span style="text-align:right">1,890</span><span style="text-align:right">182</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">91%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">1,890 / 2,072</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=6'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="91">
+              <span style="font-weight:700">グループ⑥<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">URL</span></span><span style="text-align:right">2,072</span><span style="text-align:right">1,890</span><span style="text-align:right">182</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">91%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,890 / 2,072</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=6'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;border-bottom:1px solid #eef0f5;font-size:13px;font-variant-numeric:tabular-nums;color:#8a93a5">
-              <span style="font-weight:700;color:#5b6577">グループ⑦<br><span style="font-weight:400;font-size:11.5px;color:#8a93a5">その他メモ</span></span><span style="text-align:right">0</span><span style="text-align:right">—</span><span style="text-align:right">—</span>
+            <div class="dg-row" style="color:var(--a-fg-faint)">
+              <span style="font-weight:700;color:var(--a-fg-muted)">グループ⑦<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-faint)">その他メモ</span></span><span style="text-align:right">0</span><span style="text-align:right">—</span><span style="text-align:right">—</span>
               <span style="text-align:right;padding-right:36px;font-size:12px">対象なし</span>
-              <span style="text-align:right"><button disabled style="background:#eceef3;color:#8a93a5;border:none;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:default;font-family:inherit">入力画面へ</button></span>
+              <span style="text-align:right"><button disabled title="このグループに出題できる名刺がありません" style="background:var(--a-disabled-bg);color:var(--a-fg-faint);border:none;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:default;font-family:inherit">入力画面へ</button></span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px;align-items:center;padding:0 20px;height:54px;font-size:13px;font-variant-numeric:tabular-nums">
-              <span style="font-weight:700">グループ⑧<br><span style="font-weight:400;font-size:11.5px;color:#6b7484">フリー入力</span></span><span style="text-align:right">684</span><span style="text-align:right">598</span><span style="text-align:right">86</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">87%</strong><span style="font-size:12px;color:#6b7484;margin-left:8px">598 / 684</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=8'" style="background:#fff;color:#3467d6;border:1px solid #3467d6;border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row" data-progress="87" style="border-bottom:none">
+              <span style="font-weight:700">グループ⑧<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">フリー入力</span></span><span style="text-align:right">684</span><span style="text-align:right">598</span><span style="text-align:right">86</span>
+              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">87%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">598 / 684</span></span>
+              <span style="text-align:right"><button onclick="location.href='form.html?g=8'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
             </div>
           </div>
-          <div style="margin-top:12px;font-size:12px;color:#6b7484">作業グループ①〜⑧は名刺入力の作業分割単位です(会社・法人単位のグループとは別の概念)。</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--a-fg-muted2)">作業グループ①〜⑧は名刺データ化の作業分割単位です(会社・法人単位のグループとは別の概念)。進捗が最も低い2グループを<span style="background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:3px;padding:0 6px;margin:0 2px">滞留</span>として色付けします。</div>
         </div>
         </main>
     </div>
@@ -86,6 +97,23 @@
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
-
+<script>
+// 進捗が低い順に2グループを「滞留」として色付けする。出題対象が無いグループは対象外
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#groupList .dg-row[data-progress]'));
+    rows.sort(function (a, b) {
+        return parseInt(a.getAttribute('data-progress'), 10) - parseInt(b.getAttribute('data-progress'), 10);
+    });
+    rows.slice(0, 2).forEach(function (r) {
+        r.classList.add('is-stuck');
+        var label = r.firstElementChild;
+        var badge = document.createElement('span');
+        badge.textContent = '滞留';
+        badge.style.cssText = 'margin-left:8px;font-size:11px;font-weight:700;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:4px;padding:1px 7px;vertical-align:middle';
+        badge.title = '進捗が低く作業が溜まっているグループです';
+        label.insertBefore(badge, label.firstElementChild);
+    });
+}());
+</script>
 </body>
 </html>

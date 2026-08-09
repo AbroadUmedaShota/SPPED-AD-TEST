@@ -49,24 +49,52 @@
         if (conf.n < pageMin) {
             main.innerHTML =
                 '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
-                '<div style="background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:40px 32px;text-align:center">' +
-                '<div style="font-size:16px;font-weight:700;color:#1f2733">この画面は ' + conf.label + ' シナリオでは表示されません</div>' +
-                '<div style="margin-top:10px;font-size:12.5px;color:#5b6577">閲覧可能: Lv' + pageMin + '以上(スプシ「管理画面_たたき台」G列)。ヘッダー右上の表示シナリオで切り替えられます。</div>' +
+                '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
+                '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">この画面は ' + conf.label + ' シナリオでは表示されません</div>' +
+                '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">閲覧可能: Lv' + pageMin + '以上(スプシ「管理画面_たたき台」G列)。ヘッダー右上の表示シナリオで切り替えられます。</div>' +
                 '</div></div>';
             return;
         }
 
-        // Lv1〜2は自グループ範囲であることを帯で明示(モックのためデータの絞り込みはしない)
-        if (conf.n <= 2 && !document.getElementById('proto-range-note')) {
+        // Lv1〜2は自グループ範囲であることを帯で明示(モックのためデータの絞り込みはしない)。
+        // 作業画面(名刺入力・名刺情報照合)は縦スクロールなしで1画面に収める規約のため、
+        // 本文へ帯を挟むとそのぶん名刺画像の表示領域が削られる。作業画面ではヘッダーへ逃がす
+        if (conf.n <= 2 && !document.getElementById('proto-range-note')
+            && !document.querySelector('.admin-workscreen')) {
             var band = document.createElement('div');
             band.id = 'proto-range-note';
             band.innerHTML =
                 '<div style="max-width:72rem;margin:0 auto;padding:16px 24px 0">' +
-                '<div style="font-size:11.5px;color:#8a6414;background:#fdf6ec;border:1px solid #e8cf9e;border-radius:6px;padding:6px 12px;display:inline-block">' +
-                '表示シナリオ ' + conf.label + ': 表示範囲は自グループ(' + conf.group + ')のみ(スプシG列)。モックの見せ分けのため一覧データは絞り込んでいません。' +
+                '<div style="font-size:11.5px;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:6px 12px;display:inline-block">' +
+                rangeText(conf) +
                 '</div></div>';
             main.insertBefore(band, main.firstChild);
         }
+    }
+
+    function rangeText(conf) {
+        return '表示シナリオ ' + conf.label + ': 表示範囲は自グループ(' + conf.group
+            + ')のみ(スプシG列)。モックの見せ分けのため一覧データは絞り込んでいません。';
+    }
+
+    // 作業画面用。ヘッダーの右側へ短い注記として置き、作業領域を削らない
+    function paintHeaderRange(conf) {
+        var head = document.querySelector('#header-placeholder header');
+        if (!head || !document.querySelector('.admin-workscreen')) { return; }
+        var note = document.getElementById('proto-range-note');
+        if (conf.n > 2) {
+            if (note) { note.remove(); }
+            return;
+        }
+        if (note) { return; }
+        note = document.createElement('span');
+        note.id = 'proto-range-note';
+        note.title = rangeText(conf);
+        note.textContent = '自グループのみ(' + conf.group + ')';
+        note.style.cssText = 'font-size:11px;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);'
+            + 'border-radius:4px;padding:2px 8px;white-space:nowrap';
+        var clock = head.querySelector('.admin-clock');
+        head.lastElementChild.insertBefore(note, clock || null);
     }
 
     // ヘッダー・サイドバーは admin.js が非同期注入するため、現れたタイミングで配線する
@@ -84,6 +112,7 @@
         var badge = document.getElementById('profileLevel');
         if (mail) { mail.textContent = LEVELS[key].mail; }
         if (badge) { badge.textContent = LEVELS[key].label; }
+        paintHeaderRange(LEVELS[key]);  // 作業画面の範囲注記はヘッダー側に置く
         applyVisibility(LEVELS[key].n); // サイドバーnavの data-min-lv を再適用
     }
 
