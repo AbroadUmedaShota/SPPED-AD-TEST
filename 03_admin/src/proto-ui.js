@@ -68,10 +68,9 @@
         lastFocused = null;
     }
 
-    // 値の設定(1段Undo付き)。複写・チップ由来の変更は Ctrl+Z で直前の値に戻せる
+    // 値の設定。複写・チップ由来の変更もブラウザ標準の取り消しに委ねる
     window.pApplyValue = function (el, value) {
         if (!el) { return; }
-        el.dataset.prevUndo = el.value;
         el.value = value;
         el.dispatchEvent(new Event('input', { bubbles: true }));
     };
@@ -84,26 +83,6 @@
         el.focus();
         if (el.setSelectionRange) { el.setSelectionRange(0, el.value.length); }
     };
-
-    // 手入力が入ったら複写Undoは破棄し、ブラウザ標準のUndoへ返す
-    document.addEventListener('input', function (e) {
-        var el = e.target;
-        if (e.isTrusted && el && el.dataset && el.dataset.prevUndo !== undefined) {
-            delete el.dataset.prevUndo;
-        }
-    });
-
-    // Ctrl+Z: 複写・チップ由来の変更を直前の値と入れ替える(もう一度でやり直し)
-    document.addEventListener('keydown', function (e) {
-        if (!(e.ctrlKey && !e.shiftKey && (e.key === 'z' || e.key === 'Z'))) { return; }
-        var el = e.target;
-        if (!el || el.dataset === undefined || el.dataset.prevUndo === undefined) { return; }
-        e.preventDefault();
-        var cur = el.value;
-        el.value = el.dataset.prevUndo;
-        el.dataset.prevUndo = cur;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-    });
 
     // tabindex付きのクリック要素(一覧行・カード・候補・チップ・×ボタン)を Enter / Space でも発火させる。
     // 一覧行は div のため既定のキーボード操作を持たない
@@ -125,7 +104,6 @@
     window.pAppend = function (inputId, value) {
         var el = document.getElementById(inputId);
         if (!el) { return; }
-        el.dataset.prevUndo = el.value;
         var st = el.selectionStart;
         var en = el.selectionEnd;
         if (typeof st === 'number') {
@@ -157,9 +135,9 @@
         pager.setAttribute('data-current', String(n));
         pager.querySelectorAll('button[data-page]').forEach(function (b) {
             var on = (b.getAttribute('data-page') === String(n));
-            b.style.background = on ? '#3467d6' : '#fff';
-            b.style.color = on ? '#fff' : '#374151';
-            b.style.border = '1px solid ' + (on ? '#3467d6' : '#c8cdd8');
+            b.style.background = on ? 'var(--a-accent-bg)' : 'var(--a-surface)';
+            b.style.color = on ? 'var(--a-on-accent)' : 'var(--a-fg)';
+            b.style.border = '1px solid ' + (on ? 'var(--a-accent)' : 'var(--a-border-strong)');
             b.style.fontWeight = on ? '700' : '400';
         });
         var act = pager.querySelector('button[data-page="' + n + '"]');
@@ -169,15 +147,15 @@
         var nums = Array.prototype.map.call(pager.querySelectorAll('button[data-page]'), function (b) { return parseInt(b.getAttribute('data-page'), 10); });
         var steppers = Array.prototype.filter.call(pager.querySelectorAll('button'), function (b) { return !b.hasAttribute('data-page'); });
         if (steppers.length === 2 && nums.length) {
-            steppers[0].style.color = (n <= Math.min.apply(null, nums)) ? '#c3c9d4' : '#374151';
-            steppers[1].style.color = (n >= Math.max.apply(null, nums)) ? '#c3c9d4' : '#374151';
+            steppers[0].style.color = (n <= Math.min.apply(null, nums)) ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
+            steppers[1].style.color = (n >= Math.max.apply(null, nums)) ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
         }
     };
 
     // 一覧の並び替え(モック): 容器に data-sortable を付けると見出しの各セルが押せるようになる。
     // 値は行の同じ位置のセルのテキストから取り、数値・件数(1,234)・日付は数として比較する。
     // 並び替えたあとはページを振り直す(pPageSize が data-pg を付け直す)
-    var SORT_ARROW = 'margin-left:4px;font-size:10px;color:#3467d6';
+    var SORT_ARROW = 'margin-left:4px;font-size:10px;color:var(--a-accent)';
 
     function sortRows(list) {
         // 見出しを除いた子のうち、ページングを持つならその行、無ければ子をそのまま扱う
@@ -346,8 +324,8 @@
             chip = document.createElement('div');
             chip.id = listId + '-chip';
             chip.setAttribute('style', 'margin-top:12px;display:flex;align-items:center;gap:10px;'
-                + 'background:#eef2fb;border:1px solid #b9caee;border-radius:6px;padding:7px 12px;'
-                + 'font-size:12.5px;color:#1f3d80');
+                + 'background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:6px;padding:7px 12px;'
+                + 'font-size:12.5px;color:var(--a-info-fg)');
             list.parentNode.insertBefore(chip, list);
         }
         if (!keys.length) { chip.style.display = 'none'; return; }
@@ -360,7 +338,7 @@
         span.textContent = '絞り込み中: ' + text;
         var btn = document.createElement('button');
         btn.textContent = '解除';
-        btn.setAttribute('style', 'background:#fff;color:#3467d6;border:1px solid #b9caee;border-radius:5px;'
+        btn.setAttribute('style', 'background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-info-border);border-radius:5px;'
             + 'padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit');
         btn.onclick = function () { window.pClearSearch(listId); };
         chip.appendChild(span);
@@ -525,7 +503,7 @@
                     apply(img, false);
                 } else {
                     img.dataset.pinned = '1';
-                    img.style.outline = '2px solid #3467d6';
+                    img.style.outline = '2px solid var(--a-accent)';
                     img.style.cursor = 'zoom-out';
                     apply(img, true);
                 }
@@ -546,6 +524,97 @@
     };
 
 
+    // 作業画面ロック: 名刺入力画面・名刺情報照合の共用。
+    // 無操作が続くと既定3分で解除し、名刺画像を伏せる(他者へ出題し直される状態を画面でも示す)。
+    // 入力内容は保持したままで、「対象を再取得」でロックし直す。
+    // 戻り値の expired() を確定処理の前段で見て、解除中の確定を止める。
+    window.pInitWorkLock = function (opts) {
+        var o = opts || {};
+        var seconds = o.seconds || 180;
+        var badge = document.getElementById(o.badgeId || 'lockBadge');
+        var timer = null;
+        var left = seconds;
+        var expired = false;
+
+        function mask(on) {
+            document.querySelectorAll('.card-zoom').forEach(function (box) {
+                var m = box.querySelector('.card-lock-mask');
+                if (on) {
+                    box.querySelectorAll('img').forEach(function (img) { img.style.visibility = 'hidden'; });
+                    if (!m) {
+                        m = document.createElement('div');
+                        m.className = 'card-lock-mask';
+                        m.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--a-work-bg-inner);color:var(--a-fg-faint);font-size:12px;line-height:1.8;text-align:center;padding:12px';
+                        m.innerHTML = '<span style="font-size:20px">🔒</span>ロックが解除されたため名刺画像を伏せています<br>「対象を再取得」で再表示します';
+                        if (getComputedStyle(box).position === 'static') { box.style.position = 'relative'; }
+                        box.appendChild(m);
+                    }
+                } else {
+                    box.querySelectorAll('img').forEach(function (img) { img.style.visibility = ''; });
+                    if (m) { m.remove(); }
+                }
+            });
+        }
+
+        function paint() {
+            if (!badge) { return; }
+            var sec = badge.querySelector('[data-lock-sec]');
+            if (sec) { sec.textContent = String(left); }
+            if (left <= 30) {
+                badge.style.color = 'var(--a-warn)'; badge.style.background = 'var(--a-warn-bg)'; badge.style.borderColor = 'var(--a-warn-border)';
+            } else {
+                badge.style.color = 'var(--a-accent-deep)'; badge.style.background = 'var(--a-info-bg)'; badge.style.borderColor = 'var(--a-info-border)';
+            }
+        }
+
+        function expire() {
+            if (expired) { return; }
+            if (timer) { clearInterval(timer); timer = null; }
+            expired = true;
+            mask(true);
+            if (badge) {
+                badge.innerHTML = 'ロック解除済み — <span role="button" tabindex="0" data-lock-relock style="font-weight:700;text-decoration:underline;cursor:pointer">対象を再取得</span>(入力内容は保持されます)';
+                badge.style.color = 'var(--a-danger)';
+                badge.style.background = 'var(--a-danger-bg)';
+                badge.style.borderColor = 'var(--a-danger-border)';
+            }
+            if (o.onExpire) { o.onExpire(); }
+        }
+
+        function reset() {
+            expired = false;
+            left = seconds;
+            mask(false);
+            if (timer) { clearInterval(timer); }
+            if (!badge) { return; }
+            badge.innerHTML = '作業ロック中(自動解除まで <span data-lock-sec>' + left + '</span>秒)';
+            paint();
+            timer = setInterval(function () {
+                if (!document.body.contains(badge)) { clearInterval(timer); return; }
+                left -= 1;
+                if (left > 0) { paint(); return; }
+                expire();
+            }, 1000);
+        }
+
+        ['keydown', 'input', 'mousedown'].forEach(function (ev) {
+            document.addEventListener(ev, function () {
+                if (!expired && timer) { left = seconds; paint(); }
+            });
+        });
+        if (badge) {
+            badge.addEventListener('click', function (e) {
+                if (e.target.hasAttribute && e.target.hasAttribute('data-lock-relock')) { reset(); }
+            });
+        }
+        reset();
+        // 解除後の挙動は 3 分待たないと再現できないため、確認用に即時解除の口を残す
+        var api = { expired: function () { return expired; }, reset: reset, expireNow: expire };
+        window.pWorkLock = api;
+        return api;
+    };
+
+
     // 操作の結果を短く知らせる。実データを持たないモックでも、押した操作が通ったことを示す
     window.pToast = function (msg, kind) {
         var box = document.getElementById('p-toast');
@@ -560,8 +629,8 @@
             document.body.appendChild(box);
         }
         var t = document.createElement('div');
-        t.style.cssText = 'background:' + (kind === 'error' ? '#c23934' : '#1f2733')
-            + ';color:#fff;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;'
+        t.style.cssText = 'background:' + (kind === 'error' ? 'var(--a-danger-bg-solid)' : 'var(--a-work-bg)')
+            + ';color:var(--a-on-accent);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;'
             + 'box-shadow:0 8px 24px rgba(12,18,30,.28);opacity:0;transition:opacity .12s';
         t.textContent = msg;
         box.appendChild(t);
@@ -620,11 +689,30 @@
     // 回答データDLモーダル(#mDl)の選択で実際にファイルを保存する。
     // 名刺画像は実ファイルを作れないため受付のみ知らせる。
     // アンケート管理・アンケート詳細・照合結果一覧の共用
+    // ダウンロードのモーダルを、押した行の対象で開く。
+    // 対象を渡さないと、モーダル内の文言もファイル名も既定の1件に固定されてしまう
+    window.pDlOpen = function (sid, title) {
+        var slot = document.querySelector('#mDl [data-slot="dlSid"]');
+        if (slot) { slot.textContent = sid + (title ? ' ' + title : ''); }
+        window.pOpen('mDl');
+    };
+
     window.pDlPick = function (kind) {
         var sid = (document.querySelector('#mDl [data-slot="dlSid"]') || {}).textContent
             || (document.getElementById('mDl').innerText.match(/SV-\d+/) || ['export'])[0];
         if (kind === 'zip') {
             window.pToast(sid + ' の名刺画像(ZIP)の取得を受け付けました');
+            window.pClose('mDl');
+            return;
+        }
+        // 回答データは名刺のデータ化結果ではなく、アンケートの設問回答そのもの
+        if (kind === 'answer') {
+            var ahead = ['回答ID', '受信日時', '回答言語', '設問1', '設問2', '設問3', '名刺画像の有無'];
+            var arows = [ahead];
+            for (var j = 1; j <= 8; j++) {
+                arows.push(['#' + (8800 + j), '—', '—', '—', '—', '—', '—']);
+            }
+            window.pCsv(sid + '_answers.csv', arows);
             window.pClose('mDl');
             return;
         }

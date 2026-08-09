@@ -241,7 +241,7 @@
           "invoice-management.html: 11〜16行目を data-pg=\"2\" にし、ページャへ2ページ目を追加。件数表示の初期値も 1〜10 に揃えた",
           "performance-management.html: 重複していた「集計最終更新」を1つにし、残した側へ margin-right:auto を付けてCSV出力ボタンを右端へ戻した",
           "user-detail.html: inviteAt() を追加し、招待の日時を登録日時の前日として出す。メール送達状況と操作ログの両方が同じ値を使う",
-          "BY-221_照合画面/BY-223/dummy_card_front.png・dummy_card_back.png: 架空の名刺（アブロード株式会社 山田 太郎）へ差し替え。既存の assets/meishi_sample2.png と同じ作りで、reconciliation/detail.html の照合表が期待する値（会社名・役職・住所・FAX・URL）と一致させた",
+          "assets/dummy_card_front.png・dummy_card_back.png: 架空の名刺（アブロード株式会社 山田 太郎）へ差し替え。既存の assets/meishi_sample2.png と同じ作りで、reconciliation/detail.html の照合表が期待する値（会社名・役職・住所・FAX・URL）と一致させた",
           "survey-detail.html と 13/14 の要件書: 「例外対応」を「要注意操作」へ改めた（計41箇所）"
         ],
         "verification": [
@@ -563,7 +563,7 @@
         "一覧CSV: pListCsv（表示中の行と一覧ヘッダーから列を組む。末尾が「操作」列なら出力しない）",
         "回答データDL: pDlPick（全件CSV／確定分CSV／名刺画像ZIPの受付。#mDl から対象IDを引く）",
         "名刺画像: pInitCardZoom / pZoomDelta / pRotate / pResetCardZoom",
-        "入力補助: pApplyValue / pSet / pAppend と1段Undo（Ctrl+Z）",
+        "入力補助: pApplyValue / pSet / pAppend、作業ロック pInitWorkLock",
         "一覧行の書き換え・取得: pRowSet / pRow",
         "tabindex 付きクリック要素の Enter/Space 発火（div行のキーボード操作）",
         "一覧の列の並び替え(見出し押下で昇順・降順を切り替え、ページを振り直す)"
@@ -629,7 +629,7 @@
         "body[data-level]",
         "要素の style.display",
         "#main-content の innerHTML（ガード時）",
-        "#proto-range-note 帯",
+        "#proto-range-note（一覧画面は本文の帯、作業画面はヘッダーの注記）",
         "window.pLevel()（数値 1〜4）"
       ],
       "dependencies": [
@@ -1310,7 +1310,7 @@
       ],
       "evidence": "03_admin/data-entry/form.html:135-467",
       "specDoc": "docs/リライト版仕様書/admin/20_admin_data_input_form.md",
-      "dataSource": "inline JS リテラル GROUP_DEFS / CARDS（画像は BY-221_照合画面/BY-223/ と assets/ を参照）"
+      "dataSource": "inline JS リテラル GROUP_DEFS / CARDS（画像は assets/ を参照）"
     },
     {
       "id": "scr-reconciliation-index",
@@ -1364,7 +1364,7 @@
       "responsibilities": [
         "不一致件数の集計と『次の不一致へ』送り（pNextMismatch / N キー）",
         "修正入力の監視と完成内容セル・行色・確定ボタンの連動（refreshState）",
-        "候補値の複写（クリック / Alt+1〜3）とハイライト・Ctrl+Z 復帰",
+        "候補値の複写（クリック / Alt+1〜3）とハイライト、確定チェックによる編集ロック",
         "照合ロックのカウントダウン（182秒・無操作で減算、操作で復帰）と解除後の再取得（pRelock）",
         "確定（Ctrl+Enter → 確認モーダル → 次対象へ）",
         "?id= による対象アンケートの識別情報差し替え",
@@ -3262,7 +3262,7 @@
           "order": 5,
           "node": "scr-data-entry-form",
           "edge": null,
-          "action": "入力補助: OCR候補クリック or F2 で複写、チップは同じ括りの語を排他置換（pChipEx）、〓は読み取れない文字位置へ挿入。複写由来の変更は Ctrl+Z で1段戻せる",
+          "action": "入力補助: OCR候補クリック or F2 で複写、チップは同じ括りの語を排他置換（pChipEx）、〓は読み取れない文字位置へ挿入、郵便番号から住所1の候補を提示",
           "evidence": "03_admin/data-entry/form.html:143-173, 444-450 / proto-ui.js:50-84"
         },
         {
@@ -3327,7 +3327,7 @@
           "order": 4,
           "node": "scr-reconciliation-detail",
           "edge": null,
-          "action": "候補の複写（クリック or Alt+1〜3）。既入力を上書きした場合は黄色ハイライトし、元の値を title に残す（Ctrl+Zでも戻せる）",
+          "action": "候補の複写（クリック or Alt+1〜3）。確定チェックが付いた行は先にチェックを外し、既入力を上書きした場合は黄色ハイライトする",
           "evidence": "03_admin/reconciliation/detail.html:281-293, 408-412"
         },
         {

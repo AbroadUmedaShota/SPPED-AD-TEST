@@ -7,6 +7,7 @@
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
+    <script src="src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -26,56 +27,55 @@
         <div id="sidebar-placeholder"></div>
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
           <div style="padding:18px 24px 40px">
-            <div style="font-size:12px;color:#6b7484">ホーム › <span style="color:#1f2733">オペレーター管理</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid #e2e6ed">
+            <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">オペレーター管理</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700">オペレーター管理</h1>
               <div style="display:flex;gap:10px">
-                <button data-min-lv="3" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mOpGroup')">グループ作成</button>
-                <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mInviteOp')">＋ 新規招待</button>
+                <button data-min-lv="3" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mOpGroup')">グループ作成</button>
+                <button style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mInviteOp')">＋ 新規招待</button>
               </div>
             </div>
-            <div data-filter-for="operatorsList" style="margin-top:18px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <input aria-label="氏名・メールアドレス・オペレーターID" data-f-key="any" placeholder="氏名・メールアドレス・オペレーターID(部分一致)" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 12px;font-size:13px;width:340px;font-family:inherit">
-              <select data-group-select aria-label="所属グループ" data-f-key="group" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
-              <select aria-label="権限" data-f-key="lv" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">権限: すべて</option><option>Lv1</option><option>Lv2</option><option>Lv3</option><option>Lv4</option></select>
-              <select aria-label="ステータス" data-f-key="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">ステータス: すべて</option><option>有効</option><option>無効</option><option>招待中</option></select>
-              <select aria-label="言語" data-f-key="lang" style="border:1px solid #c8cdd8;border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option value="">言語: すべて</option><option>日本語</option><option>英語</option><option>中国語簡体字</option><option>中国語繁体字</option><option>韓国語</option></select>
-              <button onclick="pSearch('operatorsList')" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
-              <button onclick="pClearSearch('operatorsList')" style="background:none;border:none;font-size:12.5px;color:#5b6577;cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
+            <div data-filter-for="operatorsList" style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <input aria-label="氏名・メールアドレス・オペレーターID" data-f-key="any" placeholder="氏名・メールアドレス・オペレーターID(部分一致)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 12px;font-size:13px;width:340px;font-family:inherit">
+              <select data-group-select aria-label="所属グループ" data-f-key="group" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
+              <select aria-label="権限" data-f-key="lv" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="">権限: すべて</option><option>Lv1</option><option>Lv2</option><option>Lv3</option><option>Lv4</option></select>
+              <select aria-label="ステータス" data-f-key="status" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="">ステータス: すべて</option><option>有効</option><option>無効</option><option>招待中</option></select>
+              <select aria-label="言語" data-f-key="lang" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="">言語: すべて</option><option>日本語</option><option>英語</option><option>中国語簡体字</option><option>中国語繁体字</option><option>韓国語</option></select>
+              <button onclick="pSearch('operatorsList')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
+              <button onclick="pClearSearch('operatorsList')" style="background:none;border:none;font-size:12.5px;color:var(--a-fg-muted);cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
             </div>
-            <div id="operatorsList" data-sortable data-filter-keys="any,group,lv,status,lang" style="margin-top:16px;background:#fff;border:1px solid #e2e6ed;border-radius:8px;overflow-x:auto">
-              <div style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:44px;background:#f7f8fb;border-bottom:1px solid #e2e6ed;font-size:12px;font-weight:700;color:#5b6577">
-                <span title="既定の並び順" style="color:#5b6577">ID ▲</span><span>氏名</span><span>メールアドレス</span><span>所属グループ</span><span>権限</span><span>対応可能言語</span><span>ステータス</span><span class="c-opt">作成日時</span><span class="c-opt">最終ログイン</span>
+            <div id="operatorsList" data-sortable data-filter-keys="any,group,lv,status,lang" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
+              <div style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
+                <span title="既定の並び順" style="color:var(--a-fg-muted)">ID ▲</span><span>氏名</span><span>メールアドレス</span><span>所属グループ</span><span>権限</span><span>対応可能言語</span><span>ステータス</span><span class="c-opt">作成日時</span><span class="c-opt">最終ログイン</span>
               </div>
-              <div tabindex="0" role="button" data-f-any="OP-0012 佐藤 由紀 y.sato@abroad-o.com" data-pg="1" data-f-oid="OP-0012" data-f-name="佐藤 由紀" data-f-mail="y.sato@abroad-o.com" data-f-group="アブロード本体" data-f-lv="Lv3" data-f-lang="日本語・英語" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0012')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0012</span><span>佐藤 由紀</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">y.sato@abroad-o.com</span><span>アブロード本体</span><span><span style="font-size:11px;font-weight:700;color:#3467d6;border:1px solid #b9caee;border-radius:4px;padding:1px 6px">Lv3</span></span><span style="font-size:12px;color:#5b6577">日本語・英語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/03/14</span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/31 09:12</span>
+              <div tabindex="0" role="button" data-f-any="OP-0012 佐藤 由紀 y.sato@abroad-o.com" data-pg="1" data-f-oid="OP-0012" data-f-name="佐藤 由紀" data-f-mail="y.sato@abroad-o.com" data-f-group="アブロード本体" data-f-lv="Lv3" data-f-lang="日本語・英語" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0012')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0012</span><span>佐藤 由紀</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">y.sato@abroad-o.com</span><span>アブロード本体</span><span><span style="font-size:11px;font-weight:700;color:var(--a-accent);border:1px solid var(--a-info-border);border-radius:4px;padding:1px 6px">Lv3</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語・英語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/03/14</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/07/31 09:12</span>
               </div>
-              <div tabindex="0" role="button" data-f-any="OP-0034 田中 大輔 d.tanaka@officeworks.co.jp" data-pg="1" data-f-oid="OP-0034" data-f-name="田中 大輔" data-f-mail="d.tanaka@officeworks.co.jp" data-f-group="オフィスワークス株式会社" data-f-lv="Lv2" data-f-lang="日本語" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0034')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0034</span><span>田中 大輔</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">d.tanaka@officeworks.co.jp</span><span>オフィスワークス株式会社</span><span><span style="font-size:11px;font-weight:700;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:1px 6px">Lv2</span></span><span style="font-size:12px;color:#5b6577">日本語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/04/02</span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/30 18:45</span>
+              <div tabindex="0" role="button" data-f-any="OP-0034 田中 大輔 d.tanaka@officeworks.co.jp" data-pg="1" data-f-oid="OP-0034" data-f-name="田中 大輔" data-f-mail="d.tanaka@officeworks.co.jp" data-f-group="オフィスワークス株式会社" data-f-lv="Lv2" data-f-lang="日本語" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0034')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0034</span><span>田中 大輔</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">d.tanaka@officeworks.co.jp</span><span>オフィスワークス株式会社</span><span><span style="font-size:11px;font-weight:700;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:1px 6px">Lv2</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/04/02</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/07/30 18:45</span>
               </div>
-              <div tabindex="0" role="button" data-f-any="OP-0058 王 麗華 l.wang@officeworks.co.jp" data-pg="1" data-f-oid="OP-0058" data-f-name="王 麗華" data-f-mail="l.wang@officeworks.co.jp" data-f-group="オフィスワークス株式会社" data-f-lv="Lv1" data-f-lang="日本語・中国語簡/繁" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0058')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0058</span><span>王 麗華</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">l.wang@officeworks.co.jp</span><span>オフィスワークス株式会社</span><span><span style="font-size:11px;font-weight:700;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:#5b6577">日本語・中国語簡/繁</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/04/21</span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/31 08:58</span>
+              <div tabindex="0" role="button" data-f-any="OP-0058 王 麗華 l.wang@officeworks.co.jp" data-pg="1" data-f-oid="OP-0058" data-f-name="王 麗華" data-f-mail="l.wang@officeworks.co.jp" data-f-group="オフィスワークス株式会社" data-f-lv="Lv1" data-f-lang="日本語・中国語簡/繁" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0058')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0058</span><span>王 麗華</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">l.wang@officeworks.co.jp</span><span>オフィスワークス株式会社</span><span><span style="font-size:11px;font-weight:700;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語・中国語簡/繁</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/04/21</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/07/31 08:58</span>
               </div>
-              <div tabindex="0" role="button" data-f-any="OP-0061 鈴木 恵 m.suzuki@datapartners.co.jp" data-pg="1" data-f-oid="OP-0061" data-f-name="鈴木 恵" data-f-mail="m.suzuki@datapartners.co.jp" data-f-group="データパートナーズ株式会社" data-f-lv="Lv1" data-f-lang="日本語" data-f-status="無効" class="proto-row-hover" onclick="pOpenOperator('OP-0061')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0061</span><span>鈴木 恵</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">m.suzuki@datapartners.co.jp</span><span>データパートナーズ株式会社</span><span><span style="font-size:11px;font-weight:700;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:#5b6577">日本語</span><span><span class="status-badge status-inactive">無効</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/05/12</span><span class="c-opt" style="font-size:12px;color:#8a93a5">2026/06/12 17:20</span>
+              <div tabindex="0" role="button" data-f-any="OP-0061 鈴木 恵 m.suzuki@datapartners.co.jp" data-pg="1" data-f-oid="OP-0061" data-f-name="鈴木 恵" data-f-mail="m.suzuki@datapartners.co.jp" data-f-group="データパートナーズ株式会社" data-f-lv="Lv1" data-f-lang="日本語" data-f-status="無効" class="proto-row-hover" onclick="pOpenOperator('OP-0061')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0061</span><span>鈴木 恵</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">m.suzuki@datapartners.co.jp</span><span>データパートナーズ株式会社</span><span><span style="font-size:11px;font-weight:700;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語</span><span><span class="status-badge status-inactive">無効</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/05/12</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-faint)">2026/06/12 17:20</span>
               </div>
-              <div tabindex="0" role="button" data-f-any="OP-0075 高橋 直樹 n.takahashi@datapartners.co.jp" data-pg="1" data-f-oid="OP-0075" data-f-name="高橋 直樹" data-f-mail="n.takahashi@datapartners.co.jp" data-f-group="データパートナーズ株式会社" data-f-lv="Lv1" data-f-lang="日本語・英語" data-f-status="招待中" class="proto-row-hover" onclick="pOpenOperator('OP-0075')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #eef0f5;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0075</span><span>高橋 直樹</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">n.takahashi@datapartners.co.jp</span><span>データパートナーズ株式会社</span><span><span style="font-size:11px;font-weight:700;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:#5b6577">日本語・英語</span><span><span class="status-badge status-info">招待中</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2025/11/12</span><span class="c-opt" style="font-size:12px;color:#8a93a5">—</span>
+              <div tabindex="0" role="button" data-f-any="OP-0075 高橋 直樹 n.takahashi@datapartners.co.jp" data-pg="1" data-f-oid="OP-0075" data-f-name="高橋 直樹" data-f-mail="n.takahashi@datapartners.co.jp" data-f-group="データパートナーズ株式会社" data-f-lv="Lv1" data-f-lang="日本語・英語" data-f-status="招待中" class="proto-row-hover" onclick="pOpenOperator('OP-0075')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;cursor:pointer">
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0075</span><span>高橋 直樹</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">n.takahashi@datapartners.co.jp</span><span>データパートナーズ株式会社</span><span><span style="font-size:11px;font-weight:700;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:1px 6px">Lv1</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語・英語</span><span><span class="status-badge status-info">招待中</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2025/11/12</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-faint)">—</span>
               </div>
               <div tabindex="0" role="button" data-f-any="OP-0077 山本 彩 a.yamamoto@abroad-o.com" data-pg="1" data-f-oid="OP-0077" data-f-name="山本 彩" data-f-mail="a.yamamoto@abroad-o.com" data-f-group="アブロード本体" data-f-lv="Lv2" data-f-lang="日本語" data-f-status="有効" class="proto-row-hover" onclick="pOpenOperator('OP-0077')" style="display:grid;grid-template-columns:minmax(104px,104fr) minmax(116px,116fr) minmax(190px,190fr) minmax(186px,186fr) minmax(64px,64fr) minmax(150px,150fr) minmax(80px,80fr) minmax(112px,112fr) minmax(116px,116fr);align-items:center;padding:0 16px;height:52px;font-size:13px;cursor:pointer">
-                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0077</span><span>山本 彩</span><span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">a.yamamoto@abroad-o.com</span><span>アブロード本体</span><span><span style="font-size:11px;font-weight:700;color:#5b6577;border:1px solid #c8cdd8;border-radius:4px;padding:1px 6px">Lv2</span></span><span style="font-size:12px;color:#5b6577">日本語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/28</span><span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">2026/07/31 07:40</span>
+                <span style="font-weight:500;font-variant-numeric:tabular-nums">OP-0077</span><span>山本 彩</span><span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">a.yamamoto@abroad-o.com</span><span>アブロード本体</span><span><span style="font-size:11px;font-weight:700;color:var(--a-fg-muted);border:1px solid var(--a-border-strong);border-radius:4px;padding:1px 6px">Lv2</span></span><span style="font-size:12px;color:var(--a-fg-muted)">日本語</span><span><span class="status-badge status-active">有効</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/07/28</span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">2026/07/31 07:40</span>
               </div>
-              <div id="operatorsList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
-              <div id="operatorsList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:#8a93a5">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
+              <div id="operatorsList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
-            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#5b6577">
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
               <span style="font-variant-numeric:tabular-nums">全 <span id="operatorsList-total">6</span> 名中 <span id="operatorsList-range">1〜6</span> 名を表示</span>
               <div style="display:flex;align-items:center;gap:16px">
-                <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('operatorsList', parseInt(this.value, 10))" style="border:1px solid #c8cdd8;border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
-                <div id="operatorsList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('operatorsList',-1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜6" onclick="pPage('operatorsList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('operatorsList',1)" style="border:1px solid #c8cdd8;background:#fff;color:#374151;border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">›</button></div>
+                <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('operatorsList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>
+                <div id="operatorsList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('operatorsList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜6" onclick="pPage('operatorsList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('operatorsList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">›</button></div>
               </div>
             </div>
-            <div style="margin-top:12px;font-size:11.5px;color:#8a93a5">行を選択すると詳細モーダルが開きます。Lv1は参照不可・Lv2は自グループ内のアカウントのみ設定可。</div>
+            <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">行を選択すると詳細モーダルが開きます。Lv1は参照不可・Lv2は自グループ内のアカウントのみ設定可。</div>
           </div>
         </main>
     </div>
@@ -83,104 +83,104 @@
 
 <div id="mInviteOp" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:540px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">オペレーターを招待</span>
-      <span role="button" onclick="pClose('mInviteOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mInviteOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">メールアドレス <span style="color:#c23934">必須</span></span><input aria-label="operator@example.co.jp" placeholder="operator@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">メールアドレス <span style="color:var(--a-danger)">必須</span></span><input aria-label="operator@example.co.jp" placeholder="operator@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">所属グループ</span><select data-group-select aria-label="所属グループ" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">権限レベル</span><select data-invite-lv aria-label="権限レベル" style="margin-top:6px;width:100%;border:1px solid #c8cdd8;border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv1(Operator)</option><option>Lv2(OperatorAdmin)</option></select></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">所属グループ</span><select data-group-select aria-label="所属グループ" style="margin-top:6px;width:100%;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">権限レベル</span><select data-invite-lv aria-label="権限レベル" style="margin-top:6px;width:100%;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>Lv1(Operator)</option><option>Lv2(OperatorAdmin)</option></select></label>
       </div>
-      <div><span style="font-size:11.5px;font-weight:700;color:#5b6577">対応可能言語</span>
+      <div><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">対応可能言語</span>
         <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-          <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">英語</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">中国語簡体字</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">中国語繁体字</span>
-          <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">韓国語</span>
+          <span style="border:1px solid var(--a-accent);background:var(--a-info-bg);color:var(--a-accent);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
+          <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">英語</span>
+          <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">中国語簡体字</span>
+          <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">中国語繁体字</span>
+          <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:4px 14px;font-size:12px;cursor:pointer">韓国語</span>
         </div>
       </div>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">招待中のアカウントは一覧に「招待中」として表示されます。Lv3以上の付与はLv4のみ実行できます。本モックは「付与上限=Lv2」の解釈で表示しています。</div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">招待中のアカウントは一覧に「招待中」として表示されます。Lv3以上の付与はLv4のみ実行できます。本モックは「付与上限=Lv2」の解釈で表示しています。</div>
     </div>
-    <div id="opInvErr" hidden style="font-size:12px;color:#c23934;font-weight:700;padding:0 22px 8px"></div>
+    <div id="opInvErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700;padding:0 22px 8px"></div>
         <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mInviteOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pOpInviteSend()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待を送信</button>
+      <button onclick="pClose('mInviteOp')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pOpInviteSend()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">招待を送信</button>
     </div>
   </div>
 </div>
 
 <div id="mOpGroup" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:460px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">オペレーターグループを作成</span>
-      <span role="button" onclick="pClose('mOpGroup')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mOpGroup')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">グループ名 <span style="color:#c23934">必須</span></span><input aria-label="例: 株式会社〇〇" placeholder="例: 株式会社〇〇(委託先)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">作成後、オペレーター招待時の所属先として選択できます。グループ作成はLv3以上のみ実行できます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">グループ名 <span style="color:var(--a-danger)">必須</span></span><input aria-label="例: 株式会社〇〇" placeholder="例: 株式会社〇〇(委託先)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">作成後、オペレーター招待時の所属先として選択できます。グループ作成はLv3以上のみ実行できます。</div>
     </div>
-    <div id="opGrpErr" hidden style="font-size:12px;color:#c23934;font-weight:700;padding:0 22px 8px"></div>
+    <div id="opGrpErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700;padding:0 22px 8px"></div>
         <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mOpGroup')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pOpGroupCreate()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成する</button>
+      <button onclick="pClose('mOpGroup')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pOpGroupCreate()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成する</button>
     </div>
   </div>
 </div>
 
 <div id="opModal" class="proto-modal" hidden>
   <div class="proto-dialog" style="overflow:hidden;width:760px;max-height:86vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--a-border)">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:16px;font-weight:700">田中 大輔</span>
-        <span style="font-size:12px;color:#6b7484;font-variant-numeric:tabular-nums">OP-0034</span>
+        <span style="font-size:12px;color:var(--a-fg-muted2);font-variant-numeric:tabular-nums">OP-0034</span>
         <span data-slot="opstatus" class="status-badge status-active">有効</span>
       </div>
-      <span role="button" onclick="pClose('opModal')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;line-height:1;border-radius:8px;margin:-6px -10px -6px 0">×</span>
+      <span role="button" onclick="pClose('opModal')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;line-height:1;border-radius:8px;margin:-6px -10px -6px 0">×</span>
     </div>
     <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
       <div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">アカウント情報</div>
+        <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">アカウント情報</div>
         <div style="display:grid;grid-template-columns:110px 1fr;gap:8px 12px;padding-top:12px;font-size:13px">
-          <span style="color:#6b7484">メール</span><span>d.tanaka@officeworks.co.jp</span>
-          <span style="color:#6b7484">登録日時</span><span style="font-variant-numeric:tabular-nums">2025/11/12 10:30</span>
-          <span style="color:#6b7484">最終ログイン</span><span style="font-variant-numeric:tabular-nums">2026/07/30 18:45</span>
+          <span style="color:var(--a-fg-muted2)">メール</span><span>d.tanaka@officeworks.co.jp</span>
+          <span style="color:var(--a-fg-muted2)">登録日時</span><span style="font-variant-numeric:tabular-nums">2025/11/12 10:30</span>
+          <span style="color:var(--a-fg-muted2)">最終ログイン</span><span style="font-variant-numeric:tabular-nums">2026/07/30 18:45</span>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">設定</div>
+        <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:20px">設定</div>
         <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;font-size:13px">
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">所属グループ<select data-op-field="group" data-group-select style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">権限レベル<select data-op-field="lv" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
-          <div data-slot="opLvNote" style="font-size:11px;color:#8a6414"></div>
-          <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;color:#6b7484">対応可能言語
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:var(--a-fg-muted2)">所属グループ<select data-op-field="group" data-group-select style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>オフィスワークス株式会社</option><option>アブロード本体</option><option>データパートナーズ株式会社</option></select></label>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:var(--a-fg-muted2)">権限レベル<select data-op-field="lv" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>Lv2(OperatorAdmin)</option><option>Lv1(Operator)</option></select></label>
+          <div data-slot="opLvNote" style="font-size:11px;color:var(--a-warn)"></div>
+          <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;color:var(--a-fg-muted2)">対応可能言語
             <span style="display:flex;gap:6px;flex-wrap:wrap">
-              <span style="border:1px solid #3467d6;background:#eef2fb;color:#3467d6;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
-              <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">英語</span>
-              <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">中国語簡体字</span>
-              <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">中国語繁体字</span>
-              <span style="border:1px solid #c8cdd8;color:#5b6577;border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">韓国語</span>
+              <span style="border:1px solid var(--a-accent);background:var(--a-info-bg);color:var(--a-accent);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer">日本語 ✓</span>
+              <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">英語</span>
+              <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">中国語簡体字</span>
+              <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">中国語繁体字</span>
+              <span style="border:1px solid var(--a-border-strong);color:var(--a-fg-muted);border-radius:999px;padding:3px 12px;font-size:12px;cursor:pointer">韓国語</span>
             </span>
           </div>
-          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:#6b7484">ステータス<select data-op-field="status" style="border:1px solid #c8cdd8;border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:#1f2733"><option>有効</option><option>無効</option></select></label>
+          <label style="display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;color:var(--a-fg-muted2)">ステータス<select data-op-field="status" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>有効</option><option>無効</option></select></label>
           <div style="display:flex;justify-content:flex-end;margin-top:4px">
-            <button style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmDisableOp')">変更を保存</button>
+            <button style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmDisableOp')">変更を保存</button>
           </div>
         </div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed">パスワード操作</div>
+        <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">パスワード操作</div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
-          <button style="align-self:flex-start;background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmResetPwOp')">初期化メールを送信</button>
-          <button data-min-lv="4" onclick="pOpen('mSetPwOp')" style="align-self:flex-start;background:#fff;color:#8a5a10;border:1px solid #e8cf9e;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
+          <button style="align-self:flex-start;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mConfirmResetPwOp')">初期化メールを送信</button>
+          <button data-min-lv="4" onclick="pOpen('mSetPwOp')" style="align-self:flex-start;background:var(--a-surface);color:var(--a-warn-deep);border:1px solid var(--a-warn-border);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">管理者による直接設定</button>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">監査ログ<span style="font-weight:400;color:#8a93a5;margin-left:8px">このアカウントに対する操作</span></div>
+        <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:20px">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアカウントに対する操作</span></div>
         <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
-          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/29 14:02</span><span>権限レベルを Lv1 → Lv2 に変更<br><span style="color:#8a93a5">実行者: admin@abroad-o.com</span></span></div>
-          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2026/07/12 09:18</span><span>パスワード初期化メールを送信<br><span style="color:#8a93a5">実行者: y.sato@abroad-o.com</span></span></div>
-          <div style="display:flex;gap:10px"><span style="color:#8a93a5;font-variant-numeric:tabular-nums;flex:none">2025/11/12 10:30</span><span>招待を実行(登録完了 2025/11/13)<br><span style="color:#8a93a5">実行者: admin@abroad-o.com</span></span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/29 14:02</span><span>権限レベルを Lv1 → Lv2 に変更<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com</span></span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/12 09:18</span><span>パスワード初期化メールを送信<br><span style="color:var(--a-fg-faint)">実行者: y.sato@abroad-o.com</span></span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2025/11/12 10:30</span><span>招待を実行(登録完了 2025/11/13)<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com</span></span></div>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#5b6577;padding-bottom:8px;border-bottom:1px solid #e2e6ed;margin-top:20px">実績</div>
+        <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:20px">実績</div>
         <div style="padding-top:12px"><a href="#op" style="font-size:13px" onclick="location.href='performance-management.html';return false">オペレーター実績確認でこのオペレーターの集計を表示 →</a></div>
       </div>
     </div>
@@ -191,12 +191,12 @@
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
       <span style="font-size:15px;font-weight:700">変更を保存しますか?</span>
-      <span role="button" onclick="pClose('mConfirmDisableOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmDisableOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">OP-0034 田中 大輔の設定を更新します。ステータスを「無効」へ変更した場合、進行中の作業ロックは解放され、本人はログインできなくなります。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">OP-0034 田中 大輔の設定を更新します。ステータスを「無効」へ変更した場合、進行中の作業ロックは解放され、本人はログインできなくなります。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmDisableOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pOpSave()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button data-initial-focus onclick="pClose('mConfirmDisableOp')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pOpSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -205,34 +205,34 @@
   <div class="proto-dialog" style="width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px 0">
       <span style="font-size:15px;font-weight:700">初期化メールを送信しますか?</span>
-      <span role="button" onclick="pClose('mConfirmResetPwOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
+      <span role="button" onclick="pClose('mConfirmResetPwOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
-    <div style="padding:10px 22px 0;font-size:13px;color:#5b6577;line-height:1.8">d.tanaka@officeworks.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
+    <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">d.tanaka@officeworks.co.jp へパスワード初期化メールを送信します。操作は監査ログに記録されます。</div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
-      <button data-initial-focus onclick="pClose('mConfirmResetPwOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pOpResetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
+      <button data-initial-focus onclick="pClose('mConfirmResetPwOp')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pOpResetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
     </div>
   </div>
 </div>
 
 <div id="mSetPwOp" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:520px">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e2e6ed">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
       <span style="font-size:15px;font-weight:700">パスワードを直接設定</span>
-      <span role="button" onclick="pClose('mSetPwOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5b6577;cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+      <span role="button" onclick="pClose('mSetPwOp')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div style="font-size:13px;color:#5b6577;line-height:1.8">OP-0034 田中 大輔のパスワードを管理者が設定します。本人が初期化メールを受け取れない場合の代替手段です。</div>
+      <div style="font-size:13px;color:var(--a-fg-muted);line-height:1.8">OP-0034 田中 大輔のパスワードを管理者が設定します。本人が初期化メールを受け取れない場合の代替手段です。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">新しいパスワード <span style="color:#c23934">必須</span></span><input data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">確認のため再入力 <span style="color:#c23934">必須</span></span><input type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">新しいパスワード <span style="color:var(--a-danger)">必須</span></span><input data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">確認のため再入力 <span style="color:var(--a-danger)">必須</span></span><input type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:#5b6577">設定する理由 <span style="color:#c23934">必須</span></span><textarea rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid #c8cdd8;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
-      <div style="font-size:11.5px;color:#6b7484;line-height:1.7">設定すると d.tanaka@officeworks.co.jp へパスワードを変更した旨の通知メールが送信されます。入力した理由は実行者とあわせて監査ログに記録されます。</div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">設定する理由 <span style="color:var(--a-danger)">必須</span></span><textarea rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">設定すると d.tanaka@officeworks.co.jp へパスワードを変更した旨の通知メールが送信されます。入力した理由は実行者とあわせて監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button onclick="pClose('mSetPwOp')" style="background:#fff;color:#374151;border:1px solid #c8cdd8;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pOpSetPw()" style="background:#3467d6;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
+      <button onclick="pClose('mSetPwOp')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pOpSetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
     </div>
   </div>
 </div>
@@ -288,17 +288,17 @@
         + '" data-f-status="招待中" class="proto-row-hover" onclick="pOpenOperator(\'' + oid + '\')"'
         + ' style="' + head.getAttribute('style') + '">'
         + '<span style="font-weight:500;font-variant-numeric:tabular-nums">' + oid + '</span>'
-        + '<span style="color:#8a93a5">—</span>'
-        + '<span style="color:#5b6577;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+        + '<span style="color:var(--a-fg-faint)">—</span>'
+        + '<span style="color:var(--a-fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
         + 'padding-right:10px">' + mail + '</span>'
         + '<span>' + group + '</span>'
-        + '<span><span style="font-size:11px;font-weight:700;color:#3467d6;border:1px solid #b9caee;'
+        + '<span><span style="font-size:11px;font-weight:700;color:var(--a-accent);border:1px solid var(--a-info-border);'
         + 'border-radius:4px;padding:1px 6px">' + lv + '</span></span>'
-        + '<span style="font-size:12px;color:#5b6577">' + (langs.join('・') || '—') + '</span>'
+        + '<span style="font-size:12px;color:var(--a-fg-muted)">' + (langs.join('・') || '—') + '</span>'
         + '<span><span class="status-badge status-info">招待中</span></span>'
-        + '<span class="c-opt" style="font-size:12px;color:#5b6577;font-variant-numeric:tabular-nums">'
+        + '<span class="c-opt" style="font-size:12px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">'
         + today + '</span>'
-        + '<span class="c-opt" style="font-size:12px;color:#8a93a5">—</span></div>';
+        + '<span class="c-opt" style="font-size:12px;color:var(--a-fg-faint)">—</span></div>';
     head.insertAdjacentHTML('beforebegin', html);
     window.pClearSearch('operatorsList');
     window.pToast(mail + ' へ招待メールを送信しました');
@@ -420,8 +420,8 @@ window.pOpSetPw = function () {
         [lvSel, stSel].forEach(function (el) {
             if (!el) { return; }
             el.disabled = locked;
-            el.style.background = locked ? '#f2f4f8' : '';
-            el.style.color = locked ? '#8a93a5' : '';
+            el.style.background = locked ? 'var(--a-surface-2)' : '';
+            el.style.color = locked ? 'var(--a-fg-faint)' : '';
         });
 
         var note = m.querySelector('[data-slot="opLvNote"]');

@@ -1,12 +1,14 @@
 /**
- * 管理画面モック（03_admin）の到達16画面と一覧の定義。
+ * 管理画面モック（03_admin）の到達画面と一覧の定義。
  *
  * ここを正として admin-mock 配下の spec が回る。画面を足したらこの表に追記する。
- * 到達16画面 = index.html から辿れる画面。escalations.html と reconciliation/list.html は
+ * 到達画面 = index.html から辿れる画面。名刺入力画面の全グループ入力（?g=all）は
+ * 画面としては同一だが、扱う項目が変わるため別行として検査する。
+ * escalations.html と reconciliation/list.html は
  * 到達不能な旧画面のため対象外（docs/architecture/admin_architecture.json の F-10）。
  */
 
-/** 到達16画面。path は baseURL からの相対、name は失敗時に読む用 */
+/** 到達画面。path は baseURL からの相対、name は失敗時に読む用 */
 const SCREENS = [
   { name: 'ダッシュボード', path: '/03_admin/index.html' },
   { name: 'ユーザー管理', path: '/03_admin/user-management.html' },
@@ -22,6 +24,7 @@ const SCREENS = [
   { name: '監査ログ', path: '/03_admin/audit-log.html' },
   { name: 'データ入力対象一覧', path: '/03_admin/data-entry/index.html' },
   { name: '名刺入力画面', path: '/03_admin/data-entry/form.html' },
+  { name: '名刺入力画面(全グループ)', path: '/03_admin/data-entry/form.html?g=all' },
   { name: '照合結果一覧', path: '/03_admin/reconciliation/index.html' },
   { name: '名刺情報照合', path: '/03_admin/reconciliation/detail.html' },
 ];

@@ -1,4 +1,66 @@
 /* admin-style.css */
+/* ============================================================
+   配色トークン（ライト / ダーク）
+   画面側はインラインstyleで色を指定しているため、値を直接書かず var(--a-*) を通す。
+   同じ色でも用途が違えば別トークンにしてある（例: #fff は文字なら --a-on-accent、
+   背景なら --a-surface）。ダークで役割が入れ替わるため、まとめると破綻する。
+   ダークは data-theme="dark" を <html> に付けて切り替える（src/theme-init.js）。
+   ============================================================ */
+:root {
+  color-scheme: light;
+  /* 面 */
+  --a-bg: #f4f6f9;            --a-surface: #ffffff;      --a-surface-2: #f7f8fb;
+  --a-surface-3: #f0f1f4;     --a-surface-hover: #f7f9fd; --a-disabled-bg: #eceef3;
+  /* 文字 */
+  --a-fg-strong: #1f2733;     --a-fg: #374151;           --a-fg-muted: #5b6577;
+  --a-fg-muted2: #6b7484;     --a-fg-faint: #8a93a5;     --a-fg-disabled: #c3c9d4;
+  --a-on-accent: #ffffff;
+  /* 罫線 */
+  --a-border-strong: #c8cdd8; --a-border: #e2e6ed;       --a-border-soft: #eef0f5;
+  /* 強調 */
+  --a-accent: #3467d6;        --a-accent-deep: #2b57b8;  --a-accent-bg: #3467d6;
+  --a-info-bg: #eef2fb;       --a-info-border: #b9caee;  --a-info-fg: #1f3d80;
+  /* 状態 */
+  --a-danger: #c23934;        --a-danger-bg: #fdf0ef;    --a-danger-border: #e3b6b3;
+  --a-danger-bg-solid: #c23934;
+  --a-warn: #8a6414;          --a-warn-deep: #8a5a10;    --a-warn-bg: #fdf6ec;
+  --a-warn-border: #e8cf9e;   --a-warn-border-strong: #c99b3f;
+  --a-ok: #237a52;            --a-ok-bg: #edf7f1;        --a-ok-border: #9fceb6;
+  --a-ok-bg-solid: #237a52;   --a-warn-bg-solid: #8a6414;  --a-danger-bg-solid-hover: #a93029;
+  --a-ok-border-soft: #bfe0cd;
+  /* 補助 */
+  --a-copy-flash: #fff7d6;    --a-focus-ring: #c8951a;
+  /* 名刺ビューアとサイドバーは両モードとも暗色。役割が変わらないので固定 */
+  --a-work-bg: #1f2733;       --a-work-bg-inner: #141b26; --a-work-border: #3c4a61;
+  --a-work-fg: #c3ccdb;       --a-work-fg-muted: #98a3b8;
+  --a-sidebar-accent: #9db8f0; --a-sidebar-border: #3c4d70;
+  --a-sidebar-bg: #1d2634;    --a-sidebar-hover: #26324a; --a-sidebar-active: #2e4370;
+  --a-fg-onwork-soft: #e8ecf4;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --a-bg: #11151b;            --a-surface: #1a202a;      --a-surface-2: #222a35;
+  --a-surface-3: #262f3b;     --a-surface-hover: #232c3a; --a-disabled-bg: #2a3139;
+  --a-fg-strong: #e8ecf2;     --a-fg: #d3dae4;           --a-fg-muted: #a7b1bf;
+  --a-fg-muted2: #99a3b2;     --a-fg-faint: #8f99a8;     --a-fg-disabled: #808a97;
+  --a-on-accent: #ffffff;
+  --a-border-strong: #4c5666; --a-border: #333c4a;       --a-border-soft: #2a323f;
+  --a-accent: #7ba6ff;        --a-accent-deep: #6d97f0;  --a-accent-bg: #3a68cf;
+  --a-info-bg: #1b2637;       --a-info-border: #3c5480;  --a-info-fg: #cfe0ff;
+  --a-danger: #f28a83;        --a-danger-bg: #3a2220;    --a-danger-border: #7a4340;
+  --a-danger-bg-solid: #b6362f;
+  --a-warn: #e3b660;          --a-warn-deep: #dfae52;    --a-warn-bg: #322817;
+  --a-warn-border: #6b5a2e;   --a-warn-border-strong: #a2823a;
+  --a-ok: #62c78f;            --a-ok-bg: #17301f;        --a-ok-border: #3d6b52;
+  --a-ok-bg-solid: #27754e;   --a-warn-bg-solid: #7d5a1c;  --a-danger-bg-solid-hover: #9c2f28;
+  --a-ok-border-soft: #345c46;
+  --a-copy-flash: #4a3d16;    --a-focus-ring: #d2a94b;
+}
+
+/* ページの地色。body に直接指定が無い画面があるため html 側にも当てる */
+html, body { background: var(--a-bg); color: var(--a-fg-strong); }
+
 /* 管理画面リファクタリング版デザイン(design_handoff_admin_ui/prototype.dc.html 準拠) */
 
 /* ============================================================
@@ -17,7 +79,7 @@
     box-sizing: border-box;
     border-width: 0;
     border-style: solid;
-    border-color: #e5e7eb;
+    border-color:var(--a-border);
 }
 
 html {
@@ -101,8 +163,8 @@ img, video {
 [type='tel'], [type='time'], [type='week'], [multiple],
 input:not([type]), textarea, select {
     appearance: none;
-    background-color: #fff;
-    border: 1px solid #6b7280;
+    background-color:var(--a-surface);
+    border:1px solid var(--a-fg-muted2);
     border-radius: 0;
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
@@ -152,7 +214,7 @@ select {
 
 ::placeholder {
     opacity: 1;
-    color: #9ca3af;
+    color:var(--a-fg-faint);
 }
 
 [type='checkbox'], [type='radio'] {
@@ -163,10 +225,10 @@ select {
     width: 1rem;
     height: 1rem;
     padding: 0;
-    color: #2563eb;
-    background-color: #fff;
+    color:var(--a-accent);
+    background-color:var(--a-surface);
     background-origin: border-box;
-    border: 1px solid #6b7280;
+    border:1px solid var(--a-fg-muted2);
     -webkit-user-select: none;
     user-select: none;
     -webkit-print-color-adjust: exact;
@@ -197,7 +259,7 @@ select {
 [type='radio']:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+    box-shadow:0 0 0 2px var(--a-surface), 0 0 0 4px var(--a-accent);
 }
 
 /* ユーティリティ(マークアップで使われているものだけ) */
@@ -229,58 +291,58 @@ select {
 
 /* デザイントークン上書き(service-top-style.css の CSS変数を管理画面用に差し替え) */
 :root {
-    --color-primary: #3467D6;
-    --color-brand-base-primary: #3467D6;
-    --color-base-background-main: #F4F6F9;
-    --color-base-background-sub: #F7F8FB;
-    --color-base-card: #FFFFFF;
-    --color-base-border-divider: #E2E6ED;
-    --color-text-main: #1F2733;
-    --color-text-sub: #5B6577;
-    --color-state-error: #C23934;
-    --color-state-success: #237A52;
-    --color-state-warning: #8A6414;
-    --color-button-primary-bg: #3467D6;
-    --color-button-primary-hover-bg: #2B57B8;
-    --color-button-danger-bg: #C23934;
-    --color-button-danger-hover-bg: #A93029;
+    --color-primary: var(--a-accent);
+    --color-brand-base-primary: var(--a-accent);
+    --color-base-background-main: var(--a-bg);
+    --color-base-background-sub: var(--a-surface-2);
+    --color-base-card: var(--a-surface);
+    --color-base-border-divider: var(--a-border);
+    --color-text-main: var(--a-fg-strong);
+    --color-text-sub: var(--a-fg-muted);
+    --color-state-error: var(--a-danger);
+    --color-state-success: var(--a-ok);
+    --color-state-warning: var(--a-warn);
+    --color-button-primary-bg: var(--a-accent-bg);
+    --color-button-primary-hover-bg: var(--a-accent-deep);
+    --color-button-danger-bg: var(--a-danger-bg-solid);
+    --color-button-danger-hover-bg: var(--a-danger-bg-solid-hover);
 }
 
 body {
     font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-    background-color: #F4F6F9;
-    color: #1F2733;
+    background-color:var(--a-bg);
+    color:var(--a-fg-strong);
 }
 
 /* リンク色: Tailwind CDN では preflight の a{color:inherit} が後勝ちしていたため、
-   従来 a{color:#3467D6} は効いていなかった。見た目を変えないよう inherit を維持する。
+   従来 a{color:var(--a-accent)} は効いていなかった。見た目を変えないよう inherit を維持する。
    :hover は詳細度が高く従来から効いていたのでそのまま残す */
 a {
     color: inherit;
     text-decoration: inherit;
 }
 
-a:hover { color: #2B57B8; }
+a:hover { color:var(--a-accent-deep); }
 
 button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible {
-    outline: 2px solid #3467D6;
+    outline:2px solid var(--a-accent);
     outline-offset: 2px;
 }
 
 /* サイドバー(232px・#1D2634・現在地 #2E4370) */
 .admin-sidebar {
-    background-color: #1D2634;
+    background-color:var(--a-sidebar-bg);
     width: 232px;
-    color: #C3CCDB;
+    color:var(--a-work-fg);
 }
 
 .admin-sidebar .profile-block {
-    border-bottom: 1px solid #2A3750;
+    border-bottom:1px solid var(--a-sidebar-border);
 }
 
 .admin-sidebar nav a.nav-link {
     display: block;
-    color: #C3CCDB;
+    color:var(--a-work-fg);
     font-size: 13.5px;
     border-radius: 6px;
     padding: 9px 14px;
@@ -289,18 +351,18 @@ button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible
 }
 
 .admin-sidebar nav a.nav-link:hover {
-    background-color: #26324A;
-    color: #FFFFFF;
+    background-color:var(--a-sidebar-hover);
+    color:var(--a-on-accent);
 }
 
 .admin-sidebar nav a.nav-link.active {
-    background-color: #2E4370;
-    color: #FFFFFF;
+    background-color:var(--a-sidebar-active);
+    color:var(--a-on-accent);
     font-weight: 700;
 }
 
 .admin-sidebar #logoutButton:hover {
-    color: #FFFFFF;
+    color:var(--a-on-accent);
 }
 
 body.sidebar-locked {
@@ -329,11 +391,11 @@ body.sidebar-locked {
     white-space: nowrap;
 }
 
-.status-active { background-color: #E5F3EC; color: #237A52; }
-.status-inactive { background-color: #F0F1F4; color: #5B6577; }
-.status-expired { background-color: #FDF0EF; color: #C23934; }
-.status-limit_reached { background-color: #FDF6EC; color: #8A6414; border: 1px solid #E8CF9E; }
-.status-info { background-color: #EEF2FB; color: #3467D6; border: 1px solid #B9CAEE; }
+.status-active { background-color:var(--a-ok-bg); color:var(--a-ok); }
+.status-inactive { background-color:var(--a-surface-3); color:var(--a-fg-muted); }
+.status-expired { background-color:var(--a-danger-bg); color:var(--a-danger); }
+.status-limit_reached { background-color:var(--a-warn-bg); color:var(--a-warn); border: 1px solid var(--a-warn-border); }
+.status-info { background-color: var(--a-info-bg); color:var(--a-accent); border: 1px solid var(--a-info-border); }
 
 /* モーダル(prototype 様式・src/proto-ui.js と対) */
 .proto-modal {
@@ -349,7 +411,7 @@ body.sidebar-locked {
 .proto-modal[hidden] { display: none; }
 
 .proto-dialog {
-    background: #FFFFFF;
+    background: var(--a-surface);
     border-radius: 10px;
     box-shadow: 0 20px 60px rgba(12, 18, 30, .4);
 }
@@ -357,7 +419,7 @@ body.sidebar-locked {
 /* 一覧行ホバー(prototype 準拠) */
 .proto-row-hover.is-tinted:hover { filter: brightness(0.97); }
 
-.proto-row-hover:not(.is-tinted):hover { background-color: #F7F9FD; }
+.proto-row-hover:not(.is-tinted):hover { background-color: var(--a-surface-hover); }
 
 /* 旧ダッシュボード用CSS(service-top-style.css)のレイアウト干渉リセット */
 /* .sidebar の折りたたみ(4rem)+hover展開、body/main-contentの4remパディングを管理画面では無効化する */
@@ -403,8 +465,8 @@ body.sidebar-locked {
 .admin-sidebar { transition: none !important; }
 
 /* Tailwind CDN の preflight(a{color:inherit}) がリンク色を打ち消すため詳細度を上げて再指定 */
-main a, .proto-modal a { color: #3467D6; }
-main a:hover, .proto-modal a:hover { color: #2B57B8; }
+main a, .proto-modal a { color:var(--a-accent); }
+main a:hover, .proto-modal a:hover { color:var(--a-accent-deep); }
 
 /* ページャの表示件数セレクトが幅不足で数字が欠けるのを防止 */
 main select { min-width: 60px; }
@@ -418,3 +480,6 @@ main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { f
 .row-act > button { width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .row-act.slots-1 { grid-template-columns: minmax(0, 1fr); }
 .row-act.slots-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+/* ダークは影が効かないため、ダイアログの輪郭を足して背面と分ける */
+:root[data-theme="dark"] .proto-dialog { border: 1px solid var(--a-border); }
