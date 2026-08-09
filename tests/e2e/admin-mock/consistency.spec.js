@@ -374,6 +374,8 @@ test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
           if (el.children.length || !(el.textContent || '').trim()) { return; }
           const r = el.getBoundingClientRect();
           if (!r.width || !r.height) { return; }
+          // 非活性の操作要素は基準の対象外（WCAG 1.4.3）
+          if (el.matches(':disabled') || el.closest('[disabled]')) { return; }
           const cs = getComputedStyle(el);
           let bg = cs.backgroundColor;
           let n = el;
@@ -388,12 +390,7 @@ test.describe('R-29 文字色のコントラスト（WCAG AA）', () => {
         });
         return [...new Set(out)];
       });
-      // 淡い補助テキストの2トークンは判断待ちの持ち越し。
-      // AA まで暗くすると濃淡5段が3段に潰れて見た目が変わるため、扱いを決めてから直す。
-      // ここでは「それ以外の新しい違反が増えないこと」を守る。
-      const KNOWN = ['rgb(138, 147, 165)', 'rgb(195, 201, 212)'];  // --a-fg-faint / --a-fg-disabled
-      const fresh = bad.filter((x) => !KNOWN.some((c) => x.includes(c)));
-      expect(fresh, fresh.join(' / ')).toEqual([]);
+      expect(bad, bad.join(' / ')).toEqual([]);
     });
   }
 });
