@@ -92,8 +92,20 @@ a {
   text-decoration: none;
 }
 
-.voice-brand__mark {
-  width: 116px;
+.voice-brand__lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-brand__emblem {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.voice-brand__wordmark {
+  width: 112px;
   height: auto;
 }
 
@@ -729,7 +741,12 @@ body.is-ready .voice-hero__photo img {
     gap: 12px;
   }
 
-  .voice-brand__mark {
+  .voice-brand__emblem {
+    width: 32px;
+    height: 32px;
+  }
+
+  .voice-brand__wordmark {
     width: 96px;
   }
 

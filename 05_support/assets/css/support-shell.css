@@ -217,9 +217,21 @@ body {
   letter-spacing: 0;
 }
 
-.support-brand img {
+.support-brand__lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.support-brand__emblem {
   width: 2rem;
   height: 2rem;
+  object-fit: contain;
+}
+
+.support-brand__wordmark {
+  width: 7.5rem;
+  height: auto;
 }
 
 .support-nav {
@@ -284,6 +296,24 @@ body {
 
 .support-footer__brand p {
   margin: 0;
+}
+
+.support-footer__lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.support-footer__emblem {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+.support-footer__wordmark {
+  width: 8rem;
+  height: auto;
 }
 
 .support-footer__brand p + p {

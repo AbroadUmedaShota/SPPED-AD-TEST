@@ -19,11 +19,14 @@ root.
 from __future__ import annotations
 
 import sys
+import mimetypes
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 
 DEFAULT_PORT = 8765
 BIND_HOST = "127.0.0.1"
+
+mimetypes.add_type("font/woff2", ".woff2")
 
 # Top-level path prefixes that should be transparently served from
 # ``05_support/`` during local development.
