@@ -107,10 +107,12 @@ test('login hero uses the custom wordmark font as one copyable text string', asy
   assert.match(fontCss, /--speed-ad-wordmark-block-offset:\s*-0\.088em;/);
   assert.match(fontCss, /--speed-ad-wordmark-first-line-indent:\s*-0\.048em;/);
   assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?font-family:\s*"SPEED AD Wordmark"[\s\S]*?user-select:\s*text;/);
-  assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?font-size:\s*clamp\(6\.1rem,\s*10vw,\s*8\.75rem\);/);
+  assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?font-size:\s*clamp\(6\.1rem,\s*10\.8vw,\s*8\.25rem\);/);
+  assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?line-height:\s*0\.79;/);
   assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?font-feature-settings:\s*"kern" 1;[\s\S]*?letter-spacing:\s*normal;/);
   assert.match(css, /\.hero__brand-text\s*\{[\s\S]*?left:\s*var\(--speed-ad-wordmark-block-offset,[\s\S]*?text-indent:\s*var\(--speed-ad-wordmark-first-line-indent,/);
-  assert.match(css, /\.hero__statement\s*\{[\s\S]*?margin:\s*8px 0 0;/);
+  assert.match(css, /\.hero__statement\s*\{[\s\S]*?margin:\s*8px 0 0;[\s\S]*?font-size:\s*32px;[\s\S]*?letter-spacing:\s*0\.025em;[\s\S]*?line-height:\s*1\.42;/);
+  assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*?\.hero__statement\s*\{[\s\S]*?font-size:\s*clamp\(1\.35rem,\s*6vw,\s*1\.5rem\);/);
   assert.match(fontBuilder, /def centered_left_side_bearing\([\s\S]*?advance - ink_width[\s\S]*?\/ 2/);
   assert.match(fontBuilder, /def setup_wordmark_gpos\([\s\S]*?addOpenTypeFeaturesFromString/);
   assert.equal(font.subarray(0, 4).toString('ascii'), 'wOF2');

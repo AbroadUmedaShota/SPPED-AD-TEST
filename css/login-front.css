@@ -343,13 +343,13 @@ img {
   width: var(--speed-ad-wordmark-first-line-width, 4.275em);
   color: var(--white);
   font-family: "SPEED AD Wordmark", serif;
-  font-size: clamp(6.1rem, 10vw, 8.75rem);
+  font-size: clamp(6.1rem, 10.8vw, 8.25rem);
   font-synthesis: none;
   font-weight: 400;
   font-kerning: normal;
   font-feature-settings: "kern" 1;
   letter-spacing: normal;
-  line-height: 0.815;
+  line-height: 0.79;
   overflow-wrap: normal;
   cursor: text;
   text-rendering: geometricPrecision;
@@ -444,10 +444,10 @@ body.is-hero-font-dragging * {
 .hero__statement {
   margin: 8px 0 0;
   font-family: var(--serif);
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1.48;
+  letter-spacing: 0.025em;
+  line-height: 1.42;
   transform: translate(var(--hero-statement-x, 0), var(--hero-statement-y, 0));
   transform-origin: left top;
 }
@@ -770,7 +770,7 @@ body.is-hero-font-dragging * {
 
 .hero__lead {
   max-width: 520px;
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -2881,6 +2881,12 @@ body.is-hero-font-dragging * {
 
   .hero__brand-text {
     font-size: clamp(2.85rem, 13.65vw, 4.83rem);
+  }
+
+  .hero__statement {
+    font-size: clamp(1.35rem, 6vw, 1.5rem);
+    letter-spacing: 0.015em;
+    line-height: 1.5;
   }
 
   .hero__actions {
