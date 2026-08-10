@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "syncedAt": "2026-08-05T06:16:12.120Z",
+  "sourceId": "latest-svg-directory",
+  "sourceFiles": {
+    "emblemColor": {
+      "filename": "カラーロゴ_ベクター_最終版_v10-edited.svg",
+      "bytes": 18938,
+      "modifiedAt": "2026-07-27T10:26:57.244Z",
+      "sha256": "1893451bf43d45b22087a98b79538a4db7717f3caec9efe154e540b6535528df"
+    },
+    "emblemWhite": {
+      "filename": "シルエットロゴ_ベクター_最終版_v10-edited.svg",
+      "bytes": 17915,
+      "modifiedAt": "2026-08-04T06:23:39.826Z",
+      "sha256": "97b8faefc8de0adec62b32ece4b8a8b493529c6837982ca7bb0d856568438bd3"
+    },
+    "wordmarkHorizontal": {
+      "filename": "ブラックフォントロゴ_幅90_白背景.svg",
+      "bytes": 13524,
+      "modifiedAt": "2026-08-04T09:40:31.602Z",
+      "sha256": "cc814aaab138fee2806a38a2675fc9275499026a36e9e1713dbf71648462cfe7"
+    },
+    "wordmarkStacked": {
+      "filename": "ブラックフォントロゴ幅90-2行左揃え_白背景.svg",
+      "bytes": 13525,
+      "modifiedAt": "2026-08-04T09:40:31.929Z",
+      "sha256": "7732b5ae1eb01e34f8c67e2a8bc38fe4a239f5bc1c75d51c273a35fe83289958"
+    }
+  },
+  "outputs": {
+    "speed-ad-emblem-color.svg": {
+      "bytes": 18938,
+      "sha256": "1893451bf43d45b22087a98b79538a4db7717f3caec9efe154e540b6535528df"
+    },
+    "speed-ad-emblem-white.svg": {
+      "bytes": 17909,
+      "sha256": "20db2eb0a70cecf2aa0630fc3916696f13c63b9415fd111c3543077162572dff"
+    },
+    "speed-ad-wordmark-horizontal-black.svg": {
+      "bytes": 13474,
+      "sha256": "b0a3e61c751753239eec5778d0d449d836c54a81052d2302657e9541bf507fd7"
+    },
+    "speed-ad-wordmark-horizontal-white.svg": {
+      "bytes": 13474,
+      "sha256": "2aeffad78cfffe1e8bbc4386b6034ab52c6511b96130b286ad6d04040a1b2664"
+    },
+    "speed-ad-wordmark-stacked-black.svg": {
+      "bytes": 13475,
+      "sha256": "3715dbc93d756227a22b0587b69c9f619bcf6fb40621b5d5b625fa5b8f3b108f"
+    },
+    "speed-ad-wordmark-stacked-white.svg": {
+      "bytes": 13475,
+      "sha256": "5037dc1b94123449c47581f4d2342fa6071ce5dae5d80970045ab97201520928"
+    },
+    "speed-ad-favicon.svg": {
+      "bytes": 18938,
+      "sha256": "1893451bf43d45b22087a98b79538a4db7717f3caec9efe154e540b6535528df"
+    }
+  }
+}

@@ -990,10 +990,8 @@
     const CUSTOM_ID = 'custom';
     const CUSTOM_STATEMENT_KEY = 'speedad-hero-copy-custom-statement';
     const CUSTOM_LEAD_KEY = 'speedad-hero-copy-custom-lead';
-    const BRAND_TEXT_KEY = 'speedad-hero-brand-text';
     const FONT_OBJECT_STORAGE_KEY = 'speedad-hero-font-objects';
     const FONT_EDIT_MODE_STORAGE_KEY = 'speedad-hero-font-edit-mode';
-    const DEFAULT_BRAND_TEXT = 'SPEED\nAD';
     const DEFAULT_CUSTOM_STATEMENT = 'スピードをアドバンテージに。';
     const DEFAULT_CUSTOM_LEAD = '展示会やイベントのリード獲得フォローを最適化する、\n次世代WEBアンケート作成ツール。';
     const DEFAULT_VARIANT = {
@@ -1003,15 +1001,6 @@
       reason: 'デフォルト（現行コピー）。営業プロセスの無駄を減らすリード獲得ツールとして訴求。'
     };
     const fontObjects = {
-      brand: {
-        el: document.getElementById('hero-title'),
-        label: 'SPEED AD',
-        sizeVar: '--hero-brand-size',
-        xVar: '--hero-brand-x',
-        yVar: '--hero-brand-y',
-        minSize: 48,
-        maxSize: 200
-      },
       statement: {
         el: statementEl,
         label: '見出し',
@@ -1319,17 +1308,9 @@
       if (!config?.el) {
         return;
       }
-      const nextText = text.trim() || (id === 'brand' ? DEFAULT_BRAND_TEXT : elementToMultiline(config.el));
+      const nextText = text.trim() || elementToMultiline(config.el);
       config.el.innerHTML = multilineToHtml(nextText);
-      if (id === 'brand') {
-        try {
-          window.localStorage.setItem(BRAND_TEXT_KEY, nextText);
-        } catch (_error) {
-          /* localStorage unavailable */
-        }
-      } else {
-        syncCustomCopyFromHero();
-      }
+      syncCustomCopyFromHero();
       updateFontOverlayPosition();
       updateFontSelectionUi();
     }
@@ -1753,15 +1734,6 @@
       updateFontOverlayPosition();
     });
     window.addEventListener('scroll', updateFontOverlayPosition, { passive: true });
-
-    try {
-      const savedBrandText = window.localStorage.getItem(BRAND_TEXT_KEY);
-      if (savedBrandText) {
-        fontObjects.brand.el.innerHTML = multilineToHtml(savedBrandText);
-      }
-    } catch (_error) {
-      /* localStorage unavailable */
-    }
 
     let savedId = CUSTOM_ID;
     try {

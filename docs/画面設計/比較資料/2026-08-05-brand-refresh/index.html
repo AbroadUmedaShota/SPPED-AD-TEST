@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPEED AD ロゴ差替 前後比較</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Noto Sans JP", system-ui, sans-serif;
+      color: #162033;
+      background: #eef2f7;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(1500px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 72px; }
+    h1 { margin: 0 0 10px; font-size: clamp(1.75rem, 4vw, 2.75rem); }
+    .lead { margin: 0 0 32px; color: #566177; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 38px; }
+    .summary div { padding: 18px; border: 1px solid #d7deea; border-radius: 16px; background: #fff; }
+    .summary strong { display: block; margin-bottom: 6px; color: #124fa4; }
+    section + section { margin-top: 42px; }
+    h2 { margin: 0 0 16px; font-size: 1.35rem; }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    figure { margin: 0; overflow: hidden; border: 1px solid #d7deea; border-radius: 18px; background: #fff; box-shadow: 0 12px 32px rgba(28, 45, 74, 0.08); }
+    figcaption { padding: 14px 16px; font-weight: 700; }
+    figure img { display: block; width: 100%; height: auto; border-top: 1px solid #e4e8ef; }
+    .mobile img { width: min(100%, 390px); margin: 0 auto; }
+    .note { margin-top: 28px; padding: 18px 20px; border-left: 4px solid #2468c9; background: #fff; }
+    @media (max-width: 900px) {
+      .summary, .gallery { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      main { width: min(100% - 20px, 1500px); padding-top: 28px; }
+      .comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SPEED AD ロゴ差替 前後比較</h1>
+    <p class="lead">2026-08-06 / 正しい静的モックリポジトリの最終調整版で取得</p>
+
+    <div class="summary">
+      <div><strong>暗背景</strong>白シルエットエンブレム＋白ワードマーク</div>
+      <div><strong>白背景</strong>カラーエンブレム＋黒ワードマーク</div>
+      <div><strong>表示ルール</strong>ヒーローは公式パス由来の選択可能な2行カスタムフォント、ヘッダー／フッターは1行版</div>
+    </div>
+
+    <section>
+      <h2>ログインLP / デスクトップ 1440×1000</h2>
+      <div class="comparison">
+        <figure><figcaption>Before</figcaption><img src="before-login-lp-desktop.png" alt="差替前のログインLP"></figure>
+        <figure><figcaption>After</figcaption><img src="after-login-lp-desktop.png" alt="差替後のログインLP"></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>ログインLP / モバイル 390×844</h2>
+      <div class="comparison">
+        <figure class="mobile"><figcaption>Before</figcaption><img src="before-login-lp-mobile.png" alt="差替前のモバイルログインLP"></figure>
+        <figure class="mobile"><figcaption>After</figcaption><img src="after-login-lp-mobile.png" alt="差替後のモバイルログインLP"></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>差替後の代表画面</h2>
+      <div class="gallery">
+        <figure><figcaption>ログイン後共通UI</figcaption><img src="after-dashboard-desktop.png" alt="ログイン後ダッシュボード"></figure>
+        <figure><figcaption>サポート</figcaption><img src="after-support-desktop.png" alt="ヘルプセンター"></figure>
+        <figure><figcaption>導入事例</figcaption><img src="after-customer-voices-desktop.png" alt="導入事例一覧"></figure>
+      </div>
+    </section>
+
+    <p class="note">比較対象はブランド表示と必要な余白調整のみです。文言、サービス機能、ナビゲーション、ログイン処理は変更していません。ヒーローの「SPEED AD」は公式の1文字SVGから生成したカスタムフォントを使用し、デスクトップでは最大140pxへ光学調整しています。見た目を維持したまま改行なしで選択・コピーできます。</p>
+  </main>
+</body>
+</html>
