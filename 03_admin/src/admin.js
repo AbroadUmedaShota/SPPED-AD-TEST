@@ -68,8 +68,7 @@ function adjustRelativePaths(container) {
  * @param {function|null} callback An optional callback function to execute after the HTML is loaded.
  */
 async function loadCommonHtml(placeholderId, filePath, callback = null) {
-    // 注入先を持たない画面では取得もしない。現行画面はフッターを表示しないため、
-    // 先に確認しないと common/footer.html を毎ページ取得しては捨てることになる
+    // 注入先を持たない画面では取得もしない(取得しては捨てる無駄を避ける)
     const placeholder = document.getElementById(placeholderId);
     if (!placeholder) {
         return;
@@ -202,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load common elements for the admin page
     await loadCommonHtml('header-placeholder', 'common/header.html');
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initAdminSidebarHandler);
-    await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
     // 共通パーツが揃ったことを知らせる。proto-level.js はこれを待ってヘッダー・サイドバーへ配線する
     document.dispatchEvent(new CustomEvent('admin:chrome-ready'));

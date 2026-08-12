@@ -23,35 +23,44 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700">営業日カレンダー</h1>
               <div style="display:flex;gap:10px">
+                <button data-min-lv="3" title="会社ごとの1人1日あたり処理枚数" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calCapaOpen()">処理能力の設定</button>
                 <button data-min-lv="3" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calRegOpen()">定休日設定</button>
-                <button data-min-lv="3" title="祝日・稼働可能日等をCSVから一括登録" onclick="pOpen('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSVインポート</button>
+                <button data-min-lv="3" title="個別休業日・振替営業日をCSVから一括登録" onclick="pOpen('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">休業日CSV取込</button>
                 <button data-min-lv="3" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calHolidayOpen()">休業日・振替を追加</button>
               </div>
             </div>
-            <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between">
+            <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
               <div style="display:flex;align-items:center;gap:12px">
+                <span id="calViewSwitch" role="group" aria-label="表示モード" style="display:flex;border:1px solid var(--a-border-strong);border-radius:6px;overflow:hidden">
+                  <button data-view="single" onclick="calMode('single')" style="border:none;border-right:1px solid var(--a-border-strong);padding:6px 13px;cursor:pointer;font-size:12px;background:var(--a-surface);color:var(--a-fg-muted);font-family:inherit">単月</button>
+                  <button data-view="around" onclick="calMode('around')" style="border:none;border-right:1px solid var(--a-border-strong);padding:6px 13px;cursor:pointer;font-size:12px;background:var(--a-surface);color:var(--a-fg-muted);font-family:inherit">前後2週</button>
+                  <button data-view="year" onclick="calMode('year')" style="border:none;padding:6px 13px;cursor:pointer;font-size:12px;background:var(--a-surface);color:var(--a-fg-muted);font-family:inherit">年間</button>
+                </span>
                 <button id="calPrev" onclick="calMonth(-1)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:var(--a-surface);color:var(--a-fg);font-family:inherit">‹ 前月</button>
                 <span id="calTitle" style="font-size:17px;font-weight:700;min-width:110px;text-align:center">2026年 7月</span>
                 <button id="calNext" onclick="calMonth(1)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;background:var(--a-surface);color:var(--a-fg);font-family:inherit">翌月 ›</button>
+                <button id="calTodayBtn" title="当月に戻り本日を選択" onclick="calToday()" style="margin-left:4px;border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 14px;cursor:pointer;font-size:12.5px;font-weight:700;background:var(--a-surface);color:var(--a-fg);font-family:inherit">今日</button>
               </div>
-              <div style="display:flex;gap:14px;font-size:11.5px;color:var(--a-fg-muted);align-items:center">
-                <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:var(--a-surface);border:1px solid var(--a-border-strong)"></span>営業日</span>
-                <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:var(--a-surface-3)"></span>休業日</span>
-                <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:var(--a-info-bg);border:1px solid var(--a-info-border)"></span>振替営業日</span><span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:var(--a-surface);box-shadow:inset 0 0 0 2px var(--a-accent)"></span>選択中</span>
+              <div id="calFilters" style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--a-fg-muted)">
+                <span style="font-weight:700">絞り込み</span>
+                <select id="calFGroup" data-min-lv="3" aria-label="担当会社で絞り込み" onchange="calFilter()" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 10px;font-size:12.5px;font-family:inherit;color:var(--a-fg-strong);background:var(--a-surface)"></select>
+                <select id="calFState" aria-label="充足状態で絞り込み" onchange="calFilter()" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 10px;font-size:12.5px;font-family:inherit;color:var(--a-fg-strong);background:var(--a-surface)">
+                  <option value="">状態: すべて</option><option value="none">未アサイン</option><option value="critical">不足(深刻)</option><option value="short">不足</option><option value="ok">充足</option><option value="over">人数過多</option>
+                </select>
               </div>
             </div>
+            <div id="calSummary" style="margin-top:12px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"></div>
             <div style="margin-top:12px;display:flex;gap:16px;align-items:flex-start">
-              <div style="flex:1;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11.5px;font-weight:700;color:var(--a-fg-muted);text-align:center">
+              <div style="flex:1;min-width:0;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
+                <div id="calWeekHead" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11.5px;font-weight:700;color:var(--a-fg-muted);text-align:center">
                   <span style="padding:8px 0;color:var(--a-danger)">日</span><span style="padding:8px 0">月</span><span style="padding:8px 0">火</span><span style="padding:8px 0">水</span><span style="padding:8px 0">木</span><span style="padding:8px 0">金</span><span style="padding:8px 0;color:var(--a-accent)">土</span>
                 </div>
-                <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
-                <div style="padding:8px 12px;border-top:1px solid var(--a-border-soft);font-size:11px;color:var(--a-fg-faint)">日付を選択すると右に詳細を表示します。</div>
+                <div id="calGrid"></div>
+                <div id="calLegend" style="padding:9px 12px;border-top:1px solid var(--a-border-soft);font-size:11px;color:var(--a-fg-faint);display:flex;gap:8px 20px;flex-wrap:wrap;align-items:center"></div>
               </div>
-              <div id="calPanel" style="width:320px;flex:none;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 18px"></div>
+              <div id="calPanel" style="width:340px;flex:none;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 18px"></div>
             </div>
           </div>
-          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>
@@ -101,21 +110,65 @@
 </div>
 
 <div id="mAssign" class="proto-modal" hidden>
-  <div class="proto-dialog" style="width:520px">
+  <div class="proto-dialog" style="width:560px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
-      <span style="font-size:15px;font-weight:700">アサインを追加<span id="calAsgDate" style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px"></span></span>
+      <span style="font-size:15px;font-weight:700"><span id="calAsgTitle">アサイン</span><span id="calAsgDate" style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px"></span></span>
       <span role="button" onclick="pClose('mAssign')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <div id="calAsgStats" style="background:var(--a-surface-2);border-radius:8px;padding:10px 14px;display:flex;gap:18px;font-size:12px;color:var(--a-fg-muted)"></div>
-      <div><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">オペレーターを選択(複数可)</span>
-        <div id="calAsgChips" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+      <div id="calAsgStats" style="background:var(--a-surface-2);border-radius:8px;padding:10px 14px;display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--a-fg-muted)"></div>
+      <div><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">会社ごとの投入人数</span>
+        <div id="calAsgRows" style="margin-top:6px"></div>
       </div>
-      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">確定すると選択したオペレーターへ割当通知(メール)が送信されます。無効・招待中のアカウントは選択できません。</div>
+      <div id="calAsgOther" style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7"></div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">確定すると担当会社のオペレーター管理者(Lv2)へ割当通知(メール)が送信されます。誰を出すかは各社で決めます。人数は会期の全日を通しての人数です。募集状態は充足に応じて自動で切り替わります(不足=追加募集中・充足=募集完了)。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mAssign')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
       <button onclick="calAssignCommit()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">アサインを確定</button>
+    </div>
+  </div>
+</div>
+
+<div id="mCapacity" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:620px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">処理能力の設定<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">会社ごとの1人1日あたり処理枚数</span></span>
+      <span role="button" onclick="pClose('mCapacity')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div id="calCapaRows"></div>
+      <div id="calCapaErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.8">推定値はオペレーター実績確認の当月の作業件数を、当月の営業日数と対象人数で割った値です(1件＝名刺1枚)。<br>実績は「その会社に振られた量」であって処理能力の上限とは限りません。稼働率が低い会社は実力より小さく出るため、実態と合わない場合は上書きしてください。</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:10px;padding:0 22px 18px">
+      <button onclick="calCapaReset()" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">推定値に戻す</button>
+      <span style="display:flex;gap:10px">
+        <button onclick="pClose('mCapacity')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+        <button onclick="calCapaSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div id="mRecruit" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">増員を依頼<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">各社のオペレーター管理者(Lv2)へ通知</span></span>
+      <span role="button" onclick="pClose('mRecruit')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+      <div id="calRecStats" style="background:var(--a-surface-2);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--a-fg-muted)"></div>
+      <div><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">宛先(所属会社)</span>
+        <div id="calRecTo" style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--a-fg)"></div>
+      </div>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">本文</span><textarea id="calRecBody" aria-label="本文" rows="5" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:12.5px;font-family:inherit;line-height:1.8;color:var(--a-fg-strong);background:var(--a-surface);resize:vertical"></textarea></label>
+      <div id="calRecErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">送信すると対象案件は「追加募集中」になり、宛先の会社から追加でアサインできる状態になります。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button onclick="pClose('mRecruit')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="calRecruitSend()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">依頼を送信</button>
     </div>
   </div>
 </div>
@@ -137,14 +190,17 @@
 <div id="mCsvImport" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:540px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
-      <span style="font-size:15px;font-weight:700">CSVインポート<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">祝日・個別設定の一括登録</span></span>
+      <span style="font-size:15px;font-weight:700">休業日CSV取込<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">個別休業日・振替営業日の一括登録</span></span>
       <span role="button" onclick="pClose('mCsvImport')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">CSVファイル</span><input aria-label="CSVファイル" type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:12.5px;font-family:inherit;background:var(--a-surface)"></label>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <label style="display:block;flex:1;min-width:0"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">CSVファイル</span><input aria-label="CSVファイル" type="file" accept=".csv" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:12.5px;font-family:inherit;background:var(--a-surface)"></label>
+        <button onclick="calTemplateDl()" title="記入例の入ったCSVテンプレートを保存します" style="flex:none;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">テンプレートをダウンロード</button>
+      </div>
       <div style="border:1px solid var(--a-border);border-radius:8px;overflow:hidden">
         <div style="padding:8px 14px;background:var(--a-surface-2);font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">列構成(すべて必須)</div>
-        <div style="padding:10px 14px;font-size:12px;line-height:1.9;font-family:ui-monospace,monospace">date, event_type, reason<br><span style="color:var(--a-fg-faint)">2026-08-13, HOLIDAY, 夏季休業<br>2026-08-08, SUBSTITUTE_WORKDAY, 振替営業</span></div>
+        <div style="padding:10px 14px;font-size:12px;line-height:1.9;font-family:ui-monospace,monospace;overflow-x:auto">date, event_type, reason<br><span style="color:var(--a-fg-faint)">2026-08-13, HOLIDAY, 夏季休業<br>2026-08-08, SUBSTITUTE_WORKDAY, 振替営業</span></div>
       </div>
       <div><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">既存の設定と重複した場合</span>
         <div style="margin-top:8px;display:flex;gap:16px;font-size:13px;color:var(--a-fg)">
@@ -152,7 +208,7 @@
           <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="calCsvDup">スキップする</label>
         </div>
       </div>
-      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">UTF-8(BOM付き)・CRLF・ヘッダー行あり。エラー行は除外して残りを取り込み、結果は更新ログへ記録されます。<a href="data:text/csv;charset=utf-8,%EF%BB%BFdate,event_type,reason%0D%0A" download="calendar_import_template.csv">テンプレートをダウンロード</a></div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">UTF-8(BOM付き)・CRLF・ヘッダー行あり。エラー行は除外して残りを取り込み、結果は更新ログへ記録されます。曜日単位の定休日はこのCSVでは扱いません。「定休日設定」から指定してください。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
@@ -173,35 +229,115 @@ window.pCalImport = function () {
     window.pToast(name + ' を取り込みました');
     window.pClose('mCsvImport');
 };
+
+// 取込テンプレート。BOM付きUTF-8・CRLF を確実に出すため data URI ではなく Blob で作る
+window.calTemplateDl = function () {
+    var rows = [
+        'date,event_type,reason',
+        '2026-08-13,HOLIDAY,夏季休業',
+        '2026-08-08,SUBSTITUTE_WORKDAY,振替営業'
+    ];
+    var blob = new Blob(['\uFEFF' + rows.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'calendar_import_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    window.pToast('テンプレートをダウンロードしました');
+};
 </script>
 
 
 <script>
 // 営業日カレンダー(モック)。表示範囲は2026年6月〜8月、データはアンケート管理から導出した静的セット。
-// 画面内の操作(選択・アサイン・営業日設定)はページ内の状態にのみ反映され、再読み込みで初期化される
+// アサインは案件(アンケート)単位で、担当は会期の全日を通す。日ごとの過不足は集計で導く。
+// 画面内の操作(選択・アサイン・営業日設定・増員依頼)はページ内の状態にのみ反映され、再読み込みで初期化される
 (function () {
     'use strict';
-    var CAL = {"surveys": {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "plan": "通常", "status": "会期前", "s": "2026-08-03", "e": "2026-08-05", "st": "10:00", "et": "17:00", "due": "", "ans": 0, "recon": true}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "plan": "特急", "status": "会期中", "s": "2026-07-30", "e": "2026-08-01", "st": "10:00", "et": "17:00", "due": "", "ans": 3842, "recon": false}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "plan": "通常", "status": "会期中", "s": "2026-07-29", "e": "2026-07-31", "st": "10:00", "et": "17:00", "due": "", "ans": 926, "recon": false}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-24", "e": "2026-07-26", "st": "10:00", "et": "17:00", "due": "2026/08/05 15:00", "ans": 2150, "recon": true}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "plan": "超特急", "status": "データ化中", "s": "2026-07-22", "e": "2026-07-24", "st": "09:30", "et": "18:00", "due": "2026/08/04 18:00", "ans": 1208, "recon": true}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "plan": "オンデマンド", "status": "データ化中", "s": "2026-07-21", "e": "2026-07-23", "st": "10:00", "et": "17:00", "due": "2026/07/31 18:00", "ans": 3420, "recon": true}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "plan": "特急", "status": "データ化中", "s": "2026-07-18", "e": "2026-07-20", "st": "10:00", "et": "17:00", "due": "2026/07/30 15:00", "ans": 2864, "recon": true}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "plan": "通常", "status": "データ化中", "s": "2026-07-16", "e": "2026-07-16", "st": "13:00", "et": "18:00", "due": "2026/08/03 12:00", "ans": 412, "recon": true}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "plan": "超特急", "status": "データ化完了", "s": "2026-07-14", "e": "2026-07-16", "st": "10:00", "et": "17:00", "due": "2026/07/21", "ans": 1980, "recon": false}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "plan": "お試し", "status": "データ化完了", "s": "2026-07-10", "e": "2026-07-10", "st": "11:00", "et": "19:00", "due": "2026/07/17", "ans": 356, "recon": false}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "plan": "特急", "status": "データ化完了", "s": "2026-07-07", "e": "2026-07-07", "st": "13:00", "et": "17:30", "due": "2026/07/14", "ans": 288, "recon": false}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-02", "e": "2026-07-04", "st": "10:00", "et": "17:00", "due": "2026/07/09", "ans": 3105, "recon": false}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "plan": "通常", "status": "データ化完了", "s": "2026-06-25", "e": "2026-06-27", "st": "10:00", "et": "17:00", "due": "2026/07/04", "ans": 1472, "recon": false}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "plan": "特急", "status": "データ化完了", "s": "2026-06-19", "e": "2026-06-20", "st": "09:30", "et": "18:00", "due": "2026/06/26", "ans": 926, "recon": false}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "plan": "超特急", "status": "データ化完了", "s": "2026-06-12", "e": "2026-06-14", "st": "10:00", "et": "17:00", "due": "2026/06/19", "ans": 1038, "recon": false}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "plan": "通常", "status": "データ化完了", "s": "2026-06-05", "e": "2026-06-07", "st": "10:00", "et": "17:00", "due": "2026/06/12", "ans": 2214, "recon": false}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "plan": "お試し", "status": "データ化完了", "s": "2026-05-28", "e": "2026-05-30", "st": "10:00", "et": "17:00", "due": "2026/06/07", "ans": 684, "recon": false}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "plan": "通常", "status": "データ化完了", "s": "2026-05-21", "e": "2026-05-23", "st": "10:00", "et": "17:00", "due": "2026/05/28", "ans": 1760, "recon": false}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-05-14", "e": "2026-05-16", "st": "10:00", "et": "17:00", "due": "2026/05/21", "ans": 2530, "recon": false}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "plan": "特急", "status": "データ化完了", "s": "2026-05-08", "e": "2026-05-10", "st": "10:00", "et": "17:00", "due": "2026/05/15", "ans": 1204, "recon": false}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "plan": "通常", "status": "データ化完了", "s": "2026-04-23", "e": "2026-04-25", "st": "10:00", "et": "17:00", "due": "2026/05/02", "ans": 842, "recon": false}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "plan": "超特急", "status": "データ化完了", "s": "2026-04-15", "e": "2026-04-15", "st": "13:00", "et": "18:00", "due": "2026/04/22", "ans": 516, "recon": false}}, "daySv": {"2026-08-03": ["SV-10262"], "2026-08-04": ["SV-10262"], "2026-08-05": ["SV-10262"], "2026-07-30": ["SV-10259", "SV-10257"], "2026-07-31": ["SV-10259", "SV-10257"], "2026-08-01": ["SV-10259"], "2026-07-29": ["SV-10257"], "2026-07-24": ["SV-10250", "SV-10244"], "2026-07-25": ["SV-10250"], "2026-07-26": ["SV-10250"], "2026-07-22": ["SV-10244", "SV-10238"], "2026-07-23": ["SV-10244", "SV-10238"], "2026-07-21": ["SV-10238"], "2026-07-18": ["SV-10236"], "2026-07-19": ["SV-10236"], "2026-07-20": ["SV-10236"], "2026-07-16": ["SV-10233", "SV-10229"], "2026-07-14": ["SV-10229"], "2026-07-15": ["SV-10229"], "2026-07-10": ["SV-10227"], "2026-07-07": ["SV-10221"], "2026-07-02": ["SV-10218"], "2026-07-03": ["SV-10218"], "2026-07-04": ["SV-10218"], "2026-06-25": ["SV-10214"], "2026-06-26": ["SV-10214"], "2026-06-27": ["SV-10214"], "2026-06-19": ["SV-10209"], "2026-06-20": ["SV-10209"], "2026-06-12": ["SV-10205"], "2026-06-13": ["SV-10205"], "2026-06-14": ["SV-10205"], "2026-06-05": ["SV-10201"], "2026-06-06": ["SV-10201"], "2026-06-07": ["SV-10201"]}, "assigns": {"2026-06-05": ["王 麗華", "田中 大輔"], "2026-06-12": ["佐藤 由紀", "王 麗華"], "2026-06-19": ["山本 彩", "佐藤 由紀"], "2026-06-25": ["王 麗華", "田中 大輔"], "2026-06-26": ["田中 大輔", "山本 彩"], "2026-07-02": ["田中 大輔", "山本 彩"], "2026-07-03": ["山本 彩", "佐藤 由紀"], "2026-07-07": ["山本 彩", "佐藤 由紀"], "2026-07-10": ["田中 大輔", "山本 彩"], "2026-07-14": ["田中 大輔", "山本 彩"], "2026-07-15": ["山本 彩", "佐藤 由紀"], "2026-07-16": ["佐藤 由紀", "王 麗華", "田中 大輔"], "2026-07-21": ["王 麗華", "田中 大輔"], "2026-07-22": ["田中 大輔", "山本 彩", "佐藤 由紀"], "2026-07-23": ["山本 彩", "佐藤 由紀", "王 麗華"], "2026-07-24": ["佐藤 由紀", "王 麗華", "田中 大輔"], "2026-07-29": ["王 麗華", "田中 大輔"], "2026-07-30": ["田中 大輔", "山本 彩", "佐藤 由紀"], "2026-07-31": ["山本 彩", "佐藤 由紀", "王 麗華"]}};
+    var CAL = {"surveys": {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "plan": "通常", "status": "会期前", "s": "2026-08-03", "e": "2026-08-05", "st": "10:00", "et": "17:00", "ans": 0, "recon": true}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "plan": "特急", "status": "会期中", "s": "2026-07-30", "e": "2026-08-01", "st": "10:00", "et": "17:00", "ans": 3842, "recon": false}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "plan": "通常", "status": "会期中", "s": "2026-07-29", "e": "2026-07-31", "st": "10:00", "et": "17:00", "ans": 926, "recon": false}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-24", "e": "2026-07-26", "st": "10:00", "et": "17:00", "ans": 2150, "recon": true}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "plan": "超特急", "status": "データ化中", "s": "2026-07-22", "e": "2026-07-24", "st": "09:30", "et": "18:00", "ans": 1208, "recon": true}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "plan": "オンデマンド", "status": "データ化中", "s": "2026-07-21", "e": "2026-07-23", "st": "10:00", "et": "17:00", "ans": 3420, "recon": true}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "plan": "特急", "status": "データ化中", "s": "2026-07-18", "e": "2026-07-20", "st": "10:00", "et": "17:00", "ans": 2864, "recon": true}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "plan": "通常", "status": "データ化中", "s": "2026-07-16", "e": "2026-07-16", "st": "13:00", "et": "18:00", "ans": 412, "recon": true}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "plan": "超特急", "status": "データ化完了", "s": "2026-07-14", "e": "2026-07-16", "st": "10:00", "et": "17:00", "ans": 1980, "recon": false}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "plan": "お試し", "status": "データ化完了", "s": "2026-07-10", "e": "2026-07-10", "st": "11:00", "et": "19:00", "ans": 356, "recon": false}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "plan": "特急", "status": "データ化完了", "s": "2026-07-07", "e": "2026-07-07", "st": "13:00", "et": "17:30", "ans": 288, "recon": false}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-07-02", "e": "2026-07-04", "st": "10:00", "et": "17:00", "ans": 3105, "recon": false}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "plan": "通常", "status": "データ化完了", "s": "2026-06-25", "e": "2026-06-27", "st": "10:00", "et": "17:00", "ans": 1472, "recon": false}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "plan": "特急", "status": "データ化完了", "s": "2026-06-19", "e": "2026-06-20", "st": "09:30", "et": "18:00", "ans": 926, "recon": false}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "plan": "超特急", "status": "データ化完了", "s": "2026-06-12", "e": "2026-06-14", "st": "10:00", "et": "17:00", "ans": 1038, "recon": false}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "plan": "通常", "status": "データ化完了", "s": "2026-06-05", "e": "2026-06-07", "st": "10:00", "et": "17:00", "ans": 2214, "recon": false}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "plan": "お試し", "status": "データ化完了", "s": "2026-05-28", "e": "2026-05-30", "st": "10:00", "et": "17:00", "ans": 684, "recon": false}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "plan": "通常", "status": "データ化完了", "s": "2026-05-21", "e": "2026-05-23", "st": "10:00", "et": "17:00", "ans": 1760, "recon": false}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "plan": "オンデマンド", "status": "データ化完了", "s": "2026-05-14", "e": "2026-05-16", "st": "10:00", "et": "17:00", "ans": 2530, "recon": false}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "plan": "特急", "status": "データ化完了", "s": "2026-05-08", "e": "2026-05-10", "st": "10:00", "et": "17:00", "ans": 1204, "recon": false}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "plan": "通常", "status": "データ化完了", "s": "2026-04-23", "e": "2026-04-25", "st": "10:00", "et": "17:00", "ans": 842, "recon": false}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "plan": "超特急", "status": "データ化完了", "s": "2026-04-15", "e": "2026-04-15", "st": "13:00", "et": "18:00", "ans": 516, "recon": false}}, "daySv": {"2026-08-03": ["SV-10262"], "2026-08-04": ["SV-10262"], "2026-08-05": ["SV-10262"], "2026-07-30": ["SV-10259", "SV-10257"], "2026-07-31": ["SV-10259", "SV-10257"], "2026-08-01": ["SV-10259"], "2026-07-29": ["SV-10257"], "2026-07-24": ["SV-10250", "SV-10244"], "2026-07-25": ["SV-10250"], "2026-07-26": ["SV-10250"], "2026-07-22": ["SV-10244", "SV-10238"], "2026-07-23": ["SV-10244", "SV-10238"], "2026-07-21": ["SV-10238"], "2026-07-18": ["SV-10236"], "2026-07-19": ["SV-10236"], "2026-07-20": ["SV-10236"], "2026-07-16": ["SV-10233", "SV-10229"], "2026-07-14": ["SV-10229"], "2026-07-15": ["SV-10229"], "2026-07-10": ["SV-10227"], "2026-07-07": ["SV-10221"], "2026-07-02": ["SV-10218"], "2026-07-03": ["SV-10218"], "2026-07-04": ["SV-10218"], "2026-06-25": ["SV-10214"], "2026-06-26": ["SV-10214"], "2026-06-27": ["SV-10214"], "2026-06-19": ["SV-10209"], "2026-06-20": ["SV-10209"], "2026-06-12": ["SV-10205"], "2026-06-13": ["SV-10205"], "2026-06-14": ["SV-10205"], "2026-06-05": ["SV-10201"], "2026-06-06": ["SV-10201"], "2026-06-07": ["SV-10201"]}, "exp": {"SV-10262": 4200, "SV-10259": 3800, "SV-10257": 1000, "SV-10250": 2200, "SV-10244": 1200, "SV-10238": 3500, "SV-10236": 2900, "SV-10233": 450, "SV-10229": 2000, "SV-10227": 360, "SV-10221": 300, "SV-10218": 3200, "SV-10214": 1500, "SV-10209": 950, "SV-10205": 1050, "SV-10201": 2250, "SV-10196": 700, "SV-10192": 1800, "SV-10188": 2600, "SV-10183": 1250, "SV-10179": 850, "SV-10174": 520}};
     var HOLI = { '2026-07-20': '海の日', '2026-08-11': '山の日' };
     var MONTHS = ['2026-06', '2026-07', '2026-08'];
     var TODAY = '2026-07-31';
-    var POOL = ['佐藤 由紀', '王 麗華', '田中 大輔', '山本 彩'];
     var WD = ['日', '月', '火', '水', '木', '金', '土'];
+    var LANES = 5;  // 1週に並べる帯の上限。あふれた案件はセル下部に「他N件」で示す
 
+    // 納期区分ごとの納期(営業日)。02_dashboard/src/services/bizcardPlans.js の turnaroundDays と揃える。
+    // 起算は「展示会会期終了日の翌営業日を1営業日目」(tooltipContent.js bizcardPlanAndSpeed)。
+    // オンデマンドは当日中の納品なので会期中に作業する
+    var TURNAROUND = { 'お試し': 6, '通常': 6, '特急': 3, '超特急': 1, 'オンデマンド': 0 };
+
+    // 会社ごとの1人1日あたり処理枚数。オペレーター実績確認(2026/07)の作業件数を
+    // 当月営業日22日と対象人数で割った推定値。1件=名刺1枚。
+    // 実績は「振られた量」であって能力の上限ではないため、処理能力の設定から上書きできる
+    var CAPA_BASE = {
+        'アブロード本体': 130,              // (2,980 + 2,742) ÷ 2人 ÷ 22日
+        'オフィスワークス株式会社': 118,     // (3,214 + 2,412 + 2,188) ÷ 3人 ÷ 22日
+        'データパートナーズ株式会社': 88     // 1,926 ÷ 1人 ÷ 22日
+    };
+    // 会社が同時に出せる人数。オペレーター管理の「有効」なアカウント数を使う。
+    // 実績から導くと、退職・無効化された人の過去実績まで現在の戦力として数えてしまう
+    // （データパートナーズは実績1,926件があるが、鈴木 恵=無効・高橋 直樹=招待中で稼働可能者0名）
+    var ACTIVE_HEADCOUNT = {
+        'アブロード本体': 2,                // 佐藤 由紀・山本 彩
+        'オフィスワークス株式会社': 2,       // 田中 大輔・王 麗華
+        'データパートナーズ株式会社': 0      // 鈴木 恵(無効)・高橋 直樹(招待中)
+    };
+
+    // 所属会社。operator-management.html のグループと同じ3件
+    var GROUPS = ['アブロード本体', 'オフィスワークス株式会社', 'データパートナーズ株式会社'];
+    var MY_GROUP = 'アブロード本体';  // Lv2シナリオの所属。proto-level.js の lv2.group と揃える
+
+    // 案件単位のアサイン。会社ごとの投入人数で持つ。誰を出すかは各社が社内で決める運用のため
+    // 個人名までは扱わない。担当は会期の全日を通しての割当
     var S = {
-        ym: '2026-07', sel: TODAY,
+        ym: '2026-07', sel: TODAY, selSv: null,
+        view: 'around',     // single(単月) / around(前後2週・既定) / year(年間)
         reg: { w: { 0: true, 6: true }, hol: true },
         ind: {
             '2026-08-08': { t: 'sub', memo: '' },
             '2026-08-13': { t: 'hol', memo: '夏季休業' },
             '2026-08-14': { t: 'hol', memo: '夏季休業' }
         },
-        asg: CAL.assigns
+        asg: {
+            // 進行中の案件は作業日が重なる。稼働可能なアカウント数
+            // (アブロード2／オフィスワークス2／データパートナーズ0) をどの日も超えない配分
+            'SV-10262': {},
+            'SV-10259': { 'オフィスワークス株式会社': 2 },
+            'SV-10257': { 'アブロード本体': 2 },
+            'SV-10250': { 'オフィスワークス株式会社': 2 },
+            'SV-10244': { 'アブロード本体': 1, 'オフィスワークス株式会社': 2 },
+            'SV-10238': { 'オフィスワークス株式会社': 1 },
+            'SV-10236': { 'アブロード本体': 1, 'オフィスワークス株式会社': 1 },
+            'SV-10233': { 'アブロード本体': 1 },
+            'SV-10229': { 'オフィスワークス株式会社': 1, 'アブロード本体': 1 },
+            'SV-10227': { 'アブロード本体': 1 },
+            'SV-10221': { 'データパートナーズ株式会社': 1 },
+            'SV-10218': { 'オフィスワークス株式会社': 2, 'データパートナーズ株式会社': 1 },
+            'SV-10214': { 'オフィスワークス株式会社': 2 },
+            'SV-10209': { 'アブロード本体': 2 },
+            'SV-10205': { 'データパートナーズ株式会社': 1 },
+            'SV-10201': { 'オフィスワークス株式会社': 1, 'アブロード本体': 1 }
+        },
+        capa: {},           // 会社 -> 1人日あたり処理枚数の上書き。未設定なら CAPA_BASE
+        recruit: {},        // sid -> 'open'(追加募集中) / 'closed'(募集完了) の手動オーバーライド
+        fGroup: '', fState: '', shortOnly: false
     };
 
+    // ---- 小道具 ----
     function lv() { return window.pLevel(); }  // 表示シナリオの判定は proto-level.js に寄せる
     function pad2(n) { return (n < 10 ? '0' : '') + n; }
-    function dow(is) { return new Date(is + 'T00:00:00').getDay(); }
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function toDate(is) { return new Date(is + 'T00:00:00'); }
+    function toIso(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+    function addDays(is, n) { var d = toDate(is); d.setDate(d.getDate() + n); return toIso(d); }
+    function diffDays(a, b) { return Math.round((toDate(b) - toDate(a)) / 86400000); }
+    function dow(is) { return toDate(is).getDay(); }
+    function md(is) { var d = toDate(is); return (d.getMonth() + 1) + '/' + d.getDate(); }
     function typ(is) {
         var i = S.ind[is];
         if (i) { return { t: i.t, memo: i.memo || '', ind: true }; }
@@ -212,160 +348,1009 @@ window.pCalImport = function () {
     // 個別設定を除いた素の区分(振替営業日の妥当性判定に使う)
     function baseHoliday(is) { return (HOLI[is] && S.reg.hol) || !!S.reg.w[dow(is)]; }
     function svOf(is) { return CAL.daySv[is] || []; }
-    function asgOf(is) { return S.asg[is] || []; }
-    function short(is) { return svOf(is).length > 0 && asgOf(is).length === 0 && typ(is).t !== 'hol' && is >= TODAY; }
 
+    // ---- 処理能力 ----
+    function perPerson(g) { return S.capa[g] != null ? S.capa[g] : (CAPA_BASE[g] || 0); }
+    function avgPerPerson() {
+        var t = 0;
+        GROUPS.forEach(function (g) { t += perPerson(g); });
+        return Math.max(1, Math.round(t / GROUPS.length));
+    }
+    // その会社が1日に同時に出せる人数の上限＝稼働可能なアカウント数
+    function headroom(g) { return ACTIVE_HEADCOUNT[g] || 0; }
+    // 対象案件の作業期間のうち、他案件がその会社を最も多く使っている日の人数。
+    // 同じ人を別案件へ二重に配員しないよう、案件をまたいで枠を押さえる
+    function otherLoad(sid, g) {
+        var peak = 0;
+        workDays(sid).forEach(function (d) {
+            var t = 0;
+            workOf(d).forEach(function (c) {
+                if (c === sid || isPast(c)) { return; }
+                t += (asgOf(c)[g] || 0);
+            });
+            if (t > peak) { peak = t; }
+        });
+        return peak;
+    }
+    // この案件がその会社から追加で確保できる人数
+    function availableFor(sid, g) { return Math.max(0, headroom(g) - otherLoad(sid, g)); }
+    // 全社を総動員したときの1日あたり処理枚数。これを超える案件は増員では解決せず、
+    // 納期区分か受注量の見直しが要る
+    function maxSupply() {
+        var t = 0;
+        GROUPS.forEach(function (g) { t += headroom(g) * perPerson(g); });
+        return t;
+    }
+    function isBiz(is) { return typ(is).t !== 'hol'; }
+
+    // ---- 作業期間 ----
+    // オンデマンドは当日データ化なので会期の各日が作業日。それ以外は会期終了日の翌営業日から
+    // 納期営業日数ぶん。休業日・振替営業日の設定がそのまま納期に効く
+    var _wd = {};
+    function workDays(sid) {
+        if (_wd[sid]) { return _wd[sid]; }
+        var out = calcWorkDays(sid);
+        _wd[sid] = out;
+        return out;
+    }
+    function calcWorkDays(sid) {
+        var v = CAL.surveys[sid], td = TURNAROUND[v.plan], out = [], i;
+        if (!td) {
+            for (i = 0; i < spanDays(sid); i++) { out.push(addDays(v.s, i)); }
+            return out;
+        }
+        var cur = v.e, guard = 0;
+        while (out.length < td && guard++ < 180) {
+            cur = addDays(cur, 1);
+            if (isBiz(cur)) { out.push(cur); }
+        }
+        return out;
+    }
+    function dueDate(sid) { var w = workDays(sid); return w.length ? w[w.length - 1] : CAL.surveys[sid].e; }
+
+    // ---- 案件の充足 ----
+    function spanDays(sid) { var v = CAL.surveys[sid]; return diffDays(v.s, v.e) + 1; }
+    // 1日あたりに処理しないと納期に間に合わない枚数
+    function dailyLoad(sid) {
+        var w = workDays(sid).length;
+        return w ? Math.ceil((CAL.exp[sid] || 0) / w) : 0;
+    }
+    // 投入人数から出る1日あたりの処理枚数。会社ごとに生産性が違うので人数だけでは決まらない
+    function supplyOf(sid) {
+        var m = asgOf(sid), t = 0;
+        GROUPS.forEach(function (g) { if (m[g] > 0) { t += m[g] * perPerson(g); } });
+        return t;
+    }
+    // 平均的な生産性で見た必要人数の目安。実際の判定は枚数(supply vs dailyLoad)で行う
+    function need(sid) { return Math.max(1, Math.ceil(dailyLoad(sid) / avgPerPerson())); }
+    function asgOf(sid) { return S.asg[sid] || {}; }
+    function filled(sid) {
+        var m = asgOf(sid), t = 0;
+        for (var g in m) { if (m[g] > 0) { t += m[g]; } }
+        return t;
+    }
+    function mineOf(sid) { return asgOf(sid)[MY_GROUP] || 0; }
+    // 終了はアンケート側のステータスで判定する。納期は営業日設定から算出する値なので、
+    // これで終了を決めると「データ化中なのに終了扱いでアサインできない」状態が起きる
+    function isPast(sid) { return CAL.surveys[sid].status === 'データ化完了'; }
+    // 充足率(供給÷必要)による段階判定。閾値は暫定値で実画面レビューで調整する(※要確定)
+    var RATE_CRIT = 0.7;    // これ未満は「不足(深刻)」= このままでは処理できない
+    var RATE_OVER = 1.3;    // これ超は「人数過多」= 余剰を他案件へ回せる
+    function fillRate(sid) {
+        var l = dailyLoad(sid);
+        return l ? supplyOf(sid) / l : 1;
+    }
+    function svState(sid) {
+        if (isPast(sid)) { return 'done'; }
+        if (filled(sid) === 0) { return 'none'; }
+        var r = fillRate(sid);
+        if (r < RATE_CRIT) { return 'critical'; }
+        if (r < 1) { return 'short'; }
+        return r > RATE_OVER ? 'over' : 'ok';
+    }
+    // 増員では解決しない案件。人手の問題ではなく納期区分か受注量の問題なので区別して見せる
+    function beyondCapacity(sid) {
+        return !isPast(sid) && supplyOf(sid) < dailyLoad(sid) && dailyLoad(sid) > maxSupply();
+    }
+    // 募集状態は充足から自動で遷移させる(運営は必要な時しか触らない方針・01共通UI §7.4)。
+    // 手動の締切・再開は例外操作。「不足を承知で打ち切った」締切(closed-sticky)は運営の判断
+    // なので維持し、充足時に付いた締切が営業日変更などで後から不足へ戻ったら自動判定へ戻す
+    function recruitState(sid) {
+        if (isPast(sid)) { return '終了'; }
+        var lacking = supplyOf(sid) < dailyLoad(sid);
+        var o = S.recruit[sid];
+        if (o === 'closed' && lacking) { delete S.recruit[sid]; o = null; }
+        if (o === 'open' && !lacking && filled(sid) > 0) { delete S.recruit[sid]; o = null; }
+        if (o) { return o === 'open' ? '追加募集中' : '募集完了'; }
+        if (filled(sid) === 0) { return '未アサイン'; }
+        return lacking ? '追加募集中' : '募集完了';
+    }
+    function planLabel(sid) {
+        var v = CAL.surveys[sid], td = TURNAROUND[v.plan];
+        return v.plan + ' ' + (td ? td + '営業日' : '当日中');
+    }
+    function loadWhy(sid) {
+        var w = workDays(sid).length;
+        return '見込 ' + (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚 ÷ 作業 ' + w + '営業日 = '
+            + dailyLoad(sid).toLocaleString('ja-JP') + '枚/日'
+            + '（' + planLabel(sid) + '。'
+            + (TURNAROUND[CAL.surveys[sid].plan] ? '会期終了日の翌営業日から起算' : '会期中に当日データ化') + '）';
+    }
+    function needWhy(sid) {
+        return dailyLoad(sid).toLocaleString('ja-JP') + '枚/日 ÷ 平均 ' + avgPerPerson() + '枚/人日 = '
+            + need(sid) + '人（目安。実際の判定は会社ごとの処理能力で行います）';
+    }
+    // 会社別の内訳。人数の入っている会社だけを GROUPS の並び順で返す
+    function byGroup(sid) {
+        var m = asgOf(sid);
+        return GROUPS.filter(function (g) { return m[g] > 0; }).map(function (g) { return { group: g, n: m[g] }; });
+    }
+
+    var BAND = {
+        none: { sym: '✕', fg: 'var(--a-danger)', bg: 'var(--a-danger-bg)', bd: 'var(--a-danger-border)', label: '未アサイン', hatch: true },
+        critical: { sym: '▲', fg: 'var(--a-on-accent)', bg: 'var(--a-danger-bg-solid)', bd: 'var(--a-danger-border)', label: '不足(深刻)', hatch: false },
+        short: { sym: '▲', fg: 'var(--a-danger)', bg: 'var(--a-danger-bg)', bd: 'var(--a-danger-border)', label: '不足', hatch: false },
+        ok: { sym: '●', fg: 'var(--a-ok)', bg: 'var(--a-ok-bg)', bd: 'var(--a-ok-border)', label: '充足', hatch: false },
+        over: { sym: '◎', fg: 'var(--a-accent-deep)', bg: 'var(--a-info-bg)', bd: 'var(--a-info-border)', label: '人数過多', hatch: false },
+        done: { sym: '・', fg: 'var(--a-fg-muted)', bg: 'var(--a-surface-2)', bd: 'var(--a-border)', label: '終了', hatch: false }
+    };
+
+    // ---- 絞り込み ----
+    function passFilter(sid) {
+        var st = svState(sid);
+        if (S.shortOnly && st !== 'none' && st !== 'short' && st !== 'critical') { return false; }
+        if (S.fState && st !== S.fState) { return false; }
+        if (S.fGroup && !(asgOf(sid)[S.fGroup] > 0)) { return false; }
+        return true;
+    }
+
+    // ---- 日単位の集計 ----
+    // その日に作業が走る案件。会期の日ではなく作業日で引く
+    var _byWorkDay = null;
+    function workOf(is) {
+        if (!_byWorkDay) {
+            _byWorkDay = {};
+            Object.keys(CAL.surveys).forEach(function (sid) {
+                workDays(sid).forEach(function (d) { (_byWorkDay[d] = _byWorkDay[d] || []).push(sid); });
+            });
+        }
+        return _byWorkDay[is] || [];
+    }
+    // 営業日設定を変えると作業日がずれるため、再描画のたびに作り直す
+    function invalidateWork() { _byWorkDay = null; _wd = {}; }
+
+    // 帯のセグメント。オンデマンドは会期＝作業なので1本、それ以外は会期と作業期間の2本
+    function segmentsOf(sid) {
+        var v = CAL.surveys[sid], w = workDays(sid);
+        if (!TURNAROUND[v.plan]) { return [{ kind: 'work', s: v.s, e: v.e }]; }
+        var segs = [{ kind: 'event', s: v.s, e: v.e }];
+        if (w.length) { segs.push({ kind: 'work', s: w[0], e: w[w.length - 1] }); }
+        return segs;
+    }
+    // 会期開始から納期までの通し区間。レーン確保はこれ単位で行い、2本を同じレーンに載せる
+    function unionSpan(sid) {
+        var v = CAL.surveys[sid], d = dueDate(sid);
+        return { s: v.s, e: d > v.e ? d : v.e };
+    }
+
+    // 不足は案件ごとの不足分の合計で数える。過剰な案件が別案件の不足を打ち消さないようにするため
+    // 納期を過ぎた案件は集計に入れない。この画面は先の人繰りを見るためのもので、
+    // 終わった案件の過不足を並べても読みにくくなるだけ
+    function dayAgg(is) {
+        var sids = workOf(is), live = [], load = 0, sup = 0, cases = 0, lackVol = 0;
+        sids.forEach(function (sid) {
+            if (isPast(sid)) { return; }
+            live.push(sid);
+            load += dailyLoad(sid); sup += supplyOf(sid);
+            var lack = dailyLoad(sid) - supplyOf(sid);
+            if (lack > 0) { cases++; lackVol += lack; }
+        });
+        return { sids: sids, live: live, evSids: svOf(is), load: load, supply: sup, lackCases: cases, lackVol: lackVol };
+    }
+    // その日に作業が走る案件を通した会社別の投入人数と処理枚数
+    function dayByGroup(is) {
+        var t = {};
+        workOf(is).forEach(function (sid) {
+            if (isPast(sid)) { return; }
+            var m = asgOf(sid);
+            GROUPS.forEach(function (g) { if (m[g] > 0) { t[g] = (t[g] || 0) + m[g]; } });
+        });
+        return GROUPS.filter(function (g) { return t[g]; })
+            .map(function (g) {
+                return { group: g, n: t[g], vol: t[g] * perPerson(g), cap: headroom(g), over: t[g] > headroom(g) };
+            });
+    }
+
+    // 要員が重複している日。営業日設定を変えると作業日がずれ、確定済みの配員が
+    // 後から上限を割ることがある。設定変更は正当なので止めず、見逃せないようにする
+    function overDaysIn(ym) {
+        var y = parseInt(ym.slice(0, 4), 10), m = parseInt(ym.slice(5, 7), 10);
+        var dim = new Date(y, m, 0).getDate(), out = [];
+        for (var d = 1; d <= dim; d++) {
+            var is = ym + '-' + pad2(d);
+            if (dayByGroup(is).some(function (g) { return g.over; })) { out.push(is); }
+        }
+        return out;
+    }
+    function allOverDays() {
+        var out = [];
+        MONTHS.forEach(function (ym) { out = out.concat(overDaysIn(ym)); });
+        return out;
+    }
+    // 営業日設定の変更後に呼ぶ。件数ではなく日付の集合で比べる。
+    // 件数で比べると、重複が別の日へ移っただけのとき(1日→1日)に見逃す
+    function warnIfNewOverlap(before) {
+        var had = {};
+        (before || []).forEach(function (d) { had[d] = 1; });
+        var added = allOverDays().filter(function (d) { return !had[d]; });
+        if (!added.length) { return; }
+        window.pToast('営業日の変更で作業日がずれ、' + added.map(md).join('・')
+            + ' で要員が重複しています。配員を見直してください', 'error');
+    }
+
+    // ---- 操作 ----
     window.calMonth = function (d) {
         var i = MONTHS.indexOf(S.ym) + d;
         if (i < 0 || i >= MONTHS.length) { return; }
         S.ym = MONTHS[i];
         calRender();
     };
-    window.calSelect = function (is) { S.sel = is; calRender(); };
-
-    function cellLines(is, t) {
-        var out = [];
-        var sv = svOf(is).length;
-        var asg = asgOf(is).length;
-        if (t.t === 'hol') { out.push('<span style="color:var(--a-fg-muted2)">休業日' + (t.memo ? '(' + t.memo + ')' : '') + '</span>'); }
-        if (t.t === 'sub') { out.push('<span style="color:var(--a-accent-deep)">振替営業日</span>'); }
-        if (sv) { out.push('<span style="color:' + (t.t === 'hol' ? 'var(--a-fg-faint)' : 'var(--a-fg-muted)') + '">会期 ' + sv + '件</span>'); }
-        if (short(is)) {
-            out.push('<span style="color:var(--a-danger);font-weight:700">アサイン 0人</span>');
-        } else if (asg) {
-            out.push('<span style="color:var(--a-fg-muted)">アサイン ' + asg + '人</span>');
+    window.calToday = function () {
+        if (S.view === 'year') { S.view = 'around'; }
+        S.ym = TODAY.slice(0, 7);
+        S.sel = TODAY;
+        S.selSv = null;
+        calRender();
+    };
+    window.calMode = function (v) {
+        if (S.view === v) { return; }
+        S.view = v;
+        calRender();
+    };
+    window.calSelect = function (is) { S.sel = is; S.selSv = null; calRender(); };
+    // 帯を選んだら、その案件の会期〜納期のうち表示中の月に入る最初の日を選ぶ。
+    // 会期だけを見ると、作業期間しか当月に無い案件で月外の日付を選んでしまう
+    window.calPick = function (sid) {
+        var u = unionSpan(sid);
+        S.selSv = sid;
+        if (!(S.sel >= u.s && S.sel <= u.e && S.sel.slice(0, 7) === S.ym)) {
+            var pick = null, n = diffDays(u.s, u.e);
+            for (var i = 0; i <= n; i++) {
+                var c = addDays(u.s, i);
+                if (c.slice(0, 7) === S.ym) { pick = c; break; }
+            }
+            // 通し区間が当月に一切かからない場合(絞り込み等で起こりうる)は月初へ寄せる
+            S.sel = pick || (S.ym + '-01');
         }
-        return out.join('<br>');
+        calRender();
+    };
+    window.calFilter = function () {
+        var g = document.getElementById('calFGroup');
+        var s = document.getElementById('calFState');
+        S.fGroup = g ? g.value : '';
+        S.fState = s ? s.value : '';
+        calRender();
+    };
+    window.calShortOnly = function (el) { S.shortOnly = !!el.checked; calRender(); };
+
+    // ---- カレンダー描画 ----
+    // 帯は週をまたぐため、42マスの平坦なグリッドではなく週ごとのグリッドを積む。
+    // 1週 = 背景セル(grid-row 1/-1) + 日番号(row 1) + 帯レーン(row 2〜) + 日計(最終row)
+    function collectBands(week) {
+        var first = week[0], last = week[6];
+        var list = [];
+        Object.keys(CAL.surveys).forEach(function (sid) {
+            var u = unionSpan(sid);
+            if (u.e < first || u.s > last) { return; }
+            if (passFilter(sid)) { list.push(sid); }
+        });
+        list.sort(function (a, b) {
+            var ua = unionSpan(a), ub = unionSpan(b);
+            if (ua.s !== ub.s) { return ua.s < ub.s ? -1 : 1; }
+            var la = diffDays(ua.s, ua.e), lb = diffDays(ub.s, ub.e);
+            if (la !== lb) { return lb - la; }
+            return a < b ? -1 : 1;
+        });
+        var lanes = [], out = [], over = {};
+        list.forEach(function (sid) {
+            var u = unionSpan(sid);
+            var us = u.s < first ? first : u.s, ue = u.e > last ? last : u.e;
+            var col = diffDays(first, us), span = diffDays(us, ue) + 1;
+            var li = 0, c;
+            for (; li < LANES; li++) {
+                if (!lanes[li]) { lanes[li] = []; }
+                var free = true;
+                for (c = col; c < col + span; c++) { if (lanes[li][c]) { free = false; break; } }
+                if (free) { break; }
+            }
+            if (li >= LANES) {
+                for (c = col; c < col + span; c++) { over[c] = (over[c] || 0) + 1; }
+                return;
+            }
+            // 会期と作業期間は同じレーンへ載せる。レーンは通し区間で押さえる
+            for (c = col; c < col + span; c++) { lanes[li][c] = true; }
+            segmentsOf(sid).forEach(function (sg) {
+                if (sg.e < first || sg.s > last) { return; }
+                var ss = sg.s < first ? first : sg.s, se = sg.e > last ? last : sg.e;
+                out.push({
+                    sid: sid, kind: sg.kind, lane: li,
+                    col: diffDays(first, ss), span: diffDays(ss, se) + 1,
+                    contL: sg.s < first, contR: sg.e > last
+                });
+            });
+        });
+        return { bands: out, over: over };
+    }
+
+    function bandHtml(b) {
+        var sid = b.sid, v = CAL.surveys[sid], st = svState(sid);
+        var isWork = b.kind === 'work';
+        // 会期は破線グレーで情報のみ。人員の充足色は作業期間側に乗せる
+        var c = isWork ? BAND[st]
+            : { sym: '', fg: 'var(--a-fg-muted)', bg: 'var(--a-surface-2)', bd: 'var(--a-border-strong)', hatch: false };
+        var load = dailyLoad(sid), sup = supplyOf(sid);
+        // 終了案件は過不足を問う対象ではないので、日次ではなく総枚数を実績として出す
+        var tail = !isWork ? '会期'
+            : st === 'done' ? (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚'
+            : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
+            : sup.toLocaleString('ja-JP') + '/' + load.toLocaleString('ja-JP') + '枚';
+        // 記号は独立した span に置く。省略表示の検査は葉要素の文字と title の先頭一致を見るため、
+        // 記号を混ぜると「・ SV-10229」と title「SV-10229 …」がずれて全文が読めない扱いになる
+        var head = isWork ? sid : (sid + ' ' + v.title);
+        var beyond = isWork && beyondCapacity(sid);
+        var sym = beyond ? '⚠' : BAND[st].sym;
+        var aria = sid + ' ' + v.title + (isWork
+            ? ' 作業期間 納期' + md(dueDate(sid)) + ' ' + planLabel(sid)
+                + ' 必要' + load + '枚/日 供給' + sup + '枚/日 '
+                + (beyond ? '全社総動員でも不足' : BAND[st].label)
+            : ' 会期 ' + md(v.s) + 'から' + md(v.e));
+        var hatch = (isWork && c.hatch)
+            ? 'background-image:repeating-linear-gradient(135deg,rgba(0,0,0,0) 0 5px,' + c.bd + ' 5px 6px);' : '';
+        var radL = b.contL ? '0' : '4px', radR = b.contR ? '0' : '4px';
+        var inner = (b.contL ? '<span style="flex:none">◀</span>' : '')
+            + (isWork ? '<span aria-hidden="true" style="flex:none;font-weight:700">' + sym + '</span>' : '')
+            + '<span title="' + esc(sid + ' ' + v.title) + '" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' + (isWork ? ';font-weight:700' : '') + '">' + esc(head) + '</span>'
+            + '<span style="flex:none;font-variant-numeric:tabular-nums' + (isWork ? ';font-weight:700' : '') + '">' + tail + '</span>'
+            + (b.contR ? '<span style="flex:none">▶</span>' : '');
+        return '<div role="button" tabindex="0" aria-label="' + esc(aria) + '" title="' + esc(aria) + '"'
+            + ' onclick="calPick(\'' + sid + '\')"'
+            + ' style="grid-row:' + (2 + b.lane) + ';grid-column:' + (b.col + 1) + '/span ' + b.span + ';'
+            + 'margin:0 ' + (b.contR ? '0' : '3px') + ' 2px ' + (b.contL ? '0' : '3px') + ';'
+            + 'display:flex;align-items:center;gap:5px;height:18px;padding:0 6px;box-sizing:border-box;cursor:pointer;'
+            + 'min-width:0;overflow:hidden;'
+            + 'font-size:10.5px;line-height:18px;color:' + c.fg + ';background-color:' + c.bg + ';' + hatch
+            + 'border:1px ' + (isWork ? 'solid ' : 'dashed ') + c.bd + ';border-radius:' + radL + ' ' + radR + ' ' + radR + ' ' + radL + ';'
+            + (sid === S.selSv ? 'box-shadow:0 0 0 2px var(--a-accent);' : '') + '">' + inner + '</div>';
+    }
+
+    function weekHtml(week, ym, isLast, dim) {
+        var col = collectBands(week);
+        var used = 1;
+        col.bands.forEach(function (b) { if (b.lane + 1 > used) { used = b.lane + 1; } });
+        var rows = ['auto'];
+        for (var i = 0; i < used; i++) { rows.push('20px'); }
+        rows.push('auto');
+
+        // 列は minmax(0,1fr) で固定する。1fr(=minmax(auto,1fr)) だと帯や休業日ラベルの
+        // min-content がその列を押し広げ、週ごとに列幅がずれて曜日ヘッダーと合わなくなる。
+        // dim=当月を含まない週(前後2週の月外部分)。帯ごと淡くして当月との違いを一目にする
+        var h = '<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:' + rows.join(' ') + ';'
+            + (isLast ? '' : 'border-bottom:1px solid var(--a-border-soft);')
+            + (dim ? 'opacity:.45;background:var(--a-surface-2);' : '') + 'min-height:86px">';
+
+        // 背景セル。クリック対象を兼ねるため最初に置いて他のレイヤーを上に重ねる
+        week.forEach(function (is, i) {
+            var t = typ(is);
+            var out = is.slice(0, 7) !== ym;
+            var bg = t.t === 'hol' ? 'background:var(--a-surface-3);' : (t.t === 'sub' ? 'background:var(--a-info-bg);' : '');
+            var d = toDate(is);
+            h += '<div tabindex="0" role="button" aria-label="' + (d.getMonth() + 1) + '月' + d.getDate() + '日"'
+                + ' onclick="calSelect(\'' + is + '\')"'
+                + ' style="grid-row:1/-1;grid-column:' + (i + 1) + ';' + bg
+                + (i < 6 ? 'border-right:1px solid var(--a-border-soft);' : '')
+                + (out ? 'opacity:.55;' : '') + 'cursor:pointer"></div>';
+        });
+
+        // 日番号と区分ラベル
+        week.forEach(function (is, i) {
+            var t = typ(is), w = dow(is), d = toDate(is);
+            var out = is.slice(0, 7) !== ym;
+            var numCol = out ? 'var(--a-fg-faint)' : (t.t === 'sub' ? 'var(--a-accent-deep)'
+                : (w === 0 ? 'var(--a-danger)' : (w === 6 ? 'var(--a-accent)' : 'var(--a-fg)')));
+            var lab = t.t === 'hol' ? '休業日' + (t.memo ? '(' + esc(t.memo) + ')' : '')
+                : (t.t === 'sub' ? '振替営業日' : '');
+            h += '<div style="grid-row:1;grid-column:' + (i + 1) + ';padding:5px 8px 3px;pointer-events:none;'
+                + 'display:flex;align-items:baseline;gap:5px;min-width:0;overflow:hidden">'
+                + '<span style="font-size:12px;font-weight:700;color:' + numCol + '">'
+                + (out ? (d.getMonth() + 1) + '/' + d.getDate() : d.getDate()) + '</span>'
+                + (is === TODAY ? '<span style="font-size:10px;color:var(--a-accent);font-weight:700;flex:none">本日</span>' : '')
+                + (lab ? '<span title="' + lab + '" style="font-size:10px;color:var(--a-fg-muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + lab + '</span>' : '')
+                + '</div>';
+        });
+
+        col.bands.forEach(function (b) { h += bandHtml(b); });
+
+        // 日計。その日に作業が走る案件の必要枚数と供給枚数の合計、および不足している案件の数
+        week.forEach(function (is, i) {
+            var a = dayAgg(is);
+            var over = dayByGroup(is).filter(function (g) { return g.over; });
+            // 要員重複は行の先頭に置く。セルは1行で溢れを切り落とすため、末尾に付けると
+            // 幅の狭い環境で警告だけが消える
+            var txt = over.length ? '<span style="color:var(--a-danger);font-weight:700">⚠重複 </span>' : '';
+            if (a.live.length) {
+                var c = a.lackCases ? 'var(--a-danger)' : 'var(--a-fg-muted)';
+                txt += '<span style="color:' + c + ';font-variant-numeric:tabular-nums;font-weight:700">'
+                    + a.supply.toLocaleString('ja-JP') + '/' + a.load.toLocaleString('ja-JP') + '枚</span>'
+                    + (a.lackCases ? '<span style="color:var(--a-danger)"> ▲' + a.lackCases + '件</span>' : '');
+            }
+            if (col.over[i]) { txt += '<span style="color:var(--a-fg-faint)"> 他' + col.over[i] + '件</span>'; }
+            // 会社が違えば供給は融通できないため、合計が足りていても案件単位では不足しうる
+            var tip = (over.length
+                    ? '要員重複: ' + over.map(function (g) { return g.group + ' ' + g.n + '/' + g.cap + '人'; }).join('・') + '\n'
+                    : '')
+                + (a.live.length
+                    ? '必要 ' + a.load.toLocaleString('ja-JP') + '枚/日 ・ 供給 ' + a.supply.toLocaleString('ja-JP') + '枚/日'
+                        + (a.lackCases ? ' ・ 不足のある案件 ' + a.lackCases + '件(合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日)' : '')
+                    : '');
+            h += '<div' + (tip ? ' title="' + esc(tip) + '"' : '') + ' style="grid-row:' + (2 + used) + ';grid-column:' + (i + 1) + ';padding:2px 8px 6px;'
+                + 'font-size:10.5px;pointer-events:none;overflow:hidden;white-space:nowrap">' + txt + '</div>';
+        });
+
+        // 選択中のリングは帯より上に重ねる。背景セル側に置くと帯に上書きされて途切れる
+        var si = week.indexOf(S.sel);
+        if (si >= 0) {
+            h += '<div aria-hidden="true" style="grid-row:1/-1;grid-column:' + (si + 1)
+                + ';box-shadow:inset 0 0 0 2px var(--a-accent);pointer-events:none;position:relative;z-index:1"></div>';
+        }
+
+        return h + '</div>';
+    }
+
+    function paintModeSwitch() {
+        [].slice.call(document.querySelectorAll('#calViewSwitch button')).forEach(function (b) {
+            var on = b.getAttribute('data-view') === S.view;
+            b.style.background = on ? 'var(--a-accent-bg)' : 'var(--a-surface)';
+            b.style.color = on ? 'var(--a-on-accent)' : 'var(--a-fg-muted)';
+            b.style.fontWeight = on ? '700' : '400';
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+    }
+
+    // 表示範囲の週リスト。単月=当月の週のみ、前後2週=当月の前2週〜後2週
+    function viewWeeks() {
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        var dim = new Date(y, m, 0).getDate();
+        var start = toIso(new Date(y, m - 1, 1 - new Date(y, m - 1, 1).getDay()));
+        var end = addDays(S.ym + '-' + pad2(dim), 6 - new Date(y, m - 1, dim).getDay());
+        if (S.view === 'around') { start = addDays(start, -14); end = addDays(end, 14); }
+        var weeks = [], n = (diffDays(start, end) + 1) / 7;
+        for (var w = 0; w < n; w++) {
+            var week = [];
+            for (var i = 0; i < 7; i++) { week.push(addDays(start, w * 7 + i)); }
+            weeks.push(week);
+        }
+        return weeks;
     }
 
     function calRender() {
         // Lv1ではページ本文がガード表示に差し替えられるため描画しない
         if (!document.getElementById('calTitle')) { return; }
+        paintModeSwitch();
+        var year = S.view === 'year';
         var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
-        document.getElementById('calTitle').textContent = y + '年 ' + m + '月';
+        document.getElementById('calTitle').textContent = year ? y + '年' : y + '年 ' + m + '月';
         var pi = MONTHS.indexOf(S.ym);
         var prev = document.getElementById('calPrev'), next = document.getElementById('calNext');
+        prev.style.display = year ? 'none' : ''; next.style.display = year ? 'none' : '';
         prev.disabled = pi === 0; next.disabled = pi === MONTHS.length - 1;
         prev.style.color = prev.disabled ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
         next.style.color = next.disabled ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
+        // 年間は月次の道具(絞り込み・集計行・右パネル・曜日ヘッダー)を持たない
+        document.getElementById('calFilters').style.display = year ? 'none' : 'flex';
+        document.getElementById('calSummary').style.display = year ? 'none' : 'flex';
+        document.getElementById('calPanel').style.display = year ? 'none' : '';
+        document.getElementById('calWeekHead').style.display = year ? 'none' : 'grid';
+        document.getElementById('calLegend').style.display = year ? 'none' : 'flex';
 
-        var first = new Date(y, m - 1, 1).getDay();
-        var dim = new Date(y, m, 0).getDate();
-        var total = Math.ceil((first + dim) / 7) * 7;
-        var cells = [];
-        for (var i = 0; i < total; i++) {
-            var lastCol = i % 7 === 6;
-            var lastRow = i >= total - 7;
-            var bd = (lastRow ? '' : 'border-bottom:1px solid var(--a-border-soft);') + (lastCol ? '' : 'border-right:1px solid var(--a-border-soft);');
-            var d = i - first + 1;
-            if (d < 1 || d > dim) {
-                var od = new Date(y, m - 1, d);
-                var lab = (d === 1 - first || d === dim + 1) ? (od.getMonth() + 1) + '/' + od.getDate() : String(od.getDate());
-                cells.push('<div style="min-height:86px;padding:6px 8px;' + bd + 'background:var(--a-surface);color:var(--a-fg-faint);font-size:12px">' + lab + '</div>');
-                continue;
-            }
-            var is = y + '-' + pad2(m) + '-' + pad2(d);
-            var t = typ(is);
-            var w = dow(is);
-            var numCol = w === 0 ? ';color:var(--a-danger)' : (w === 6 ? ';color:var(--a-accent)' : '');
-            if (t.t === 'sub') { numCol = ';color:var(--a-accent-deep)'; }
-            var bg = t.t === 'hol' ? 'background:var(--a-surface-3);' : (t.t === 'sub' ? 'background:var(--a-info-bg);' : '');
-            var ring = is === S.sel ? 'box-shadow:inset 0 0 0 2px var(--a-accent);' : '';
-            var today = is === TODAY ? ' <span style="font-size:10px;color:var(--a-accent);font-weight:700">本日</span>' : '';
-            var lines = cellLines(is, t);
-            cells.push('<div tabindex="0" role="button" aria-label="' + m + '月' + d + '日" onclick="calSelect(\'' + is + '\')" style="min-height:86px;padding:6px 8px;' + bd + bg + ring + 'font-size:12px;cursor:pointer">'
-                + '<span style="font-weight:700' + numCol + '">' + d + '</span>' + today
-                + (lines ? '<div style="margin-top:4px;font-size:10.5px;line-height:1.6">' + lines + '</div>' : '')
-                + '</div>');
+        invalidateWork();   // 営業日設定が変わると作業日と納期がずれる
+        if (year) { yearRender(); return; }
+
+        // 前後2週は前月末〜翌月頭を上下にそのまま並べる(スクロール窓は使わない)。
+        // 月の境目が分かるよう、月が替わる週の前に区切りラベル行を挟み、
+        // 当月を含まない週は帯ごと淡くして当月ブロックを浮かび上がらせる
+        function divider(label, accent) {
+            return '<div style="display:flex;align-items:center;gap:10px;padding:5px 12px;'
+                + (accent ? 'background:var(--a-info-bg);color:var(--a-accent-deep);' : 'background:var(--a-surface-2);color:var(--a-fg-muted);')
+                + 'border-bottom:1px solid var(--a-border-soft);font-size:11.5px;font-weight:700">'
+                + label + '<span style="flex:1;border-top:1px solid ' + (accent ? 'var(--a-info-border)' : 'var(--a-border)') + '"></span></div>';
         }
-        document.getElementById('calGrid').innerHTML = cells.join('');
+        var weeks = viewWeeks();
+        var html = '';
+        weeks.forEach(function (week, w) {
+            var inMonth = week.some(function (is) { return is.slice(0, 7) === S.ym; });
+            if (S.view === 'around') {
+                if (w === 0) {
+                    html += divider(parseInt(week[0].slice(5, 7), 10) + '月', false);
+                } else {
+                    for (var i = 0; i < 7; i++) {
+                        if (week[i].slice(8) === '01') {
+                            var isCur = week[i].slice(0, 7) === S.ym;
+                            html += divider(parseInt(week[i].slice(5, 7), 10) + '月' + (isCur ? '（対象月）' : ''), isCur);
+                            break;
+                        }
+                    }
+                }
+            }
+            html += weekHtml(week, S.ym, w === weeks.length - 1, S.view === 'around' && !inMonth);
+        });
+        document.getElementById('calGrid').innerHTML = html;
+        summaryRender();
+        legendRender();
         panelRender();
     }
 
+    // 年間ビュー: 月×指標の一覧表。図は使わず数値で俯瞰する
+    function yearRender() {
+        var y = parseInt(S.ym.slice(0, 4), 10);
+        var COLS = 'display:grid;grid-template-columns:minmax(80px,80fr) minmax(90px,70fr) minmax(130px,95fr) minmax(120px,85fr) minmax(120px,95fr) minmax(90px,70fr) minmax(110px,85fr);align-items:center;padding:0 18px';
+        var h = '<div style="' + COLS + ';height:40px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">'
+            + '<span>月</span><span style="text-align:right">営業日数</span><span style="text-align:right">休業・振替の設定</span><span style="text-align:right">会期のある案件</span><span style="text-align:right">予定枚数合計</span><span style="text-align:right">不足日数</span><span style="text-align:right">要員重複日数</span></div>';
+        for (var m = 1; m <= 12; m++) {
+            var ym = y + '-' + pad2(m);
+            var dim = new Date(y, m, 0).getDate();
+            var mEnd = ym + '-' + pad2(dim);
+            var biz = 0, ind = 0, lackDays = 0;
+            for (var d = 1; d <= dim; d++) {
+                var is = ym + '-' + pad2(d);
+                if (isBiz(is)) { biz++; }
+                if (S.ind[is]) { ind++; }
+                if (dayAgg(is).lackCases) { lackDays++; }
+            }
+            var svN = 0, vol = 0;
+            Object.keys(CAL.surveys).forEach(function (sid) {
+                var v = CAL.surveys[sid];
+                if (!(v.e < ym + '-01' || v.s > mEnd)) { svN++; }
+                if (v.s.slice(0, 7) === ym) { vol += CAL.exp[sid] || 0; }
+            });
+            var od = overDaysIn(ym).length;
+            var inRange = MONTHS.indexOf(ym) >= 0;
+            h += '<div' + (inRange
+                    ? ' tabindex="0" role="button" class="proto-row-hover" onclick="calYearPick(\'' + ym + '\')" title="押すと前後2週表示でこの月を開きます"'
+                    : ' title="モックのデータ範囲外(2026/06〜08)"')
+                + ' style="' + COLS + ';height:42px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;'
+                + (inRange ? 'cursor:pointer' : 'color:var(--a-fg-faint)') + '">'
+                + '<span style="font-weight:700">' + m + '月</span>'
+                + '<span style="text-align:right">' + biz + '日</span>'
+                + '<span style="text-align:right">' + (ind ? ind + '件' : '—') + '</span>'
+                + '<span style="text-align:right">' + (svN ? svN + '件' : '—') + '</span>'
+                + '<span style="text-align:right">' + (vol ? vol.toLocaleString('ja-JP') + '枚' : '—') + '</span>'
+                + '<span style="text-align:right' + (lackDays ? ';color:var(--a-danger);font-weight:700' : '') + '">' + (lackDays ? lackDays + '日' : '—') + '</span>'
+                + '<span style="text-align:right' + (od ? ';color:var(--a-danger);font-weight:700' : '') + '">' + (od ? od + '日' : '—') + '</span>'
+                + '</div>';
+        }
+        h += '<div style="padding:9px 18px;font-size:11px;color:var(--a-fg-faint)">予定枚数合計は会期初日の属する月に計上する。不足日数はその日に必要枚数へ届かない案件がある日の数。</div>';
+        document.getElementById('calGrid').innerHTML = h;
+    }
+    window.calYearPick = function (ym) { S.view = 'around'; S.ym = ym; calRender(); };
+
+    // 当月に会期がかかる案件の状態内訳。Lv4が「どこが足りないか」へ最短で入るための行
+    function summaryRender() {
+        var el = document.getElementById('calSummary');
+        if (!el) { return; }
+        // 会期だけでなく作業期間が当月にかかる案件も数える。作業は会期の後に来るため
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        var mStart = S.ym + '-01', mEnd = S.ym + '-' + pad2(new Date(y, m, 0).getDate());
+        var cnt = { none: 0, critical: 0, short: 0, ok: 0, over: 0, done: 0, beyond: 0 };
+        Object.keys(CAL.surveys).forEach(function (sid) {
+            var u = unionSpan(sid);
+            if (u.e < mStart || u.s > mEnd) { return; }
+            cnt[svState(sid)]++;
+            if (beyondCapacity(sid)) { cnt.beyond++; }
+        });
+        function part(label, n, danger) {
+            var c = (danger && n > 0) ? 'var(--a-danger)' : 'var(--a-fg-muted)';
+            return '<span style="color:' + c + '">' + label + ' <strong style="font-variant-numeric:tabular-nums">' + n + '件</strong></span>';
+        }
+        var refocus = document.activeElement && document.activeElement.id === 'calShortOnly';
+        el.innerHTML =
+            '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:12.5px">'
+            + '<span style="font-weight:700;font-size:13px">この月の案件</span>'
+            + part('未アサイン', cnt.none, true) + part('不足(深刻)', cnt.critical, true) + part('不足', cnt.short, true)
+            + (cnt.beyond
+                ? '<span title="増員では解決しません。納期区分か受注量の見直しが要ります" style="color:var(--a-danger);font-weight:700;cursor:help">⚠ 総動員でも不足 <strong style="font-variant-numeric:tabular-nums">' + cnt.beyond + '件</strong></span>'
+                : '')
+            + part('充足', cnt.ok, false) + part('人数過多', cnt.over, false) + part('終了', cnt.done, false)
+            + (function () {
+                var od = overDaysIn(S.ym);
+                return od.length
+                    ? '<span title="' + esc('要員が重複している日: ' + od.map(md).join('・')) + '" style="color:var(--a-danger);font-weight:700;cursor:help">⚠ 要員重複 <strong style="font-variant-numeric:tabular-nums">' + od.length + '日</strong></span>'
+                    : '';
+            })()
+            + '</div>'
+            + '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
+            + '<input type="checkbox" id="calShortOnly" onchange="calShortOnly(this)"' + (S.shortOnly ? ' checked' : '') + '>不足のみ表示</label>';
+        if (refocus) { document.getElementById('calShortOnly').focus(); }
+    }
+
+    function legendRender() {
+        var el = document.getElementById('calLegend');
+        if (!el) { return; }
+        function sw(style, label) {
+            return '<span style="display:flex;align-items:center;gap:5px"><span style="width:13px;height:13px;border-radius:3px;'
+                + style + '"></span>' + label + '</span>';
+        }
+        function sym(k) {
+            return '<span style="display:flex;align-items:center;gap:4px"><span style="color:' + BAND[k].fg + ';font-weight:700">'
+                + BAND[k].sym + '</span>' + BAND[k].label + '</span>';
+        }
+        el.innerHTML =
+            '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">営業日区分</span>'
+            + sw('background:var(--a-surface);border:1px solid var(--a-border-strong)', '営業日')
+            + sw('background:var(--a-surface-3)', '休業日')
+            + sw('background:var(--a-info-bg);border:1px solid var(--a-info-border)', '振替営業日')
+            + sw('background:var(--a-surface);box-shadow:inset 0 0 0 2px var(--a-accent)', '選択中') + '</span>'
+            + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">帯</span>'
+            + sw('background:var(--a-surface-2);border:1px dashed var(--a-border-strong)', '会期(名刺が集まる期間)')
+            + sym('none') + sym('critical') + sym('short')
+            + '<span style="display:flex;align-items:center;gap:4px"><span style="color:var(--a-danger);font-weight:700">⚠</span>総動員でも不足</span>'
+            + sym('ok') + sym('over') + sym('done')
+            + '<span style="color:var(--a-fg-muted2)">充足色は作業期間(データ化する日)に付きます。不足(深刻)=充足率70%未満・人数過多=130%超(閾値は要確定)</span></span>'
+            + '<span>日付または帯を選択すると右に詳細を表示します。</span>';
+    }
+
+    // ---- 右パネル ----
+    function svCard(sid) {
+        var v = CAL.surveys[sid], st = svState(sid), c = BAND[st];
+        var load = dailyLoad(sid), sup = supplyOf(sid), lackVol = load - sup;
+        var f = filled(sid), w = workDays(sid);
+        var canEdit = st !== 'done';
+        var isLead = lv() >= 3;
+        var groups = byGroup(sid).map(function (g) {
+            var self = g.group === MY_GROUP && lv() <= 2;
+            var label = g.group + (self ? '（自社）' : '');
+            return '<div style="display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid var(--a-border-soft)">'
+                + '<span title="' + esc(label) + '" style="flex:1;min-width:0;color:' + (self ? 'var(--a-fg-strong);font-weight:700' : 'var(--a-fg-muted)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+                + esc(label) + '</span>'
+                + '<span style="flex:none;font-variant-numeric:tabular-nums;font-weight:700">' + g.n + '人</span>'
+                + '<span style="flex:none;width:74px;text-align:right;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)" title="' + esc(g.group + ' は1人1日あたり ' + perPerson(g.group) + '枚') + '">'
+                + (g.n * perPerson(g.group)).toLocaleString('ja-JP') + '枚/日</span></div>';
+        }).join('');
+        if (!groups) { groups = '<div style="padding:4px 0;border-top:1px solid var(--a-border-soft);color:var(--a-danger);font-weight:700">担当会社が決まっていません</div>'; }
+
+        var links = v.recon
+            ? '<a href="data-entry/index.html" style="font-size:11px">名刺入力</a> · <a href="reconciliation/index.html?sid=' + sid + '" style="font-size:11px">照合 →</a>'
+            : '';
+        var rs = recruitState(sid);
+        var btns = '';
+        if (canEdit) {
+            btns += '<button onclick="calAssignOpen(\'' + sid + '\')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">'
+                + (isLead ? '会社別の人数を編集' : '自社の人数を入力') + '</button>';
+            if (isLead) {
+                if (lackVol > 0) {
+                    btns += '<button onclick="calRecruitOpen(\'' + sid + '\')" style="background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">増員を依頼</button>';
+                }
+                btns += rs === '募集完了'
+                    ? '<button onclick="calRecruitReopen(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の再募集は例外時のみ使い、充足と矛盾したら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">再募集(例外)</button>'
+                    : '<button onclick="calRecruitClose(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の締切は例外時のみ使い、不足へ戻ったら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">募集締切(例外)</button>';
+            }
+        }
+        return '<div style="border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';border-radius:6px;padding:9px 11px;'
+            + (sid === S.selSv ? 'box-shadow:0 0 0 1px var(--a-accent);' : '') + '">'
+            + '<div style="display:flex;gap:6px;align-items:baseline"><span style="flex:none;color:' + c.fg + ';font-weight:700">' + c.sym + '</span>'
+            + '<span style="flex:1;min-width:0"><a href="survey-detail.html?id=' + sid + '" style="font-variant-numeric:tabular-nums;font-size:12px">' + sid + '</a> ' + esc(v.title) + '</span></div>'
+            + '<div style="margin-top:3px;color:var(--a-fg-muted2);font-size:11.5px">会期 ' + md(v.s) + '–' + md(v.e)
+            + ' ・ ' + esc(planLabel(sid)) + ' ・ 納期 ' + md(dueDate(sid)) + '</div>'
+            + '<div style="margin-top:2px;color:var(--a-fg-muted2);font-size:11.5px">作業 '
+            + (w.length ? md(w[0]) + '–' + md(w[w.length - 1]) + '（' + w.length + '営業日）' : '—') + '</div>'
+            + '<div style="margin-top:5px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:11.5px">'
+            + '<span title="' + esc(loadWhy(sid)) + '" style="border-bottom:1px dotted var(--a-border-strong);cursor:help">必要 <strong style="font-variant-numeric:tabular-nums">' + load.toLocaleString('ja-JP') + '枚/日</strong></span>'
+            + '<span title="' + esc('投入 ' + f + '人ぶんの1日あたり処理枚数') + '">供給 <strong style="font-variant-numeric:tabular-nums">' + sup.toLocaleString('ja-JP') + '枚/日</strong>(' + f + '人)</span>'
+            + '<span style="color:' + (st === 'critical' ? 'var(--a-danger)' : c.fg) + ';font-weight:700">'
+            + (st === 'critical' || st === 'short'
+                ? '▲' + lackVol.toLocaleString('ja-JP') + '枚/日 不足（' + (st === 'critical' ? '深刻・' : '') + '充足率' + Math.round(fillRate(sid) * 100) + '%）'
+                : st === 'over' ? '◎ 人数過多（充足率' + Math.round(fillRate(sid) * 100) + '%）'
+                : c.label) + '</span>'
+            + '<span style="margin-left:auto;color:var(--a-fg-muted2)">' + rs + '</span></div>'
+            + (st === 'critical' || st === 'short' || st === 'none'
+                ? (load > maxSupply()
+                    ? '<div style="margin-top:4px;background:var(--a-danger-bg);border:1px solid var(--a-danger-border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--a-danger);font-weight:700;line-height:1.6">'
+                        + '⚠ 全社を総動員しても届きません（最大 ' + maxSupply().toLocaleString('ja-JP') + '枚/日）。増員では解決しないため、納期区分か受注量の見直しが要ります</div>'
+                    : '<div title="' + esc(needWhy(sid)) + '" style="margin-top:3px;font-size:11px;color:var(--a-fg-muted2);cursor:help">'
+                        + '目安 ' + need(sid) + '人（平均 ' + avgPerPerson() + '枚/人日 換算）'
+                        + (f > 0 && f >= need(sid) ? ' — 人数は目安に達していますが、担当会社の処理能力では届いていません' : '')
+                        + '</div>')
+                : '')
+            + (st === 'over'
+                ? '<div style="margin-top:3px;font-size:11px;color:var(--a-fg-muted2)">余剰 ' + (sup - load).toLocaleString('ja-JP') + '枚/日（平均換算で約 '
+                    + Math.floor((sup - load) / avgPerPerson()) + '人分）。他案件へ回せます</div>'
+                : '')
+            + '<div style="margin-top:5px;font-size:11.5px">' + groups + '</div>'
+            + (btns ? '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">' + btns + '</div>' : '')
+            + (links ? '<div style="margin-top:7px;text-align:right">' + links + '</div>' : '')
+            + '</div>';
+    }
+
     function panelRender() {
-        var is = S.sel;
-        var t = typ(is);
-        var d = new Date(is + 'T00:00:00');
-        var head = (d.getMonth() + 1) + '/' + d.getDate() + '(' + WD[d.getDay()] + ')の詳細';
-        var kind = t.t === 'hol' ? '<span style="font-size:11.5px;color:var(--a-fg-muted2);font-weight:700">休業日' + (t.memo ? '(' + t.memo + ')' : '') + '</span>'
+        var is = S.sel, t = typ(is), d = toDate(is);
+        var head = md(is) + '(' + WD[d.getDay()] + ')の詳細';
+        var kind = t.t === 'hol' ? '<span style="font-size:11.5px;color:var(--a-fg-muted2);font-weight:700">休業日' + (t.memo ? '(' + esc(t.memo) + ')' : '') + '</span>'
             : t.t === 'sub' ? '<span style="font-size:11.5px;color:var(--a-accent-deep);font-weight:700">振替営業日</span>'
             : '<span style="font-size:11.5px;color:var(--a-ok);font-weight:700">営業日</span>';
-        var ids = svOf(is);
-        var cards = ids.map(function (sid) {
-            var v = CAL.surveys[sid];
-            var links = v.recon
-                ? '<span style="white-space:nowrap"><a href="data-entry/index.html" style="font-size:11px">名刺入力</a> · <a href="reconciliation/index.html?sid=' + sid + '" style="font-size:11px">照合 →</a></span>'
-                : '';
-            return '<div style="border:1px solid var(--a-border-soft);border-radius:6px;padding:8px 10px">'
-                + '<a href="survey-detail.html?id=' + sid + '" style="font-variant-numeric:tabular-nums;font-size:12px">' + sid + '</a> ' + v.title
-                + '<div style="color:var(--a-fg-muted2);margin-top:2px;display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span>納期 ' + (v.due || '—') + '</span>' + links + '</div>'
-                + '</div>';
-        }).join('');
-        if (!cards) { cards = '<div style="color:var(--a-fg-faint)">この日に会期のあるアンケートはありません。</div>'; }
-        var names = asgOf(is);
-        var chips = names.map(function (n) {
-            return '<span style="border:1px solid var(--a-border-strong);border-radius:999px;padding:3px 4px 3px 10px;display:inline-flex;align-items:center;gap:2px">' + n
-                + '<button aria-label="' + n + ' のアサインを取り消す" title="取り消す" onclick="calUnassign(\'' + n + '\')" style="border:none;background:none;color:var(--a-fg-faint);cursor:pointer;font-size:13px;line-height:1;padding:2px 6px;font-family:inherit">×</button></span>';
-        }).join('');
-        if (!chips) {
-            chips = short(is) ? '<span style="color:var(--a-danger);font-weight:700">未アサイン</span>' : '<span style="color:var(--a-fg-faint)">未アサイン</span>';
-        }
-        var del = (t.ind && lv() >= 3)
-            ? '<button onclick="calDelAsk()" style="margin-top:12px;width:100%;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">この日の個別設定を削除</button>'
+
+        var a = dayAgg(is);
+        var summary = (a.live.length || a.evSids.length)
+            ? '<div style="margin-top:12px;background:var(--a-surface-2);border-radius:6px;padding:8px 11px;font-size:12px">'
+                + '<div style="display:flex;gap:14px;align-items:baseline">'
+                + '<span style="font-weight:700">この日のデータ化作業</span>'
+                + (a.live.length
+                    ? '<span style="font-variant-numeric:tabular-nums;font-weight:700;color:' + (a.lackCases ? 'var(--a-danger)' : 'var(--a-fg)') + '">'
+                        + a.supply.toLocaleString('ja-JP') + '/' + a.load.toLocaleString('ja-JP') + '枚</span>'
+                    : '<span style="color:var(--a-fg-muted2)">なし</span>')
+                + '</div>'
+                + (a.lackCases
+                    ? '<div style="margin-top:4px;color:var(--a-danger);font-weight:700">▲ 不足のある案件 ' + a.lackCases
+                        + '件（合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日 不足）</div>'
+                    : '')
+                + (a.live.length && a.load > maxSupply()
+                    ? '<div style="margin-top:4px;color:var(--a-danger);font-weight:700">⚠ この日の必要量が全社の最大処理量（' + maxSupply().toLocaleString('ja-JP') + '枚/日）を超えています</div>'
+                    : '')
+                + (a.evSids.length
+                    ? '<div style="margin-top:4px;color:var(--a-fg-muted2)">会期中のアンケート ' + a.evSids.length + '件（名刺の回収日。作業は納期区分に応じて後日）</div>'
+                    : '')
+                + '</div>'
             : '';
+        // その日に各社が何人出すことになるか。案件をまたいだ負荷はここでしか見えない
+        var load = dayByGroup(is);
+        var loadHtml = load.length
+            ? '<div style="margin-top:8px;border:1px solid var(--a-border-soft);border-radius:6px;padding:7px 11px;font-size:11.5px">'
+                + '<div style="color:var(--a-fg-muted);font-weight:700">この日の会社別 投入</div>'
+                + load.map(function (g) {
+                    var self = g.group === MY_GROUP && lv() <= 2;
+                    var label = g.group + (self ? '（自社）' : '');
+                    return '<div style="display:flex;gap:8px;align-items:baseline;margin-top:3px">'
+                        + '<span title="' + esc(label) + '" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:' + (self ? 'var(--a-fg-strong);font-weight:700' : 'var(--a-fg-muted)') + '">'
+                        + esc(label) + '</span>'
+                        + '<span title="' + esc(g.group + ' が同時に出せるのは ' + g.cap + '人まで（オペレーター管理で有効なアカウント数）') + '"'
+                        + ' style="flex:none;font-variant-numeric:tabular-nums;font-weight:700' + (g.over ? ';color:var(--a-danger)' : '') + '">'
+                        + g.n + '/' + g.cap + '人</span>'
+                        + '<span style="flex:none;width:74px;text-align:right;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">' + g.vol.toLocaleString('ja-JP') + '枚/日</span></div>';
+                }).join('')
+                + (load.some(function (g) { return g.over; })
+                    ? '<div style="margin-top:5px;color:var(--a-danger);font-weight:700">▲ 同時に出せる人数を超えている会社があります（案件をまたいだ重複割当）</div>'
+                    : '')
+                + '</div>'
+            : '';
+
+        // 作業日の案件を先に、会期だけの案件を後に並べる
+        var order = a.sids.slice();
+        a.evSids.forEach(function (sid) { if (order.indexOf(sid) < 0) { order.push(sid); } });
+        var cards = order.map(svCard).join('');
+        if (!cards) { cards = '<div style="color:var(--a-fg-faint)">この日に会期・作業のあるアンケートはありません。</div>'; }
+
+        var del = (t.ind && lv() >= 3)
+            ? '<button onclick="calDelAsk()" style="margin-top:14px;width:100%;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">この日の個別設定を削除</button>'
+            : '';
+
         document.getElementById('calPanel').innerHTML =
             '<div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--a-border)">'
             + '<span style="font-size:14px;font-weight:700">' + head + '</span>' + kind + '</div>'
-            + '<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--a-fg-muted)">会期のあるアンケート(' + ids.length + '件)</div>'
-            + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:280px;overflow-y:auto">' + cards + '</div>'
-            + '<div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--a-fg-muted)">アサイン済み(' + names.length + '人)</div>'
-            + '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">' + chips + '</div>'
-            + '<button onclick="calAssignOpen()" style="margin-top:14px;width:100%;background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 0;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">この日にアサインを追加</button>'
-            + '<div style="margin-top:10px;font-size:11px;color:var(--a-fg-faint)">確定するとオペレーターへ割当通知が送信されます。</div>'
+            + summary + loadHtml
+            + '<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--a-fg-muted)">この日のアンケート(' + order.length + '件)</div>'
+            + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:520px;overflow-y:auto">' + cards + '</div>'
             + del;
     }
 
-    // ---- アサイン ----
-    var tmpAsg = [];
-    window.calAssignOpen = function () {
-        tmpAsg = asgOf(S.sel).slice();
-        var d = new Date(S.sel + 'T00:00:00');
-        document.getElementById('calAsgDate').textContent = d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + '(' + WD[d.getDay()] + ')';
-        var ans = svOf(S.sel).reduce(function (a, sid) { return a + (CAL.surveys[sid].ans || 0); }, 0);
-        document.getElementById('calAsgStats').innerHTML =
-            '<span>会期 <strong style="font-variant-numeric:tabular-nums">' + svOf(S.sel).length + '件</strong></span>'
-            + '<span>回答数計 <strong style="font-variant-numeric:tabular-nums">' + ans.toLocaleString('ja-JP') + '件</strong></span>'
-            + '<span>アサイン済み <strong id="calAsgCount" style="font-variant-numeric:tabular-nums">' + tmpAsg.length + '人</strong></span>';
-        renderAsgChips();
+    // ---- アサイン(案件単位・会社ごとの人数) ----
+    // 誰を出すかは各社が社内で決めるため、この画面では会社と人数までを扱う
+    var asgSid = null, tmpAsg = {};
+    window.calAssignOpen = function (sid) {
+        asgSid = sid;
+        tmpAsg = {};
+        var cur = asgOf(sid);
+        GROUPS.forEach(function (g) { tmpAsg[g] = cur[g] || 0; });
+        var v = CAL.surveys[sid];
+        document.getElementById('calAsgTitle').textContent = sid + (lv() >= 3 ? ' の会社別人数' : ' への自社の投入人数');
+        document.getElementById('calAsgDate').textContent = '会期 ' + v.s.replace(/-/g, '/') + '〜' + v.e.replace(/-/g, '/');
+        renderAsg();
         window.pOpen('mAssign');
     };
-    function renderAsgChips() {
-        document.getElementById('calAsgChips').innerHTML = POOL.map(function (n) {
-            var on = tmpAsg.indexOf(n) >= 0;
-            return '<button onclick="calChip(\'' + n + '\')" style="border:1px solid ' + (on ? 'var(--a-accent)' : 'var(--a-border-strong)') + ';background:' + (on ? 'var(--a-info-bg)' : 'var(--a-surface)') + ';color:' + (on ? 'var(--a-accent)' : 'var(--a-fg-muted)') + ';border-radius:999px;padding:4px 14px;font-size:12px;' + (on ? 'font-weight:700;' : '') + 'cursor:pointer;font-family:inherit">' + n + (on ? ' ✓' : '') + '</button>';
-        }).join('');
-        var c = document.getElementById('calAsgCount');
-        if (c) { c.textContent = tmpAsg.length + '人'; }
+    // 合計と過不足は枚数で見る。同じ人数でも会社によって処理できる枚数が違うため
+    function asgTotals() {
+        var people = 0, vol = 0;
+        GROUPS.forEach(function (g) { people += tmpAsg[g]; vol += tmpAsg[g] * perPerson(g); });
+        return { people: people, vol: vol, load: dailyLoad(asgSid) };
     }
-    window.calChip = function (n) {
-        var i = tmpAsg.indexOf(n);
-        if (i >= 0) { tmpAsg.splice(i, 1); } else { tmpAsg.push(n); }
-        renderAsgChips();
+    // 供給と必要から状態表示(充足率つき)を作る。初期表示と入力追従で共用
+    function rateBadge(vol, load) {
+        if (!load) { return { color: 'var(--a-ok)', text: '充足' }; }
+        var lack = load - vol, pct = Math.round(vol / load * 100);
+        if (vol === 0) { return { color: 'var(--a-danger)', text: '未アサイン' }; }
+        if (pct < RATE_CRIT * 100) { return { color: 'var(--a-danger)', text: '▲' + lack.toLocaleString('ja-JP') + '枚/日 不足(深刻・充足率' + pct + '%)' }; }
+        if (pct < 100) { return { color: 'var(--a-danger)', text: '▲' + lack.toLocaleString('ja-JP') + '枚/日 不足(充足率' + pct + '%)' }; }
+        if (pct > RATE_OVER * 100) { return { color: 'var(--a-accent-deep)', text: '◎ 人数過多(充足率' + pct + '%・余剰' + (-lack).toLocaleString('ja-JP') + '枚/日)' }; }
+        return { color: 'var(--a-ok)', text: '充足(充足率' + pct + '%)' };
+    }
+    function renderAsg() {
+        var t = asgTotals(), badge = rateBadge(t.vol, t.load);
+        document.getElementById('calAsgStats').innerHTML =
+            '<span title="' + esc(loadWhy(asgSid)) + '" style="border-bottom:1px dotted var(--a-border-strong);cursor:help">必要 <strong style="font-variant-numeric:tabular-nums">' + t.load.toLocaleString('ja-JP') + '枚/日</strong></span>'
+            + '<span>供給 <strong style="font-variant-numeric:tabular-nums">' + t.vol.toLocaleString('ja-JP') + '枚/日</strong></span>'
+            + '<span>合計 <strong style="font-variant-numeric:tabular-nums">' + t.people + '人</strong></span>'
+            + '<span style="font-weight:700;color:' + badge.color + '">' + badge.text + '</span>';
+
+        var isLead = lv() >= 3;
+        document.getElementById('calAsgRows').innerHTML = GROUPS.map(function (g, i) {
+            var own = g === MY_GROUP;
+            var used = otherLoad(asgSid, g);             // 作業日が重なる他案件での使用人数
+            var cap = availableFor(asgSid, g);
+            var editable = (isLead || own) && cap > 0;   // 空きが無い会社へは入力させない
+            var label = g + (own && !isLead ? '（自社）' : '');
+            return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0' + (i ? ';border-top:1px solid var(--a-border-soft)' : '') + '">'
+                + '<span title="' + esc(label) + '" style="flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'
+                + (editable ? 'var(--a-fg-strong)' : 'var(--a-fg-muted)') + (own && !isLead ? ';font-weight:700' : '') + '">'
+                + esc(label) + '</span>'
+                + (editable
+                    ? '<input type="number" min="0" max="' + cap + '" step="1" value="' + tmpAsg[g] + '"'
+                        + ' aria-label="' + esc(g) + ' の投入人数" data-asg-group="' + esc(g) + '" data-asg-cap="' + cap + '" oninput="calAsgInput(this)"'
+                        + ' style="flex:none;width:72px;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;text-align:right;color:var(--a-fg-strong);background:var(--a-surface)">'
+                    : '<span style="flex:none;width:72px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted)">' + tmpAsg[g] + '</span>')
+                + '<span title="' + esc(g + ' の稼働可能 ' + headroom(g) + '名' + (used ? '、うち ' + used + '名は作業日の重なる他案件で使用中' : '')) + '"'
+                + ' style="flex:none;font-size:12px;color:' + (used ? 'var(--a-warn)' : 'var(--a-fg-muted2)') + '">/ ' + cap + '人'
+                + (used ? '（他案件 ' + used + '名）' : '') + '</span>'
+                + '<span data-asg-vol="' + esc(g) + '" title="' + esc(g + ' は1人1日あたり ' + perPerson(g) + '枚') + '"'
+                + ' style="flex:none;width:86px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">'
+                + (tmpAsg[g] * perPerson(g)).toLocaleString('ja-JP') + '枚/日</span></div>';
+        }).join('');
+
+        var zero = GROUPS.filter(function (g) { return headroom(g) === 0; });
+        document.getElementById('calAsgOther').innerHTML =
+            (zero.length ? '稼働可能なオペレーターがいないため入力できない会社: ' + zero.map(esc).join('・')
+                + '（オペレーター管理で有効なアカウントがありません）<br>' : '')
+            + '「/ N人」は、この案件の作業日にその会社から追加で確保できる人数です。作業日が重なる他案件で使っている分は差し引いています。<br>'
+            + (isLead ? '' : '自社以外の人数は参照のみです。変更が必要な場合は運営（Lv3以上）へ連絡してください。');
+    }
+    // 入力中の再描画はフォーカスを飛ばすため、集計表示だけを更新する
+    window.calAsgInput = function (el) {
+        // 空欄は0として集計するがフィールドは書き換えない(書き換えると入力途中で打てなくなる)。
+        // 範囲外の値だけ実際に丸める
+        var cap = parseInt(el.getAttribute('data-asg-cap'), 10);
+        if (isNaN(cap)) { cap = 99; }
+        var v = parseInt(el.value, 10);
+        if (isNaN(v)) { v = 0; }
+        else if (v < 0) { v = 0; el.value = 0; }
+        else if (v > cap) { v = cap; el.value = cap; }   // 稼働可能な人数を超えて入れられない
+        var g = el.getAttribute('data-asg-group');
+        tmpAsg[g] = v;
+        var cell = document.querySelector('[data-asg-vol="' + g.replace(/"/g, '\\"') + '"]');
+        if (cell) { cell.textContent = (v * perPerson(g)).toLocaleString('ja-JP') + '枚/日'; }
+        var t = asgTotals(), badge = rateBadge(t.vol, t.load);
+        var box = document.getElementById('calAsgStats');
+        box.children[1].innerHTML = '供給 <strong style="font-variant-numeric:tabular-nums">' + t.vol.toLocaleString('ja-JP') + '枚/日</strong>';
+        box.children[2].innerHTML = '合計 <strong style="font-variant-numeric:tabular-nums">' + t.people + '人</strong>';
+        box.children[3].style.color = badge.color;
+        box.children[3].textContent = badge.text;
     };
     window.calAssignCommit = function () {
-        var ordered = POOL.filter(function (n) { return tmpAsg.indexOf(n) >= 0; });
-        if (ordered.length) { S.asg[S.sel] = ordered; } else { delete S.asg[S.sel]; }
+        var m = {}, total = 0;
+        // 入力欄でも丸めているが、確定時にも案件横断の空きで頭打ちにする
+        GROUPS.forEach(function (g) {
+            var n = Math.min(tmpAsg[g] || 0, availableFor(asgSid, g));
+            if (n > 0) { m[g] = n; total += n; }
+        });
+        S.asg[asgSid] = m;
+        // 充足したら手動の募集オーバーライドを解いて自動判定へ戻す
+        if (S.recruit[asgSid] === 'open' && supplyOf(asgSid) >= dailyLoad(asgSid)) { delete S.recruit[asgSid]; }
+        S.selSv = asgSid;
         window.pClose('mAssign');
         calRender();
+        window.pToast(asgSid + ' の投入人数を更新しました');
     };
-    window.calUnassign = function (n) {
-        var a = asgOf(S.sel).filter(function (x) { return x !== n; });
-        if (a.length) { S.asg[S.sel] = a; } else { delete S.asg[S.sel]; }
+
+    // ---- 処理能力の設定(Lv3以上) ----
+    var tmpCapa = {};
+    window.calCapaOpen = function () {
+        tmpCapa = {};
+        GROUPS.forEach(function (g) { tmpCapa[g] = perPerson(g); });
+        renderCapa();
+        var e = document.getElementById('calCapaErr');
+        e.hidden = true; e.textContent = '';
+        window.pOpen('mCapacity');
+    };
+    function renderCapa() {
+        document.getElementById('calCapaRows').innerHTML =
+            '<div style="display:flex;align-items:center;gap:10px;padding-bottom:6px;border-bottom:1px solid var(--a-border);font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">'
+            + '<span style="flex:1;min-width:0">会社</span>'
+            + '<span style="flex:none;width:104px;text-align:right">実績からの推定</span>'
+            + '<span style="flex:none;width:96px;text-align:right">使用する値</span>'
+            + '<span style="flex:none;width:28px"></span></div>'
+            + GROUPS.map(function (g) {
+                var over = S.capa[g] != null && S.capa[g] !== CAPA_BASE[g];
+                return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--a-border-soft)">'
+                    + '<span title="' + esc(g) + '" style="flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(g)
+                    + (over ? '<span style="font-size:11px;color:var(--a-warn);margin-left:8px">上書き中</span>' : '') + '</span>'
+                    + '<span style="flex:none;width:104px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">' + CAPA_BASE[g] + '枚</span>'
+                    + '<input type="number" min="1" max="9999" step="1" value="' + tmpCapa[g] + '"'
+                    + ' aria-label="' + esc(g) + ' の1人1日あたり処理枚数" data-capa-group="' + esc(g) + '"'
+                    + ' style="flex:none;width:96px;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;text-align:right;color:var(--a-fg-strong);background:var(--a-surface)">'
+                    + '<span style="flex:none;width:28px;font-size:12px;color:var(--a-fg-muted2)">枚</span></div>';
+            }).join('');
+    }
+    window.calCapaReset = function () {
+        GROUPS.forEach(function (g) { tmpCapa[g] = CAPA_BASE[g]; });
+        renderCapa();
+    };
+    window.calCapaSave = function () {
+        var err = document.getElementById('calCapaErr'), bad = false;
+        [].slice.call(document.querySelectorAll('#calCapaRows [data-capa-group]')).forEach(function (el) {
+            var v = parseInt(el.value, 10);
+            if (isNaN(v) || v < 1) { bad = true; return; }
+            tmpCapa[el.getAttribute('data-capa-group')] = v;
+        });
+        if (bad) { err.textContent = '1以上の枚数を入力してください。'; err.hidden = false; return; }
+        GROUPS.forEach(function (g) {
+            if (tmpCapa[g] === CAPA_BASE[g]) { delete S.capa[g]; } else { S.capa[g] = tmpCapa[g]; }
+        });
+        window.pClose('mCapacity');
         calRender();
+        window.pToast('処理能力を更新しました');
+    };
+
+    // ---- 増員依頼(Lv3以上) ----
+    var recSid = null;
+    window.calRecruitOpen = function (sid) {
+        recSid = sid;
+        var v = CAL.surveys[sid], load = dailyLoad(sid), sup = supplyOf(sid), lack = load - sup;
+        var w = workDays(sid);
+        document.getElementById('calRecStats').innerHTML =
+            '<div style="color:var(--a-fg-strong);font-weight:700">' + sid + ' ' + esc(v.title) + '</div>'
+            + '<div>会期 ' + v.s.replace(/-/g, '/') + '〜' + v.e.replace(/-/g, '/') + ' ・ ' + esc(planLabel(sid))
+            + ' ・ 納期 ' + dueDate(sid).replace(/-/g, '/') + '</div>'
+            + '<div>作業 ' + (w.length ? md(w[0]) + '〜' + md(w[w.length - 1]) + '（' + w.length + '営業日）' : '—') + '</div>'
+            + '<div>必要 <strong style="font-variant-numeric:tabular-nums">' + load.toLocaleString('ja-JP') + '枚/日</strong>'
+            + ' ／ 供給 <strong style="font-variant-numeric:tabular-nums">' + sup.toLocaleString('ja-JP') + '枚/日</strong>(' + filled(sid) + '人)'
+            + ' ／ <span style="color:var(--a-danger);font-weight:700">不足 ' + lack.toLocaleString('ja-JP') + '枚/日</span></div>';
+        // 稼働可能者がいない会社へ依頼しても増員できないため、既定でチェックを外す
+        document.getElementById('calRecTo').innerHTML = GROUPS.map(function (g) {
+            var cap = headroom(g);
+            return '<label style="display:flex;align-items:center;gap:6px' + (cap ? '' : ';color:var(--a-fg-muted2)') + '">'
+                + '<input type="checkbox" data-rec-to="' + esc(g) + '"' + (cap ? ' checked' : '') + ' aria-label="' + esc(g) + ' へ送信">'
+                + esc(g) + '<span style="color:var(--a-fg-muted2);font-size:11.5px">('
+                + (cap ? '稼働可能 ' + cap + '名・' + perPerson(g) + '枚/人日' : '稼働可能なアカウントなし') + ')</span></label>';
+        }).join('');
+        document.getElementById('calRecBody').value =
+            sid + ' ' + v.title + '（会期 ' + v.s.replace(/-/g, '/') + '〜' + v.e.replace(/-/g, '/')
+            + '／' + planLabel(sid) + '／納期 ' + dueDate(sid).replace(/-/g, '/') + '）の増員をお願いします。\n'
+            + '1日あたり ' + load.toLocaleString('ja-JP') + '枚の処理が必要ですが、現在の割当は '
+            + sup.toLocaleString('ja-JP') + '枚/日（' + filled(sid) + '人）で、' + lack.toLocaleString('ja-JP') + '枚/日 不足しています。\n'
+            + '対応可能な人数を営業日カレンダーからアサインしてください。';
+        var e = document.getElementById('calRecErr');
+        e.hidden = true; e.textContent = '';
+        window.pOpen('mRecruit');
+    };
+    window.calRecruitSend = function () {
+        var to = [].slice.call(document.querySelectorAll('#calRecTo [data-rec-to]')).filter(function (c) { return c.checked; });
+        var err = document.getElementById('calRecErr');
+        if (!to.length) { err.textContent = '宛先を1社以上選択してください。'; err.hidden = false; return; }
+        if (!document.getElementById('calRecBody').value.trim()) { err.textContent = '本文を入力してください。'; err.hidden = false; return; }
+        S.recruit[recSid] = 'open';
+        S.selSv = recSid;
+        window.pClose('mRecruit');
+        calRender();
+        window.pToast(to.length + '社のオペレーター管理者へ増員依頼を送信しました');
+    };
+    window.calRecruitClose = function (sid) {
+        // 不足のまま打ち切る場合は運営の意思決定なので sticky にして自動判定へ戻さない
+        var lacking = supplyOf(sid) < dailyLoad(sid);
+        S.recruit[sid] = lacking ? 'closed-sticky' : 'closed';
+        S.selSv = sid; calRender();
+        window.pToast(sid + ' の追加募集を締め切りました' + (lacking ? '(不足のまま打ち切り)' : ''));
+    };
+    window.calRecruitReopen = function (sid) {
+        S.recruit[sid] = 'open'; S.selSv = sid; calRender();
+        window.pToast(sid + ' の追加募集を再開しました');
     };
 
     // ---- 休業日・振替 ----
-    var origHolidayOpen = null;
     window.calHolidayOpen = function () {
         document.getElementById('calHolDate').value = S.sel;
         document.getElementById('calHolKind').value = 'hol';
@@ -384,24 +1369,28 @@ window.pCalImport = function () {
         if (MONTHS.indexOf(is.slice(0, 7)) < 0) { return fail('表示範囲(2026年6月〜8月)内の日付を指定してください。'); }
         if (S.ind[is]) { return fail('この日には既に個別設定があります。先に削除してください。'); }
         if (kind === 'sub' && !baseHoliday(is)) { return fail('振替営業日は定休日・祝日にあたる日付にのみ設定できます。'); }
+        var before = allOverDays();
         S.ind[is] = { t: kind, memo: memo };
         S.ym = is.slice(0, 7);
         S.sel = is;
+        S.selSv = null;
         window.pClose('mHoliday');
         calRender();
+        warnIfNewOverlap(before);
     };
     window.calDelAsk = function () {
-        var t = typ(S.sel);
-        var d = new Date(S.sel + 'T00:00:00');
+        var t = typ(S.sel), d = toDate(S.sel);
         var name = (t.t === 'hol' ? '休業日' : '振替営業日') + (t.memo ? '「' + t.memo + '」' : '');
         document.getElementById('calDelText').textContent =
-            (d.getMonth() + 1) + '/' + d.getDate() + '(' + WD[d.getDay()] + ')の個別設定(' + name + ')を削除します。以後この日は定休日・祝日の設定に従います。';
+            md(S.sel) + '(' + WD[d.getDay()] + ')の個別設定(' + name + ')を削除します。以後この日は定休日・祝日の設定に従います。';
         window.pOpen('mConfirmDelHoliday');
     };
     window.calDelDo = function () {
+        var before = allOverDays();
         delete S.ind[S.sel];
         window.pClose('mConfirmDelHoliday');
         calRender();
+        warnIfNewOverlap(before);
     };
 
     // ---- 定休日 ----
@@ -427,13 +1416,23 @@ window.pCalImport = function () {
         renderReg();
     };
     window.calRegSave = function () {
+        var before = allOverDays();
         S.reg = tmpReg;
         window.pClose('mRegularHoliday');
         calRender();
+        warnIfNewOverlap(before);
     };
 
-    document.addEventListener('DOMContentLoaded', calRender);
-    if (document.readyState !== 'loading') { calRender(); }
+    function boot() {
+        var g = document.getElementById('calFGroup');
+        if (g && !g.options.length) {
+            g.innerHTML = '<option value="">担当会社: すべて</option>'
+                + GROUPS.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
+        }
+        calRender();
+    }
+    document.addEventListener('DOMContentLoaded', boot);
+    if (document.readyState !== 'loading') { boot(); }
 })();
 </script>
 

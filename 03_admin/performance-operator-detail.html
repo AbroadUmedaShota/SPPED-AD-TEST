@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - オペレーター実績詳細</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <script src="src/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    /* サマリ数値カード(index.html の dash-card 準拠・遷移しないため hover 装飾なし) */
+    .perf-cards { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+    .perf-card {
+        flex: 1 1 150px; max-width: 200px; box-sizing: border-box;
+        background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px;
+        padding: 14px 18px;
+    }
+    .perf-card-label { font-size: 12px; color: var(--a-fg-muted); font-weight: 500; min-height: 20px; }
+    .perf-card-num { margin-top: 2px; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .perf-card-unit { font-size: 12px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }
+    .perf-sec { margin-top: 24px; font-size: 13px; font-weight: 700; color: var(--a-fg); }
+    .perf-sec-note { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--a-fg-muted2); }
+    .perf-table { margin-top: 10px; background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto; }
+    /* 日別実績は行数が多いので高さを絞ってスクロールさせる */
+    .perf-daily-scroll { max-height: 420px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1" style="padding-top:56px">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
+          <div style="padding:18px 24px 40px">
+            <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="performance-management.html">オペレーター実績確認</a> › <span style="color:var(--a-fg-strong)">オペレーター実績詳細</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+              <div>
+                <h1 style="margin:0;font-size:20px;font-weight:700"><span data-slot="opname">オペレーター実績詳細</span><span data-slot="opid" style="margin-left:10px;font-size:13px;font-weight:400;color:var(--a-fg-muted2)"></span></h1>
+                <div style="margin-top:4px;font-size:12.5px;color:var(--a-fg-muted)">所属グループ: <a data-slot="opgroup" href="#"></a></div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
+                <select id="odMonth" onchange="odSetMonth(this.value)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
+              </label>
+            </div>
+
+            <div class="perf-sec" style="margin-top:18px">当月サマリ <span class="perf-sec-note">報酬金額 = 作業件数 × 単価50円(モックの仮単価)</span></div>
+            <div class="perf-cards">
+              <div class="perf-card"><div class="perf-card-label">作業件数</div><div class="perf-card-num" data-card="w">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">正解件数</div><div class="perf-card-num" data-card="o">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">正答率</div><div class="perf-card-num" data-card="r">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">スキップ回数</div><div class="perf-card-num" data-card="s">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">報酬金額</div><div class="perf-card-num" data-card="pay">—</div></div>
+            </div>
+
+            <div class="perf-sec">月次推移 <span class="perf-sec-note">直近6ヶ月。行は新しい月が上</span></div>
+            <div class="perf-table">
+              <div data-grid="trend" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>対象月</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
+              </div>
+              <div id="odTrend"></div>
+            </div>
+
+            <div class="perf-sec">作業グループ①〜⑧×入力項目別の内訳 <span class="perf-sec-note">作業グループ行を押すと入力項目ごとの内訳を開きます</span></div>
+            <div class="perf-table">
+              <div data-grid="bd" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>作業グループ / 入力項目</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
+              </div>
+              <div id="odBreakdown"></div>
+            </div>
+
+            <div class="perf-sec">日別実績 <span class="perf-sec-note">土日を除く稼働日ごとの内訳</span></div>
+            <div class="perf-table perf-daily-scroll">
+              <div data-grid="daily" style="position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>日付</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span>
+              </div>
+              <div id="odDaily"></div>
+            </div>
+
+            <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">正答率は 95% 未満を<span style="color:var(--a-warn);font-weight:700">この色</span>で示す。日別は入力を確定した日を基準に集計する。</div>
+          </div>
+        </main>
+    </div>
+</div>
+
+<script type="module" src="src/admin.js"></script>
+<script src="src/proto-ui.js"></script>
+<script src="src/proto-level.js"></script>
+<script src="src/perf-data.js"></script>
+<script>
+// オペレーター実績詳細(モック)。?oid=OP-#### で対象を受け取り、サマリ・推移・内訳・日別を描く
+(function () {
+    'use strict';
+    var D = window.PerfData;
+    var q = new URLSearchParams(location.search);
+    var oid = D.PERF[q.get('oid')] ? q.get('oid') : 'OP-0058';
+    var month = '2026-07';
+    var openG = -1; // 展開中の作業グループ(①〜⑧)の添字。-1は全閉
+
+    var GRIDS = {
+        trend: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
+        bd: 'display:grid;grid-template-columns:minmax(240px,230fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
+        daily: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr);align-items:center;padding:0 18px'
+    };
+    document.querySelectorAll('[data-grid]').forEach(function (el) {
+        el.setAttribute('style', GRIDS[el.getAttribute('data-grid')] + ';' + el.getAttribute('style'));
+    });
+
+    function cell(v, right, extra) {
+        return '<span style="' + (right ? 'text-align:right;' : '') + (extra || '') + '">' + v + '</span>';
+    }
+    function rateCell(o, w, bold) {
+        var rt = D.rate(o, w);
+        var warn = (w && parseInt(rt, 10) < 95) ? 'color:var(--a-warn);' : '';
+        return cell(rt, true, warn + (bold ? 'font-weight:700;' : ''));
+    }
+
+    function renderBreakdown() {
+        var d = D.PERF[oid].m[month];
+        var host = document.getElementById('odBreakdown');
+        if (!d) {
+            host.innerHTML = '<div style="padding:22px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">この月の内訳データはありません。</div>';
+            return;
+        }
+        var body = '';
+        d.rows.forEach(function (g, gi) {
+            var mark = (openG === gi) ? '▾ ' : '▸ ';
+            body += '<div tabindex="0" role="button" aria-expanded="' + (openG === gi) + '" onclick="odToggleGroup(' + gi + ')"'
+                + ' class="proto-row-hover" style="' + GRIDS.bd + ';height:38px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums;cursor:pointer">'
+                + cell(mark + g.n, false, 'font-weight:700') + cell(D.num(g.w), true) + cell(D.num(g.o), true)
+                + rateCell(g.o, g.w, true) + cell(D.num(g.s), true) + cell(D.num(g.w * D.UNIT) + ' 円', true) + '</div>';
+            if (openG === gi) {
+                g.sub.forEach(function (it) {
+                    body += '<div style="' + GRIDS.bd + ';height:34px;border-bottom:1px solid var(--a-border-soft);font-size:12px;font-variant-numeric:tabular-nums;background:var(--a-surface-2)">'
+                        + cell(it.n, false, 'padding-left:22px;color:var(--a-fg-muted)') + cell(D.num(it.w), true) + cell(D.num(it.o), true)
+                        + rateCell(it.o, it.w) + cell(D.num(it.s), true) + cell(D.num(it.w * D.UNIT) + ' 円', true) + '</div>';
+                });
+            }
+        });
+        host.innerHTML = body;
+    }
+
+    function paint() {
+        var p = D.PERF[oid];
+        var gid = D.opGroup(oid);
+        var t = D.totals(oid, month);
+        document.querySelector('[data-slot="opname"]').textContent = p.name;
+        document.querySelector('[data-slot="opid"]').textContent = oid;
+        var ga = document.querySelector('[data-slot="opgroup"]');
+        ga.textContent = D.GROUPS[gid].name;
+        ga.href = 'performance-group-detail.html?group=' + gid;
+        document.title = 'SpeedAd - オペレーター実績詳細 ' + p.name;
+        function card(k, v, unit) {
+            document.querySelector('[data-card="' + k + '"]').innerHTML =
+                v + (unit ? '<span class="perf-card-unit">' + unit + '</span>' : '');
+        }
+        card('w', D.num(t.w), '件'); card('o', D.num(t.o), '件'); card('r', D.rate(t.o, t.w));
+        card('s', D.num(t.s), '回'); card('pay', D.num(t.w * D.UNIT), '円');
+
+        // 月次推移(新→旧)。表示中の月の行を淡く強調する
+        var trend = '';
+        D.TREND_MONTHS.forEach(function (m) {
+            var x = D.totals(oid, m);
+            var cur = (m === month) ? 'background:var(--a-surface-hover);' : '';
+            trend += '<div style="' + GRIDS.trend + ';height:42px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;' + cur + '">'
+                + cell(m.replace('-', '/'), false, 'font-weight:500')
+                + cell(D.num(x.w), true) + cell(D.num(x.o), true) + rateCell(x.o, x.w, true)
+                + cell(D.num(x.s), true) + cell(D.num(x.w * D.UNIT) + ' 円', true) + '</div>';
+        });
+        document.getElementById('odTrend').innerHTML = trend;
+
+        renderBreakdown();
+
+        // 日別実績(平日のみ・月合計と一致するよう機械配分)
+        var daily = '';
+        D.daily(oid, month).forEach(function (r) {
+            daily += '<div style="' + GRIDS.daily + ';height:36px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums">'
+                + cell(month.replace('-', '/') + '/' + String(r.d).padStart(2, '0') + '(' + r.dow + ')', false)
+                + cell(D.num(r.w), true) + cell(D.num(r.o), true) + rateCell(r.o, r.w) + cell(D.num(r.s), true) + '</div>';
+        });
+        document.getElementById('odDaily').innerHTML = daily;
+    }
+
+    window.odToggleGroup = function (gi) {
+        openG = (openG === gi) ? -1 : gi;
+        renderBreakdown();
+    };
+    window.odSetMonth = function (m) { month = m; openG = -1; paint(); };
+    document.addEventListener('DOMContentLoaded', paint);
+    if (document.readyState !== 'loading') { paint(); }
+})();
+</script>
+
+</body>
+</html>

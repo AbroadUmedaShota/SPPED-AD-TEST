@@ -28,12 +28,12 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" data-guard-unsaved>
             <div style="padding:18px 24px 40px">
               <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">クーポン管理</span></div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
                 <h1 style="margin:0;font-size:20px;font-weight:700">クーポン管理</h1>
-                <span style="display:flex;gap:10px"><button style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pBulkOpen()">＋ 一括作成</button><button style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを作成'">＋ クーポンを作成</button></span>
+                <span style="display:flex;gap:10px"><button style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pBulkOpen()">＋ 一括作成</button><button style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pCouponCreate()">＋ クーポンを作成</button></span>
               </div>
               <div data-filter-for="couponList" style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                 <input aria-label="クーポンID" data-f-key="cid" placeholder="クーポンID" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 12px;font-size:13px;width:130px;font-family:inherit">
@@ -47,21 +47,21 @@
                 <div style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
                   <span>ID</span><span>クーポン名</span><span>コード</span><span class="c-opt" title="既定の並び順" style="color:var(--a-fg-muted)">作成日 ▼</span><span>使用可能期限</span><span style="text-align:right">割引率</span><span style="text-align:right">可能回数</span><span style="text-align:right">使用回数(率)</span><span class="c-opt">メモ</span><span style="padding-left:12px">操作</span>
                 </div>
-                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0021" data-f-cname="サマーキャンペーン10" data-f-code="SUMMER10" data-f-date="2026/06/01" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0021" data-f-cname="サマーキャンペーン10" data-f-code="SUMMER10" data-f-date="2026/06/01" data-f-rate="10" data-f-limit="50" data-f-until="2026-09-30" data-f-memo="夏季販促" class="proto-row-hover" onclick="pCouponEdit('CP-0021')" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0021</span><span>サマーキャンペーン10</span><span style="font-family:ui-monospace,monospace;font-size:12px">SUMMER10</span><span class="c-opt">2026/06/01</span><span>2026/09/30</span><span style="text-align:right">10%</span><span style="text-align:right">50</span><span style="text-align:right">18 <span style="color:var(--a-fg-muted2);font-size:11.5px">(36%)</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted)">夏季販促</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0021');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pCouponEdit('CP-0021');return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0021');return false">利用履歴</a></span>
                 </div>
-                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0018" data-f-cname="プレミアム移行応援" data-f-code="PREMUP15" data-f-date="2026/04/10" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0018" data-f-cname="プレミアム移行応援" data-f-code="PREMUP15" data-f-date="2026/04/10" data-f-rate="15" data-f-limit="20" data-f-until="2026-08-31" data-f-memo="プラン移行促進" class="proto-row-hover" onclick="pCouponEdit('CP-0018')" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0018</span><span>プレミアム移行応援</span><span style="font-family:ui-monospace,monospace;font-size:12px">PREMUP15</span><span class="c-opt">2026/04/10</span><span>2026/08/31</span><span style="text-align:right">15%</span><span style="text-align:right">20</span><span style="text-align:right;font-weight:700;color:var(--a-warn)">20 <span style="font-size:11px">(上限到達)</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted)">プラン移行促進</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0018');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pCouponEdit('CP-0018');return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0018');return false">利用履歴</a></span>
                 </div>
-                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0015" data-f-cname="展示会ご紹介割" data-f-code="EXPOREF5" data-f-date="2026/03/02" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
+                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0015" data-f-cname="展示会ご紹介割" data-f-code="EXPOREF5" data-f-date="2026/03/02" data-f-rate="5" data-f-limit="100" data-f-until="2026-12-31" data-f-memo="紹介経由の申込向け" class="proto-row-hover" onclick="pCouponEdit('CP-0015')" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">CP-0015</span><span>展示会ご紹介割</span><span style="font-family:ui-monospace,monospace;font-size:12px">EXPOREF5</span><span class="c-opt">2026/03/02</span><span>2026/12/31</span><span style="text-align:right">5%</span><span style="text-align:right">100</span><span style="text-align:right">41 <span style="color:var(--a-fg-muted2);font-size:11.5px">(41%)</span></span><span class="c-opt" style="font-size:12px;color:var(--a-fg-muted)">紹介経由の申込向け</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0015');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pCouponEdit('CP-0015');return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0015');return false">利用履歴</a></span>
                 </div>
-                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0009" data-f-cname="年度末感謝クーポン" data-f-code="THANKS20" data-f-date="2026/02/01" class="proto-row-hover" onclick="pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集'" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;font-size:13px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted);cursor:pointer">
+                <div tabindex="0" role="button" data-pg="1" data-f-cid="CP-0009" data-f-cname="年度末感謝クーポン" data-f-code="THANKS20" data-f-date="2026/02/01" data-f-rate="20" data-f-limit="30" data-f-until="2026-03-31" data-f-memo="" class="proto-row-hover" onclick="pCouponEdit('CP-0009')" style="display:grid;grid-template-columns:90px minmax(180px,210fr) minmax(120px,70fr) minmax(108px,50fr) minmax(120px,58fr) minmax(70px,32fr) minmax(100px,46fr) minmax(130px,60fr) minmax(150px,140fr) 110px;align-items:center;padding:0 16px;height:50px;font-size:13px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted);cursor:pointer">
                   <span style="font-weight:500">CP-0009</span><span style="color:var(--a-fg-muted)">年度末感謝クーポン</span><span style="font-family:ui-monospace,monospace;font-size:12px">THANKS20</span><span class="c-opt">2026/02/01</span><span>2026/03/31<br><span style="font-size:10.5px;border:1px solid var(--a-border-strong);border-radius:3px;padding:0 4px">期限切れ</span></span><span style="text-align:right">20%</span><span style="text-align:right">30</span><span style="text-align:right">12 <span style="font-size:11.5px">(40%)</span></span><span class="c-opt" style="font-size:12px">—</span>
-                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pOpen('mCoupon');document.getElementById('mCouponTitle').textContent='クーポンを編集';return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0009');return false">利用履歴</a></span>
+                  <span style="padding-left:12px;display:flex;gap:10px;font-size:12px"><a href="#c" onclick="event.stopPropagation();pCouponEdit('CP-0009');return false">編集</a><a href="#c" onclick="event.stopPropagation();pCouponHistory('CP-0009');return false">利用履歴</a></span>
                 </div>
               <div id="couponList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
               </div>
@@ -71,7 +71,6 @@
               </div>
               <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">個別の請求への適用は請求管理で実行。</div>
             </div>
-          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>
@@ -177,19 +176,68 @@
 <script src="src/proto-ui.js"></script>
 <script src="src/proto-level.js"></script>
 <script>
-// 作成モーダルの保存。新規のときだけ一覧へ行を足す(編集は既存行を触らない)
+// 作成/編集モーダルの保存。curCouponId が空なら新規作成(一覧へ行を足す)、
+// 値が入っていれば編集対象として押した行を pRowSet で更新する
+var curCouponId = '';
+
+function cpEsc(v) {
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ヘッダーの「クーポンを作成」から呼ぶ。前回の編集内容を持ち越さないようフォームを空に戻す
+window.pCouponCreate = function () {
+    curCouponId = '';
+    document.getElementById('mCouponTitle').textContent = 'クーポンを作成';
+    ['cpName', 'cpCode', 'cpRate', 'cpLimit', 'cpUntil', 'cpMemo'].forEach(function (id) {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('cpErr').hidden = true;
+    window.pOpen('mCoupon');
+};
+
+// 行または「編集」リンクから呼ぶ。押した行の値をモーダルへ読み込む
+window.pCouponEdit = function (cid) {
+    var row = window.pRow('couponList', 'cid', cid);
+    if (!row) { return; }
+    curCouponId = cid;
+    document.getElementById('mCouponTitle').textContent = 'クーポンを編集';
+    document.getElementById('cpName').value = row.getAttribute('data-f-cname') || '';
+    document.getElementById('cpCode').value = row.getAttribute('data-f-code') || '';
+    document.getElementById('cpRate').value = row.getAttribute('data-f-rate') || '';
+    document.getElementById('cpLimit').value = row.getAttribute('data-f-limit') || '';
+    document.getElementById('cpUntil').value = row.getAttribute('data-f-until') || '';
+    document.getElementById('cpMemo').value = row.getAttribute('data-f-memo') || '';
+    document.getElementById('cpErr').hidden = true;
+    window.pOpen('mCoupon');
+};
+
 window.pCouponSave = function () {
-    var isNew = document.getElementById('mCouponTitle').textContent.indexOf('作成') >= 0;
-    if (isNew) {
-        var v = function (id) { return document.getElementById(id).value.trim(); };
-        var code = v('cpCode');
-        var dup = document.querySelector('#couponList [data-f-code="' + code + '"]');
-        var err = document.getElementById('cpErr');
-        if (!code || !v('cpName')) { err.textContent = 'クーポン名とコードは必須です'; err.hidden = false; return; }
-        if (dup) { err.textContent = 'コード ' + code + ' は既に使われています'; err.hidden = false; return; }
-        err.hidden = true;
-        window.cpAddCoupons([{ name: v('cpName'), code: code, rate: v('cpRate'),
-                               limit: v('cpLimit'), until: v('cpUntil'), memo: v('cpMemo') }]);
+    var v = function (id) { return document.getElementById(id).value.trim(); };
+    var name = v('cpName');
+    var code = v('cpCode');
+    var err = document.getElementById('cpErr');
+    if (!name || !code) { err.textContent = 'クーポン名とコードは必須です'; err.hidden = false; return; }
+    // 重複コードの検証(編集時は自分自身の行を除外する)
+    var dup = document.querySelector('#couponList [data-f-code="' + code + '"]');
+    if (dup && dup.getAttribute('data-f-cid') !== curCouponId) {
+        err.textContent = 'コード ' + code + ' は既に使われています'; err.hidden = false; return;
+    }
+    err.hidden = true;
+    var rate = v('cpRate'), limit = v('cpLimit'), until = v('cpUntil'), memo = v('cpMemo');
+    if (curCouponId) {
+        var row = window.pRow('couponList', 'cid', curCouponId);
+        if (row) {
+            window.pRowSet(row, {
+                1: cpEsc(name),
+                2: cpEsc(code),
+                4: until.replace(/-/g, '/'),
+                5: cpEsc(rate) + '%',
+                6: cpEsc(limit),
+                8: cpEsc(memo) || '—'
+            }, { cname: name, code: code, rate: rate, limit: limit, until: until, memo: memo });
+        }
+    } else {
+        window.cpAddCoupons([{ name: name, code: code, rate: rate, limit: limit, until: until, memo: memo }]);
     }
     pClose('mCoupon');
 };
@@ -237,8 +285,9 @@ window.pCouponSave = function () {
             var until = String(c.until || '').replace(/-/g, '/');
             html += '<div tabindex="0" role="button" data-pg="1" data-f-cid="' + id + '"'
                  + ' data-f-cname="' + esc(c.name) + '" data-f-code="' + esc(c.code) + '"'
-                 + ' data-f-date="' + today() + '" class="proto-row-hover"'
-                 + ' onclick="pOpen(\'mCoupon\');document.getElementById(\'mCouponTitle\').textContent=\'クーポンを編集\'"'
+                 + ' data-f-date="' + today() + '" data-f-rate="' + esc(c.rate) + '" data-f-limit="' + esc(c.limit) + '"'
+                 + ' data-f-until="' + esc(c.until || '') + '" data-f-memo="' + esc(c.memo || '') + '" class="proto-row-hover"'
+                 + ' onclick="pCouponEdit(\'' + id + '\')"'
                  + ' style="' + ROW_COLS + '">'
                  + '<span style="font-weight:500">' + id + '</span>'
                  + '<span>' + esc(c.name) + '</span>'
@@ -250,8 +299,7 @@ window.pCouponSave = function () {
                  + '<span style="text-align:right">0 <span style="color:var(--a-fg-muted2);font-size:11.5px">(0%)</span></span>'
                  + '<span class="c-opt" style="font-size:12px;color:var(--a-fg-muted)">' + (esc(c.memo) || '—') + '</span>'
                  + '<span style="padding-left:12px;display:flex;gap:10px;font-size:12px">'
-                 + '<a href="#c" onclick="event.stopPropagation();pOpen(\'mCoupon\');'
-                 + 'document.getElementById(\'mCouponTitle\').textContent=\'クーポンを編集\';return false">編集</a>'
+                 + '<a href="#c" onclick="event.stopPropagation();pCouponEdit(\'' + id + '\');return false">編集</a>'
                  + '<a href="#c" onclick="event.stopPropagation();pCouponHistory(\'' + id + '\');return false">利用履歴</a>'
                  + '</span></div>';
             COUPON_HISTORY[id] = { code: c.code, rate: c.rate, used: 0, cap: c.limit, rows: [] };

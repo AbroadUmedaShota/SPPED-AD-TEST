@@ -24,7 +24,7 @@
 <div class="relative flex flex-col overflow-x-hidden admin-workscreen" style="height:100vh;overflow:hidden">
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="min-height:0">
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" style="margin-left:0;min-height:0;display:flex;flex-direction:column">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" data-guard-unsaved style="margin-left:0;min-height:0;display:flex;flex-direction:column">
         <div class="workscreen-body" style="flex:1;min-height:0;padding:12px 20px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:10px;border-bottom:2px solid var(--a-border)">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -327,14 +327,15 @@
         window.pOpen('mConfirmMatch');
     };
 
-    // 照合対象(モック2件)。確定すると次の対象へヘッダーを切り替える(照合内容は同一サンプル)。
-    // 会社名・納期区分はアンケートに紐づくため、対象が変わればヘッダーも入れ替える
+    // 照合対象(モック2件)。確定すると次の対象へ切り替える(照合内容は同一サンプル)。
+    // 同じアンケートの未照合名刺を続けて出す仕様(22号 §4.5/§7.2)のため、
+    // 次対象も同一アンケートIDとする(アンケートIDが変われば会社名・納期区分も変わってしまうため)
     var reqId = new URLSearchParams(location.search).get('id');
     if (reqId && !SURVEYS[reqId]) { window.pNotFound('アンケート', reqId, 'index.html', '照合結果一覧へ戻る'); return; }
     if (!SURVEYS[reqId]) { reqId = 'SV-10236'; }
     var TARGETS = [
         { sv: reqId, title: '製造業DXセミナー2026', due: '2026/07/30 15:00', overdue: true },
-        { sv: reqId === 'SV-10238' ? 'SV-10236' : 'SV-10238', title: 'BtoB EXPO 東京 2026', due: '2026/07/31 18:00', overdue: false }
+        { sv: reqId, title: '製造業DXセミナー2026', due: '2026/07/30 15:00', overdue: true }
     ];
     var targetIdx = 0;
     function applyTarget() {

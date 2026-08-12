@@ -46,6 +46,9 @@ const CHECK = () => {
 
   // 一覧の見出し・行のセル数がグリッドの列数と合うか。ずれると列が横にずれる
   document.querySelectorAll('[id$="List"], #groupList').forEach((list) => {
+    // 非表示のタブ内などレンダリングされていない一覧は対象外。
+    // 非表示だと grid-template-columns が px へ解決されず minmax 表記のまま数えてしまう
+    if (!list.offsetParent) { return; }
     const head = list.firstElementChild;
     if (!head || getComputedStyle(head).display !== 'grid') { return; }
     const cols = getComputedStyle(head).gridTemplateColumns.split(' ').length;

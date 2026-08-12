@@ -10,24 +10,28 @@
   1. ノード・エッジ・フローの必須項目と id の整合（未知の node / edge を指していないか）
   2. metadata.statistics の件数が実数と合っているか
   3. evidence などに書かれた file:line が実在ファイルの行数の範囲内か
-  4. 到達16画面の共通シェルが揃っているか（script/link の並び・必須要素）
+  4. 到達18画面の共通シェルが揃っているか（script/link の並び・必須要素）
 """
 import json
 import pathlib
 import re
 import sys
 
-# 到達16画面（index.html から到達できる範囲）
+# 到達18画面（index.html から到達できる範囲）
 SCREENS = [
     "index.html", "user-management.html", "user-detail.html",
     "survey-management.html", "survey-detail.html", "billing-management.html",
     "invoice-management.html", "coupon-management.html", "calendar-management.html",
-    "operator-management.html", "performance-management.html", "audit-log.html",
+    "operator-management.html", "performance-management.html",
+    "performance-group-detail.html", "performance-operator-detail.html",
+    "audit-log.html",
     "data-entry/index.html", "data-entry/form.html",
     "reconciliation/index.html", "reconciliation/detail.html",
 ]
 # サイドバーを持たない全画面作業モード
 NO_SIDEBAR = {"data-entry/form.html", "reconciliation/detail.html"}
+# 画面固有の共有データモジュール。共通シェルの署名比較からは除外する
+PAGE_ASSETS = {"src/perf-data.js"}
 
 ASSET = re.compile(r'<(?:script|link)\b[^>]*?(?:src|href)="([^"]+)"')
 
@@ -69,7 +73,8 @@ def check_shell(problems: list) -> int:
             continue
         html = p.read_text(encoding="utf-8")
         # 相対パスの深さは画面の位置で変わるため正規化してから比べる
-        assets = tuple(a.replace("../", "") for a in ASSET.findall(html))
+        assets = tuple(a.replace("../", "") for a in ASSET.findall(html)
+                       if a.replace("../", "") not in PAGE_ASSETS)
         signatures.setdefault(assets, []).append(rel)
 
         if 'id="header-placeholder"' not in html:
@@ -82,12 +87,9 @@ def check_shell(problems: list) -> int:
             problems.append(f"シェル検査: {rel} は全画面作業モードのはずだが #sidebar-placeholder がある")
         if rel not in NO_SIDEBAR and not has_sidebar:
             problems.append(f"シェル検査: {rel} に #sidebar-placeholder が無い")
-        # フッターは `01_admin_common_ui.md` §2。個票・作業画面は 1 画面に収める制約があるため置かない
-        has_footer = 'id="footer-placeholder"' in html
-        if rel in NO_SIDEBAR and has_footer:
-            problems.append(f"シェル検査: {rel} は個票・作業画面のはずだが #footer-placeholder がある")
-        if rel not in NO_SIDEBAR and not has_footer:
-            problems.append(f"シェル検査: {rel} に #footer-placeholder が無い")
+        # フッターは置かない(2026-08-12 全廃)。復活の混入をここで検知する
+        if 'id="footer-placeholder"' in html:
+            problems.append(f"シェル検査: {rel} に #footer-placeholder が残っている")
 
     if len(signatures) > 1:
         problems.append("シェル検査: script/link の並びが画面ごとに食い違っている")
@@ -181,7 +183,7 @@ def main() -> int:
 
     print(f"ノード {len(data['nodes'])} / エッジ {len(data['edges'])} / フロー {len(data['flows'])}"
           f" / file:line 参照 {checked} 件（うち中身まで照合 {anchored} 件）"
-          f" / 到達16画面のシェル{'一致' if shell_groups == 1 else f'{shell_groups}種'} を検査")
+          f" / 到達{len(SCREENS)}画面のシェル{'一致' if shell_groups == 1 else f'{shell_groups}種'} を検査")
     if problems:
         print("問題:")
         for p in sorted(set(problems)):

@@ -66,10 +66,10 @@
     }
     .dash-start-note { font-size: 11.5px; color: var(--a-fg-faint); }
 
-    /* 表: 幅が足りない場合は潰さず横スクロールさせる */
+    /* 表: 幅が足りない場合は補助的な列(c-opt)を隠して収める(横スクロールはさせない) */
     .dash-table {
         margin-top: 10px; background: var(--a-surface);
-        border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto;
+        border: 1px solid var(--a-border); border-radius: 8px;
     }
     .dash-thead {
         display: grid; align-items: center; padding: 0 18px; height: 40px;
@@ -90,17 +90,24 @@
     .dash-link-cell { text-align: right; font-size: 11.5px; color: var(--a-accent); }
 
     /* 現在会期中のアンケート一覧 */
-    .tbl-surveys { min-width: 966px; }
     .tbl-surveys .dash-thead,
     .tbl-surveys .dash-trow { grid-template-columns: 100px minmax(230px, 1fr) 200px 200px 90px 110px; }
 
     /* 名刺データ化申込状況
-       右カラムが狭いと遷移リンクの列が隠れて押せなくなるため、
        列幅は上限をハンドオフ指定(170/210px)としつつ縮小を許す。 */
-    .tbl-plans { min-width: 494px; }
     .tbl-plans .dash-thead,
     .tbl-plans .dash-trow {
         grid-template-columns: minmax(96px, 1fr) minmax(112px, 170px) minmax(140px, 210px) 110px;
+    }
+
+    /* 幅が足りない画面では補助的な列(c-opt)を隠し、横スクロールを避ける。
+       基準は1920px表示。1459px未満で適用する(他画面の一覧と同じ基準)。 */
+    @media (max-width: 1459px) {
+      .tbl-surveys .dash-thead,
+      .tbl-surveys .dash-trow { grid-template-columns: 100px minmax(200px, 1fr) 160px 90px !important; }
+      .tbl-plans .dash-thead,
+      .tbl-plans .dash-trow { grid-template-columns: minmax(96px, 1fr) minmax(112px, 170px) 110px !important; }
+      .dash-table .c-opt { display: none !important; }
     }
 
     /* 下段: 新規発生の状況 + 名刺データ化申込状況 */
@@ -199,13 +206,13 @@
               <div class="dash-table">
                 <div class="tbl-surveys">
                   <div class="dash-thead">
-                    <span>アンケートID</span><span>タイトル</span><span>契約ユーザー</span><span>会期</span><span class="dash-r">回答数</span><span class="dash-r">納期区分</span>
+                    <span>アンケートID</span><span>タイトル</span><span>契約ユーザー</span><span class="c-opt">会期</span><span class="dash-r">回答数</span><span class="dash-r c-opt">納期区分</span>
                   </div>
                   <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10259'">
-                    <span style="font-weight:500">SV-10259</span><span class="dash-ellip">ITインフラEXPO 2026 来場者アンケート</span><span class="dash-sub dash-ellip">(株)マーケットビジョン</span><span class="dash-sub-muted">2026/07/30〜2026/08/01</span><span class="dash-r">3,842</span><span class="dash-r">特急</span>
+                    <span style="font-weight:500">SV-10259</span><span class="dash-ellip">ITインフラEXPO 2026 来場者アンケート</span><span class="dash-sub dash-ellip">(株)マーケットビジョン</span><span class="dash-sub-muted c-opt">2026/07/30〜2026/08/01</span><span class="dash-r">3,842</span><span class="dash-r c-opt">特急</span>
                   </div>
                   <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10257'">
-                    <span style="font-weight:500">SV-10257</span><span class="dash-ellip">医療機器・ヘルスケア展 来場者アンケート</span><span class="dash-sub dash-ellip">地方創生機構</span><span class="dash-sub-muted">2026/07/29〜2026/07/31</span><span class="dash-r">926</span><span class="dash-r">通常</span>
+                    <span style="font-weight:500">SV-10257</span><span class="dash-ellip">医療機器・ヘルスケア展 来場者アンケート</span><span class="dash-sub dash-ellip">地方創生機構</span><span class="dash-sub-muted c-opt">2026/07/29〜2026/07/31</span><span class="dash-r">926</span><span class="dash-r c-opt">通常</span>
                   </div>
                 </div>
               </div>
@@ -235,22 +242,22 @@
                 <div class="dash-table">
                   <div class="tbl-plans">
                     <div class="dash-thead">
-                      <span>納期区分</span><span class="dash-r">申込アンケート数</span><span class="dash-r">データ化対象名刺件数</span><span></span>
+                      <span>納期区分</span><span class="dash-r">申込アンケート数</span><span class="dash-r c-opt">データ化対象名刺件数</span><span></span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=オンデマンド'">
-                      <span style="font-weight:700;color:var(--a-warn-deep)">オンデマンド</span><span class="dash-r">4 件</span><span class="dash-r">9,905 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                      <span style="font-weight:700;color:var(--a-warn-deep)">オンデマンド</span><span class="dash-r">4 件</span><span class="dash-r c-opt">9,905 件</span><span class="dash-link-cell">一覧で表示 →</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=超特急'">
-                      <span style="font-weight:500">超特急</span><span class="dash-r">4 件</span><span class="dash-r">4,282 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                      <span style="font-weight:500">超特急</span><span class="dash-r">4 件</span><span class="dash-r c-opt">4,282 件</span><span class="dash-link-cell">一覧で表示 →</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=特急'">
-                      <span style="font-weight:500">特急</span><span class="dash-r">5 件</span><span class="dash-r">8,035 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                      <span style="font-weight:500">特急</span><span class="dash-r">5 件</span><span class="dash-r c-opt">8,035 件</span><span class="dash-link-cell">一覧で表示 →</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=通常'">
-                      <span style="font-weight:500">通常</span><span class="dash-r">7 件</span><span class="dash-r">7,626 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                      <span style="font-weight:500">通常</span><span class="dash-r">7 件</span><span class="dash-r c-opt">7,626 件</span><span class="dash-link-cell">一覧で表示 →</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=お試し'">
-                      <span style="font-weight:500">お試し</span><span class="dash-r">2 件</span><span class="dash-r">1,040 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                      <span style="font-weight:500">お試し</span><span class="dash-r">2 件</span><span class="dash-r c-opt">1,040 件</span><span class="dash-link-cell">一覧で表示 →</span>
                     </div>
                   </div>
                 </div>
@@ -259,7 +266,6 @@
 
             
           </div>
-          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>

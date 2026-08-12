@@ -20,7 +20,10 @@ const SCREENS = [
   { name: 'クーポン管理', path: '/03_admin/coupon-management.html' },
   { name: '営業日カレンダー', path: '/03_admin/calendar-management.html' },
   { name: 'オペレーター管理', path: '/03_admin/operator-management.html' },
-  { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html' },
+  // perfList(人の一覧)がオペレーター別タブ側にあるため、一覧の検査はタブを開いた状態で行う
+  { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html?tab=operators' },
+  { name: 'グループ実績詳細', path: '/03_admin/performance-group-detail.html' },
+  { name: 'オペレーター実績詳細', path: '/03_admin/performance-operator-detail.html' },
   { name: '監査ログ', path: '/03_admin/audit-log.html' },
   { name: 'データ入力対象一覧', path: '/03_admin/data-entry/index.html' },
   { name: '名刺入力画面', path: '/03_admin/data-entry/form.html' },
@@ -41,7 +44,8 @@ const LISTS = [
   { name: 'クーポン管理', path: '/03_admin/coupon-management.html', id: 'couponList', sortCol: 5, numeric: true },
   { name: '照合結果一覧', path: '/03_admin/reconciliation/index.html', id: 'reconList', sortCol: 0, numeric: false },
   { name: 'オペレーター管理', path: '/03_admin/operator-management.html', id: 'operatorsList', sortCol: 0, numeric: false },
-  { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html', id: 'perfList', sortCol: 3, numeric: true },
+  // 一覧はタブ2枚構成。perfList はオペレーター別タブ側にあるため ?tab= で開いた状態から検査する
+  { name: 'オペレーター実績確認', path: '/03_admin/performance-management.html?tab=operators', id: 'perfList', sortCol: 3, numeric: true },
   { name: '監査ログ', path: '/03_admin/audit-log.html', id: 'auditList', sortCol: 0, numeric: false },
 ];
 
@@ -63,9 +67,6 @@ async function openScreen(page, path) {
       // サイドバーは全画面作業モードの2画面には無い。ある画面では注入まで待つ
       const s = document.querySelector('#sidebar-placeholder');
       if (s && !s.children.length) { return false; }
-      // フッターも同じ。注入前に検査を始めると、後から入る分の再描画と競合する
-      const f = document.querySelector('#footer-placeholder');
-      if (f && !f.children.length) { return false; }
       return typeof window.pLevel === 'function';
     },
     null,

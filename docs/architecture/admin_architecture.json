@@ -18,11 +18,11 @@
     "buildSystem": "なし（トランスパイル・バンドル・パッケージ依存なし）",
     "runtimeHost": "静的ファイルサーバー（VS Code Live Server :5500 / 代替: scripts/dev-server.py :8765）",
     "statistics": {
-      "reachableScreens": 16,
-      "sharedRuntimeModules": 3,
-      "layoutPartials": 3,
-      "nodes": 40,
-      "edges": 93,
+      "reachableScreens": 18,
+      "sharedRuntimeModules": 4,
+      "layoutPartials": 2,
+      "nodes": 42,
+      "edges": 101,
       "flows": 21,
       "modals": 43,
       "unreachableJsLines": 5381,
@@ -509,10 +509,10 @@
       "layer": "runtime",
       "reachable": true,
       "confidence": "verified",
-      "description": "ES モジュール。DOMContentLoaded でヘッダー・サイドバー・フッターを fetch して注入し、注入HTML内の相対パスをページ位置に合わせて書き換える。サブディレクトリ（data-entry/, reconciliation/）でも同じ common/*.html が使えるのはこの書き換えのため。",
+      "description": "ES モジュール。DOMContentLoaded でヘッダー・サイドバーを fetch して注入し、注入HTML内の相対パスをページ位置に合わせて書き換える。サブディレクトリ（data-entry/, reconciliation/）でも同じ common/*.html が使えるのはこの書き換えのため。",
       "responsibilities": [
         "script[src*=admin.js] の src からベースパスを逆算（resolveAdminBasePath）",
-        "common/header.html・sidebar.html・footer.html の取得と innerHTML 注入（注入先が無い画面では取得もしない）",
+        "common/header.html・sidebar.html の取得と innerHTML 注入（注入先が無い画面では取得もしない）",
         "注入HTML内 a[href]/img[src]/link[href] の相対パス補正（adjustRelativePaths）",
         "サイドバーの active 判定、モバイル開閉、ログアウト遷移",
         "ページ別初期化の分岐（現在は data_entry.html の1件のみ、実質不使用）",
@@ -533,17 +533,16 @@
         "common/*.html の HTTP レスポンス"
       ],
       "outputs": [
-        "#header-placeholder / #sidebar-placeholder / #footer-placeholder への innerHTML",
+        "#header-placeholder / #sidebar-placeholder への innerHTML",
         "sidebar .nav-link の active クラス",
         "ログアウト時の location.href 変更"
       ],
       "dependencies": [
         "theme-toggle-js",
         "common-header",
-        "common-sidebar",
-        "common-footer"
+        "common-sidebar"
       ],
-      "evidence": "03_admin/src/admin.js:1-225（注入先の事前確認は 2026-08-06 追加）",
+      "evidence": "03_admin/src/admin.js:1-223（注入先の事前確認は 2026-08-06 追加）",
       "specDoc": "docs/リライト版仕様書/admin/01_admin_common_ui.md"
     },
     {
@@ -737,33 +736,6 @@
       "dependencies": [],
       "evidence": "03_admin/common/sidebar.html:11-27 / 03_admin/data-entry/form.html と reconciliation/detail.html には sidebar-placeholder が無い（変更前の HEAD でも同じ）",
       "specDoc": "docs/リライト版仕様書/admin/01_admin_common_ui.md"
-    },
-    {
-      "id": "common-footer",
-      "name": "common/footer.html — フッター",
-      "type": "layout-partial",
-      "layer": "chrome",
-      "reachable": true,
-      "confidence": "verified",
-      "description": "フッター（`01_admin_common_ui.md` §2）。到達16画面のうち、1 画面に収める制約がある個票・作業画面2枚（data-entry/form.html・reconciliation/detail.html）を除く14画面が #footer-placeholder を持つ。admin.js が注入先の有無を見てから取得する。到達不能な escalations.html / reconciliation/list.html / sample/data_entry_admin_form.html も同じパーツを読む。配色は var(--a-*) を通し、フォールバック値を添えてトークン未読込でも色が消えないようにしている（2026-08-09 に14画面へ配置）。",
-      "responsibilities": [
-        "フッター表示（到達14画面 + 到達不能3枚）"
-      ],
-      "filePaths": [
-        "03_admin/common/footer.html"
-      ],
-      "technologies": [
-        "HTML5"
-      ],
-      "inputs": [
-        "admin.js による fetch"
-      ],
-      "outputs": [
-        "#footer-placeholder への innerHTML（対象がある場合のみ）"
-      ],
-      "dependencies": [],
-      "evidence": "grep -l 'id=\"footer-placeholder\"' の一致は escalations.html / reconciliation/list.html / sample/data_entry_admin_form.html の3枚。到達16画面は0件（invoice-management.html:104 の一致は stripChrome() 内の iframe 用CSSセレクタ文字列であり要素ではない）",
-      "specDoc": null
     },
     {
       "id": "admin-style-css",
@@ -1456,12 +1428,13 @@
       "confidence": "verified",
       "minLevel": 2,
       "url": "/03_admin/performance-management.html",
-      "description": "オペレーター別の実績。対象月の切替と、グループ／個人の内訳展開をページ内状態で行う。表示中の行から一覧ヘッダーごとCSVに落とせる（操作列は除外）。",
+      "description": "実績の一覧。グループ別集計とオペレーター別集計をタブで切り替え、行クリックで各実績詳細画面へ遷移する（2026-08-12 タブ化・内訳は詳細画面へ移設）。表示中のタブの表を一覧ヘッダーごとCSVに落とせる。",
       "responsibilities": [
+        "グループ別集計／オペレーター別集計のタブ切替（perfTab・?tab= 連動）",
         "perfList の一覧表示と絞り込み（oid, name, group）",
-        "対象月の切替（perfSetMonth）",
-        "グループ／オペレーター単位の内訳展開（perfToggleGroup / perfToggle）",
-        "表示中の行からのCSV出力（pListCsv / pPerfCsv）"
+        "対象月の切替（perfSetMonth）とグループ別集計の再描画（renderGroups）",
+        "行クリックでグループ実績詳細／オペレーター実績詳細への遷移",
+        "開いているタブの表からのCSV出力（pListCsv / pPerfCsv）"
       ],
       "filePaths": [
         "03_admin/performance-management.html"
@@ -1472,21 +1445,137 @@
         "proto-ui.js API"
       ],
       "inputs": [
-        "?oid= ?name= ?group=",
-        "対象月の選択"
+        "?oid= ?name= ?group= ?tab=",
+        "対象月の選択",
+        "perf-data.js（window.PerfData）"
       ],
       "outputs": [
         "一覧の再描画",
+        "詳細画面への遷移URL（?group= / ?oid=）",
         "CSVファイル"
       ],
       "dependencies": [
         "page-shell",
         "proto-ui-js",
-        "proto-level-js"
+        "proto-level-js",
+        "perf-data-js"
       ],
-      "evidence": "03_admin/performance-management.html:59（data-filter-keys）, 119-122（pPerfCsv ラッパ）, 126-211（inline script）",
+      "evidence": "03_admin/performance-management.html:58（data-filter-keys）, 43-46（タブ）, 113（perf-data.js 読み込み）, 116-205（inline script）",
       "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
-      "dataSource": "HTML直書き6行 + inline 集計セット"
+      "dataSource": "src/perf-data.js（PERF・GROUPS）+ HTML直書き6行（オペレーター行）"
+    },
+    {
+      "id": "scr-performance-group-detail",
+      "name": "グループ実績詳細",
+      "type": "screen",
+      "layer": "screen",
+      "reachable": true,
+      "confidence": "verified",
+      "minLevel": 2,
+      "url": "/03_admin/performance-group-detail.html",
+      "description": "グループ（会社単位）1件の実績詳細。?group=<id> で対象を受け、当月サマリの数値カード・月次推移（直近6ヶ月）・作業グループ①〜⑧別内訳（正答率ワースト注記付き）・所属オペレーター一覧を表と数値で示す。グラフは使わない（2026-08-12 新設）。",
+      "responsibilities": [
+        "?group= の解決とサマリ数値カード7枚の描画",
+        "月次推移（直近6ヶ月・表示中の月を強調）の描画",
+        "作業グループ①〜⑧別内訳と正答率ワースト項目の注記",
+        "所属オペレーター一覧からオペレーター実績詳細への遷移"
+      ],
+      "filePaths": [
+        "03_admin/performance-group-detail.html"
+      ],
+      "technologies": [
+        "HTML5",
+        "Vanilla JS（inline）"
+      ],
+      "inputs": [
+        "?group=",
+        "対象月の選択",
+        "perf-data.js（window.PerfData）"
+      ],
+      "outputs": [
+        "サマリ・推移・内訳・所属一覧の再描画",
+        "オペレーター実績詳細への遷移URL（?oid=）"
+      ],
+      "dependencies": [
+        "page-shell",
+        "proto-level-js",
+        "perf-data-js"
+      ],
+      "evidence": "03_admin/performance-group-detail.html:90-180（inline script）",
+      "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
+      "dataSource": "src/perf-data.js（PERF・GROUPS から集計）"
+    },
+    {
+      "id": "scr-performance-operator-detail",
+      "name": "オペレーター実績詳細",
+      "type": "screen",
+      "layer": "screen",
+      "reachable": true,
+      "confidence": "verified",
+      "minLevel": 2,
+      "url": "/03_admin/performance-operator-detail.html",
+      "description": "オペレーター1名の実績詳細。?oid=OP-#### で対象を受け、当月サマリの数値カード（報酬の算出根拠注記付き）・月次推移（直近6ヶ月）・作業グループ①〜⑧×入力項目別内訳（行クリックで展開）・日別実績を表と数値で示す。一覧の2段階展開の移設先（2026-08-12 新設）。",
+      "responsibilities": [
+        "?oid= の解決とサマリ数値カード5枚の描画",
+        "月次推移（直近6ヶ月・表示中の月を強調）の描画",
+        "作業グループ①〜⑧×入力項目別内訳の描画とトグル展開（odToggleGroup）",
+        "日別実績（平日のみ・月合計と一致）の描画",
+        "所属グループリンクからグループ実績詳細への遷移"
+      ],
+      "filePaths": [
+        "03_admin/performance-operator-detail.html"
+      ],
+      "technologies": [
+        "HTML5",
+        "Vanilla JS（inline）"
+      ],
+      "inputs": [
+        "?oid=",
+        "対象月の選択",
+        "perf-data.js（window.PerfData）"
+      ],
+      "outputs": [
+        "サマリ・推移・内訳・日別の再描画",
+        "グループ実績詳細への遷移URL（?group=）"
+      ],
+      "dependencies": [
+        "page-shell",
+        "proto-level-js",
+        "perf-data-js"
+      ],
+      "evidence": "03_admin/performance-operator-detail.html:93-198（inline script）",
+      "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
+      "dataSource": "src/perf-data.js（PERF から集計・日別は固定ウェイトで機械配分）"
+    },
+    {
+      "id": "perf-data-js",
+      "name": "src/perf-data.js — 実績データ",
+      "type": "runtime-module",
+      "layer": "runtime",
+      "reachable": true,
+      "confidence": "verified",
+      "description": "実績確認・グループ実績詳細・オペレーター実績詳細の3画面で共用するモックデータと集計関数。オペレーター別の月次実績（PERF）・グループ構成（GROUPS）と、月合計・グループ集計・作業グループ別内訳・日別配分のヘルパーを window.PerfData で公開する（2026-08-12 に performance-management.html の inline から移設）。",
+      "responsibilities": [
+        "PERF（オペレーター×月×作業グループ×入力項目の実績）と GROUPS（会社単位の構成・報酬調整額）の保持",
+        "totals / groupTotals / groupBreakdown / daily の集計ヘルパー提供",
+        "詳細を持たない過去月（2026-02〜04）の推移値を 2026-05 実績から機械生成"
+      ],
+      "filePaths": [
+        "03_admin/src/perf-data.js"
+      ],
+      "technologies": [
+        "Vanilla JS（IIFE）"
+      ],
+      "inputs": [
+        "なし（データ内蔵）"
+      ],
+      "outputs": [
+        "window.PerfData"
+      ],
+      "dependencies": [],
+      "evidence": "03_admin/src/perf-data.js:1-112",
+      "specDoc": "docs/リライト版仕様書/admin/24_admin_achievements.md",
+      "dataSource": "ファイル内直書き（すべてダミー値）"
     },
     {
       "id": "scr-audit-log",
@@ -1551,7 +1640,7 @@
         "請求書シートDOM"
       ],
       "dependencies": [],
-      "evidence": "03_admin/invoice-management.html:97（f.src に &embed=1）, 86-98（pInvoice）",
+      "evidence": "03_admin/invoice-management.html:96（f.src に &embed=1）, 85-97（pInvoice）",
       "specDoc": "docs/リライト版仕様書/admin/16_admin_invoice.md",
       "risk": "埋め込み時の見た目は利用者側の html[data-embed=\"1\"] のCSSが決める。管理側からは触らないため、崩れても管理画面の実装を追う必要はない"
     },
@@ -1693,7 +1782,7 @@
       "dependencies": [
         "legacy-data-json"
       ],
-      "evidence": "全HTMLの script src を走査した結果、これら9本への参照は 03_admin/sample/data_entry_admin_form.html（到達不能）と admin.js:214 の動的 import のみ",
+      "evidence": "全HTMLの script src を走査した結果、これら9本への参照は 03_admin/sample/data_entry_admin_form.html（到達不能）と admin.js:212 の動的 import のみ",
       "specDoc": null,
       "impact": "03_admin/modals/ 配下7ファイルも groupManagement.js / operator-management.js からしか fetch されないため連鎖的に未使用"
     },
@@ -1786,7 +1875,7 @@
       "layer": "legacy",
       "reachable": false,
       "confidence": "verified",
-      "description": "157行の『エスカレーション対応』画面。サイドバーにも他画面にもリンクがなく、URL直打ちでしか開けない。ページシェルも古い世代（Material Icons、pt-16、bg-background、#footer-placeholder あり）で、現行16画面と骨格が揃っていない。",
+      "description": "162行の『エスカレーション対応』画面。サイドバーにも他画面にもリンクがなく、URL直打ちでしか開けない。ページシェルも古い世代（Material Icons、pt-16、bg-background）で、現行16画面と骨格が揃っていない。",
       "responsibilities": [
         "（現行フローから到達不能）"
       ],
@@ -2056,6 +2145,96 @@
       "confidence": "verified"
     },
     {
+      "id": "e-perfgd-shell",
+      "source": "scr-performance-group-detail",
+      "target": "page-shell",
+      "relationship": "conforms-to",
+      "protocol": "html-structure",
+      "kind": "structure",
+      "description": "共通シェル骨格を複製して持つ（data-page-min-lv=2）",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perfod-shell",
+      "source": "scr-performance-operator-detail",
+      "target": "page-shell",
+      "relationship": "conforms-to",
+      "protocol": "html-structure",
+      "kind": "structure",
+      "description": "共通シェル骨格を複製して持つ（data-page-min-lv=2）",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perf-perfgd",
+      "source": "scr-performance-management",
+      "target": "scr-performance-group-detail",
+      "relationship": "navigates",
+      "protocol": "location.href（?group=）",
+      "kind": "navigate",
+      "description": "グループ別集計タブの行クリックでグループ実績詳細へ",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perf-perfod",
+      "source": "scr-performance-management",
+      "target": "scr-performance-operator-detail",
+      "relationship": "navigates",
+      "protocol": "location.href（?oid=）",
+      "kind": "navigate",
+      "description": "オペレーター別集計タブの行クリックでオペレーター実績詳細へ",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perfgd-perfod",
+      "source": "scr-performance-group-detail",
+      "target": "scr-performance-operator-detail",
+      "relationship": "navigates",
+      "protocol": "location.href（?oid=）",
+      "kind": "navigate",
+      "description": "所属オペレーター一覧の行クリックで個人の実績詳細へ",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perfod-perfgd",
+      "source": "scr-performance-operator-detail",
+      "target": "scr-performance-group-detail",
+      "relationship": "navigates",
+      "protocol": "a[href]（?group=）",
+      "kind": "navigate",
+      "description": "所属グループのリンクでグループ実績詳細へ",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perf-perfdata",
+      "source": "scr-performance-management",
+      "target": "perf-data-js",
+      "relationship": "calls",
+      "protocol": "window グローバル",
+      "kind": "call",
+      "description": "window.PerfData の集計ヘルパーで一覧・グループ別集計を描画する",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perfgd-perfdata",
+      "source": "scr-performance-group-detail",
+      "target": "perf-data-js",
+      "relationship": "calls",
+      "protocol": "window グローバル",
+      "kind": "call",
+      "description": "window.PerfData の groupTotals / groupBreakdown で描画する",
+      "confidence": "verified"
+    },
+    {
+      "id": "e-perfod-perfdata",
+      "source": "scr-performance-operator-detail",
+      "target": "perf-data-js",
+      "relationship": "calls",
+      "protocol": "window グローバル",
+      "kind": "call",
+      "description": "window.PerfData の totals / daily で描画する",
+      "confidence": "verified"
+    },
+    {
       "id": "e-audit-shell",
       "source": "scr-audit-log",
       "target": "page-shell",
@@ -2083,16 +2262,6 @@
       "protocol": "fetch / http-get",
       "kind": "inject",
       "description": "common/sidebar.html を取得して注入後、initAdminSidebarHandler で active 判定・モバイル開閉・ログアウトを配線。注入先を持たない作業画面2枚（名刺入力・名刺情報照合）では 2026-08-06 以降は取得もしない",
-      "confidence": "verified"
-    },
-    {
-      "id": "e-adminjs-footer",
-      "source": "admin-js",
-      "target": "common-footer",
-      "relationship": "fetches-and-injects",
-      "protocol": "fetch / http-get",
-      "kind": "inject",
-      "description": "以前は無条件に fetch していたため到達16画面すべてで取得しては捨てていた。2026-08-06 に loadCommonHtml() の先頭で注入先を確認するようにし、注入先を持つ到達不能3枚でのみ取得する",
       "confidence": "verified"
     },
     {
@@ -2811,24 +2980,17 @@
           "node": "common-header",
           "edge": "e-adminjs-header",
           "action": "admin.js が fetch → #header-placeholder へ注入 → 相対パス補正",
-          "evidence": "03_admin/src/admin.js:203"
+          "evidence": "03_admin/src/admin.js:202"
         },
         {
           "order": 7,
           "node": "common-sidebar",
           "edge": "e-adminjs-sidebar",
           "action": "fetch → 注入 → active判定・モバイル開閉・ログアウトを配線",
-          "evidence": "03_admin/src/admin.js:204"
+          "evidence": "03_admin/src/admin.js:203"
         },
         {
           "order": 8,
-          "node": "common-footer",
-          "edge": "e-adminjs-footer",
-          "action": "admin.js が注入先(#footer-placeholder)を確認し、ある14画面だけ取得して注入する",
-          "evidence": "03_admin/src/admin.js:72-77"
-        },
-        {
-          "order": 9,
           "node": "proto-ui-js",
           "edge": null,
           "action": "DOMContentLoaded で {listId}-pager を初期化し、URLクエリの絞り込みを適用、data-requires ボタンを非活性化",
@@ -3849,7 +4011,7 @@
       "severity": "high",
       "title": "src/ の5,381行が未参照のまま残っている",
       "detail": "03_admin/src/ の12本のうち9本（5,381行）がどのHTMLからも読み込まれない。現行の到達16画面は合計4,952行で、その全体より未参照JSの方が多い。現行画面はすべてHTML直書き＋inline scriptへ移行済みで、旧モジュールと data/admin/*.json（8ファイル・約206KB）が二重管理の残骸になっている。",
-      "evidence": "全HTMLの script src を走査。参照は sample/data_entry_admin_form.html（到達不能）と admin.js:214 の動的 import のみ",
+      "evidence": "全HTMLの script src を走査。参照は sample/data_entry_admin_form.html（到達不能）と admin.js:212 の動的 import のみ",
       "impact": "grep でヒットする関数名が現行の挙動と一致せず、改修時に誤った側を直す事故が起きる。03_admin/modals/ の7ファイルも連鎖的に未使用",
       "recommendation": "削除も移動もしない。docs/画面設計/仕様/18_screen_inventory_current.md・screen_spec_audit_tasks.md・docs/フロー定義/01_user_flow.md・docs/リライト版仕様書/admin/17_admin_coupon.md など6ドキュメントが「再作成予定」「監査対象」「前世代モックの根拠」としてこれらのパスを参照しているため、消すと棚卸しの記録が切れる。2026-08-06 に全16ファイルの先頭へ「未参照」「現行はどこか」「残置の理由」の3行注記を入れて grep 事故だけを防いだ。なお data/admin/performance.json は tools/generate_performance_data.py が書き tools/generate_current_data.py が読む現役データのため、この判断とは切り離す。",
       "status": "mitigated-2026-08-06"
@@ -3903,11 +4065,11 @@
       "severity": "low",
       "title": "footer.html が全画面で無駄に取得されていた",
       "detail": "admin.js は注入先の有無を確認せずに common/footer.html を fetch していた。到達16画面はいずれも #footer-placeholder を持たないため、16画面すべてで取得しては捨てていた。 同じ理由で、サイドバーを持たない作業画面2枚（名刺入力・名刺情報照合）では sidebar.html も取得しては捨てていた。",
-      "evidence": "修正前は admin.js が注入先を確認せずに fetch していた。現在は 03_admin/src/admin.js:72-77 で先に確認し、footer の呼び出しは同 207。grep -l 'id=\"footer-placeholder\"' の一致は到達16画面で0件、到達不能な escalations.html / reconciliation/list.html / sample/data_entry_admin_form.html の3枚のみ",
+      "evidence": "修正前は admin.js が注入先を確認せずに fetch していた。現在は 03_admin/src/admin.js:71-75 で先に確認する。2026-08-12 のフッター全廃で common/footer.html と全画面の #footer-placeholder は削除済み",
       "impact": "ページあたり1リクエストの無駄。フッターを出す／出さないの意図がコードから読み取れない状態だった",
-      "recommendation": "loadCommonHtml() の先頭で注入先を確認し、無ければ取得もしないようにした（2026-08-06）。common/footer.html は #footer-placeholder を持つ到達不能2枚がまだ読み込むため残置し、その旨をファイル先頭に注記した。",
+      "recommendation": "loadCommonHtml() の先頭で注入先を確認し、無ければ取得もしないようにした（2026-08-06）。",
       "status": "resolved-2026-08-06",
-      "resolution": "loadCommonHtml() の先頭で注入先を確認するようにした。到達16画面での footer.html 取得と、作業画面2枚での sidebar.html 取得が消えた。注入先を持つ到達不能2枚では従来どおり取得・描画される（ブラウザで確認済み）。"
+      "resolution": "loadCommonHtml() の先頭で注入先を確認するようにした。その後 2026-08-12 に管理画面のフッター自体を全廃し、common/footer.html と各画面の #footer-placeholder を削除した。"
     },
     {
       "id": "F-07",
@@ -3946,12 +4108,12 @@
       "id": "F-10",
       "severity": "info",
       "title": "到達不能な旧画面が2枚残っている",
-      "detail": "escalations.html（157行・エスカレーション対応）と reconciliation/list.html（128行・照合一覧）はどこからもリンクされておらず、シェル骨格も旧世代（Material Icons・pt-16・bg-background・#footer-placeholder あり）で現行16画面と揃っていない。",
+      "detail": "escalations.html（162行・エスカレーション対応）と reconciliation/list.html（133行・照合一覧）はどこからもリンクされておらず、シェル骨格も旧世代（Material Icons・pt-16・bg-background）で現行16画面と揃っていない。",
       "evidence": "grep で両ファイルへの参照が0件",
       "impact": "URL直打ちでしか開けないが、開くと現行と体裁の違う画面が出る。棚卸し対象",
-      "recommendation": "残す判断なら現行シェルへ揃えてサイドバーに載せる。残さないなら削除する。なお escalations.html の扱いは docs/admin_本番画面網羅_差分と修正プラン_20260802.md:151 で「削除か凍結資料として残置か」として既に未決論点に挙がっており、docs/リライト版仕様書/admin/19,20 は SCR-A-016 を「検討凍結」と記している。この2枚は #footer-placeholder を持つため、common/footer.html を消すとフッターが落ちる点にも注意。",
+      "recommendation": "残す判断なら現行シェルへ揃えてサイドバーに載せる。残さないなら削除する。なお escalations.html の扱いは docs/admin_本番画面網羅_差分と修正プラン_20260802.md:151 で「削除か凍結資料として残置か」として既に未決論点に挙がっており、docs/リライト版仕様書/admin/19,20 は SCR-A-016 を「検討凍結」と記している。",
       "status": "mitigated-2026-08-06",
-      "resolution": "未決論点のため削除も現行シェルへの統一も行わず、両ファイル先頭に「到達不能・検討凍結・別世代の骨格・この2枚だけが #footer-placeholder を持つ」ことを注記した。"
+      "resolution": "未決論点のため削除も現行シェルへの統一も行わず、両ファイル先頭に「到達不能・検討凍結・別世代の骨格」であることを注記した。"
     },
     {
       "id": "F-11",
@@ -3989,7 +4151,7 @@
       "severity": "high",
       "title": "ユーザー詳細で招待が本登録より後の日時になっていた",
       "detail": "招待メールの日時を「登録日の 10:02」で固定していたため、登録日時が10:02より前のアカウントで時系列が逆転した。U-1002 は招待 10:02 → 本登録完了 08:57 だった。",
-      "evidence": "03_admin/user-detail.html:373（inviteAt）",
+      "evidence": "03_admin/user-detail.html:372（inviteAt）",
       "impact": "メール送達状況と操作ログの両方に出るため、運用者が実際の順序を誤解する",
       "recommendation": "inviteAt() で登録日時の前日を返し、送達状況と操作ログが同じ値を使う",
       "status": "resolved-2026-08-06"
