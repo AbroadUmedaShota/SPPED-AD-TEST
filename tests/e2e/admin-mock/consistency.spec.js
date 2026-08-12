@@ -241,7 +241,7 @@ test.describe('R-05 〜 R-13 用語の統一', () => {
 
   test('R-13 人を数える一覧は「名」で数える', async ({ page }) => {
     for (const path of ['/03_admin/user-management.html', '/03_admin/operator-management.html',
-      '/03_admin/performance-management.html']) {
+      '/03_admin/performance-management.html?tab=operators']) {
       const t = await visibleText(page, path);
       const m = /全\s*\d+\s*([件名])中\s*[\d〜]+\s*([件名])を表示/.exec(t);
       expect(m, `件数表示が読めない: ${path}`).not.toBeNull();
@@ -409,11 +409,12 @@ test.describe('R-19 〜 R-23 表示の読み取りやすさ', () => {
     });
     expect(labels.length).toBeGreaterThan(0);
     for (const x of labels) {
-      // 名詞1語（「クーポン」だけ）では何が起きるか分からない
-      expect(x.label, 'ボタンが動詞になっていない').toMatch(/を(適用|変更)$/);
+      // 名詞1語（「クーポン」だけ）では何が起きるか分からない。
+      // (例外) は自動化方針(01_admin_common_ui.md §7.4・2026-08-12)による例外操作の明示
+      expect(x.label, 'ボタンが動詞になっていない').toMatch(/を(適用|変更)\(例外\)$/);
       const applied = x.coupon && x.coupon !== '—';
       expect(x.label, `クーポン=${x.coupon || 'なし'} の行のラベルが合っていない`)
-        .toBe(applied ? 'クーポンを変更' : 'クーポンを適用');
+        .toBe(applied ? 'クーポンを変更(例外)' : 'クーポンを適用(例外)');
     }
   });
 
