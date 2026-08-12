@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - グループ実績詳細</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <script src="src/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    /* サマリ数値カード(index.html の dash-card 準拠・遷移しないため hover 装飾なし) */
+    .perf-cards { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+    .perf-card {
+        flex: 1 1 150px; max-width: 200px; box-sizing: border-box;
+        background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px;
+        padding: 14px 18px;
+    }
+    .perf-card-label { font-size: 12px; color: var(--a-fg-muted); font-weight: 500; min-height: 20px; }
+    .perf-card-num { margin-top: 2px; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .perf-card-unit { font-size: 12px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }
+    .perf-sec { margin-top: 24px; font-size: 13px; font-weight: 700; color: var(--a-fg); }
+    .perf-sec-note { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--a-fg-muted2); }
+    .perf-table { margin-top: 10px; background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1" style="padding-top:56px">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
+          <div style="padding:18px 24px 40px">
+            <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="performance-management.html">オペレーター実績確認</a> › <span style="color:var(--a-fg-strong)">グループ実績詳細</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+              <h1 style="margin:0;font-size:20px;font-weight:700"><span data-slot="gname">グループ実績詳細</span><span style="margin-left:10px;font-size:12.5px;font-weight:400;color:var(--a-fg-muted2)">グループ実績詳細</span></h1>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
+                <select id="gdMonth" onchange="gdSetMonth(this.value)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
+              </label>
+            </div>
+
+            <div class="perf-sec" style="margin-top:18px">当月サマリ <span class="perf-sec-note">対象期間の集計値</span></div>
+            <div class="perf-cards">
+              <div class="perf-card"><div class="perf-card-label">作業件数</div><div class="perf-card-num" data-card="w">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">正解件数</div><div class="perf-card-num" data-card="o">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">正答率</div><div class="perf-card-num" data-card="r">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">スキップ回数</div><div class="perf-card-num" data-card="s">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">合計報酬金額</div><div class="perf-card-num" data-card="pay">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">最終報酬金額</div><div class="perf-card-num" data-card="final">—</div></div>
+              <div class="perf-card"><div class="perf-card-label">稼働人数</div><div class="perf-card-num" data-card="members">—</div></div>
+            </div>
+
+            <div class="perf-sec">月次推移 <span class="perf-sec-note">直近6ヶ月。行は新しい月が上</span></div>
+            <div class="perf-table">
+              <div data-grid="trend" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>対象月</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">合計報酬金額</span><span style="text-align:right">最終報酬金額</span>
+              </div>
+              <div id="gdTrend"></div>
+            </div>
+
+            <div class="perf-sec">作業グループ①〜⑧別の内訳 <span class="perf-sec-note" id="gdWorst"></span></div>
+            <div class="perf-table">
+              <div data-grid="bd" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>作業グループ</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
+              </div>
+              <div id="gdBreakdown"></div>
+            </div>
+
+            <div class="perf-sec">所属オペレーター <span class="perf-sec-note">行を押すとオペレーター実績詳細へ移動します</span></div>
+            <div class="perf-table">
+              <div data-grid="ops" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
+                <span>ID</span><span>氏名</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
+              </div>
+              <div id="gdOps"></div>
+            </div>
+
+            <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">報酬金額は作業件数 × 単価50円(モックの仮単価)。最終報酬金額は検収・調整を反映した支払額。正答率は 95% 未満を<span style="color:var(--a-warn);font-weight:700">この色</span>で示す。</div>
+          </div>
+        </main>
+    </div>
+</div>
+
+<script type="module" src="src/admin.js"></script>
+<script src="src/proto-ui.js"></script>
+<script src="src/proto-level.js"></script>
+<script src="src/perf-data.js"></script>
+<script>
+// グループ実績詳細(モック)。?group=<id> で対象を受け取り、サマリ・推移・内訳・所属を描く
+(function () {
+    'use strict';
+    var D = window.PerfData;
+    var q = new URLSearchParams(location.search);
+    var gid = D.GROUPS[q.get('group')] ? q.get('group') : 'abroad';
+    var month = '2026-07';
+
+    var GRIDS = {
+        trend: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
+        bd: 'display:grid;grid-template-columns:minmax(240px,230fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
+        ops: 'display:grid;grid-template-columns:110px minmax(140px,115fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px'
+    };
+
+    // 見出し行に各表と同じ列構成を当てる(列指定を1箇所=GRIDSに集約するため)
+    document.querySelectorAll('[data-grid]').forEach(function (el) {
+        el.setAttribute('style', GRIDS[el.getAttribute('data-grid')] + ';' + el.getAttribute('style'));
+    });
+
+    function cell(v, right, extra) {
+        return '<span style="' + (right ? 'text-align:right;' : '') + (extra || '') + '">' + v + '</span>';
+    }
+    function rateCell(o, w, bold) {
+        var rt = D.rate(o, w);
+        var warn = (w && parseInt(rt, 10) < 95) ? 'color:var(--a-warn);' : '';
+        return cell(rt, true, warn + (bold ? 'font-weight:700;' : ''));
+    }
+
+    function paint() {
+        var t = D.groupTotals(gid, month);
+        var g = D.GROUPS[gid];
+        document.querySelector('[data-slot="gname"]').textContent = g.name;
+        document.title = 'SpeedAd - グループ実績詳細 ' + g.name;
+        function card(k, v, unit) {
+            document.querySelector('[data-card="' + k + '"]').innerHTML =
+                v + (unit ? '<span class="perf-card-unit">' + unit + '</span>' : '');
+        }
+        card('w', D.num(t.w), '件'); card('o', D.num(t.o), '件'); card('r', D.rate(t.o, t.w));
+        card('s', D.num(t.s), '回'); card('pay', D.num(t.pay), '円'); card('final', D.num(t.final), '円');
+        card('members', t.members, '名');
+
+        // 月次推移(新→旧)。表示中の月の行を淡く強調する
+        var trend = '';
+        D.TREND_MONTHS.forEach(function (m) {
+            var x = D.groupTotals(gid, m);
+            var cur = (m === month) ? 'background:var(--a-surface-hover);' : '';
+            trend += '<div style="' + GRIDS.trend + ';height:42px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;' + cur + '">'
+                + cell(m.replace('-', '/'), false, 'font-weight:500')
+                + cell(D.num(x.w), true) + cell(D.num(x.o), true) + rateCell(x.o, x.w, true)
+                + cell(D.num(x.s), true) + cell(D.num(x.pay) + ' 円', true)
+                + cell(D.num(x.final) + ' 円', true, 'font-weight:700') + '</div>';
+        });
+        document.getElementById('gdTrend').innerHTML = trend;
+
+        // 作業グループ①〜⑧別の内訳と、正答率ワースト項目の注記
+        var rows = D.groupBreakdown(gid, month);
+        var body = '';
+        var worst = null;
+        rows.forEach(function (r) {
+            if (!worst || (r.o / r.w) < (worst.o / worst.w)) { worst = r; }
+            body += '<div style="' + GRIDS.bd + ';height:40px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums">'
+                + cell(r.n, false, 'font-weight:500') + cell(D.num(r.w), true) + cell(D.num(r.o), true)
+                + rateCell(r.o, r.w, true) + cell(D.num(r.s), true) + cell(D.num(r.w * D.UNIT) + ' 円', true) + '</div>';
+        });
+        document.getElementById('gdBreakdown').innerHTML = body
+            || '<div style="padding:22px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">この月の内訳データはありません。</div>';
+        document.getElementById('gdWorst').textContent = worst
+            ? '正答率がもっとも低い項目: ' + worst.n + '(' + D.rate(worst.o, worst.w) + ')' : '';
+
+        // 所属オペレーター(行クリックで個人詳細へ)
+        var ops = '';
+        D.GROUPS[gid].ops.forEach(function (oid) {
+            var x = D.totals(oid, month);
+            ops += '<div class="proto-row-hover" tabindex="0" role="link" onclick="location.href=\'performance-operator-detail.html?oid=' + oid + '\'"'
+                + ' style="' + GRIDS.ops + ';height:44px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">'
+                + cell(oid, false, 'font-weight:500') + cell(D.PERF[oid].name, false)
+                + cell(D.num(x.w), true) + cell(D.num(x.o), true) + rateCell(x.o, x.w, true)
+                + cell(D.num(x.s), true) + cell(D.num(x.w * D.UNIT) + ' 円', true) + '</div>';
+        });
+        document.getElementById('gdOps').innerHTML = ops;
+    }
+
+    window.gdSetMonth = function (m) { month = m; paint(); };
+    document.addEventListener('DOMContentLoaded', paint);
+    if (document.readyState !== 'loading') { paint(); }
+})();
+</script>
+
+</body>
+</html>

@@ -345,13 +345,13 @@
     // 行に data-f-<key>、絞り込みUIに data-f-key、一覧容器に data-filter-keys、
     // 絞り込みバーに data-filter-for="{listId}" を付けて使う。
     // 他画面からは同名のクエリ(?uid=U-1052 等)で同じ条件を引き継ぐ
-    var P_EXACT = { status: 1, plan: 1, coupon: 1, group: 1, lv: 1, lang: 1, month: 1, type: 1, today: 1, isnew: 1, premium: 1 };
+    var P_EXACT = { status: 1, plan: 1, coupon: 1, group: 1, lv: 1, lang: 1, month: 1, type: 1, today: 1, isnew: 1, premium: 1, unpaid: 1 };
     var P_LABEL = {
         uid: 'ユーザーID', sid: 'アンケートID', oid: 'オペレーターID', cid: 'クーポンID',
         company: '会社名', name: '氏名', mail: 'メールアドレス', code: 'コード', cname: 'クーポン名',
         status: '状態', plan: '納期区分', group: '所属グループ', lv: '権限', lang: '言語',
         month: '発行月', type: '操作種別', target: '対象', actor: '操作者', any: '氏名・メール・ID', from: '開始日', to: '終了日',
-        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム'
+        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム', unpaid: '入金未確認のみ'
     };
 
     function pFilterBar(listId) {
@@ -837,6 +837,49 @@
         var t = e.target;
         if (t && t.classList && t.classList.contains('proto-modal')) { window.pCloseAll(); }
     });
+
+    // 未保存離脱ガード: main要素に data-guard-unsaved があるページで、
+    // input/textarea/select への入力・変更があった後にページを離れようとしたら確認する。
+    // フラグは「フォーム変更で立ち、確認ダイアログで移動を許可すると消える」単純仕様
+    // (保存操作でフラグを下ろす仕組みは持たない)。
+    // モーダル(.proto-modal)内の入力・リンクは対象外(モーダルは別の確認導線を持つため)。
+    // ページ内アンカー(href="#...")はJS駆動の操作(取り消しリンク等)であり
+    // 画面遷移ではないため対象外にする
+    (function () {
+        var unsavedDirty = false;
+
+        function guardedMain() {
+            return document.querySelector('main[data-guard-unsaved]');
+        }
+
+        ['input', 'change'].forEach(function (evName) {
+            document.addEventListener(evName, function (e) {
+                var main = guardedMain();
+                if (!main || !main.contains(e.target)) { return; }
+                if (!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName || '')) { return; }
+                if (e.target.closest('.proto-modal')) { return; }
+                unsavedDirty = true;
+            });
+        });
+
+        window.addEventListener('beforeunload', function (e) {
+            if (!unsavedDirty || !guardedMain()) { return; }
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!unsavedDirty || !guardedMain()) { return; }
+            var a = e.target.closest && e.target.closest('a[href]');
+            if (!a || a.closest('.proto-modal')) { return; }
+            if (a.getAttribute('href').charAt(0) === '#') { return; }
+            if (!window.confirm('入力内容が保存されていません。移動しますか?')) {
+                e.preventDefault();
+                return;
+            }
+            unsavedDirty = false;
+        });
+    })();
 
     // 初期化: ページャの初期状態適用と、理由必須ボタン(data-requires)の非活性制御
     document.addEventListener('DOMContentLoaded', function () {

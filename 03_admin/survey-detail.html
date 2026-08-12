@@ -29,7 +29,7 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" data-guard-unsaved>
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="survey-management.html">アンケート管理</a> › <span style="color:var(--a-fg-strong)">アンケート詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
@@ -78,7 +78,8 @@
       </div>
       <div style="margin-top:8px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">会期開始後の設問構成の変更は要注意操作として扱います。会期終了後は変更できません。</div>
                 </div>
-                <div style="display:flex;justify-content:flex-end;margin-top:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+                  <button onclick="pOpen('mConfirmRequestMail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確認依頼メールを送信</button>
                   <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
                 </div>
               </div>
@@ -154,7 +155,6 @@
               </div>
             </div>
           </div>
-          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>
@@ -207,6 +207,28 @@
     <div style="display:flex;justify-content:flex-end;padding:0 22px 18px">
       <button data-initial-focus onclick="pClose('mThanksMail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
       <button data-slot="tmSave" hidden onclick="pSdThanksSave()" style="background:var(--a-danger-bg-solid);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">要注意操作として保存する</button>
+    </div>
+  </div>
+</div>
+
+<div id="mConfirmRequestMail" class="proto-modal" hidden>
+  <div class="proto-dialog" style="width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
+      <span style="font-size:15px;font-weight:700">確認依頼メールの送信<span style="font-weight:400;font-size:12px;color:var(--a-fg-muted2);margin-left:10px">SV-10262 人事・労務フォーラム 来場者アンケート</span></span>
+      <span role="button" onclick="pClose('mConfirmRequestMail')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
+    </div>
+    <div style="padding:16px 22px">
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">宛先</div>
+      <div style="margin-top:6px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:10px 14px;font-size:13px" data-slot="crmTo">s.miura@growthp.co.jp(三浦 沙織・グロースパートナーズ(株))</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted);margin-top:14px">件名</div>
+      <div style="margin-top:6px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:10px 14px;font-size:13px" data-slot="crmSubject">【人事・労務フォーラム 来場者アンケート】設定内容のご確認をお願いいたします</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted);margin-top:14px">本文</div>
+      <div style="margin-top:6px;background:var(--a-surface-2);border:1px solid var(--a-border);border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:var(--a-fg)" data-slot="crmBody">三浦 沙織 様<br><br>いつもお世話になっております。下記アンケートの設定内容についてご確認をお願いいたします。<br><br>アンケートID: SV-10262<br>タイトル: 人事・労務フォーラム 来場者アンケート<br>会期: 2026/08/03〜2026/08/05<br><br>内容に相違があれば本メールへご返信ください。<br><br>SpeedAd 運営事務局</div>
+      <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">送信前に宛先と内容をここで確認できます。宛先の特定条件(作成者本人か契約上の連絡先か)は確定前のため、現時点は作成者の登録メールを表示しています(14_admin_survey_detail.md §11 #7)。</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
+      <button data-initial-focus onclick="pClose('mConfirmRequestMail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
+      <button onclick="pSdSendConfirmMail()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">送信する</button>
     </div>
   </div>
 </div>
@@ -1505,6 +1527,15 @@ window.pSdUpload = function () {
     window.pToast('完了データの取込を実行しました');
     window.pClose('mDangerUpload');
 };
+
+// 確認依頼メールの送信(14_admin_survey_detail.md §4.8)。送信前に宛先・件名・本文を
+// 画面上で確認させ、実行後に監査ログへ宛先を残す。要注意操作の4種とは別枠のため理由入力は必須にしない
+window.pSdSendConfirmMail = function () {
+    var to = (document.querySelector('#mConfirmRequestMail [data-slot="crmTo"]') || {}).textContent || '';
+    window.pSdLog('確認依頼メールを送信', '', false, '宛先: ' + to);
+    window.pToast('確認依頼メールを送信しました');
+    window.pClose('mConfirmRequestMail');
+};
 </script>
 
 
@@ -1512,7 +1543,7 @@ window.pSdUpload = function () {
 // ?id= で表示対象を切り替える(モック)。差し替えるのは一覧に実在する識別情報のみで、
 // 集計値・監査ログ・モーダル本文の数値は固定のダミーのまま
 (function () {
-    var DATA = {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常", "answers": "0", "dataCount": "—"}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急", "answers": "3,842", "dataCount": "—"}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常", "answers": "926", "dataCount": "—"}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "company": "(株)イベントプラス", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/08/03", "dataCount": "2,150"}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急", "answers": "納品予定 2026/08/01", "dataCount": "1,208"}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "company": "(株)テックブリッジ", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド", "answers": "納品予定 2026/07/28", "dataCount": "3,420"}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "company": "(株)サンライトプロモーション", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急", "answers": "納品予定 2026/07/25", "dataCount": "2,180"}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常", "answers": "納品済 2026/07/23", "dataCount": "486"}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "company": "ミライ電装(株)", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/07/21", "dataCount": "1,980"}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/07/17", "dataCount": "356"}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "company": "(株)クレストメディカル", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/07/14", "dataCount": "288"}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "company": "東亜精密工業(株)", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/07/09", "dataCount": "3,105"}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "company": "(株)ネオフーズ", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/07/04", "dataCount": "1,472"}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "company": "西日本トラベル(株)", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/06/26", "dataCount": "926"}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "company": "(株)アークデザイン", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/06/19", "dataCount": "1,038"}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "company": "セントラル機器(株)", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/06/12", "dataCount": "2,214"}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "company": "(株)ハーベスト農園", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/06/07", "dataCount": "684"}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "company": "光陽印刷(株)", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/28", "dataCount": "1,760"}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "company": "(株)ラピスソフト", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/05/21", "dataCount": "2,530"}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "company": "大和ハウジング(株)", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/05/15", "dataCount": "1,204"}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "company": "(株)エコスタイル", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/02", "dataCount": "842"}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "company": "(株)テクノブレイン", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/04/22", "dataCount": "516"}};
+    var DATA = {"SV-10262": {"title": "人事・労務フォーラム 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常", "answers": "0", "dataCount": "—"}, "SV-10259": {"title": "ITインフラEXPO 2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急", "answers": "3,842", "dataCount": "—"}, "SV-10257": {"title": "医療機器・ヘルスケア展 来場者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常", "answers": "926", "dataCount": "—"}, "SV-10250": {"title": "食品・飲料展 出展者アンケート", "uid": "U-1050", "company": "(株)イベントプラス", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/07/26", "dataCount": "2,150"}, "SV-10244": {"title": "マーケティングサミット2026 来場者アンケート", "uid": "U-1052", "company": "(株)マーケットビジョン", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急", "answers": "納品予定 2026/07/27", "dataCount": "1,208"}, "SV-10238": {"title": "BtoB EXPO 東京 2026 来場者アンケート", "uid": "U-1038", "company": "(株)テックブリッジ", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド", "answers": "納品予定 2026/07/23", "dataCount": "3,420"}, "SV-10236": {"title": "スマート物流EXPO 来場者アンケート", "uid": "U-1033", "company": "(株)サンライトプロモーション", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急", "answers": "納品予定 2026/07/23", "dataCount": "2,180"}, "SV-10233": {"title": "地方創生フォーラム 参加者アンケート", "uid": "U-1035", "company": "地方創生機構", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常", "answers": "納品済 2026/07/27", "dataCount": "486"}, "SV-10229": {"title": "グリーンエネルギー展 来場者アンケート", "uid": "U-1031", "company": "ミライ電装(株)", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/07/17", "dataCount": "1,980"}, "SV-10227": {"title": "スタートアップピッチ2026 来場者アンケート", "uid": "U-1049", "company": "グロースパートナーズ(株)", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/07/21", "dataCount": "356"}, "SV-10221": {"title": "医薬品研究セミナー 参加者アンケート", "uid": "U-1026", "company": "(株)クレストメディカル", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/07/10", "dataCount": "288"}, "SV-10218": {"title": "ものづくりワールド 来場者アンケート", "uid": "U-1025", "company": "東亜精密工業(株)", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/07/04", "dataCount": "3,105"}, "SV-10214": {"title": "フードテックジャパン 出展者アンケート", "uid": "U-1022", "company": "(株)ネオフーズ", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/07/06", "dataCount": "1,472"}, "SV-10209": {"title": "観光インバウンドサミット 来場者アンケート", "uid": "U-1021", "company": "西日本トラベル(株)", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/06/24", "dataCount": "926"}, "SV-10205": {"title": "デザイントレンド展 来場者アンケート", "uid": "U-1019", "company": "(株)アークデザイン", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/06/15", "dataCount": "1,038"}, "SV-10201": {"title": "産業機械フェア 来場者アンケート", "uid": "U-1017", "company": "セントラル機器(株)", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/06/15", "dataCount": "2,214"}, "SV-10196": {"title": "アグリビジネス展 出展者アンケート", "uid": "U-1016", "company": "(株)ハーベスト農園", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し", "answers": "納品済 2026/06/08", "dataCount": "684"}, "SV-10192": {"title": "印刷・パッケージ総合展 来場者アンケート", "uid": "U-1014", "company": "光陽印刷(株)", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/06/01", "dataCount": "1,760"}, "SV-10188": {"title": "SaaS Expo 2026 来場者アンケート", "uid": "U-1012", "company": "(株)ラピスソフト", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド", "answers": "納品済 2026/05/16", "dataCount": "2,530"}, "SV-10183": {"title": "住宅リフォームフェア 来場者アンケート", "uid": "U-1009", "company": "大和ハウジング(株)", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急", "answers": "納品済 2026/05/13", "dataCount": "1,204"}, "SV-10179": {"title": "環境ソリューション展 来場者アンケート", "uid": "U-1007", "company": "(株)エコスタイル", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常", "answers": "納品済 2026/05/08", "dataCount": "842"}, "SV-10174": {"title": "AI活用カンファレンス 参加者アンケート", "uid": "U-1002", "company": "(株)テクノブレイン", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急", "answers": "納品済 2026/04/16", "dataCount": "516"}};
     var BADGE = {"有効": "status-active", "停止": "status-inactive", "招待中": "status-info", "本登録未了": "status-limit_reached", "会期前": "status-inactive", "会期中": "status-info", "データ化中": "status-limit_reached", "データ化完了": "status-active"};
     var DEF = 'SV-10262';
     var id = new URLSearchParams(location.search).get('id');
@@ -1568,6 +1599,39 @@ window.pSdUpload = function () {
     document.querySelectorAll('[data-slot="creator"]').forEach(function (e) {
         e.textContent = d.uid + ' ' + (UNAME[d.uid] || '—') + '(' + d.company + ')';
     });
+
+    // 確認依頼メールの宛先(user-detail.html の登録メールと同じ値。§11 #7 で正式な特定条件は確定前)
+    var EMAIL = {
+        'U-1002': 's.kawamura@technobrain.co.jp', 'U-1007': 'j.hasegawa@ecostyle.co.jp',
+        'U-1009': 'k.miyake@yamato-housing.co.jp', 'U-1012': 'a.nakajima@lapis-soft.co.jp',
+        'U-1014': 't.kondo@koyo-print.co.jp', 'U-1016': 'm.ishikawa@harvest-farm.co.jp',
+        'U-1017': 's.okamoto@central-kiki.co.jp', 'U-1019': 'r.kobayashi@arc-design.co.jp',
+        'U-1021': 'd.fujita@nishinihon-tv.co.jp', 'U-1022': 'c.murakami@neofoods.co.jp',
+        'U-1025': 'k.omori@toa-seimitsu.co.jp', 'U-1026': 's.hirano@crest-med.co.jp',
+        'U-1031': 't.sasaki@mirai-denso.co.jp', 'U-1033': 'e.takahashi@sunlight-pr.co.jp',
+        'U-1035': 'm.kawaguchi@chihososei.or.jp', 'U-1038': 'y.morita@techbridge.co.jp',
+        'U-1049': 's.miura@growthp.co.jp', 'U-1050': 'r.nakayama@eventplus.co.jp',
+        'U-1052': 'k.okada@market-v.co.jp'
+    };
+    (function () {
+        var esc = function (s) {
+            return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+            });
+        };
+        var name = UNAME[d.uid] || '—';
+        var mail = EMAIL[d.uid] || '—';
+        var to = document.querySelector('#mConfirmRequestMail [data-slot="crmTo"]');
+        if (to) { to.textContent = mail + '(' + name + '・' + d.company + ')'; }
+        var subj = document.querySelector('#mConfirmRequestMail [data-slot="crmSubject"]');
+        if (subj) { subj.textContent = '【' + d.title + '】設定内容のご確認をお願いいたします'; }
+        var body = document.querySelector('#mConfirmRequestMail [data-slot="crmBody"]');
+        if (body) {
+            body.innerHTML = esc(name) + ' 様<br><br>いつもお世話になっております。下記アンケートの設定内容についてご確認をお願いいたします。<br><br>'
+                + 'アンケートID: ' + esc(id) + '<br>タイトル: ' + esc(d.title) + '<br>会期: ' + esc(d.period)
+                + '<br><br>内容に相違があれば本メールへご返信ください。<br><br>SpeedAd 運営事務局';
+        }
+    })();
 
     // グループ(アンケートを複数名で共同編集する単位)。グループ契約のアンケートだけ名前を出す。
     // グループ名と請求先の設定は請求管理・ユーザー詳細の所属グループと同じ値を使う

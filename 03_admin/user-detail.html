@@ -29,7 +29,7 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" data-guard-unsaved>
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="user-management.html">ユーザー管理</a> › <span style="color:var(--a-fg-strong)">ユーザー詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
@@ -63,7 +63,7 @@
                   <span style="color:var(--a-fg-muted2)">適用開始</span><span style="font-variant-numeric:tabular-nums">2026/07/01</span>
                   </div>
                   <div style="display:flex;justify-content:flex-end;margin-top:12px">
-                  <button onclick="pOpen('mConfirmSaveUser')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                  <button onclick="pUdOpenSaveConfirm()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
                   </div>
                   <div style="margin-top:14px;font-size:11.5px;color:var(--a-fg-muted2)">代行操作・変更はすべて監査ログに記録されます。アカウントの停止・再開はユーザー管理で行います。</div>
                 </div>
@@ -101,7 +101,6 @@
               </div>
             </div>
           </div>
-          <div id="footer-placeholder"></div>
         </main>
     </div>
 </div>
@@ -115,9 +114,13 @@
       <span role="button" onclick="pClose('mConfirmSaveUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px 0 0">×</span>
     </div>
     <div style="padding:10px 22px 0;font-size:13px;color:var(--a-fg-muted);line-height:1.8">U-1052 岡田 健一のアカウント情報・契約プランを更新します。管理者による変更は代行操作として監査ログに記録されます。</div>
+    <div data-slot="planChangeNote" hidden style="margin:12px 22px 0;padding:10px 12px;background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;font-size:12px;color:var(--a-warn-deep);line-height:1.7">プラン(プレミアム↔通常)の変更は、書面契約の締結・解約に基づく例外的な代行操作です。理由を必ず記録してください。</div>
+    <div data-slot="planChangeReason" hidden style="padding:12px 22px 0">
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">変更理由 <span style="color:var(--a-danger)">必須</span></span><textarea id="planChangeReasonText" rows="2" placeholder="例: 書面契約の締結に伴う切替" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
+    </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:18px 22px">
       <button onclick="pClose('mConfirmSaveUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
+      <button id="btnSaveUserConfirm" onclick="pUdSave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>
     </div>
   </div>
 </div>
@@ -145,15 +148,16 @@
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div style="font-size:13px;color:var(--a-fg-muted);line-height:1.8">U-1052 岡田 健一((株)マーケットビジョン)のパスワードを管理者が設定します。本人が初期化メールを受け取れない場合の代替手段です。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">新しいパスワード <span style="color:var(--a-danger)">必須</span></span><input data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">確認のため再入力 <span style="color:var(--a-danger)">必須</span></span><input type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">新しいパスワード <span style="color:var(--a-danger)">必須</span></span><input id="udPwNew" data-initial-focus type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+        <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">確認のため再入力 <span style="color:var(--a-danger)">必須</span></span><input id="udPwConfirm" type="password" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       </div>
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">設定する理由 <span style="color:var(--a-danger)">必須</span></span><textarea rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">設定する理由 <span style="color:var(--a-danger)">必須</span></span><textarea id="udPwReason" rows="2" placeholder="例: 本人がメールを受信できないため、電話で本人確認のうえ再設定" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical"></textarea></label>
       <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">設定すると k.okada@market-v.co.jp へパスワードを変更した旨の通知メールが送信されます。入力した理由は実行者とあわせて監査ログに記録されます。</div>
     </div>
+    <div id="udPwErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700;padding:0 22px 8px"></div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mSetPwUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="pUdSetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
+      <button data-requires="udPwReason" onclick="pUdSetPw()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">設定する</button>
     </div>
   </div>
 </div>
@@ -363,7 +367,9 @@
             }).join('');
     }
     window.pUdUnpaid = function () {
-        location.href = 'billing-management.html?uid=' + uid() + '&unpaid=1';
+        // billing-management.html の data-filter-keys(survey,uid,company,name,coupon)に
+        // unpaid キーは無いため、成立する uid だけで絞り込む
+        location.href = 'billing-management.html?uid=' + uid();
     };
     window.pUdBilling = function () { location.href = 'billing-management.html?uid=' + uid(); };
 
@@ -421,6 +427,7 @@
     // ---- 未保存で離れるときの確認(§4.2 / 01_admin_common_ui.md §8) ----
     var dirty = false;
     var leaveTo = '';
+    var initialPremium = null;
     document.addEventListener('DOMContentLoaded', function () {
         // 入力欄は2ブロック(アカウント情報と契約)ある。どちらの変更も未保存として扱う
         document.querySelectorAll('[data-slot="acctFields"]').forEach(function (box) {
@@ -441,6 +448,34 @@
         location.href = leaveTo;
     };
     window.pUdClean = function () { dirty = false; };
+
+    // ---- プラン(プレミアム↔通常)変更は書面契約に基づく例外的な代行操作(§7.4) ----
+    // 変更したときだけ理由入力を必須にし、保存確認モーダルへ明記する
+    function isPremiumSelected(sel) {
+        var o = sel.options[sel.selectedIndex];
+        return !!(o && /プレミアム/.test(o.textContent));
+    }
+    window.pUdOpenSaveConfirm = function () {
+        var sel = document.querySelector('[data-slot="planSelect"]');
+        var note = document.querySelector('[data-slot="planChangeNote"]');
+        var box = document.querySelector('[data-slot="planChangeReason"]');
+        var text = document.getElementById('planChangeReasonText');
+        var btn = document.getElementById('btnSaveUserConfirm');
+        var changed = !!(sel && initialPremium !== null && isPremiumSelected(sel) !== initialPremium);
+        if (note) { note.hidden = !changed; }
+        if (box) { box.hidden = !changed; }
+        if (text) { text.value = ''; }
+        function sync() {
+            if (!btn) { return; }
+            var ok = !changed || !!(text && text.value.trim());
+            btn.disabled = !ok;
+            btn.style.opacity = ok ? '' : '0.55';
+            btn.style.cursor = ok ? 'pointer' : 'default';
+        }
+        if (text) { text.oninput = sync; }
+        sync();
+        window.pOpen('mConfirmSaveUser');
+    };
 
     // ---- 招待の再送・キャンセル(§4.6)。監査ログへ残す(§7.4) ----
     window.pUdResend = function () {
@@ -484,6 +519,7 @@
         }).join('');
     }
     window.pUdPaint = function (status, mail, created, premium) {
+        initialPremium = !!premium;
         // 招待中・本登録未了はまだログインしていない
         var last = document.querySelector('[data-slot="lastLogin"]');
         if (last && (status === '招待中' || status === '本登録未了')) { last.textContent = '—'; }
@@ -515,6 +551,11 @@ window.pUdStop = function () {
 };
 window.pUdSave = function () {
     if (window.pUdClean) { window.pUdClean(); }
+    var reasonBox = document.querySelector('[data-slot="planChangeReason"]');
+    if (reasonBox && !reasonBox.hidden && window.pUdLog) {
+        var reasonEl = document.getElementById('planChangeReasonText');
+        window.pUdLog('プラン変更(書面契約に基づく例外的な代行操作)', reasonEl ? reasonEl.value.trim() : '');
+    }
     window.pToast('変更を保存しました');
     window.pClose('mConfirmSaveUser');
 };
@@ -524,6 +565,20 @@ window.pUdResetPw = function () {
     window.pClose('mConfirmResetPwUser');
 };
 window.pUdSetPw = function () {
+    var pw = document.getElementById('udPwNew').value;
+    var pw2 = document.getElementById('udPwConfirm').value;
+    var reason = document.getElementById('udPwReason').value.trim();
+    var err = document.getElementById('udPwErr');
+    if (!pw || !pw2) {
+        err.textContent = '新しいパスワードと確認のため再入力の両方を入力してください'; err.hidden = false; return;
+    }
+    if (pw !== pw2) {
+        err.textContent = 'パスワードが一致しません'; err.hidden = false; return;
+    }
+    if (!reason) {
+        err.textContent = '設定する理由を入力してください'; err.hidden = false; return;
+    }
+    err.hidden = true;
     window.pToast('パスワードを設定し、本人へ通知しました');
     window.pClose('mSetPwUser');
 };
