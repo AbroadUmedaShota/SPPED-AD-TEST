@@ -154,17 +154,19 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
   text-decoration: none;
 }
 
-.site-footer__brand-mark {
+.site-footer__brand-emblem {
   width: 30px;
-  height: 26px;
+  height: 30px;
   flex: 0 0 auto;
   object-fit: contain;
+}
+
+.site-footer__brand-wordmark {
+  width: 132px;
+  height: auto;
 }
 
 .site-top-header {
@@ -197,26 +199,15 @@ img {
   flex-shrink: 0;
 }
 
-.site-top-header__logo {
-  display: inline-flex;
-  width: 56px;
-  height: 48px;
-  align-items: center;
-  justify-content: center;
-}
-
-.site-top-header__logo-image {
-  width: 100%;
-  height: 100%;
+.site-top-header__emblem {
+  width: 42px;
+  height: 42px;
   object-fit: contain;
 }
 
-.site-top-header__brand-name {
-  font-family: var(--serif);
-  font-size: 1.18rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  color: var(--white);
+.site-top-header__wordmark {
+  width: 150px;
+  height: auto;
 }
 
 .site-top-header__nav {
@@ -343,13 +334,29 @@ img {
 
 .hero h1 {
   margin: 0;
-  font-family: var(--serif);
-  font-size: var(--hero-brand-size, clamp(4.06rem, 9.1vw, 7.84rem));
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 0.92;
-  transform: translate(var(--hero-brand-x, 0), var(--hero-brand-y, 0));
-  transform-origin: left top;
+}
+
+.hero__brand-text {
+  position: relative;
+  left: var(--speed-ad-wordmark-block-offset, -0.088em);
+  display: block;
+  width: var(--speed-ad-wordmark-first-line-width, 4.275em);
+  color: var(--white);
+  font-family: "SPEED AD Wordmark", serif;
+  font-size: clamp(6.1rem, 10.8vw, 8.25rem);
+  font-synthesis: none;
+  font-weight: 400;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+  letter-spacing: normal;
+  line-height: 0.79;
+  overflow-wrap: normal;
+  cursor: text;
+  text-rendering: geometricPrecision;
+  text-indent: var(--speed-ad-wordmark-first-line-indent, -0.048em);
+  user-select: text;
+  white-space: normal;
+  word-break: normal;
 }
 
 .hero-font-object {
@@ -435,12 +442,12 @@ body.is-hero-font-dragging * {
 }
 
 .hero__statement {
-  margin: 28px 0 0;
+  margin: 8px 0 0;
   font-family: var(--serif);
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1.48;
+  letter-spacing: 0.025em;
+  line-height: 1.42;
   transform: translate(var(--hero-statement-x, 0), var(--hero-statement-y, 0));
   transform-origin: left top;
 }
@@ -763,7 +770,7 @@ body.is-hero-font-dragging * {
 
 .hero__lead {
   max-width: 520px;
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -2702,6 +2709,10 @@ body.is-hero-font-dragging * {
     justify-self: start;
   }
 
+  .hero__brand-text {
+    font-size: clamp(4.5rem, 10vw, 5.6rem);
+  }
+
   .scenario-accounts {
     position: relative;
     margin-top: 14px;
@@ -2852,13 +2863,13 @@ body.is-hero-font-dragging * {
     height: 56px;
   }
 
-  .site-top-header__brand-name {
-    font-size: 1.05rem;
+  .site-top-header__emblem {
+    width: 36px;
+    height: 36px;
   }
 
-  .site-top-header__logo {
-    width: 48px;
-    height: 42px;
+  .site-top-header__wordmark {
+    width: 129px;
   }
 
   .site-top-header__cta {
@@ -2868,8 +2879,14 @@ body.is-hero-font-dragging * {
     letter-spacing: 0.1em;
   }
 
-  .hero h1 {
-    font-size: var(--hero-brand-size, clamp(3.36rem, 15.4vw, 4.9rem));
+  .hero__brand-text {
+    font-size: clamp(2.85rem, 13.65vw, 4.83rem);
+  }
+
+  .hero__statement {
+    font-size: clamp(1.35rem, 6vw, 1.5rem);
+    letter-spacing: 0.015em;
+    line-height: 1.5;
   }
 
   .hero__actions {
@@ -3017,10 +3034,6 @@ body.is-hero-font-dragging * {
 }
 
 @media (max-width: 430px) {
-  .hero h1 {
-    font-size: var(--hero-brand-size, 2.94rem);
-  }
-
   .login-panel,
   .modal__content {
     padding: 22px;
@@ -3057,9 +3070,13 @@ body.is-hero-font-dragging * {
     gap: 8px 14px;
   }
 
-  .site-footer__brand-mark {
+  .site-footer__brand-emblem {
     width: 26px;
-    height: 22px;
+    height: 26px;
+  }
+
+  .site-footer__brand-wordmark {
+    width: 112px;
   }
 
   .site-footer nav a {

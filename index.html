@@ -22,15 +22,14 @@
       firstScript.parentNode.insertBefore(tagManagerScript, firstScript);
     })(window, document, 'script', 'dataLayer', 'GTM-NSC8G2DB');
   </script>
-  <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
+  <link rel="icon" href="img/brand/speed-ad-favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/login-front.css?v=20260602-reasons-matrix-a">
+  <link rel="stylesheet" href="fonts/speed-ad-wordmark.css?v=20260810-optical-balance">
+  <link rel="stylesheet" href="css/login-front.css?v=20260810-smart-balance-v3">
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。この行＋下部の script を消せば撤去完了 -->
   <link rel="stylesheet" href="css/emblem-tools.css">
-  <!-- lettering-tools（開発者向け・?lettering=1 で起動）。この行＋下部の script を消せば撤去完了 -->
-  <link rel="stylesheet" href="css/lettering-tools.css">
   <style>
     body.login-front-edit--watermark {
       position: relative;
@@ -53,7 +52,7 @@
       position: absolute;
       aspect-ratio: 2000 / 2000;
       pointer-events: none;
-      background: url("img/speedad-watermark-logo.svg") center / contain no-repeat;
+      background: url("img/brand/speed-ad-emblem-color.svg") center / contain no-repeat;
       filter: saturate(1.04);
     }
 
@@ -135,10 +134,8 @@
       <header class="site-top-header" aria-label="サイトヘッダー">
         <div class="site-top-header__inner">
           <a class="site-top-header__brand" href="#top" aria-label="SPEED AD トップへ">
-            <span class="site-top-header__logo" aria-hidden="true">
-<img src="02_dashboard/assets/svg/speedad_emblem_silhouette.svg" alt="" class="site-top-header__logo-image">
-            </span>
-            <span class="site-top-header__brand-name">SPEED AD</span>
+            <img src="img/brand/speed-ad-emblem-white.svg" alt="" class="site-top-header__emblem" aria-hidden="true">
+            <img src="img/brand/speed-ad-wordmark-horizontal-white.svg" alt="" class="site-top-header__wordmark" aria-hidden="true">
           </a>
           <button type="button" class="site-top-header__hamburger" id="site-top-hamburger" aria-expanded="false" aria-controls="site-top-nav" aria-label="メニューを開く">
             <span class="site-top-header__hamburger-bar" aria-hidden="true"></span>
@@ -156,7 +153,7 @@
       </header>
       <div class="hero__inner">
         <div class="hero__copy">
-          <h1 id="hero-title" data-hero-font-object="brand">SPEED<br>AD</h1>
+          <h1 id="hero-title" class="hero__brand-text">SPEED AD</h1>
           <p class="hero__statement" id="hero-statement" data-hero-font-object="statement">スピードをアドバンテージに。</p>
           <p class="hero__lead" id="hero-lead" data-hero-font-object="lead">
             展示会やイベントのリード獲得フォローを最適化する、<br>次世代WEBアンケート作成ツール。
@@ -568,8 +565,8 @@
   <footer class="site-footer">
     <div class="site-footer__identity">
       <a class="site-footer__brand" href="#top" aria-label="SPEED AD トップへ">
-        <img class="site-footer__brand-mark" src="img/speedad-login-header-logo.svg" alt="" width="30" height="26" loading="lazy" decoding="async">
-        <span>SPEED AD</span>
+        <img class="site-footer__brand-emblem" src="img/brand/speed-ad-emblem-white.svg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+        <img class="site-footer__brand-wordmark" src="img/brand/speed-ad-wordmark-horizontal-white.svg" alt="" loading="lazy" decoding="async" aria-hidden="true">
       </a>
       <p>© 2026 Abroad Outsourcing Co.,Inc.</p>
     </div>
@@ -639,8 +636,6 @@
   <script src="js/login-front-fullpage.js?v=20260602-tail-scroll-stop" defer></script>
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。撤去時はこの行とhead内のcssリンクを削除 -->
   <script src="js/emblem-tools.js" defer></script>
-  <!-- lettering-tools（開発者向け・?lettering=1 で起動）。撤去時はこの行とhead内のcssリンクを削除 -->
-  <script src="js/lettering-tools.js" defer></script>
 </body>
 </html>
 
