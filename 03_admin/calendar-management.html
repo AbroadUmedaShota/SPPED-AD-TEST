@@ -10,6 +10,19 @@
     <script src="src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* カレンダー本体と日付詳細の2カラム。狭い画面では詳細をカレンダーの下へ積む。
+   縦積みのときは align-items を stretch へ戻す。flex-start のままだと横方向が
+   cross 軸になり、カレンダーが内容なりの幅まで広がって親からはみ出す */
+.cal-2col { display: flex; gap: 16px; align-items: flex-start; }
+.cal-2col > #calPanel { width: 340px; flex: none; }
+@media (max-width: 1100px) {
+  .cal-2col { flex-direction: column; align-items: stretch; }
+  .cal-2col > #calPanel { width: 100%; }
+}
+/* 900px 以下では7列のマス目をやめ、1日1行の行形式にする(admin-style.css と同じ境目)。
+   曜日ヘッダーの出し分けを含めて描画の切替は JS 側(calRender)で行う */
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -20,17 +33,27 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">営業日カレンダー</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px;padding-bottom:12px">
               <h1 style="margin:0;font-size:20px;font-weight:700">営業日カレンダー</h1>
-              <div style="display:flex;gap:10px">
-                <button data-min-lv="3" title="会社ごとの1人1日あたり処理枚数" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calCapaOpen()">処理能力の設定</button>
-                <button data-min-lv="3" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calRegOpen()">定休日設定</button>
-                <button data-min-lv="3" title="個別休業日・振替営業日をCSVから一括登録" onclick="pOpen('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">休業日CSV取込</button>
-                <button data-min-lv="3" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calHolidayOpen()">休業日・振替を追加</button>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <span id="calActsCal" style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button title="表示中の月の営業日区分をCSVで書き出します" onclick="calCsvExport()" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">休業日CSV出力</button>
+                  <button data-min-lv="3" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calRegOpen()">定休日設定</button>
+                  <button data-min-lv="3" title="個別休業日・振替営業日をCSVから一括登録" onclick="pOpen('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">休業日CSV取込</button>
+                  <button data-min-lv="3" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calHolidayOpen()">休業日・振替を追加</button>
+                </span>
+                <span id="calActsAsg" style="display:none;gap:10px;flex-wrap:wrap">
+                  <button data-min-lv="3" title="会社ごとの1人1日あたり処理枚数" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="calCapaOpen()">処理能力の設定</button>
+                </span>
               </div>
             </div>
+            <div role="tablist" aria-label="表示の切り替え" style="display:flex;gap:2px;border-bottom:2px solid var(--a-border)">
+              <button id="calTabCal" role="tab" aria-selected="true" aria-controls="calPane" onclick="calTab('calendar')" style="background:none;border:none;border-bottom:2px solid var(--a-accent);margin-bottom:-2px;padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit">営業日・会期</button>
+              <button id="calTabAsg" role="tab" aria-selected="false" aria-controls="calPane" onclick="calTab('assign')" style="background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 18px;font-size:13.5px;color:var(--a-fg-muted);cursor:pointer;font-family:inherit">アサイン</button>
+            </div>
+            <section id="calPane" role="tabpanel" aria-labelledby="calTabCal">
             <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-              <div style="display:flex;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
                 <span id="calViewSwitch" role="group" aria-label="表示モード" style="display:flex;border:1px solid var(--a-border-strong);border-radius:6px;overflow:hidden">
                   <button data-view="single" onclick="calMode('single')" style="border:none;border-right:1px solid var(--a-border-strong);padding:6px 13px;cursor:pointer;font-size:12px;background:var(--a-surface);color:var(--a-fg-muted);font-family:inherit">単月</button>
                   <button data-view="around" onclick="calMode('around')" style="border:none;border-right:1px solid var(--a-border-strong);padding:6px 13px;cursor:pointer;font-size:12px;background:var(--a-surface);color:var(--a-fg-muted);font-family:inherit">前後2週</button>
@@ -50,7 +73,8 @@
               </div>
             </div>
             <div id="calSummary" style="margin-top:12px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"></div>
-            <div style="margin-top:12px;display:flex;gap:16px;align-items:flex-start">
+            <div id="calImpact" role="status" hidden style="margin-top:12px;background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:8px;padding:10px 14px"></div>
+            <div class="cal-2col" style="margin-top:12px">
               <div style="flex:1;min-width:0;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
                 <div id="calWeekHead" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11.5px;font-weight:700;color:var(--a-fg-muted);text-align:center">
                   <span style="padding:8px 0;color:var(--a-danger)">日</span><span style="padding:8px 0">月</span><span style="padding:8px 0">火</span><span style="padding:8px 0">水</span><span style="padding:8px 0">木</span><span style="padding:8px 0">金</span><span style="padding:8px 0;color:var(--a-accent)">土</span>
@@ -58,8 +82,9 @@
                 <div id="calGrid"></div>
                 <div id="calLegend" style="padding:9px 12px;border-top:1px solid var(--a-border-soft);font-size:11px;color:var(--a-fg-faint);display:flex;gap:8px 20px;flex-wrap:wrap;align-items:center"></div>
               </div>
-              <div id="calPanel" style="width:340px;flex:none;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 18px"></div>
+              <div id="calPanel" style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:16px 18px"></div>
             </div>
+            </section>
           </div>
         </main>
     </div>
@@ -68,7 +93,7 @@
 <div id="mHoliday" class="proto-modal" hidden>
   <div class="proto-dialog" style="width:480px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--a-border)">
-      <span style="font-size:15px;font-weight:700">休業日・振替営業日を追加</span>
+      <span id="calHolTitle" style="font-size:15px;font-weight:700">休業日・振替営業日を追加</span>
       <span role="button" onclick="pClose('mHoliday')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
@@ -77,12 +102,12 @@
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">区分</span><select aria-label="区分" id="calHolKind" style="margin-top:6px;width:100%;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="hol">休業日</option><option value="sub">振替営業日</option></select></label>
       </div>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">メモ(任意)</span><input id="calHolMemo" placeholder="例: 夏季休業" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div id="calHolErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
-      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">追加は以後の納期計算に反映されます。振替営業日は定休日・祝日にあたる日付にのみ設定できます。</div>
+      <div id="calHolErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">変更は以後の納期計算に反映され、<a href="audit-log.html">監査ログ</a>へ記録されます。振替営業日は定休日・祝日にあたる日付にのみ設定できます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mHoliday')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
-      <button onclick="calHolidaySave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">追加する</button>
+      <button id="calHolSubmit" onclick="calHolidaySave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">追加する</button>
     </div>
   </div>
 </div>
@@ -138,7 +163,7 @@
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
       <div id="calCapaRows"></div>
-      <div id="calCapaErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
+      <div id="calCapaErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
       <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.8">推定値はオペレーター実績確認の当月の作業件数を、当月の営業日数と対象人数で割った値です(1件＝名刺1枚)。<br>実績は「その会社に振られた量」であって処理能力の上限とは限りません。稼働率が低い会社は実力より小さく出るため、実態と合わない場合は上書きしてください。</div>
     </div>
     <div style="display:flex;justify-content:space-between;gap:10px;padding:0 22px 18px">
@@ -163,7 +188,7 @@
         <div id="calRecTo" style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--a-fg)"></div>
       </div>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">本文</span><textarea id="calRecBody" aria-label="本文" rows="5" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:12.5px;font-family:inherit;line-height:1.8;color:var(--a-fg-strong);background:var(--a-surface);resize:vertical"></textarea></label>
-      <div id="calRecErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
+      <div id="calRecErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
       <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">送信すると対象案件は「追加募集中」になり、宛先の会社から追加でアサインできる状態になります。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
@@ -208,7 +233,7 @@
           <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="calCsvDup">スキップする</label>
         </div>
       </div>
-      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">UTF-8(BOM付き)・CRLF・ヘッダー行あり。エラー行は除外して残りを取り込み、結果は更新ログへ記録されます。曜日単位の定休日はこのCSVでは扱いません。「定休日設定」から指定してください。</div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">UTF-8(BOM付き)・CRLF・ヘッダー行あり。エラー行は除外して残りを取り込み、結果は<a href="audit-log.html">監査ログ</a>へ記録されます。曜日単位の定休日はこのCSVでは扱いません。「定休日設定」から指定してください。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mCsvImport')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
@@ -253,6 +278,9 @@ window.calTemplateDl = function () {
 
 <script>
 // 営業日カレンダー(モック)。表示範囲は2026年6月〜8月、データはアンケート管理から導出した静的セット。
+// 画面は2タブ構成。営業日・会期タブは休業日設定と会期の俯瞰、アサインタブは作業期間と人員の過不足を扱う。
+// 会期と作業期間を1枚に重ねると1週あたり最大10本の帯が積まれて読めなくなるため、目的ごとに分けている。
+// 休業日・振替営業日の背景色はタブをまたいで常に出す(切り替わるのは帯と集計だけ)。
 // アサインは案件(アンケート)単位で、担当は会期の全日を通す。日ごとの過不足は集計で導く。
 // 画面内の操作(選択・アサイン・営業日設定・増員依頼)はページ内の状態にのみ反映され、再読み込みで初期化される
 (function () {
@@ -279,10 +307,12 @@ window.calTemplateDl = function () {
     };
     // 会社が同時に出せる人数。オペレーター管理の「有効」なアカウント数を使う。
     // 実績から導くと、退職・無効化された人の過去実績まで現在の戦力として数えてしまう
-    // （データパートナーズは実績1,926件があるが、鈴木 恵=無効・高橋 直樹=招待中で稼働可能者0名）
+    // （データパートナーズは実績1,926件があるが、鈴木 恵=無効・高橋 直樹=招待中で稼働可能者0名）。
+    // 逆に7月末に登録した新任は当月実績を持たないため CAPA_BASE の対象人数には入らない。
+    // 「1人あたりどれだけ処理できるか」と「何人出せるか」で取得元を分けているのはこのため
     var ACTIVE_HEADCOUNT = {
-        'アブロード本体': 2,                // 佐藤 由紀・山本 彩
-        'オフィスワークス株式会社': 2,       // 田中 大輔・王 麗華
+        'アブロード本体': 5,                // 佐藤 由紀・山本 彩・中村 悠斗・小林 美咲・森田 拓海
+        'オフィスワークス株式会社': 5,       // 田中 大輔・王 麗華・佐々木 遥・吉田 健太・林 由香（陳 志明=無効）
         'データパートナーズ株式会社': 0      // 鈴木 恵(無効)・高橋 直樹(招待中)
     };
 
@@ -293,8 +323,11 @@ window.calTemplateDl = function () {
     // 案件単位のアサイン。会社ごとの投入人数で持つ。誰を出すかは各社が社内で決める運用のため
     // 個人名までは扱わない。担当は会期の全日を通しての割当
     var S = {
+        tab: 'calendar',    // calendar(営業日・会期) / assign(アサイン)
         ym: '2026-07', sel: TODAY, selSv: null,
-        view: 'around',     // single(単月) / around(前後2週・既定) / year(年間)
+        // 表示モードはタブごとに使える組み合わせが違う(VIEWS)。会期は月をまたぐことが少ないので
+        // 営業日・会期タブは単月で足り、作業期間が月末を越えて伸びるアサインタブに前後2週を置く
+        view: 'single',     // single(単月) / around(前後2週) / year(年間)
         reg: { w: { 0: true, 6: true }, hol: true },
         ind: {
             '2026-08-08': { t: 'sub', memo: '' },
@@ -303,15 +336,17 @@ window.calTemplateDl = function () {
         },
         asg: {
             // 進行中の案件は作業日が重なる。稼働可能なアカウント数
-            // (アブロード2／オフィスワークス2／データパートナーズ0) をどの日も超えない配分
-            'SV-10262': {},
-            'SV-10259': { 'オフィスワークス株式会社': 2 },
-            'SV-10257': { 'アブロード本体': 2 },
+            // (アブロード5／オフィスワークス5／データパートナーズ0) をどの日も超えない配分。
+            // あわせて、充足の段階(未アサイン・不足(深刻)・不足・充足・人数過多)が
+            // どれも画面上に現れるようにしてある。1つも出ない段階があると配色を確認できない
+            'SV-10262': { 'アブロード本体': 3, 'オフィスワークス株式会社': 3 },   // 充足 106%
+            'SV-10259': { 'アブロード本体': 4, 'オフィスワークス株式会社': 5 },   // 総動員でも不足 88%
+            'SV-10257': { 'アブロード本体': 1 },                                  // 不足 78%
             'SV-10250': { 'オフィスワークス株式会社': 2 },
-            'SV-10244': { 'アブロード本体': 1, 'オフィスワークス株式会社': 2 },
-            'SV-10238': { 'オフィスワークス株式会社': 1 },
-            'SV-10236': { 'アブロード本体': 1, 'オフィスワークス株式会社': 1 },
-            'SV-10233': { 'アブロード本体': 1 },
+            'SV-10244': {},                                                       // 未アサイン
+            'SV-10238': { 'オフィスワークス株式会社': 2 },                        // 不足(深刻) 20%
+            'SV-10236': { 'アブロード本体': 4, 'オフィスワークス株式会社': 3 },   // 不足 90%
+            'SV-10233': { 'アブロード本体': 1 },                                  // 人数過多 173%
             'SV-10229': { 'オフィスワークス株式会社': 1, 'アブロード本体': 1 },
             'SV-10227': { 'アブロード本体': 1 },
             'SV-10221': { 'データパートナーズ株式会社': 1 },
@@ -323,11 +358,15 @@ window.calTemplateDl = function () {
         },
         capa: {},           // 会社 -> 1人日あたり処理枚数の上書き。未設定なら CAPA_BASE
         recruit: {},        // sid -> 'open'(追加募集中) / 'closed'(募集完了) の手動オーバーライド
-        fGroup: '', fState: '', shortOnly: false
+        fGroup: '', fState: '', shortOnly: false, hideDone: false
     };
 
     // ---- 小道具 ----
+    // タブごとに選べる表示モード。切替時に現在のモードが使えなければ既定へ寄せる
+    var VIEWS = { calendar: ['single', 'year'], assign: ['single', 'around'] };
+    var VIEW_DEFAULT = { calendar: 'single', assign: 'around' };
     function lv() { return window.pLevel(); }  // 表示シナリオの判定は proto-level.js に寄せる
+    function isAsg() { return S.tab === 'assign'; }
     function pad2(n) { return (n < 10 ? '0' : '') + n; }
     function esc(s) {
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -496,8 +535,12 @@ window.calTemplateDl = function () {
     };
 
     // ---- 絞り込み ----
+    // 絞り込みは充足状態と担当会社で絞る道具なのでアサインタブのもの。
+    // 営業日・会期タブに持ち越すと、絞り込んだまま切り替えたときに会期が黙って消える
     function passFilter(sid) {
+        if (!isAsg()) { return true; }
         var st = svState(sid);
+        if (S.hideDone && st === 'done') { return false; }
         if (S.shortOnly && st !== 'none' && st !== 'short' && st !== 'critical') { return false; }
         if (S.fState && st !== S.fState) { return false; }
         if (S.fGroup && !(asgOf(sid)[S.fGroup] > 0)) { return false; }
@@ -519,17 +562,22 @@ window.calTemplateDl = function () {
     // 営業日設定を変えると作業日がずれるため、再描画のたびに作り直す
     function invalidateWork() { _byWorkDay = null; _wd = {}; }
 
-    // 帯のセグメント。オンデマンドは会期＝作業なので1本、それ以外は会期と作業期間の2本
+    // 帯のセグメント。営業日・会期タブは会期だけを1本出す。
+    // アサインタブはオンデマンドが会期＝作業なので1本、それ以外は会期と作業期間の2本
     function segmentsOf(sid) {
         var v = CAL.surveys[sid], w = workDays(sid);
+        if (!isAsg()) { return [{ kind: 'event', s: v.s, e: v.e }]; }
         if (!TURNAROUND[v.plan]) { return [{ kind: 'work', s: v.s, e: v.e }]; }
         var segs = [{ kind: 'event', s: v.s, e: v.e }];
         if (w.length) { segs.push({ kind: 'work', s: w[0], e: w[w.length - 1] }); }
         return segs;
     }
-    // 会期開始から納期までの通し区間。レーン確保はこれ単位で行い、2本を同じレーンに載せる
+    // レーン確保の単位。アサインタブは会期開始から納期までの通し区間で押さえ、2本を同じレーンへ載せる。
+    // 営業日・会期タブは会期しか描かないので、納期まで押さえると帯の無い区間がレーンを塞ぐ
     function unionSpan(sid) {
-        var v = CAL.surveys[sid], d = dueDate(sid);
+        var v = CAL.surveys[sid];
+        if (!isAsg()) { return { s: v.s, e: v.e }; }
+        var d = dueDate(sid);
         return { s: v.s, e: d > v.e ? d : v.e };
     }
 
@@ -588,6 +636,83 @@ window.calTemplateDl = function () {
             + ' で要員が重複しています。配員を見直してください', 'error');
     }
 
+    // ---- 営業日設定の影響(納期のずれ) ----
+    // 営業日・会期タブには作業期間の帯を出さないため、休業日を動かした結果が画面から読めない。
+    // 変更の前後で納期を比べて、動いた案件をその場に残す(トーストと違い消えないので後から追える)
+    function dueSnapshot() {
+        var out = {};
+        Object.keys(CAL.surveys).forEach(function (sid) { out[sid] = dueDate(sid); });
+        return out;
+    }
+    var IMPACT_ROWS = 5;   // 全部並べるとカレンダーが押し下がるので、残りは件数でまとめる
+    function showDueShift(before, what) {
+        var el = document.getElementById('calImpact');
+        if (!el) { return; }
+        // 終了案件はデータ化が済んでいるので、納期が動いても実務上の影響がない
+        var moved = Object.keys(CAL.surveys).filter(function (sid) {
+            return !isPast(sid) && before[sid] && before[sid] !== dueDate(sid);
+        }).sort(function (a, b) { return before[a] < before[b] ? -1 : 1; });
+        if (!moved.length) { window.calImpactClose(); return; }
+        var rows = moved.slice(0, IMPACT_ROWS).map(function (sid) {
+            var v = CAL.surveys[sid], back = dueDate(sid) > before[sid];
+            return '<div style="display:flex;gap:8px;align-items:baseline;margin-top:3px">'
+                + '<a href="survey-detail.html?id=' + sid + '" style="flex:none;font-variant-numeric:tabular-nums">' + sid + '</a>'
+                + '<span title="' + esc(v.title) + '" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--a-fg-muted)">'
+                + esc(v.title) + '</span>'
+                + '<span style="flex:none;font-variant-numeric:tabular-nums;font-weight:700">' + md(before[sid]) + ' → ' + md(dueDate(sid)) + '</span>'
+                + '<span style="flex:none;width:42px;text-align:right;color:' + (back ? 'var(--a-warn)' : 'var(--a-accent-deep)') + '">'
+                + (back ? '後ろへ' : '前へ') + '</span></div>';
+        }).join('');
+        el.hidden = false;
+        el.innerHTML = '<div style="display:flex;align-items:baseline;gap:10px">'
+            + '<span style="font-weight:700;font-size:12.5px">' + esc(what) + 'で ' + moved.length + '件の納期が動きました</span>'
+            + '<button onclick="calImpactClose()" style="margin-left:auto;background:none;border:none;padding:0;font-size:11.5px;color:var(--a-fg-muted);cursor:pointer;font-family:inherit;text-decoration:underline">閉じる</button></div>'
+            + '<div style="margin-top:4px;font-size:11.5px">' + rows + '</div>'
+            + (moved.length > IMPACT_ROWS
+                ? '<div style="margin-top:4px;font-size:11px;color:var(--a-fg-muted2)">ほか ' + (moved.length - IMPACT_ROWS) + '件</div>'
+                : '')
+            + '<div style="margin-top:6px;font-size:11px;color:var(--a-fg-muted2)">納期は会期終了日の翌営業日から起算します。休業日を足すと、その分だけ後ろへずれます。</div>';
+    }
+    window.calImpactClose = function () {
+        var el = document.getElementById('calImpact');
+        if (el) { el.hidden = true; el.innerHTML = ''; }
+    };
+
+    // ---- CSV出力（表示中の月の営業日区分） ----
+    // 取込の列(date/event_type/reason)と違い、出力は営業日も含めた月の全日を書き出す。
+    // 由来(source)を分けるのは、休業日が定休日・祝日・個別設定のどれで決まったかが
+    // CSVだけでは追えないため
+    function csvCell(v) {
+        var s = String(v == null ? '' : v);
+        return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    window.calCsvExport = function () {
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        var dim = new Date(y, m, 0).getDate();
+        var rows = [['date', 'day_of_week', 'status', 'status_label', 'source', 'reason', 'memo']];
+        for (var d = 1; d <= dim; d++) {
+            var is = S.ym + '-' + pad2(d), i = S.ind[is], t = typ(is);
+            var status = t.t === 'hol' ? 'HOLIDAY' : (t.t === 'sub' ? 'SUBSTITUTE_WORKDAY' : 'BUSINESS_DAY');
+            var label = t.t === 'hol' ? '休業日' : (t.t === 'sub' ? '振替営業日' : '営業日');
+            var source = i ? 'INDIVIDUAL'
+                : (HOLI[is] && S.reg.hol) ? 'PUBLIC_HOLIDAY'
+                : S.reg.w[dow(is)] ? 'REGULAR' : '';
+            var reason = i ? '' : (source === 'PUBLIC_HOLIDAY' ? HOLI[is] : (source === 'REGULAR' ? WD[dow(is)] + '曜の定休日' : ''));
+            rows.push([is, WD[dow(is)], status, label, source, reason, i ? (i.memo || '') : '']);
+        }
+        var body = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n') + '\r\n';
+        var blob = new Blob(['\uFEFF' + body], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'calendar_' + S.ym + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        window.pToast(y + '年' + m + '月の営業日区分を書き出しました（監査ログに記録されます）');
+    };
+
     // ---- 操作 ----
     window.calMonth = function (d) {
         var i = MONTHS.indexOf(S.ym) + d;
@@ -596,7 +721,7 @@ window.calTemplateDl = function () {
         calRender();
     };
     window.calToday = function () {
-        if (S.view === 'year') { S.view = 'around'; }
+        if (S.view === 'year') { S.view = VIEW_DEFAULT[S.tab]; }
         S.ym = TODAY.slice(0, 7);
         S.sel = TODAY;
         S.selSv = null;
@@ -632,6 +757,7 @@ window.calTemplateDl = function () {
         calRender();
     };
     window.calShortOnly = function (el) { S.shortOnly = !!el.checked; calRender(); };
+    window.calHideDone = function (el) { S.hideDone = !!el.checked; calRender(); };
 
     // ---- カレンダー描画 ----
     // 帯は週をまたぐため、42マスの平坦なグリッドではなく週ごとのグリッドを積む。
@@ -685,25 +811,45 @@ window.calTemplateDl = function () {
     function bandHtml(b) {
         var sid = b.sid, v = CAL.surveys[sid], st = svState(sid);
         var isWork = b.kind === 'work';
-        // 会期は破線グレーで情報のみ。人員の充足色は作業期間側に乗せる
-        var c = isWork ? BAND[st]
-            : { sym: '', fg: 'var(--a-fg-muted)', bg: 'var(--a-surface-2)', bd: 'var(--a-border-strong)', hatch: false };
         var load = dailyLoad(sid), sup = supplyOf(sid);
-        // 終了案件は過不足を問う対象ではないので、日次ではなく総枚数を実績として出す
-        var tail = !isWork ? '会期'
-            : st === 'done' ? (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚'
-            : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
-            : sup.toLocaleString('ja-JP') + '/' + load.toLocaleString('ja-JP') + '枚';
-        // 記号は独立した span に置く。省略表示の検査は葉要素の文字と title の先頭一致を見るため、
-        // 記号を混ぜると「・ SV-10229」と title「SV-10229 …」がずれて全文が読めない扱いになる
-        var head = isWork ? sid : (sid + ' ' + v.title);
         var beyond = isWork && beyondCapacity(sid);
-        var sym = beyond ? '⚠' : BAND[st].sym;
+        // 営業日・会期タブは帯に納期を出さないぶん、補足表示で納期区分と納期を読めるようにする
         var aria = sid + ' ' + v.title + (isWork
             ? ' 作業期間 納期' + md(dueDate(sid)) + ' ' + planLabel(sid)
                 + ' 必要' + load + '枚/日 供給' + sup + '枚/日 '
                 + (beyond ? '全社総動員でも不足' : BAND[st].label)
-            : ' 会期 ' + md(v.s) + 'から' + md(v.e));
+            : ' 会期 ' + md(v.s) + 'から' + md(v.e)
+                + (isAsg() ? '（名刺の回収期間。データ化は納期区分に応じて後日）'
+                    : ' ' + planLabel(sid) + ' 納期' + md(dueDate(sid))));
+
+        // アサインタブの会期は帯にせず、作業期間の帯へつながる細い線として置く。
+        // 同じ高さの帯を2本並べると1案件が2件に見えるため、高さで主従を付ける。
+        // 色は付けない(充足は作業期間の話で、名刺を集めている間の過不足という概念がない)
+        if (isAsg() && !isWork) {
+            return '<div role="button" tabindex="0" aria-label="' + esc(aria) + '" title="' + esc(aria) + '"'
+                + ' onclick="calPick(\'' + sid + '\')"'
+                + ' style="grid-row:' + (2 + b.lane) + ';grid-column:' + (b.col + 1) + '/span ' + b.span + ';'
+                + 'margin:0 ' + (b.contR ? '0' : '3px') + ' 2px ' + (b.contL ? '0' : '3px') + ';'
+                + 'height:18px;display:flex;align-items:center;cursor:pointer;min-width:0">'
+                // 線の色は枠線トークンではなく文字トークンを使う。--a-border-strong だと
+                // セル背景とのコントラストが 1.5〜2.0:1 で、非テキストの基準(3:1)に届かない
+                + '<span aria-hidden="true" style="flex:1;height:3px;border-radius:2px;background:'
+                + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-fg-faint)') + '"></span></div>';
+        }
+
+        // 会期は破線グレーで情報のみ。人員の充足色は作業期間側に乗せる
+        var c = isWork ? BAND[st]
+            : { sym: '', fg: 'var(--a-fg-muted)', bg: 'var(--a-surface-2)', bd: 'var(--a-border-strong)', hatch: false };
+        // 終了案件は過不足を問う対象ではないので、日次ではなく総枚数を実績として出す
+        var tail = !isWork ? ''
+            : st === 'done' ? (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚'
+            : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
+            : sup.toLocaleString('ja-JP') + '/' + load.toLocaleString('ja-JP') + '枚';
+        // 記号は独立した span に置く。省略表示の検査は葉要素の文字と title の先頭一致を見るため、
+        // 記号を混ぜると「・ SV-10229」と title「SV-10229 …」がずれて全文が読めない扱いになる。
+        // 会期を線にしたぶん、案件名は作業期間の帯が持つ(幅が足りなければ省略され、補足表示で読める)
+        var head = sid + ' ' + v.title;
+        var sym = beyond ? '⚠' : BAND[st].sym;
         var hatch = (isWork && c.hatch)
             ? 'background-image:repeating-linear-gradient(135deg,rgba(0,0,0,0) 0 5px,' + c.bd + ' 5px 6px);' : '';
         var radL = b.contL ? '0' : '4px', radR = b.contR ? '0' : '4px';
@@ -770,28 +916,34 @@ window.calTemplateDl = function () {
 
         col.bands.forEach(function (b) { h += bandHtml(b); });
 
-        // 日計。その日に作業が走る案件の必要枚数と供給枚数の合計、および不足している案件の数
+        // 日計。その日に作業が走る案件の必要枚数と供給枚数の合計、および不足している案件の数。
+        // 営業日・会期タブでは人員の話をしないため、レーンからあふれた件数だけを出す。
+        // 中身の無いセルは div ごと出さない(空の div でも padding のぶん行が伸びるため)
         week.forEach(function (is, i) {
-            var a = dayAgg(is);
-            var over = dayByGroup(is).filter(function (g) { return g.over; });
-            // 要員重複は行の先頭に置く。セルは1行で溢れを切り落とすため、末尾に付けると
-            // 幅の狭い環境で警告だけが消える
-            var txt = over.length ? '<span style="color:var(--a-danger);font-weight:700">⚠重複 </span>' : '';
-            if (a.live.length) {
-                var c = a.lackCases ? 'var(--a-danger)' : 'var(--a-fg-muted)';
-                txt += '<span style="color:' + c + ';font-variant-numeric:tabular-nums;font-weight:700">'
-                    + a.supply.toLocaleString('ja-JP') + '/' + a.load.toLocaleString('ja-JP') + '枚</span>'
-                    + (a.lackCases ? '<span style="color:var(--a-danger)"> ▲' + a.lackCases + '件</span>' : '');
+            var txt = '', tip = '';
+            if (isAsg()) {
+                var a = dayAgg(is);
+                var over = dayByGroup(is).filter(function (g) { return g.over; });
+                // 要員重複は行の先頭に置く。セルは1行で溢れを切り落とすため、末尾に付けると
+                // 幅の狭い環境で警告だけが消える
+                txt = over.length ? '<span style="color:var(--a-danger);font-weight:700">⚠重複 </span>' : '';
+                if (a.live.length) {
+                    var c = a.lackCases ? 'var(--a-danger)' : 'var(--a-fg-muted)';
+                    txt += '<span style="color:' + c + ';font-variant-numeric:tabular-nums;font-weight:700">'
+                        + a.supply.toLocaleString('ja-JP') + '/' + a.load.toLocaleString('ja-JP') + '枚</span>'
+                        + (a.lackCases ? '<span style="color:var(--a-danger)"> ▲' + a.lackCases + '件</span>' : '');
+                }
+                // 会社が違えば供給は融通できないため、合計が足りていても案件単位では不足しうる
+                tip = (over.length
+                        ? '要員重複: ' + over.map(function (g) { return g.group + ' ' + g.n + '/' + g.cap + '人'; }).join('・') + '\n'
+                        : '')
+                    + (a.live.length
+                        ? '必要 ' + a.load.toLocaleString('ja-JP') + '枚/日 ・ 供給 ' + a.supply.toLocaleString('ja-JP') + '枚/日'
+                            + (a.lackCases ? ' ・ 不足のある案件 ' + a.lackCases + '件(合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日)' : '')
+                        : '');
             }
             if (col.over[i]) { txt += '<span style="color:var(--a-fg-faint)"> 他' + col.over[i] + '件</span>'; }
-            // 会社が違えば供給は融通できないため、合計が足りていても案件単位では不足しうる
-            var tip = (over.length
-                    ? '要員重複: ' + over.map(function (g) { return g.group + ' ' + g.n + '/' + g.cap + '人'; }).join('・') + '\n'
-                    : '')
-                + (a.live.length
-                    ? '必要 ' + a.load.toLocaleString('ja-JP') + '枚/日 ・ 供給 ' + a.supply.toLocaleString('ja-JP') + '枚/日'
-                        + (a.lackCases ? ' ・ 不足のある案件 ' + a.lackCases + '件(合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日)' : '')
-                    : '');
+            if (!txt) { return; }
             h += '<div' + (tip ? ' title="' + esc(tip) + '"' : '') + ' style="grid-row:' + (2 + used) + ';grid-column:' + (i + 1) + ';padding:2px 8px 6px;'
                 + 'font-size:10.5px;pointer-events:none;overflow:hidden;white-space:nowrap">' + txt + '</div>';
         });
@@ -807,14 +959,48 @@ window.calTemplateDl = function () {
     }
 
     function paintModeSwitch() {
-        [].slice.call(document.querySelectorAll('#calViewSwitch button')).forEach(function (b) {
+        var allowed = VIEWS[S.tab] || VIEWS.calendar;
+        var shown = [].slice.call(document.querySelectorAll('#calViewSwitch button')).filter(function (b) {
+            var ok = allowed.indexOf(b.getAttribute('data-view')) >= 0;
+            b.style.display = ok ? '' : 'none';
+            return ok;
+        });
+        shown.forEach(function (b, i) {
             var on = b.getAttribute('data-view') === S.view;
             b.style.background = on ? 'var(--a-accent-bg)' : 'var(--a-surface)';
             b.style.color = on ? 'var(--a-on-accent)' : 'var(--a-fg-muted)';
             b.style.fontWeight = on ? '700' : '400';
             b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            // 区切り線は見えているボタンの間だけに引く。末尾に残すと枠の内側に線が1本余る
+            b.style.borderRight = (i === shown.length - 1) ? 'none' : '1px solid var(--a-border-strong)';
         });
     }
+
+    // ---- タブ ----
+    var TABS = { calendar: ['calTabCal', 'calActsCal'], assign: ['calTabAsg', 'calActsAsg'] };
+    window.calTab = function (name) {
+        if (!VIEWS[name] || !document.getElementById('calTitle')) { return; }
+        S.tab = name;
+        if (VIEWS[name].indexOf(S.view) < 0) { S.view = VIEW_DEFAULT[name]; }
+        S.selSv = null;     // 帯の選択はタブによって指すものが変わる(会期／作業期間)ので持ち越さない
+        Object.keys(TABS).forEach(function (k) {
+            var on = (k === name);
+            var btn = document.getElementById(TABS[k][0]);
+            var acts = document.getElementById(TABS[k][1]);
+            if (btn) {
+                btn.setAttribute('aria-selected', on ? 'true' : 'false');
+                btn.style.borderBottomColor = on ? 'var(--a-accent)' : 'transparent';
+                btn.style.color = on ? 'var(--a-accent)' : 'var(--a-fg-muted)';
+                btn.style.fontWeight = on ? '700' : '400';
+            }
+            // 操作ボタンの箱ごと出し分ける。中のボタンは data-min-lv を持っていて
+            // proto-level.js が display を握っているため、箱の側で切り替える
+            if (acts) { acts.style.display = on ? 'flex' : 'none'; }
+        });
+        var pane = document.getElementById('calPane');
+        if (pane) { pane.setAttribute('aria-labelledby', TABS[name][0]); }
+        calRender();
+    };
 
     // 表示範囲の週リスト。単月=当月の週のみ、前後2週=当月の前2週〜後2週
     function viewWeeks() {
@@ -832,6 +1018,77 @@ window.calTemplateDl = function () {
         return weeks;
     }
 
+    // ---- 行形式(狭い画面) ----
+    // 7列のマス目は1列あたりの幅が要るため、狭い画面では1日1行の縦並びに切り替える。
+    // 帯は日をまたぐ表現なので行形式では持てない。その日にかかる案件を日ごとに並べ直す
+    var NARROW = window.matchMedia('(max-width: 900px)');
+    function isNarrow() { return NARROW.matches; }
+
+    // その日に並べる案件。アサインタブは作業のある案件を先に、会期だけの案件を後に置く
+    function rowItems(is) {
+        var out = [], seen = {};
+        if (isAsg()) {
+            workOf(is).forEach(function (sid) {
+                if (passFilter(sid)) { out.push({ sid: sid, work: true }); seen[sid] = 1; }
+            });
+        }
+        svOf(is).forEach(function (sid) {
+            if (passFilter(sid) && !seen[sid]) { out.push({ sid: sid, work: false }); seen[sid] = 1; }
+        });
+        return out;
+    }
+
+    function dayRowHtml(is) {
+        var t = typ(is), w = dow(is), d = toDate(is);
+        var numCol = t.t === 'sub' ? 'var(--a-accent-deep)'
+            : (w === 0 ? 'var(--a-danger)' : (w === 6 ? 'var(--a-accent)' : 'var(--a-fg)'));
+        var lab = t.t === 'hol' ? '休業日' + (t.memo ? '(' + esc(t.memo) + ')' : '')
+            : (t.t === 'sub' ? '振替営業日' : '');
+        var body = rowItems(is).map(function (it) {
+            var sid = it.sid, v = CAL.surveys[sid], st = svState(sid), c = BAND[st];
+            // マス目と同じ約束にする。作業は記号つきの枠、会期は線
+            var badge = it.work
+                ? '<span style="flex:none;color:' + c.fg + ';font-weight:700">' + (beyondCapacity(sid) ? '⚠' : c.sym) + '</span>'
+                : '<span aria-hidden="true" style="flex:none;width:14px;height:3px;border-radius:2px;background:var(--a-fg-faint)"></span>';
+            // 営業日・会期タブは全行が会期なので注記しない。幅は案件名へ回す
+            var tail = !it.work ? (isAsg() ? '会期' : '')
+                : st === 'done' ? ''
+                : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
+                : supplyOf(sid).toLocaleString('ja-JP') + '/' + dailyLoad(sid).toLocaleString('ja-JP') + '枚';
+            return '<div role="button" tabindex="0" onclick="calPick(\'' + sid + '\')"'
+                + ' title="' + esc(sid + ' ' + v.title) + '"'
+                + ' style="display:flex;align-items:center;gap:6px;margin-top:4px;padding:5px 8px;border-radius:5px;'
+                + 'border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';'
+                + (it.work ? 'background-color:' + c.bg + ';' : '')
+                + 'font-size:11.5px;cursor:pointer;min-width:0">' + badge
+                + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+                + sid + ' ' + esc(v.title) + '</span>'
+                + (tail ? '<span style="flex:none;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">' + tail + '</span>' : '')
+                + '</div>';
+        }).join('');
+        return '<div style="display:flex;gap:10px;padding:8px 12px;border-bottom:1px solid var(--a-border-soft);'
+            + (t.t === 'hol' ? 'background:var(--a-surface-3);' : (t.t === 'sub' ? 'background:var(--a-info-bg);' : ''))
+            + (is === S.sel ? 'box-shadow:inset 0 0 0 2px var(--a-accent);' : '') + '">'
+            + '<div role="button" tabindex="0" aria-label="' + (d.getMonth() + 1) + '月' + d.getDate() + '日"'
+            + ' onclick="calSelect(\'' + is + '\')" style="flex:none;width:46px;cursor:pointer;text-align:center">'
+            + '<div style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:' + numCol + '">' + d.getDate() + '</div>'
+            + '<div style="font-size:11px;color:' + numCol + '">' + WD[w] + '</div>'
+            + (is === TODAY ? '<div style="font-size:10px;color:var(--a-accent);font-weight:700">本日</div>' : '')
+            + '</div>'
+            + '<div style="flex:1;min-width:0">'
+            + (lab ? '<div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted2)">' + lab + '</div>' : '')
+            + (body || (lab ? '' : '<div style="font-size:11.5px;color:var(--a-fg-faint);padding-top:3px">—</div>'))
+            + '</div></div>';
+    }
+
+    // 行形式は対象月の日付だけを並べる。前後2週の月外分まで行にすると縦に長くなりすぎる
+    function listRender() {
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        var dim = new Date(y, m, 0).getDate(), h = '';
+        for (var d = 1; d <= dim; d++) { h += dayRowHtml(S.ym + '-' + pad2(d)); }
+        document.getElementById('calGrid').innerHTML = h;
+    }
+
     function calRender() {
         // Lv1ではページ本文がガード表示に差し替えられるため描画しない
         if (!document.getElementById('calTitle')) { return; }
@@ -845,15 +1102,25 @@ window.calTemplateDl = function () {
         prev.disabled = pi === 0; next.disabled = pi === MONTHS.length - 1;
         prev.style.color = prev.disabled ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
         next.style.color = next.disabled ? 'var(--a-fg-disabled)' : 'var(--a-fg)';
-        // 年間は月次の道具(絞り込み・集計行・右パネル・曜日ヘッダー)を持たない
-        document.getElementById('calFilters').style.display = year ? 'none' : 'flex';
+        // 年間は月次の道具(絞り込み・集計行・右パネル・曜日ヘッダー)を持たない。
+        // 絞り込みは充足状態と担当会社で絞るものなので、アサインタブにだけ置く
+        document.getElementById('calFilters').style.display = (year || !isAsg()) ? 'none' : 'flex';
         document.getElementById('calSummary').style.display = year ? 'none' : 'flex';
         document.getElementById('calPanel').style.display = year ? 'none' : '';
-        document.getElementById('calWeekHead').style.display = year ? 'none' : 'grid';
+        // 曜日ヘッダーは7列のマス目のためのもの。行形式では並びが合わないので出さない
+        var narrow = isNarrow();
+        document.getElementById('calWeekHead').style.display = (year || narrow) ? 'none' : 'grid';
         document.getElementById('calLegend').style.display = year ? 'none' : 'flex';
 
         invalidateWork();   // 営業日設定が変わると作業日と納期がずれる
         if (year) { yearRender(); return; }
+        if (narrow) {
+            listRender();
+            summaryRender();
+            legendRender();
+            panelRender();
+            return;
+        }
 
         // 前後2週は前月末〜翌月頭を上下にそのまま並べる(スクロール窓は使わない)。
         // 月の境目が分かるよう、月が替わる週の前に区切りラベル行を挟み、
@@ -889,33 +1156,31 @@ window.calTemplateDl = function () {
         panelRender();
     }
 
-    // 年間ビュー: 月×指標の一覧表。図は使わず数値で俯瞰する
+    // 年間ビュー: 月×指標の一覧表。図は使わず数値で俯瞰する。
+    // 営業日・会期タブ専用のため、人員の過不足ではなく営業日の姿と案件の多寡だけを並べる
     function yearRender() {
         var y = parseInt(S.ym.slice(0, 4), 10);
-        var COLS = 'display:grid;grid-template-columns:minmax(80px,80fr) minmax(90px,70fr) minmax(130px,95fr) minmax(120px,85fr) minmax(120px,95fr) minmax(90px,70fr) minmax(110px,85fr);align-items:center;padding:0 18px';
+        var COLS = 'display:grid;grid-template-columns:minmax(90px,70fr) minmax(110px,80fr) minmax(160px,110fr) minmax(150px,105fr);align-items:center;padding:0 18px';
         var h = '<div style="' + COLS + ';height:40px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">'
-            + '<span>月</span><span style="text-align:right">営業日数</span><span style="text-align:right">休業・振替の設定</span><span style="text-align:right">会期のある案件</span><span style="text-align:right">予定枚数合計</span><span style="text-align:right">不足日数</span><span style="text-align:right">要員重複日数</span></div>';
+            + '<span>月</span><span style="text-align:right">営業日数</span><span style="text-align:right">休業・振替の個別設定</span><span style="text-align:right">会期のある案件</span></div>';
         for (var m = 1; m <= 12; m++) {
             var ym = y + '-' + pad2(m);
             var dim = new Date(y, m, 0).getDate();
             var mEnd = ym + '-' + pad2(dim);
-            var biz = 0, ind = 0, lackDays = 0;
+            var biz = 0, ind = 0;
             for (var d = 1; d <= dim; d++) {
                 var is = ym + '-' + pad2(d);
                 if (isBiz(is)) { biz++; }
                 if (S.ind[is]) { ind++; }
-                if (dayAgg(is).lackCases) { lackDays++; }
             }
-            var svN = 0, vol = 0;
+            var svN = 0;
             Object.keys(CAL.surveys).forEach(function (sid) {
                 var v = CAL.surveys[sid];
                 if (!(v.e < ym + '-01' || v.s > mEnd)) { svN++; }
-                if (v.s.slice(0, 7) === ym) { vol += CAL.exp[sid] || 0; }
             });
-            var od = overDaysIn(ym).length;
             var inRange = MONTHS.indexOf(ym) >= 0;
             h += '<div' + (inRange
-                    ? ' tabindex="0" role="button" class="proto-row-hover" onclick="calYearPick(\'' + ym + '\')" title="押すと前後2週表示でこの月を開きます"'
+                    ? ' tabindex="0" role="button" class="proto-row-hover" onclick="calYearPick(\'' + ym + '\')" title="押すと単月表示でこの月を開きます"'
                     : ' title="モックのデータ範囲外(2026/06〜08)"')
                 + ' style="' + COLS + ';height:42px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;'
                 + (inRange ? 'cursor:pointer' : 'color:var(--a-fg-faint)') + '">'
@@ -923,20 +1188,43 @@ window.calTemplateDl = function () {
                 + '<span style="text-align:right">' + biz + '日</span>'
                 + '<span style="text-align:right">' + (ind ? ind + '件' : '—') + '</span>'
                 + '<span style="text-align:right">' + (svN ? svN + '件' : '—') + '</span>'
-                + '<span style="text-align:right">' + (vol ? vol.toLocaleString('ja-JP') + '枚' : '—') + '</span>'
-                + '<span style="text-align:right' + (lackDays ? ';color:var(--a-danger);font-weight:700' : '') + '">' + (lackDays ? lackDays + '日' : '—') + '</span>'
-                + '<span style="text-align:right' + (od ? ';color:var(--a-danger);font-weight:700' : '') + '">' + (od ? od + '日' : '—') + '</span>'
                 + '</div>';
         }
-        h += '<div style="padding:9px 18px;font-size:11px;color:var(--a-fg-faint)">予定枚数合計は会期初日の属する月に計上する。不足日数はその日に必要枚数へ届かない案件がある日の数。</div>';
+        h += '<div style="padding:9px 18px;font-size:11px;color:var(--a-fg-faint)">営業日数は定休日・祝日・個別設定を反映した日数。会期のある案件は、その月に会期がかかるアンケートの件数。</div>';
         document.getElementById('calGrid').innerHTML = h;
     }
-    window.calYearPick = function (ym) { S.view = 'around'; S.ym = ym; calRender(); };
+    window.calYearPick = function (ym) { S.view = 'single'; S.ym = ym; calRender(); };
+
+    // 営業日・会期タブの月サマリ。休業日を動かすときに効く数だけを1行で置く
+    function summaryCalRender(el) {
+        var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
+        var dim = new Date(y, m, 0).getDate();
+        var biz = 0, hol = 0, ind = 0;
+        for (var d = 1; d <= dim; d++) {
+            var is = S.ym + '-' + pad2(d);
+            if (isBiz(is)) { biz++; } else { hol++; }
+            if (S.ind[is]) { ind++; }
+        }
+        var mStart = S.ym + '-01', mEnd = S.ym + '-' + pad2(dim), svN = 0;
+        Object.keys(CAL.surveys).forEach(function (sid) {
+            var v = CAL.surveys[sid];
+            if (!(v.e < mStart || v.s > mEnd)) { svN++; }
+        });
+        function part(label, n, unit) {
+            return '<span>' + label + ' <strong style="font-variant-numeric:tabular-nums;color:var(--a-fg-strong)">' + n + unit + '</strong></span>';
+        }
+        el.innerHTML = '<div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--a-fg-muted)">'
+            + '<span style="font-weight:700;font-size:13px;color:var(--a-fg)">この月</span>'
+            + part('営業日', biz, '日') + part('休業日', hol, '日')
+            + part('個別設定', ind, '件') + part('会期のある案件', svN, '件')
+            + '</div>';
+    }
 
     // 当月に会期がかかる案件の状態内訳。Lv4が「どこが足りないか」へ最短で入るための行
     function summaryRender() {
         var el = document.getElementById('calSummary');
         if (!el) { return; }
+        if (!isAsg()) { return summaryCalRender(el); }
         // 会期だけでなく作業期間が当月にかかる案件も数える。作業は会期の後に来るため
         var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
         var mStart = S.ym + '-01', mEnd = S.ym + '-' + pad2(new Date(y, m, 0).getDate());
@@ -951,14 +1239,17 @@ window.calTemplateDl = function () {
             var c = (danger && n > 0) ? 'var(--a-danger)' : 'var(--a-fg-muted)';
             return '<span style="color:' + c + '">' + label + ' <strong style="font-variant-numeric:tabular-nums">' + n + '件</strong></span>';
         }
-        var refocus = document.activeElement && document.activeElement.id === 'calShortOnly';
+        var focused = document.activeElement && document.activeElement.id;
+        // 「総動員でも不足」は独立した状態ではなく、未アサイン・不足に付く印。
+        // 並べて置くと合計に足したくなるため「うち」を付けて内訳であることを示す
         el.innerHTML =
             '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:12.5px">'
             + '<span style="font-weight:700;font-size:13px">この月の案件</span>'
             + part('未アサイン', cnt.none, true) + part('不足(深刻)', cnt.critical, true) + part('不足', cnt.short, true)
             + (cnt.beyond
-                ? '<span title="増員では解決しません。納期区分か受注量の見直しが要ります" style="color:var(--a-danger);font-weight:700;cursor:help">⚠ 総動員でも不足 <strong style="font-variant-numeric:tabular-nums">' + cnt.beyond + '件</strong></span>'
+                ? '<span title="未アサイン・不足のうち、増員では解決しない件数です。納期区分か受注量の見直しが要ります" style="color:var(--a-danger);font-weight:700;cursor:help">⚠ うち総動員でも不足 <strong style="font-variant-numeric:tabular-nums">' + cnt.beyond + '件</strong></span>'
                 : '')
+            + '<span aria-hidden="true" style="color:var(--a-border-strong)">｜</span>'
             + part('充足', cnt.ok, false) + part('人数過多', cnt.over, false) + part('終了', cnt.done, false)
             + (function () {
                 var od = overDaysIn(S.ym);
@@ -967,9 +1258,13 @@ window.calTemplateDl = function () {
                     : '';
             })()
             + '</div>'
+            + '<div style="display:flex;align-items:center;gap:16px">'
             + '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
-            + '<input type="checkbox" id="calShortOnly" onchange="calShortOnly(this)"' + (S.shortOnly ? ' checked' : '') + '>不足のみ表示</label>';
-        if (refocus) { document.getElementById('calShortOnly').focus(); }
+            + '<input type="checkbox" id="calShortOnly" onchange="calShortOnly(this)"' + (S.shortOnly ? ' checked' : '') + '>不足のみ表示</label>'
+            + '<label title="データ化が済んだ案件をカレンダーから外します。件数は上の集計に残ります" style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
+            + '<input type="checkbox" id="calHideDone" onchange="calHideDone(this)"' + (S.hideDone ? ' checked' : '') + '>終了を隠す</label>'
+            + '</div>';
+        if (focused === 'calShortOnly' || focused === 'calHideDone') { document.getElementById(focused).focus(); }
     }
 
     function legendRender() {
@@ -980,22 +1275,34 @@ window.calTemplateDl = function () {
                 + style + '"></span>' + label + '</span>';
         }
         function sym(k) {
-            return '<span style="display:flex;align-items:center;gap:4px"><span style="color:' + BAND[k].fg + ';font-weight:700">'
+            // 凡例には帯の背景が無い。不足(深刻)の文字色は赤地に載せる前提の白なので、
+            // そのまま置くと白地に白で消える。凡例では枠線と同じ赤を使う
+            var col = k === 'critical' ? 'var(--a-danger-border)' : BAND[k].fg;
+            return '<span style="display:flex;align-items:center;gap:4px"><span style="color:' + col + ';font-weight:700">'
                 + BAND[k].sym + '</span>' + BAND[k].label + '</span>';
         }
-        el.innerHTML =
-            '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">営業日区分</span>'
+        // 営業日区分の凡例はタブをまたいで共通(休業日の背景色は常に出しているため)
+        var days = '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">営業日区分</span>'
             + sw('background:var(--a-surface);border:1px solid var(--a-border-strong)', '営業日')
             + sw('background:var(--a-surface-3)', '休業日')
             + sw('background:var(--a-info-bg);border:1px solid var(--a-info-border)', '振替営業日')
-            + sw('background:var(--a-surface);box-shadow:inset 0 0 0 2px var(--a-accent)', '選択中') + '</span>'
-            + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">帯</span>'
-            + sw('background:var(--a-surface-2);border:1px dashed var(--a-border-strong)', '会期(名刺が集まる期間)')
+            + sw('background:var(--a-surface);box-shadow:inset 0 0 0 2px var(--a-accent)', '選択中') + '</span>';
+        if (!isAsg()) {
+            el.innerHTML = days
+                + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">帯</span>'
+                + sw('background:var(--a-surface-2);border:1px dashed var(--a-border-strong)', '会期(名刺が集まる期間)') + '</span>'
+                + '<span>日付または帯を選択すると詳細を表示します。納期区分と納期は詳細で確認できます。</span>';
+            return;
+        }
+        el.innerHTML = days
+            + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">案件</span>'
+            + '<span style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:3px;border-radius:2px;background:var(--a-fg-faint)"></span>会期(名刺の回収)</span>'
+            + sw('background:var(--a-surface-2);border:1px solid var(--a-border-strong)', '帯 = 作業期間(データ化する日)')
             + sym('none') + sym('critical') + sym('short')
             + '<span style="display:flex;align-items:center;gap:4px"><span style="color:var(--a-danger);font-weight:700">⚠</span>総動員でも不足</span>'
             + sym('ok') + sym('over') + sym('done')
-            + '<span style="color:var(--a-fg-muted2)">充足色は作業期間(データ化する日)に付きます。不足(深刻)=充足率70%未満・人数過多=130%超(閾値は要確定)</span></span>'
-            + '<span>日付または帯を選択すると右に詳細を表示します。</span>';
+            + '<span style="color:var(--a-fg-muted2)">充足色は帯(作業期間)にだけ付きます。不足(深刻)=充足率70%未満・人数過多=130%超(閾値は要確定)</span></span>'
+            + '<span>会期の線から帯までが1件の案件です。線または帯を選択すると詳細を表示します。</span>';
     }
 
     // ---- 右パネル ----
@@ -1018,7 +1325,10 @@ window.calTemplateDl = function () {
         if (!groups) { groups = '<div style="padding:4px 0;border-top:1px solid var(--a-border-soft);color:var(--a-danger);font-weight:700">担当会社が決まっていません</div>'; }
 
         var links = v.recon
-            ? '<a href="data-entry/index.html" style="font-size:11px">名刺入力</a> · <a href="reconciliation/index.html?sid=' + sid + '" style="font-size:11px">照合 →</a>'
+            // データ入力対象一覧は項目グループ単位の全体キューで、案件では絞り込めない。
+            // 照合結果一覧は sid を絞り込みへ適用した状態で開く
+            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのため案件では絞り込めません）" style="font-size:11px">名刺入力</a>'
+                + ' · <a href="reconciliation/index.html?sid=' + sid + '" title="' + sid + ' で絞り込んだ照合結果一覧を開きます" style="font-size:11px">照合 →</a>'
             : '';
         var rs = recruitState(sid);
         var btns = '';
@@ -1070,12 +1380,53 @@ window.calTemplateDl = function () {
             + '</div>';
     }
 
+    // 営業日・会期タブの案件カード。人員の話は載せず、素性・納期・詳細への導線だけを出す
+    function svCardLite(sid) {
+        var v = CAL.surveys[sid];
+        var links = v.recon
+            // データ入力対象一覧は項目グループ単位の全体キューで、案件では絞り込めない。
+            // 照合結果一覧は sid を絞り込みへ適用した状態で開く
+            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのため案件では絞り込めません）" style="font-size:11px">名刺入力</a>'
+                + ' · <a href="reconciliation/index.html?sid=' + sid + '" title="' + sid + ' で絞り込んだ照合結果一覧を開きます" style="font-size:11px">照合 →</a>'
+            : '';
+        return '<div style="border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';border-radius:6px;padding:9px 11px;'
+            + (sid === S.selSv ? 'box-shadow:0 0 0 1px var(--a-accent);' : '') + '">'
+            + '<div><a href="survey-detail.html?id=' + sid + '" style="font-variant-numeric:tabular-nums;font-size:12px">' + sid + '</a> ' + esc(v.title) + '</div>'
+            + '<div style="margin-top:3px;color:var(--a-fg-muted2);font-size:11.5px">会期 ' + md(v.s) + '–' + md(v.e)
+            + ' ' + v.st + '–' + v.et + '</div>'
+            + '<div style="margin-top:2px;color:var(--a-fg-muted2);font-size:11.5px">' + esc(planLabel(sid)) + ' ・ 納期 ' + md(dueDate(sid)) + '</div>'
+            + '<div style="margin-top:5px;display:flex;gap:12px;align-items:baseline;font-size:11.5px">'
+            + '<span style="font-weight:700">' + esc(v.status) + '</span>'
+            + '<span style="color:var(--a-fg-muted2)">回答 <strong style="font-variant-numeric:tabular-nums">' + (v.ans || 0).toLocaleString('ja-JP') + '</strong>件</span>'
+            + (links ? '<span style="margin-left:auto">' + links + '</span>' : '') + '</div>'
+            + '</div>';
+    }
+
     function panelRender() {
         var is = S.sel, t = typ(is), d = toDate(is);
         var head = md(is) + '(' + WD[d.getDay()] + ')の詳細';
         var kind = t.t === 'hol' ? '<span style="font-size:11.5px;color:var(--a-fg-muted2);font-weight:700">休業日' + (t.memo ? '(' + esc(t.memo) + ')' : '') + '</span>'
             : t.t === 'sub' ? '<span style="font-size:11.5px;color:var(--a-accent-deep);font-weight:700">振替営業日</span>'
             : '<span style="font-size:11.5px;color:var(--a-ok);font-weight:700">営業日</span>';
+        var headHtml = '<div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--a-border)">'
+            + '<span style="font-size:14px;font-weight:700">' + head + '</span>' + kind + '</div>';
+        // 個別設定は編集と削除を並べる。編集が無いと、メモの直しでも削除→再作成になる
+        var delBtn = (t.ind && lv() >= 3)
+            ? '<div style="margin-top:14px;display:flex;gap:8px">'
+                + '<button onclick="calHolidayOpen(\'' + is + '\')" style="flex:1;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">この日の個別設定を編集</button>'
+                + '<button onclick="calDelAsk()" style="flex:none;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">削除</button></div>'
+            : '';
+
+        // 営業日・会期タブ: その日に会期のあるアンケートを並べ、詳細画面への入口にする
+        if (!isAsg()) {
+            var evs = svOf(is);
+            document.getElementById('calPanel').innerHTML = headHtml
+                + '<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--a-fg-muted)">この日に会期のあるアンケート(' + evs.length + '件)</div>'
+                + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:520px;overflow-y:auto">'
+                + (evs.map(svCardLite).join('') || '<div style="color:var(--a-fg-faint)">この日に会期のあるアンケートはありません。</div>')
+                + '</div>' + delBtn;
+            return;
+        }
 
         var a = dayAgg(is);
         var summary = (a.live.length || a.evSids.length)
@@ -1127,17 +1478,11 @@ window.calTemplateDl = function () {
         var cards = order.map(svCard).join('');
         if (!cards) { cards = '<div style="color:var(--a-fg-faint)">この日に会期・作業のあるアンケートはありません。</div>'; }
 
-        var del = (t.ind && lv() >= 3)
-            ? '<button onclick="calDelAsk()" style="margin-top:14px;width:100%;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">この日の個別設定を削除</button>'
-            : '';
-
-        document.getElementById('calPanel').innerHTML =
-            '<div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--a-border)">'
-            + '<span style="font-size:14px;font-weight:700">' + head + '</span>' + kind + '</div>'
+        document.getElementById('calPanel').innerHTML = headHtml
             + summary + loadHtml
             + '<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--a-fg-muted)">この日のアンケート(' + order.length + '件)</div>'
             + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:520px;overflow-y:auto">' + cards + '</div>'
-            + del;
+            + delBtn;
     }
 
     // ---- アサイン(案件単位・会社ごとの人数) ----
@@ -1351,10 +1696,17 @@ window.calTemplateDl = function () {
     };
 
     // ---- 休業日・振替 ----
-    window.calHolidayOpen = function () {
-        document.getElementById('calHolDate').value = S.sel;
-        document.getElementById('calHolKind').value = 'hol';
-        document.getElementById('calHolMemo').value = '';
+    // 編集中の日付。null なら新規追加。編集では日付そのものも変えられるため、
+    // 元の日付を覚えておいて保存時に差し替える(削除→再作成をユーザーにさせない)
+    var holEdit = null;
+    window.calHolidayOpen = function (editIs) {
+        holEdit = editIs || null;
+        var cur = holEdit ? S.ind[holEdit] : null;
+        document.getElementById('calHolDate').value = holEdit || S.sel;
+        document.getElementById('calHolKind').value = cur ? cur.t : 'hol';
+        document.getElementById('calHolMemo').value = cur ? (cur.memo || '') : '';
+        document.getElementById('calHolTitle').textContent = holEdit ? '休業日・振替営業日を編集' : '休業日・振替営業日を追加';
+        document.getElementById('calHolSubmit').textContent = holEdit ? '保存する' : '追加する';
         var e = document.getElementById('calHolErr');
         e.hidden = true; e.textContent = '';
         window.pOpen('mHoliday');
@@ -1367,16 +1719,22 @@ window.calTemplateDl = function () {
         function fail(msg) { err.textContent = msg; err.hidden = false; }
         if (!is) { return fail('日付を指定してください。'); }
         if (MONTHS.indexOf(is.slice(0, 7)) < 0) { return fail('表示範囲(2026年6月〜8月)内の日付を指定してください。'); }
-        if (S.ind[is]) { return fail('この日には既に個別設定があります。先に削除してください。'); }
+        // 編集中は自分自身との重複を許す。別の日へ移す場合だけ既存設定を弾く
+        if (S.ind[is] && is !== holEdit) { return fail('この日には既に個別設定があります。先に削除してください。'); }
         if (kind === 'sub' && !baseHoliday(is)) { return fail('振替営業日は定休日・祝日にあたる日付にのみ設定できます。'); }
-        var before = allOverDays();
+        var before = allOverDays(), beforeDue = dueSnapshot();
+        var editing = !!holEdit;
+        if (holEdit && holEdit !== is) { delete S.ind[holEdit]; }
         S.ind[is] = { t: kind, memo: memo };
         S.ym = is.slice(0, 7);
         S.sel = is;
         S.selSv = null;
+        holEdit = null;
         window.pClose('mHoliday');
         calRender();
+        showDueShift(beforeDue, (kind === 'hol' ? '休業日' : '振替営業日') + ' ' + md(is) + (editing ? ' の変更' : ' の追加'));
         warnIfNewOverlap(before);
+        window.pToast(md(is) + ' の個別設定を' + (editing ? '変更' : '追加') + 'しました');
     };
     window.calDelAsk = function () {
         var t = typ(S.sel), d = toDate(S.sel);
@@ -1386,10 +1744,12 @@ window.calTemplateDl = function () {
         window.pOpen('mConfirmDelHoliday');
     };
     window.calDelDo = function () {
-        var before = allOverDays();
+        var before = allOverDays(), beforeDue = dueSnapshot();
+        var what = md(S.sel) + ' の個別設定の削除';
         delete S.ind[S.sel];
         window.pClose('mConfirmDelHoliday');
         calRender();
+        showDueShift(beforeDue, what);
         warnIfNewOverlap(before);
     };
 
@@ -1416,10 +1776,11 @@ window.calTemplateDl = function () {
         renderReg();
     };
     window.calRegSave = function () {
-        var before = allOverDays();
+        var before = allOverDays(), beforeDue = dueSnapshot();
         S.reg = tmpReg;
         window.pClose('mRegularHoliday');
         calRender();
+        showDueShift(beforeDue, '定休日の変更');
         warnIfNewOverlap(before);
     };
 
@@ -1429,8 +1790,19 @@ window.calTemplateDl = function () {
             g.innerHTML = '<option value="">担当会社: すべて</option>'
                 + GROUPS.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
         }
-        calRender();
+        // 他画面からアサインタブへ直接入れるようにする(?tab=assign)。既定は営業日・会期。
+        // 表示モードは初回だけタブの既定から始める。以後のタブ切替では、切替先でも使える
+        // モードならそのまま保つ(単月で見ていたのに勝手に切り替わると位置を見失う)
+        var q = new URLSearchParams(location.search);
+        var t = q.get('tab') === 'assign' ? 'assign' : 'calendar';
+        S.view = VIEW_DEFAULT[t];
+        window.calTab(t);
     }
+    // マス目と行形式の境目をまたいだら描き直す。回転や分割表示で幅が変わる場面がある
+    function onNarrowChange() { calRender(); }
+    if (NARROW.addEventListener) { NARROW.addEventListener('change', onNarrowChange); }
+    else if (NARROW.addListener) { NARROW.addListener(onNarrowChange); }
+
     document.addEventListener('DOMContentLoaded', boot);
     if (document.readyState !== 'loading') { boot(); }
 })();

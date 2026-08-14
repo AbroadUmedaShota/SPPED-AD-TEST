@@ -19,6 +19,7 @@
    なし   —                              1398px        1678px
    第1段  総件数・一致・不一致(.c-opt)    1180px        1460px
    第2段  ＋会期(.c-term)                 1042px        1322px
+   第3段  ＋会社名(.c-client)              882px        1162px
 
    ビューポート = 本文幅 + サイドバー232px + ページ余白48px。
    閾値は上の「溢れない最小ビューポート」より少し広い側へ置き、切り替わる前に溢れないようにする。 */
@@ -57,6 +58,14 @@ body[data-level="lv2"] #reconList .c-client { display: none; }
     grid-template-columns: 92px minmax(140px,170fr) 82px minmax(62px,28fr) minmax(118px,56fr) minmax(112px,52fr) 228px;
   }
   #reconList .c-term { display: none !important; }
+}
+
+/* 第3段: ＋会社名(.c-client)を隠す。lv1/lv2は元々この列を持たないため対象外(既存のstage2幅で足りる) */
+@media (max-width: 1300px) {
+  #reconList .rc-line {
+    grid-template-columns: 92px minmax(140px,170fr) 82px minmax(62px,28fr) minmax(118px,56fr) minmax(112px,52fr) 228px;
+  }
+  #reconList .c-client { display: none !important; }
 }
 </style>
 </head>
@@ -98,7 +107,7 @@ body[data-level="lv2"] #reconList .c-client { display: none; }
             <span style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap">
               <span style="width:1px;height:26px;background:var(--a-border)"></span>
               <input aria-label="アンケートIDを指定して照合" id="reconGoId" placeholder="アンケートIDを指定して照合(例: SV-10236)" title="指定したアンケートの未照合名刺から照合を開始" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 12px;font-size:13px;width:290px;font-family:inherit">
-              <button onclick="location.href='detail.html?id=' + encodeURIComponent((document.getElementById('reconGoId').value || '').trim())" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">指定して照合開始</button>
+              <button data-requires="reconGoId" title="入力したアンケートIDの照合画面を開く(アンケートIDが未入力の間は押せません)" onclick="location.href='detail.html?id=' + encodeURIComponent((document.getElementById('reconGoId').value || '').trim())" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">指定して照合開始</button>
             </span>
           </div>
           <div id="reconList" data-sortable data-filter-keys="sid,uid,company,status,plan" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
@@ -206,6 +215,23 @@ body[data-level="lv2"] #reconList .c-client { display: none; }
 <script type="module" src="../src/admin.js"></script>
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
+<script>
+// 営業日カレンダーからの遷移(?sid=)。渡されたアンケートIDを絞り込みへ適用した状態で開く。
+// パラメータを無視すると、押した案件と関係のない全件が出て遷移の意味が消える
+(function () {
+    'use strict';
+    function apply() {
+        var sid = new URLSearchParams(location.search).get('sid');
+        if (!sid) { return; }
+        var el = document.querySelector('[data-f-key="sid"]');
+        if (!el || typeof window.pSearch !== 'function') { return; }
+        el.value = sid;
+        window.pSearch('reconList');
+    }
+    document.addEventListener('DOMContentLoaded', apply);
+    if (document.readyState !== 'loading') { apply(); }
+})();
+</script>
 
 </body>
 </html>
