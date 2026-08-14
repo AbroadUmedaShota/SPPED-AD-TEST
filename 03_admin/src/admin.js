@@ -140,6 +140,7 @@ function handleResizeForSidebar() {
 function setActiveSidebarLink() {
     const normalizedCurrentPath = window.location.pathname.replace(/\/index\.html$/, '/');
     const sidebarLinks = document.querySelectorAll('.admin-sidebar .nav-link');
+    let matched = false;
 
     sidebarLinks.forEach(link => {
         link.classList.remove('active');
@@ -152,8 +153,27 @@ function setActiveSidebarLink() {
         const linkPath = new URL(href, window.location.href).pathname.replace(/\/index\.html$/, '/');
         if (linkPath === normalizedCurrentPath) {
             link.classList.add('active');
+            matched = true;
         }
     });
+
+    // 一覧に属さない詳細系画面(user-detail.html 等)は pathname が一覧のリンクと一致しないため、
+    // 上のループでは active が付かない。<main data-nav="親一覧のファイル名"> を目印に、
+    // 一致するリンクが無かった場合だけこちらでフォールバックする
+    if (!matched) {
+        const navTarget = document.querySelector('[data-nav]');
+        const navFile = navTarget ? navTarget.getAttribute('data-nav') : '';
+        if (navFile) {
+            sidebarLinks.forEach(link => {
+                // href は adjustRelativePaths() で絶対パス寄りに書き換えられている(例: /03_admin/user-management.html)ため、
+                // ファイル名だけを取り出して data-nav の値(例: user-management.html)と比較する
+                const href = link.getAttribute('href');
+                if (href && href.split('/').pop() === navFile) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    }
 }
 
 /**
@@ -188,7 +208,8 @@ function initAdminSidebarHandler() {
             logoutButton.addEventListener('click', (e) => {
                 e.preventDefault(); // Prevent default link behavior
                 // In a real application, this would involve clearing session/token and redirecting to login
-                window.location.href = '../../index.html'; // Redirect to the main index.html (e.g., login page)
+                // 03_admin/ 配下の階層に依らず正しく解決するため getAdminBaseUrl() を基準に組み立てる
+                window.location.href = new URL('../index.html', getAdminBaseUrl()).href; // Redirect to the main index.html (e.g., login page)
             });
         }
     }

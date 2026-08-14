@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ロゴ差替 影響画面一覧（Teams貼付用）</title>
+</head>
+<body style="font-family: 'Yu Gothic UI', Meiryo, sans-serif; font-size: 14px; color: #222; max-width: 960px; margin: 24px auto; padding: 0 16px;">
+
+<p>この表を範囲選択してコピーし、Teams に貼り付けてください（書式ごと貼れます）。</p>
+
+<h2 style="font-size: 16px;">■ 提出情報</h2>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+  <tr><td style="padding: 6px 10px; background: #f0f0f0; width: 160px;"><b>コミットID</b></td><td style="padding: 6px 10px;">7bc0ca7</td></tr>
+  <tr><td style="padding: 6px 10px; background: #f0f0f0;"><b>コミットメッセージ</b></td><td style="padding: 6px 10px;">chore(logo): サービスロゴを新デザイン（鷲+SAマーク）に全面差替</td></tr>
+  <tr><td style="padding: 6px 10px; background: #f0f0f0;"><b>ブランチ</b></td><td style="padding: 6px 10px;">main（Push済み・マージ作業なし）</td></tr>
+  <tr><td style="padding: 6px 10px; background: #f0f0f0;"><b>変更ファイル数</b></td><td style="padding: 6px 10px;">12（ロゴ画像7・共通ヘッダー3・ロゴ元データ2）※画面側HTMLはほぼ触らず、共有ロゴ画像の差替で全画面に反映</td></tr>
+</table>
+
+<h2 style="font-size: 16px;">■ 変更内容（見た目の変化は3種類）</h2>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+  <tr style="background: #f0f0f0;"><th style="padding: 6px 10px;">#</th><th style="padding: 6px 10px;">変化</th><th style="padding: 6px 10px;">内容</th></tr>
+  <tr><td style="padding: 6px 10px; text-align: center;">1</td><td style="padding: 6px 10px; white-space: nowrap;">ヘッダーのロゴ</td><td style="padding: 6px 10px;">白の新ロゴに変更（青・濃グレーの暗色ヘッダー画面のみ）</td></tr>
+  <tr><td style="padding: 6px 10px; text-align: center;">2</td><td style="padding: 6px 10px; white-space: nowrap;">ページ内・フッターのロゴ</td><td style="padding: 6px 10px;">カラーの新ロゴに変更</td></tr>
+  <tr><td style="padding: 6px 10px; text-align: center;">3</td><td style="padding: 6px 10px; white-space: nowrap;">ブラウザタブのアイコン</td><td style="padding: 6px 10px;">カラーの新ロゴに変更（ほぼ全ページ）</td></tr>
+</table>
+
+<h2 style="font-size: 16px;">■ 影響があった画面（計92画面）</h2>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+  <tr style="background: #f0f0f0;">
+    <th style="padding: 6px 10px; white-space: nowrap;">画面グループ</th>
+    <th style="padding: 6px 10px;">画面数</th>
+    <th style="padding: 6px 10px;">変わる箇所</th>
+    <th style="padding: 6px 10px;">対象画面（ファイル名）</th>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">ログイン後の一般画面<br>(02_dashboard)</td>
+    <td style="padding: 6px 10px; text-align: center;">29</td>
+    <td style="padding: 6px 10px;">ヘッダー＝白／フッター＝カラー／タブ＝カラー</td>
+    <td style="padding: 6px 10px;">index（アンケート一覧）, surveyCreation, surveyCreation-v2, survey-answer（回答画面）, thankYouScreen（回答完了）, speed-review, bizcardSettings, thankYouEmailSettings, thankYouScreenSettings, graph-page, group-edit, invoice-detail, invoiceList, premium_signup, premium_signup_new, premium_registration_spa, premium_registration_complete, premium_cancel, premium_cancel_complete, password_change, password-change-complete, help, help-content, faq, bug-report, changelog, terms-of-service, personal-data-protection-policy, specified-commercial-transactions</td>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">管理画面<br>(03_admin)</td>
+    <td style="padding: 6px 10px; text-align: center;">17</td>
+    <td style="padding: 6px 10px;">ヘッダー＝白／タブ＝カラー</td>
+    <td style="padding: 6px 10px;">index, user-management, user-detail, survey-management, survey-detail, operator-management, performance-management, billing-management, coupon-management, calendar-management, escalations, data-entry/index, data-entry/form, reconciliation/index, reconciliation/list, reconciliation/detail, sample/data_entry_admin_form</td>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">サポートサイト<br>(05_support)</td>
+    <td style="padding: 6px 10px; text-align: center;">19</td>
+    <td style="padding: 6px 10px;">ヘッダー＝カラー／タブ＝カラー</td>
+    <td style="padding: 6px 10px;">help, help-content, faq, contact, plans, terms, privacy, privacy/member-registration, tokushoho, news一覧＋記事6本, customer-voices一覧＋事例2本</td>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">チュートリアル<br>(05_support/tutorial)</td>
+    <td style="padding: 6px 10px; text-align: center;">7</td>
+    <td style="padding: 6px 10px;">ヘッダー＝白／フッター＝カラー／タブ＝カラー</td>
+    <td style="padding: 6px 10px;">index, survey-creation, surveyCreation, survey-answer, speed-review, bizcard-settings, thank-you-email</td>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">バックエンドdocs<br>(99_backend-docs)</td>
+    <td style="padding: 6px 10px; text-align: center;">17</td>
+    <td style="padding: 6px 10px;">タブ＝カラーのみ</td>
+    <td style="padding: 6px 10px;">index ほか全ドキュメントページ（00〜13）</td>
+  </tr>
+  <tr>
+    <td style="padding: 6px 10px; white-space: nowrap;">ログイン前まわり<br>(ルート直下)</td>
+    <td style="padding: 6px 10px; text-align: center;">3</td>
+    <td style="padding: 6px 10px;">タブ＝カラーのみ（legacy_loginのみ画面内ロゴも変更）</td>
+    <td style="padding: 6px 10px;">index.html（ログイン前）, signup-verify.html, legacy_login.html<br>※ログイン前画面の画面内ロゴ・透かしは既に新デザイン適用済みだったため今回変更なし</td>
+  </tr>
+</table>
+
+<h2 style="font-size: 16px;">■ 影響がなかった画面</h2>
+<p style="margin: 4px 0;">理由は共通：その画面にはロゴ表示もタブアイコン設定も元々ない。</p>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+  <tr style="background: #f0f0f0;">
+    <th style="padding: 6px 10px; white-space: nowrap;">画面グループ</th>
+    <th style="padding: 6px 10px;">対象画面</th>
+  </tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">ログイン後の一般画面</td><td style="padding: 6px 10px;">forgot-password, reset-password, reset-password-complete, invoice-print（印刷ビュー）, seikyuusyo_sample, matrix-comparison</td></tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">管理画面</td><td style="padding: 6px 10px;">data_entry, data-entry-management, BY-211／BY-221／BY-231系の旧モック</td></tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">初回ログイン</td><td style="padding: 6px 10px;">04_first-login/index.html</td></tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">サポートサイト</td><td style="padding: 6px 10px;">index（トップ）, bug-report</td></tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">その他</td><td style="padding: 6px 10px;">404.html, ルート直下の customer-voices 旧複製, アーカイブ・docs 配下すべて</td></tr>
+  <tr><td style="padding: 6px 10px; white-space: nowrap;">画面部品</td><td style="padding: 6px 10px;">モーダル・サイドバー等の部品49件（単独画面ではないため一覧から除外）</td></tr>
+</table>
+
+</body>
+</html>

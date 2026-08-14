@@ -95,7 +95,11 @@
       "mcp__google-sheets__get_sheet_data",
       "mcp__google-sheets__list_sheets",
       "mcp__google-sheets__create_sheet",
-      "mcp__google-sheets__update_cells"
+      "mcp__google-sheets__update_cells",
+      "mcp__google-sheets__copy_sheet",
+      "mcp__google-sheets__batch_update_cells",
+      "mcp__google-sheets__batch_update",
+      "mcp__google-sheets__get_multiple_sheet_data"
     ]
   },
   "enableAllProjectMcpServers": true,

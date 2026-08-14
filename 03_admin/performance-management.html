@@ -16,6 +16,8 @@
 @media (max-width: 1459px) {
   #perfList > div { grid-template-columns: 110px minmax(140px,115fr) minmax(200px,230fr) minmax(130px,60fr) minmax(100px,46fr) minmax(130px,60fr) minmax(130px,60fr) !important; }
   #perfList .c-opt { display: none !important; }
+  #perfGroups > div, #perfGroupsBody > div { grid-template-columns: minmax(200px,230fr) minmax(140px,70fr) minmax(110px,52fr) minmax(150px,70fr) minmax(150px,70fr) minmax(150px,70fr) !important; }
+  #perfGroups .c-opt { display: none !important; }
 }
 </style>
 </head>
@@ -31,7 +33,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700">オペレーター実績確認</h1>
               <span style="font-size:12px;color:var(--a-fg-muted2);margin-left:14px;margin-right:auto">集計最終更新 <span style="font-variant-numeric:tabular-nums">2026/07/31 09:45</span>(最大5分の遅延)</span>
-              <button onclick="pOpen('mPerfCsv')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
+              <button onclick="pOpen('mPerfCsv')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
             <div data-filter-for="perfList" style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
@@ -48,7 +50,7 @@
             <div style="margin-top:14px;font-size:12px;color:var(--a-fg-muted2)">行を押すとグループ実績詳細(月次推移・項目別内訳・所属オペレーター)へ移動します</div>
             <div id="perfGroups" style="margin-top:10px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
               <div style="display:grid;grid-template-columns:minmax(200px,230fr) minmax(140px,70fr) minmax(140px,70fr) minmax(110px,52fr) minmax(150px,70fr) minmax(150px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px;height:42px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
-                <span>グループ名</span><span style="text-align:right">合計作業件数</span><span style="text-align:right">合計正解件数</span><span style="text-align:right">平均正答率</span><span style="text-align:right">合計スキップ回数</span><span style="text-align:right">合計報酬金額</span><span style="text-align:right">最終報酬金額</span>
+                <span>グループ名</span><span style="text-align:right">合計作業件数</span><span class="c-opt" style="text-align:right">合計正解件数</span><span style="text-align:right">平均正答率</span><span style="text-align:right">合計スキップ回数</span><span style="text-align:right">合計報酬金額</span><span style="text-align:right">最終報酬金額</span>
               </div>
               <div id="perfGroupsBody"></div>
             </div>
@@ -140,7 +142,7 @@
                 + ' style="' + GCOLS + ';border-bottom:1px solid var(--a-border-soft);cursor:pointer">'
                 + '<span style="font-weight:500">' + g.name + '</span>'
                 + '<span style="text-align:right">' + D.num(t.w) + '</span>'
-                + '<span style="text-align:right">' + D.num(t.o) + '</span>'
+                + '<span class="c-opt" style="text-align:right">' + D.num(t.o) + '</span>'
                 + '<span style="text-align:right;font-weight:700' + warn + '">' + rt + '</span>'
                 + '<span style="text-align:right">' + D.num(t.s) + '</span>'
                 + '<span style="text-align:right">' + D.num(t.pay) + ' 円</span>'

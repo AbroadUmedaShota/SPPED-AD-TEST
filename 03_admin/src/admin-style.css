@@ -483,3 +483,15 @@ main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { f
 
 /* ダークは影が効かないため、ダイアログの輪郭を足して背面と分ける */
 :root[data-theme="dark"] .proto-dialog { border: 1px solid var(--a-border); }
+
+/* サマリ数値カード(オペレーター実績詳細・グループ実績詳細で共用。旧 performance-*-detail.html 内で重複定義だったものを集約)。
+   index.html の dash-card(運用状況サマリ)と実値を揃える。ここのカードは遷移しないため hover 装飾は持たない */
+.perf-cards { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+.perf-card {
+    flex: 1 1 176px; max-width: 212px; box-sizing: border-box;
+    background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px;
+    padding: 14px 18px;
+}
+.perf-card-label { font-size: 12px; color: var(--a-fg-muted); font-weight: 500; min-height: 34px; }
+.perf-card-num { margin-top: 2px; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.perf-card-unit { font-size: 12px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }

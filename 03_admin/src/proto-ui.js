@@ -351,7 +351,8 @@
         company: '会社名', name: '氏名', mail: 'メールアドレス', code: 'コード', cname: 'クーポン名',
         status: '状態', plan: '納期区分', group: '所属グループ', lv: '権限', lang: '言語',
         month: '発行月', type: '操作種別', target: '対象', actor: '操作者', any: '氏名・メール・ID', from: '開始日', to: '終了日',
-        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム', unpaid: '入金未確認のみ'
+        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム', unpaid: '入金未確認のみ',
+        survey: 'アンケート', invoice: '請求書'
     };
 
     function pFilterBar(listId) {
@@ -397,6 +398,7 @@
             var v = String(conds[k] === undefined || conds[k] === null ? '' : conds[k]).trim();
             if (v) { use[k] = v; }
         });
+        list.__pConds = use;
         var keys = Object.keys(use);
         Array.prototype.forEach.call(list.querySelectorAll('[data-pg]'), function (r) {
             var hit = keys.every(function (k) {
@@ -420,11 +422,18 @@
         window.pPageSize(listId, parseInt(list.getAttribute('data-page-size') || '10', 10));
     };
 
-    // 「検索」ボタン: 絞り込みバーの入力値を集めて適用する
+    // 「検索」ボタン: 絞り込みバーの入力値を集めて適用する。
+    // バーに入力欄が無いキー(他画面から引き継いだ ?oid= 等)は再検索でも落とさず維持する
+    // (維持中の条件は絞り込みバッジに表示され続け、「解除」でのみ外れる)
     window.pSearch = function (listId) {
         var bar = pFilterBar(listId);
         if (!bar) { return; }
+        var list = document.getElementById(listId);
+        var prev = (list && list.__pConds) || {};
         var conds = {};
+        Object.keys(prev).forEach(function (k) {
+            if (!bar.querySelector('[data-f-key="' + k + '"]')) { conds[k] = prev[k]; }
+        });
         Array.prototype.forEach.call(bar.querySelectorAll('[data-f-key]'), function (el) {
             var k = el.getAttribute('data-f-key');
             conds[k] = (el.type === 'checkbox') ? (el.checked ? '1' : '') : el.value;
@@ -767,6 +776,22 @@
         }
         window.pCsv(sid + (kind === 'all' ? '_all' : '_final') + '.csv', rows);
         window.pClose('mDl');
+    };
+
+    // 指定された対象が無いときは、黙って既定の対象を出さない。
+    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため。
+    // 詳細系画面(ユーザー詳細・アンケート詳細・照合詳細ほか)の共用
+    window.pNotFound = function (kind, wanted, backHref, backLabel) {
+        var main = document.getElementById('main-content');
+        if (!main) { return; }
+        main.innerHTML =
+            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
+            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
+            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
+            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
+            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
+            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
+            '</div></div>';
     };
 
     // 一覧の行を書き換える。cells は 0 起点の位置 → HTML

@@ -11,16 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-    /* サマリ数値カード(index.html の dash-card 準拠・遷移しないため hover 装飾なし) */
-    .perf-cards { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
-    .perf-card {
-        flex: 1 1 150px; max-width: 200px; box-sizing: border-box;
-        background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px;
-        padding: 14px 18px;
-    }
-    .perf-card-label { font-size: 12px; color: var(--a-fg-muted); font-weight: 500; min-height: 20px; }
-    .perf-card-num { margin-top: 2px; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
-    .perf-card-unit { font-size: 12px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }
+    /* サマリ数値カード(.perf-card 系)は src/admin-style.css へ集約(user-detail/survey-detail 等と同じ方針) */
     .perf-sec { margin-top: 24px; font-size: 13px; font-weight: 700; color: var(--a-fg); }
     .perf-sec-note { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--a-fg-muted2); }
     .perf-table { margin-top: 10px; background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto; }
@@ -32,14 +23,17 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2" data-nav="performance-management.html">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="performance-management.html">オペレーター実績確認</a> › <span style="color:var(--a-fg-strong)">グループ実績詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
               <h1 style="margin:0;font-size:20px;font-weight:700"><span data-slot="gname">グループ実績詳細</span><span style="margin-left:10px;font-size:12.5px;font-weight:400;color:var(--a-fg-muted2)">グループ実績詳細</span></h1>
-              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
-                <select id="gdMonth" onchange="gdSetMonth(this.value)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
-              </label>
+              <div style="display:flex;align-items:center;gap:14px">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
+                  <select id="gdMonth" onchange="gdSetMonth(this.value)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
+                </label>
+                <button onclick="location.href='performance-management.html'" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">‹ 一覧へ戻る</button>
+              </div>
             </div>
 
             <div class="perf-sec" style="margin-top:18px">当月サマリ <span class="perf-sec-note">対象期間の集計値</span></div>
@@ -93,7 +87,10 @@
     'use strict';
     var D = window.PerfData;
     var q = new URLSearchParams(location.search);
-    var gid = D.GROUPS[q.get('group')] ? q.get('group') : 'abroad';
+    var gid = q.get('group');
+    // 指定が無ければ既定表示、指定があって実在しなければ「見つかりません」(存在しないIDへ黙ってフォールバックしない)
+    if (gid && !D.GROUPS[gid]) { window.pNotFound('グループ', gid, 'performance-management.html', 'オペレーター実績確認へ戻る'); return; }
+    if (!D.GROUPS[gid]) { gid = 'abroad'; }
     var month = '2026-07';
 
     var GRIDS = {

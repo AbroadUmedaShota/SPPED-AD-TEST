@@ -29,7 +29,7 @@
     <div id="header-placeholder"></div>
     <div class="flex flex-1" style="padding-top:56px">
         <div id="sidebar-placeholder"></div>
-        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" data-guard-unsaved>
+        <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3" data-guard-unsaved data-nav="survey-management.html">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <a href="survey-management.html">アンケート管理</a> › <span style="color:var(--a-fg-strong)">アンケート詳細</span></div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
@@ -369,8 +369,8 @@
     </div>
     <div id="qReasonWrap" hidden style="padding:12px 22px 0;flex-shrink:0">
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">実行理由 <span style="color:var(--a-danger)">必須</span></span>
-        <input id="qReason" placeholder="例: 主催者からの依頼により設問3を削除" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div id="qErr" hidden style="margin-top:6px;font-size:12px;color:var(--a-danger)">実行理由を入力してください</div>
+        <input id="qReason" aria-describedby="qErr" placeholder="例: 主催者からの依頼により設問3を削除" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <div id="qErr" role="alert" hidden style="margin-top:6px;font-size:12px;color:var(--a-danger)">実行理由を入力してください</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;flex-shrink:0;border-top:1px solid var(--a-border);margin-top:12px">
       <button onclick="pQPreview()" style="margin-right:auto;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">回答画面でプレビュー ↗</button>
@@ -394,20 +394,7 @@
 //   会期終了後        … 変更できない(確認のみ)
 (function () {
     'use strict';
-    // 指定された対象が無いときは、黙って既定の対象を出さない。
-    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため
-    window.pNotFound = function (kind, wanted, backHref, backLabel) {
-        var main = document.getElementById('main-content');
-        if (!main) { return; }
-        main.innerHTML =
-            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
-            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
-            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
-            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
-            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
-            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
-            '</div></div>';
-    };
+    // pNotFound は src/proto-ui.js へ共通化(user-detail/survey-detail/reconciliation/detailの3重複を解消)
 
 
     // 設問タイプ・型別の設定・多言語の扱いはユーザー側エディタ

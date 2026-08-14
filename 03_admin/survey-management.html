@@ -10,6 +10,15 @@
     <script src="src/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 幅が足りない画面では余白と最小幅を詰めて8列全部を収め、横スクロールを避ける。
+   納期区分・回答数など全列が業務判断に使う情報のため、列は隠さない。
+   基準は1920px表示。1459px未満で適用する(他画面の一覧と同じ基準)。 */
+@media (max-width: 1459px) {
+  #surveysList > div { grid-template-columns: 58px minmax(144px,220fr) minmax(142px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(64px,40fr) minmax(72px,45fr) 264px !important; column-gap: 6px !important; }
+  #surveysList > div > span:nth-child(6) { padding-right: 16px !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -155,7 +164,7 @@
       <label style="display:block;max-width:240px"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">データ化の納期区分</span><select id="svPlan" aria-label="データ化の納期区分" style="margin-top:6px;width:100%;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option>お試し</option><option>通常</option><option>特急</option><option>超特急</option><option>オンデマンド</option></select></label>
       <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">管理者による作成・編集は代行操作として監査ログに記録されます。ユーザー側で制限がかかっている操作(当日中のアンケート編集等)も管理者は実行できます。設問の編集は別画面で提供します(本モック対象外)。</div>
     </div>
-    <div id="svErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700;padding:0 22px 8px"></div>
+    <div id="svErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700;padding:0 22px 8px"></div>
       <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mSurvey')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
       <button onclick="pSurveySave()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">保存する</button>

@@ -92,7 +92,7 @@
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">使用可能期限</span><input id="cpUntil" aria-label="使用可能期限" type="date" value="2026-09-30" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"></label>
       </div>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">メモ(任意)</span><input id="cpMemo" aria-label="メモ(任意)" value="夏季販促" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
-      <div id="cpErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div><div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">使用済み回数がある場合、割引率の変更は適用済みの請求へ遡及しません。作成・変更は監査ログに記録されます。</div>
+      <div id="cpErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div><div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">使用済み回数がある場合、割引率の変更は適用済みの請求へ遡及しません。作成・変更は監査ログに記録されます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mCoupon')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>

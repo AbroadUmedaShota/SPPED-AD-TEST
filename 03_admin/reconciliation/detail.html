@@ -140,21 +140,7 @@
 // 画像操作(ホバー拡大・クリック固定・回転)は proto-ui.js の pInitCardZoom を使用
 (function () {
     'use strict';
-    // 指定された対象が無いときは、黙って既定の対象を出さない。
-    // 別のレコードを見ていることに気づけないまま、レビューや代行操作の判断材料になるため
-    window.pNotFound = function (kind, wanted, backHref, backLabel) {
-        var main = document.getElementById('main-content');
-        if (!main) { return; }
-        main.innerHTML =
-            '<div class="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">' +
-            '<div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:40px 32px;text-align:center">' +
-            '<div style="font-size:16px;font-weight:700;color:var(--a-fg-strong)">指定された' + kind + 'が見つかりません</div>' +
-            '<div style="margin-top:10px;font-size:12.5px;color:var(--a-fg-muted)">ID: ' +
-            String(wanted).replace(/[&<>"]/g, '') + '</div>' +
-            '<div style="margin-top:16px"><a href="' + backHref + '" style="font-weight:700">' + backLabel + '</a></div>' +
-            '</div></div>';
-    };
-
+    // pNotFound は src/proto-ui.js へ共通化(user-detail/survey-detail/reconciliation/detailの3重複を解消)
 
     // アンケートに紐づく識別情報(会社名・納期区分)。?id= で対象を切り替える
     var SURVEYS = {"SV-10262": {"company": "グロースパートナーズ(株)", "plan": "通常"}, "SV-10259": {"company": "(株)マーケットビジョン", "plan": "特急"}, "SV-10257": {"company": "地方創生機構", "plan": "通常"}, "SV-10250": {"company": "(株)イベントプラス", "plan": "オンデマンド"}, "SV-10244": {"company": "(株)マーケットビジョン", "plan": "超特急"}, "SV-10238": {"company": "(株)テックブリッジ", "plan": "オンデマンド"}, "SV-10236": {"company": "(株)サンライトプロモーション", "plan": "特急"}, "SV-10233": {"company": "地方創生機構", "plan": "通常"}, "SV-10229": {"company": "ミライ電装(株)", "plan": "超特急"}, "SV-10227": {"company": "グロースパートナーズ(株)", "plan": "お試し"}, "SV-10221": {"company": "(株)クレストメディカル", "plan": "特急"}, "SV-10218": {"company": "東亜精密工業(株)", "plan": "オンデマンド"}, "SV-10214": {"company": "(株)ネオフーズ", "plan": "通常"}, "SV-10209": {"company": "西日本トラベル(株)", "plan": "特急"}, "SV-10205": {"company": "(株)アークデザイン", "plan": "超特急"}, "SV-10201": {"company": "セントラル機器(株)", "plan": "通常"}, "SV-10196": {"company": "(株)ハーベスト農園", "plan": "お試し"}, "SV-10192": {"company": "光陽印刷(株)", "plan": "通常"}, "SV-10188": {"company": "(株)ラピスソフト", "plan": "オンデマンド"}, "SV-10183": {"company": "大和ハウジング(株)", "plan": "特急"}, "SV-10179": {"company": "(株)エコスタイル", "plan": "通常"}, "SV-10174": {"company": "(株)テクノブレイン", "plan": "超特急"}};

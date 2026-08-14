@@ -154,12 +154,12 @@
       <span role="button" onclick="pClose('mInviteUser')" tabIndex="0" title="閉じる" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--a-fg-muted);cursor:pointer;border-radius:8px;margin:-6px -10px">×</span>
     </div>
     <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
-      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">メールアドレス <span style="color:var(--a-danger)">必須</span></span><input aria-label="user@example.co.jp" data-initial-focus placeholder="user@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
+      <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">メールアドレス <span style="color:var(--a-danger)">必須</span></span><input aria-label="メールアドレス" data-initial-focus placeholder="user@example.co.jp" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">会社名(任意)</span><input aria-label="会社名(任意)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
         <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">氏名(任意)</span><input aria-label="氏名(任意)" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit"></label>
       </div>
-      <div id="invErr" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div><div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">招待リンクの有効期限は送信から72時間です。期限切れ・未達の場合は一覧から再送できます。</div>
+      <div id="invErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div><div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">招待リンクの有効期限は送信から72時間です。期限切れ・未達の場合は一覧から再送できます。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mInviteUser')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
@@ -317,8 +317,11 @@ window.pInviteSend = function () {
     var comp = (ins[1] || {}).value ? ins[1].value.trim() : '';
     var name = (ins[2] || {}).value ? ins[2].value.trim() : '';
     var err = document.getElementById('invErr');
-    if (!mail || mail.indexOf('@') < 0) {
+    if (!mail) {
         err.textContent = 'メールアドレスを入力してください'; err.hidden = false; return;
+    }
+    if (mail.indexOf('@') < 0) {
+        err.textContent = '正しいメールアドレスの形式で入力してください'; err.hidden = false; return;
     }
     if (window.pRow('usersList', 'mail', mail)) {
         err.textContent = mail + ' は既に登録または招待済みです'; err.hidden = false; return;

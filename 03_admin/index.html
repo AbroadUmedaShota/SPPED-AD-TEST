@@ -11,8 +11,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-    /* ダッシュボード(SCR-A-001)固有レイアウト
-       design_handoff_admin_ui/prototype.dc.html 準拠。
+    /* ダッシュボード(SCR-A-001)固有レイアウト。
+       2026-08-13 にゼロベースで再構成、同日中に2回のユーザー指示で再整理
+       (最終構成: あなたの作業[Lv1] / 案件パイプライン[Lv2+] /
+       上段2カラム=会期中・終了間際のアンケート+会期前・新規作成アンケート[Lv3+] /
+       下段2カラム=直近の新規登録ユーザー[Lv3+]+滞留している作業[Lv2+])。
+       グラフ・図・canvas・svgチャートは使わない。
        メディアクエリを使うため、この画面だけインラインstyleではなくクラスで組む。 */
 
     /* 本文の左余白は admin-style.css で全画面共通に定義 */
@@ -25,7 +29,7 @@
         gap: 10px 16px; flex-wrap: wrap;
         margin-top: 6px; padding-bottom: 14px; border-bottom: 2px solid var(--a-border);
     }
-    .dash-head h2 { margin: 0; font-size: 20px; font-weight: 700; }
+    .dash-head h1 { margin: 0; font-size: 20px; font-weight: 700; }
     .dash-head-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .dash-refresh {
         background: var(--a-surface); border: 1px solid var(--a-border-strong); border-radius: 6px;
@@ -39,10 +43,7 @@
     .dash-sec-note { font-weight: 400; font-size: 12px; color: var(--a-fg-muted2); margin-left: 8px; }
     .dash-note { margin-top: 8px; font-size: 11.5px; color: var(--a-fg-faint); }
 
-    /* 運用状況サマリ
-       flex-basis 176px + max-width 212px で、1280px幅では5枚が1行(約190px)、
-       1400px以上でハンドオフ指定の212pxに達して止まる。
-       権限レベルで枚数が減っても引き伸ばされない(要件書 10_admin_dashboard.md §4.2)。 */
+    /* カード(案件パイプラインで使用) */
     .dash-cards { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
     .dash-card {
         flex: 1 1 176px; max-width: 212px; box-sizing: border-box;
@@ -57,6 +58,9 @@
     .dash-card-unit { font-size: 12.5px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }
     .dash-card-sub { margin-top: 2px; font-size: 11.5px; color: var(--a-fg-muted2); font-variant-numeric: tabular-nums; }
     .dash-card-link { margin-top: 6px; font-size: 11.5px; color: var(--a-accent); }
+    /* Lv2 版など、遷移先へアクセスできない権限レベル向けの非活性カード */
+    .dash-card-static { cursor: default; }
+    .dash-card-static:hover { border-color: var(--a-border); box-shadow: none; }
 
     .dash-start { display: flex; align-items: center; flex-wrap: wrap; margin-top: 14px; gap: 10px; }
     .dash-start-btn {
@@ -66,64 +70,87 @@
     }
     .dash-start-note { font-size: 11.5px; color: var(--a-fg-faint); }
 
-    /* 表: 幅が足りない場合は補助的な列(c-opt)を隠して収める(横スクロールはさせない) */
+    /* 表(全ての一覧ブロックで共用) */
     .dash-table {
         margin-top: 10px; background: var(--a-surface);
-        border: 1px solid var(--a-border); border-radius: 8px;
+        border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto;
     }
     .dash-thead {
-        display: grid; align-items: center; padding: 0 18px; height: 40px;
+        display: grid; column-gap: 8px; align-items: center; padding: 0 18px; height: 40px;
         background: var(--a-surface-2); border-bottom: 1px solid var(--a-border);
         font-size: 12px; font-weight: 700; color: var(--a-fg-muted);
     }
     .dash-trow {
-        display: grid; align-items: center; padding: 0 18px; height: 44px;
+        display: grid; column-gap: 8px; align-items: center; padding: 0 18px; height: 44px;
         border-bottom: 1px solid var(--a-border-soft);
         font-size: 13px; font-variant-numeric: tabular-nums; cursor: pointer;
     }
     .dash-trow:last-child { border-bottom: none; }
     .dash-trow:hover { background: var(--a-surface-hover); }
     .dash-ellip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 10px; }
+    .dash-clamp2 { min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; padding-right: 10px; }
     .dash-sub { font-size: 12px; }
     .dash-sub-muted { font-size: 12px; color: var(--a-fg-muted); }
     .dash-r { text-align: right; }
     .dash-link-cell { text-align: right; font-size: 11.5px; color: var(--a-accent); }
+    .dash-warn-cell { color: var(--a-warn-deep); font-weight: 700; }
 
-    /* 現在会期中のアンケート一覧 */
-    .tbl-surveys .dash-thead,
-    .tbl-surveys .dash-trow { grid-template-columns: 100px minmax(230px, 1fr) 200px 200px 90px 110px; }
+    /* 2カラム帯(上段=D+会期前新規／下段=新規ユーザー+滞留作業)の共通シェル。
+       1920px(min-width:1680px)でのみ横2列、それ未満は縦積みにする。
+       縦積み時は各表が全幅を使えるため列を戻し、横2列時(半幅、約810px前後)は
+       各表ごとに c-half で列を間引いて収める。 */
+    .dash-2col { margin-top: 24px; display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; align-items: start; }
+    @media (min-width: 1680px) { .dash-2col { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+    .dash-2col .dash-sec { margin-top: 0; }
 
-    /* 名刺データ化申込状況
-       列幅は上限をハンドオフ指定(170/210px)としつつ縮小を許す。 */
-    .tbl-plans .dash-thead,
-    .tbl-plans .dash-trow {
-        grid-template-columns: minmax(96px, 1fr) minmax(112px, 170px) minmax(140px, 210px) 110px;
+    /* 会期中・終了間際のアンケート(D)。基本9列: フェーズ/ID/タイトル/契約ユーザー/会期/回答数/
+       データ化対象名刺件数/納期区分/納期日。2行になりうるセルがあるため行高は可変にする。 */
+    .tbl-dsurveys .dash-thead,
+    .tbl-dsurveys .dash-trow {
+        grid-template-columns: 86px 84px minmax(200px,1fr) minmax(120px,160px) minmax(120px,140px) 74px minmax(100px,140px) 76px 100px;
     }
+    .tbl-dsurveys .dash-trow { height: auto; min-height: 52px; padding: 9px 18px; }
 
-    /* 幅が足りない画面では補助的な列(c-opt)を隠し、横スクロールを避ける。
-       基準は1920px表示。1459px未満で適用する(他画面の一覧と同じ基準)。 */
+    /* 単独幅で狭い画面(1459px未満)では会期・納期区分を隠す */
     @media (max-width: 1459px) {
-      .tbl-surveys .dash-thead,
-      .tbl-surveys .dash-trow { grid-template-columns: 100px minmax(200px, 1fr) 160px 90px !important; }
-      .tbl-plans .dash-thead,
-      .tbl-plans .dash-trow { grid-template-columns: minmax(96px, 1fr) minmax(112px, 170px) 110px !important; }
-      .dash-table .c-opt { display: none !important; }
+        .tbl-dsurveys .dash-thead,
+        .tbl-dsurveys .dash-trow { grid-template-columns: 86px 84px minmax(200px,1fr) minmax(120px,160px) 74px minmax(100px,140px) 100px !important; }
+        .tbl-dsurveys .c-opt { display: none !important; }
+    }
+    /* 2カラム化(半幅)では契約ユーザー・会期・納期区分も隠し6列にする(c-half) */
+    @media (min-width: 1680px) {
+        .tbl-dsurveys .dash-thead,
+        .tbl-dsurveys .dash-trow { grid-template-columns: 86px 84px minmax(140px,1fr) 70px minmax(90px,120px) 90px !important; }
+        .tbl-dsurveys .c-half { display: none !important; }
     }
 
-    /* 下段: 新規発生の状況 + 名刺データ化申込状況 */
-    .dash-lower {
-        margin-top: 24px; display: grid;
-        grid-template-columns: 420px minmax(0, 1fr); gap: 20px; align-items: start;
+    /* 会期前・新規作成アンケート。6列: ID/タイトル/契約ユーザー/作成日/会期開始日/納期区分。
+       半幅(2カラム時)でも収まる幅で設計済みのため追加の圧縮ルールは無い。 */
+    .tbl-newsurveys .dash-thead,
+    .tbl-newsurveys .dash-trow {
+        grid-template-columns: 84px minmax(160px,1fr) minmax(110px,150px) 90px 96px 70px;
     }
-    @media (max-width: 1200px) { .dash-lower { grid-template-columns: minmax(0, 1fr); } }
-    .dash-lower-cards {
-        margin-top: 10px; display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;
+    .tbl-newsurveys .dash-trow { height: auto; min-height: 48px; padding: 8px 18px; }
+
+    /* 直近の新規登録ユーザー。5列: 登録日時/会社名/氏名/メールアドレス/状態。
+       半幅(2カラム時)でも収まる幅で設計済みのため追加の圧縮ルールは無い。 */
+    .tbl-newusers .dash-thead,
+    .tbl-newusers .dash-trow {
+        grid-template-columns: 130px minmax(110px,160px) minmax(90px,120px) minmax(160px,1fr) 84px;
     }
-    .dash-lower-cards .dash-card { max-width: none; }
-    .dash-lower-cards .dash-card-label { min-height: 0; }
-    .dash-lower-cards .dash-card-num { font-size: 30px; line-height: 1.3; }
-    .dash-lower-cards .dash-card-unit { font-size: 13px; }
+    .tbl-newusers .dash-trow { height: auto; min-height: 48px; padding: 8px 18px; }
+
+    /* 滞留している作業(E)。7列: アンケート/作業グループ/対象件数/入力済/進捗率/経過/納期(日付のみ) */
+    .tbl-stuck .dash-thead,
+    .tbl-stuck .dash-trow {
+        grid-template-columns: minmax(170px,1fr) minmax(150px,190px) 84px 84px 96px 90px 100px;
+    }
+    .tbl-stuck .dash-trow { height: auto; min-height: 52px; padding: 9px 18px; }
+    /* 2カラム化(半幅)では列幅をさらに詰める(列数は変えない) */
+    @media (min-width: 1680px) {
+        .tbl-stuck .dash-thead,
+        .tbl-stuck .dash-trow { grid-template-columns: minmax(120px,1fr) minmax(100px,140px) 64px 60px 72px 70px 86px !important; }
+    }
     </style>
 </head>
 <body>
@@ -145,126 +172,274 @@
             <!-- data-lv-display: proto-level.js が style.display を上書きするため表示形式を明示する -->
             <div data-min-lv="3" data-lv-display="inline-block" style="margin-top:10px;font-size:11.5px;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:6px;padding:6px 12px;display:inline-block">表示シナリオはヘッダー右上で切替できます(モックの見せ分けであり、実際の認可制御ではありません)。</div>
 
-            <!-- 運用状況サマリ(§4.2) -->
-            <div class="dash-sec" style="margin-top:18px">運用状況サマリ <span class="dash-sec-note">カード押下で絞り込み済みの一覧へ遷移します</span></div>
-            <div class="dash-cards">
-              <!-- Lv1は「入力待ちの名刺件数」に代えて本人の着手可能分を表示(§4.5) -->
-              <div data-max-lv="1" class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'" style="display:none">
-                <div class="dash-card-label">あなたが着手できる<br>名刺件数</div>
-                <div class="dash-card-num">1,284<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-link">データ入力対象一覧 →</div>
+            <!-- ※要確認: Lv2は案件パイプラインと滞留している作業のみが見える構成になっている
+                 (会期中・終了間際のアンケート/会期前・新規作成アンケート/直近の新規登録ユーザーはLv3+)。情報量として十分か要判断。 -->
+
+            <!-- ============================================================
+                 B. あなたの作業(Lv1のみ)
+                 ============================================================ -->
+            <div data-max-lv="1">
+              <div class="dash-sec">あなたの作業</div>
+              <div class="dash-cards">
+                <div class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                  <div class="dash-card-label">着手できる<br>名刺件数</div>
+                  <div class="dash-card-num">1,284<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-link">データ入力対象一覧 →</div>
+                </div>
+                <!-- 0件時は「本日はまだ入力がありません」を表示する(静的モックのため未実装) -->
+                <div class="dash-card dash-card-static">
+                  <div class="dash-card-label">本日あなたが<br>入力した件数</div>
+                  <div class="dash-card-num">312<span class="dash-card-unit">件</span></div>
+                </div>
+                <!-- ※要確認: 集計定義はオペレーター実績確認(performance-management.html)と同一とする -->
+                <div class="dash-card dash-card-static">
+                  <div class="dash-card-label">今月の正答率</div>
+                  <div class="dash-card-num">98.2<span class="dash-card-unit">%</span></div>
+                  <div class="dash-card-sub">判定対象 8,120件</div>
+                </div>
               </div>
-              <div data-min-lv="2" class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                <div class="dash-card-label">入力待ちの<br>名刺件数</div>
-                <div class="dash-card-num">4,219<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-link">データ入力対象一覧 →</div>
-              </div>
-              <div data-min-lv="1" class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                <div class="dash-card-label">入力進捗率</div>
-                <div class="dash-card-num">67<span class="dash-card-unit">%</span></div>
-                <div class="dash-card-sub">8,463 / 12,682 件</div>
-                <div class="dash-card-link">データ入力対象一覧 →</div>
-              </div>
-              <div data-min-lv="1" class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                <div class="dash-card-label">滞留している<br>作業グループ</div>
-                <div class="dash-card-num">2<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-sub">進捗が低い順に2件</div>
-                <div class="dash-card-link">データ入力対象一覧 →</div>
-              </div>
-              <div data-min-lv="2" class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
-                <div class="dash-card-label">照合待ちの<br>アンケート数</div>
-                <div class="dash-card-num">4<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-link">照合結果一覧 →</div>
-              </div>
-              <div data-min-lv="2" class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
-                <div class="dash-card-label">納期を過ぎた<br>アンケート数</div>
-                <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-link">照合結果一覧 →</div>
-              </div>
-              <div data-min-lv="2" class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
-                <div class="dash-card-label">本日が納期の<br>アンケート数</div>
-                <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
-                <div class="dash-card-sub">2026/07/31</div>
-                <div class="dash-card-link">照合結果一覧 →</div>
-              </div>
-              <div data-min-lv="3" class="dash-card" tabindex="0" role="link" onclick="location.href='user-management.html?status=招待中'">
-                <div class="dash-card-label">招待・本登録未了の<br>ユーザー数</div>
-                <div class="dash-card-num">4<span class="dash-card-unit">名</span></div>
-                <div class="dash-card-link">ユーザー管理 →</div>
+              <div data-lv-display="flex" class="dash-start">
+                <button type="button" class="dash-start-btn" onclick="location.href='data-entry/form.html'">入力を開始</button>
+                <span class="dash-start-note">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。</span>
               </div>
             </div>
 
-            <!-- Lv1の入力開始導線(§4.5) -->
-            <div data-max-lv="1" data-lv-display="flex" class="dash-start" style="display:none">
-              <button type="button" class="dash-start-btn" onclick="location.href='data-entry/form.html'">入力を開始</button>
-              <span class="dash-start-note">全体キューから算出した現在着手できる件数です。他のオペレーターの作業進行によって変動します。</span>
-            </div>
-
-            <!-- 現在会期中のアンケート一覧(§4.2a) -->
-            <div data-min-lv="3">
-              <div class="dash-sec">現在会期中のアンケート一覧 <span class="dash-sec-note">全2件・行押下でアンケート詳細へ</span></div>
-              <div class="dash-table">
-                <div class="tbl-surveys">
-                  <div class="dash-thead">
-                    <span>アンケートID</span><span>タイトル</span><span>契約ユーザー</span><span class="c-opt">会期</span><span class="dash-r">回答数</span><span class="dash-r c-opt">納期区分</span>
-                  </div>
-                  <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10259'">
-                    <span style="font-weight:500">SV-10259</span><span class="dash-ellip">ITインフラEXPO 2026 来場者アンケート</span><span class="dash-sub dash-ellip">(株)マーケットビジョン</span><span class="dash-sub-muted c-opt">2026/07/30〜2026/08/01</span><span class="dash-r">3,842</span><span class="dash-r c-opt">特急</span>
-                  </div>
-                  <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10257'">
-                    <span style="font-weight:500">SV-10257</span><span class="dash-ellip">医療機器・ヘルスケア展 来場者アンケート</span><span class="dash-sub dash-ellip">地方創生機構</span><span class="dash-sub-muted c-opt">2026/07/29〜2026/07/31</span><span class="dash-r">926</span><span class="dash-r c-opt">通常</span>
-                  </div>
+            <!-- ============================================================
+                 C. 案件パイプライン(Lv2+)
+                 ※要確認: 「7日以内」「3日以内」の閾値
+                 ============================================================ -->
+            <div data-min-lv="2">
+              <div class="dash-sec">案件パイプライン <span class="dash-sec-note">受注から納品までの各段階の件数(単位: 件〈アンケート〉)</span></div>
+              <div class="dash-cards">
+                <!-- 会期前(7日以内に開始)。Lv2は survey-management.html にアクセスできないため遷移なしカードにする(※要確認: Lv2への表示可否) -->
+                <div class="dash-card dash-card-static" data-min-lv="2" data-max-lv="2" style="display:none">
+                  <div class="dash-card-label">会期前<br>(7日以内に開始)</div>
+                  <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-sub">詳細はLv3以上で確認できます</div>
+                </div>
+                <div class="dash-card" data-min-lv="3" tabindex="0" role="link" onclick="location.href='survey-management.html'">
+                  <div class="dash-card-label">会期前<br>(7日以内に開始)</div>
+                  <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-link">アンケート管理 →</div>
+                </div>
+                <!-- 会期中(D一覧の会期中2行と同数) -->
+                <div class="dash-card dash-card-static" data-min-lv="2" data-max-lv="2" style="display:none">
+                  <div class="dash-card-label">会期中</div>
+                  <div class="dash-card-num">2<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-sub">詳細はLv3以上で確認できます</div>
+                </div>
+                <div class="dash-card" data-min-lv="3" tabindex="0" role="link" onclick="location.href='survey-management.html'">
+                  <div class="dash-card-label">会期中</div>
+                  <div class="dash-card-num">2<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-link">アンケート管理 →</div>
+                </div>
+                <div class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                  <div class="dash-card-label">名刺データ化中</div>
+                  <div class="dash-card-num">6<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-sub">入力待ち名刺 4,219件・進捗67%</div>
+                  <div class="dash-card-link">データ入力対象一覧 →</div>
+                </div>
+                <!-- 照合結果一覧の「進行中の作業対象アンケート数4件」と同数(仕様書の同数原則) -->
+                <div class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
+                  <div class="dash-card-label">照合待ち</div>
+                  <div class="dash-card-num">4<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-link">照合結果一覧 →</div>
+                </div>
+                <div class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
+                  <div class="dash-card-label">3日以内が納期</div>
+                  <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-sub">うち本日 1件</div>
+                  <div class="dash-card-link">照合結果一覧 →</div>
+                </div>
+                <div class="dash-card" tabindex="0" role="link" onclick="location.href='reconciliation/index.html'">
+                  <div class="dash-card-label">納期を過ぎた</div>
+                  <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-link">照合結果一覧 →</div>
                 </div>
               </div>
             </div>
 
-            <!-- 新規発生の状況(§4.3) / 名刺データ化申込状況(§4.4) -->
-            <div data-min-lv="3" class="dash-lower">
+            <!-- ============================================================
+                 上段2カラム: 会期前・新規作成アンケート(左) / 会期中・終了間際のアンケート(D・右)
+                 いずれもLv3+
+                 ============================================================ -->
+            <div data-min-lv="3" class="dash-2col">
+
+              <!-- 会期前・新規作成アンケート
+                   survey-detail.html のデータセット(22件)には「作成日」フィールドが無く、
+                   会期前ステータスのアンケートは SV-10262 の1件のみ。5行での表示は実在データでは満たせないため、
+                   実在する1件だけを表示する(※要確認: 会期前アンケートの母数。増やすには survey-detail.html
+                   /survey-management.html 側のマスタ拡充が別途必要)。作成日はマスタに無いため会期開始日から
+                   逆算した参考値(※要確認: 実データ化時は登録日時を持たせる)。 -->
               <div>
-                <div class="dash-sec" style="margin-top:0">新規発生の状況 <span class="dash-sec-note">2026/07/24〜2026/07/31(直近7日)</span></div>
-                <div class="dash-lower-cards">
-                  <div class="dash-card" tabindex="0" role="link" onclick="location.href='user-management.html'">
-                    <div class="dash-card-label">新規ユーザー数</div>
-                    <div class="dash-card-num">4<span class="dash-card-unit">名</span></div>
-                    <div class="dash-card-link">ユーザー管理 →</div>
-                  </div>
-                  <!-- 「直近7日の新規作成」に対応する絞り込みキーが遷移先にないため条件は付けない
-                       (isnew は「新着(前日比増)のみ」で別概念。要件書 §11 #9 の未整備項目) -->
-                  <div class="dash-card" tabindex="0" role="link" onclick="location.href='survey-management.html'">
-                    <div class="dash-card-label">新規アンケート数</div>
-                    <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
-                    <div class="dash-card-link">アンケート管理 →</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="dash-sec" style="margin-top:0">名刺データ化申込状況 <span class="dash-sec-note">全期間の累計・納期区分ごと・行押下でアンケート管理へ</span></div>
-                <div class="dash-table">
-                  <div class="tbl-plans">
+                <div class="dash-sec">会期前・新規作成アンケート 全1件 <span class="dash-sec-note">作成日の新しい順・行押下でアンケート詳細へ</span></div>
+                <div id="dashUpcomingSurveyTbl" class="dash-table">
+                  <div class="tbl-newsurveys">
                     <div class="dash-thead">
-                      <span>納期区分</span><span class="dash-r">申込アンケート数</span><span class="dash-r c-opt">データ化対象名刺件数</span><span></span>
+                      <span>アンケートID</span><span>タイトル</span><span>契約ユーザー</span><span>作成日</span><span>会期開始日</span><span>納期区分</span>
                     </div>
-                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=オンデマンド'">
-                      <span style="font-weight:700;color:var(--a-warn-deep)">オンデマンド</span><span class="dash-r">4 件</span><span class="dash-r c-opt">9,905 件</span><span class="dash-link-cell">一覧で表示 →</span>
-                    </div>
-                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=超特急'">
-                      <span style="font-weight:500">超特急</span><span class="dash-r">4 件</span><span class="dash-r c-opt">4,282 件</span><span class="dash-link-cell">一覧で表示 →</span>
-                    </div>
-                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=特急'">
-                      <span style="font-weight:500">特急</span><span class="dash-r">5 件</span><span class="dash-r c-opt">8,035 件</span><span class="dash-link-cell">一覧で表示 →</span>
-                    </div>
-                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=通常'">
-                      <span style="font-weight:500">通常</span><span class="dash-r">7 件</span><span class="dash-r c-opt">7,626 件</span><span class="dash-link-cell">一覧で表示 →</span>
-                    </div>
-                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-management.html?plan=お試し'">
-                      <span style="font-weight:500">お試し</span><span class="dash-r">2 件</span><span class="dash-r c-opt">1,040 件</span><span class="dash-link-cell">一覧で表示 →</span>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10262'">
+                      <span style="font-weight:500">SV-10262</span>
+                      <span class="dash-clamp2" title="人事・労務フォーラム 来場者アンケート">人事・労務フォーラム 来場者アンケート</span>
+                      <span class="dash-ellip" title="グロースパートナーズ(株)">グロースパートナーズ(株)</span>
+                      <span class="dash-sub">2026/07/29</span>
+                      <span class="dash-sub">2026/08/03</span>
+                      <span class="dash-sub">通常</span>
                     </div>
                   </div>
                 </div>
+                <div class="dash-note"><a href="survey-management.html" style="color:var(--a-accent)">アンケート管理で全件表示 →</a></div>
               </div>
+
+              <!-- D. 会期中・終了間際のアンケート
+                   モックデータ(survey-detail.html)は会期中ステータスのアンケートを2件しか持たないため、
+                   その2件を終了が近い順に表示する。納期日は時刻を持たない運用のため日付のみで表示する。
+                   0件時は「該当するアンケートはありません」を表示する(静的モックのため未実装)。 -->
+              <div>
+                <div class="dash-sec">会期中・終了間際のアンケート 全2件 <span class="dash-sec-note">終了が近い順・行押下でアンケート詳細へ</span></div>
+                <div id="dashSurveyTbl" class="dash-table">
+                  <div class="tbl-dsurveys">
+                    <div class="dash-thead">
+                      <span>フェーズ</span><span>アンケートID</span><span>タイトル</span><span class="c-half">契約ユーザー</span><span class="c-opt c-half">会期</span><span class="dash-r">回答数</span><span class="dash-r" title="データ化対象名刺件数">名刺件数</span><span class="c-opt c-half">納期区分</span><span>納期日</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10257'">
+                      <span><span class="status-badge status-info">会期中</span></span>
+                      <span style="font-weight:500">SV-10257</span>
+                      <span class="dash-clamp2" title="医療機器・ヘルスケア展 来場者アンケート">医療機器・ヘルスケア展 来場者アンケート</span>
+                      <span class="c-half dash-ellip" title="地方創生機構">地方創生機構</span>
+                      <span class="c-opt c-half dash-sub-muted" style="line-height:1.5">2026/07/29<br>〜2026/07/31</span>
+                      <span class="dash-r">926</span>
+                      <span class="dash-r">850</span>
+                      <span class="c-opt c-half dash-sub">通常</span>
+                      <span class="dash-sub" style="font-weight:500">2026/08/05</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='survey-detail.html?id=SV-10259'">
+                      <span><span class="status-badge status-info">会期中</span></span>
+                      <span style="font-weight:500">SV-10259</span>
+                      <span class="dash-clamp2" title="ITインフラEXPO 2026 来場者アンケート">ITインフラEXPO 2026 来場者アンケート</span>
+                      <span class="c-half dash-ellip" title="(株)マーケットビジョン">(株)マーケットビジョン</span>
+                      <span class="c-opt c-half dash-sub-muted" style="line-height:1.5">2026/07/30<br>〜2026/08/01</span>
+                      <span class="dash-r">3,842</span>
+                      <span class="dash-r">3,760</span>
+                      <span class="c-opt c-half dash-sub">特急</span>
+                      <span class="dash-sub" style="font-weight:500">2026/08/03</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-note"><a href="survey-management.html" style="color:var(--a-accent)">アンケート管理で全件表示 →</a></div>
+              </div>
+
             </div>
 
-            
+            <!-- ============================================================
+                 下段2カラム: 直近の新規登録ユーザー(左・Lv3+) / 滞留している作業(右・Lv2+)
+                 左右でLvが異なるため、外枠はLv2+で開けて内側の各表に個別のdata-min-lvを付ける。
+                 Lv2表示時は左が消えるため、右(滞留)は単独残置(半幅のまま・崩れないことのみ担保)。
+                 ============================================================ -->
+            <div data-min-lv="2" class="dash-2col">
+
+              <!-- 直近の新規登録ユーザー(user-detail.html のデータセット24件から登録日時降順の上位5件) -->
+              <div data-min-lv="3">
+                <div class="dash-sec">直近の新規登録ユーザー 全5件 <span class="dash-sec-note">登録日時の新しい順・行押下でユーザー詳細へ</span></div>
+                <div id="dashNewUsersTbl" class="dash-table">
+                  <div class="tbl-newusers">
+                    <div class="dash-thead">
+                      <span>登録日時</span><span>会社名</span><span>氏名</span><span>メールアドレス</span><span>状態</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='user-detail.html?id=U-1052'">
+                      <span class="dash-sub-muted">2026/07/29 14:20</span>
+                      <span class="dash-ellip" title="(株)マーケットビジョン">(株)マーケットビジョン</span>
+                      <span class="dash-ellip" title="岡田 健一">岡田 健一</span>
+                      <span class="dash-ellip" title="k.okada@market-v.co.jp">k.okada@market-v.co.jp</span>
+                      <span><span class="status-badge status-active">有効</span></span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='user-detail.html?id=U-1051'">
+                      <span class="dash-sub-muted">2026/07/28 11:02</span>
+                      <span class="dash-ellip" title="—">—</span>
+                      <span class="dash-ellip" title="—">—</span>
+                      <span class="dash-ellip" title="info@newcorp.example.jp">info@newcorp.example.jp</span>
+                      <span><span class="status-badge status-info">招待中</span></span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='user-detail.html?id=U-1050'">
+                      <span class="dash-sub-muted">2026/07/27 16:48</span>
+                      <span class="dash-ellip" title="(株)イベントプラス">(株)イベントプラス</span>
+                      <span class="dash-ellip" title="中山 亮">中山 亮</span>
+                      <span class="dash-ellip" title="r.nakayama@eventplus.co.jp">r.nakayama@eventplus.co.jp</span>
+                      <span><span class="status-badge status-limit_reached">本登録未了</span></span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='user-detail.html?id=U-1049'">
+                      <span class="dash-sub-muted">2026/07/27 09:15</span>
+                      <span class="dash-ellip" title="グロースパートナーズ(株)">グロースパートナーズ(株)</span>
+                      <span class="dash-ellip" title="三浦 沙織">三浦 沙織</span>
+                      <span class="dash-ellip" title="s.miura@growthp.co.jp">s.miura@growthp.co.jp</span>
+                      <span><span class="status-badge status-active">有効</span></span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='user-detail.html?id=U-1038'">
+                      <span class="dash-sub-muted">2026/07/02 10:40</span>
+                      <span class="dash-ellip" title="(株)テックブリッジ">(株)テックブリッジ</span>
+                      <span class="dash-ellip" title="森田 優子">森田 優子</span>
+                      <span class="dash-ellip" title="y.morita@techbridge.co.jp">y.morita@techbridge.co.jp</span>
+                      <span><span class="status-badge status-inactive">停止</span></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-note"><a href="user-management.html" style="color:var(--a-accent)">ユーザー管理で全件表示 →</a></div>
+              </div>
+
+              <!-- 滞留している作業(復活)。survey-detail.html でデータ化中ステータスの実在4件
+                   (SV-10236/10238/10233/10244)を使用。総件数・納期は reconciliation/index.html の
+                   同IDの表示値と一致させてある(入力済・進捗率・経過・作業グループは本表独自の参考値)。 -->
+              <div data-min-lv="2">
+                <div class="dash-sec">滞留している作業 全4件 <span class="dash-sec-note">進捗が低い順・行押下でデータ入力対象一覧へ</span></div>
+                <div id="dashStuckTbl" class="dash-table">
+                  <div class="tbl-stuck">
+                    <div class="dash-thead">
+                      <span>アンケート</span><span>作業グループ</span><span class="dash-r">対象件数</span><span class="dash-r">入力済</span><span class="dash-r">進捗率</span><span class="dash-r" title="最終入力からの経過">経過</span><span>納期</span>
+                    </div>
+                    <!-- 経過が24時間超の行は経過セルをwarn色で強調する(※要確認: 24時間という閾値) -->
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                      <span class="dash-clamp2"><span data-min-lv="3">SV-10236<br>スマート物流EXPO 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10236</span></span>
+                      <span>グループ⑤<br><span class="dash-sub-muted">電話番号・FAX</span></span>
+                      <span class="dash-r">2,180</span>
+                      <span class="dash-r">262</span>
+                      <span class="dash-r"><strong>12%</strong></span>
+                      <span class="dash-r dash-warn-cell">26時間</span>
+                      <span style="color:var(--a-danger);font-weight:700">2026/07/30</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                      <span class="dash-clamp2"><span data-min-lv="3">SV-10238<br>BtoB EXPO 東京 2026 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10238</span></span>
+                      <span>グループ③<br><span class="dash-sub-muted">会社・部署・役職</span></span>
+                      <span class="dash-r">3,420</span>
+                      <span class="dash-r">616</span>
+                      <span class="dash-r"><strong>18%</strong></span>
+                      <span class="dash-r">19時間</span>
+                      <span>2026/07/31</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                      <span class="dash-clamp2"><span data-min-lv="3">SV-10233<br>地方創生フォーラム 参加者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10233</span></span>
+                      <span>グループ①<br><span class="dash-sub-muted">メールアドレス</span></span>
+                      <span class="dash-r">486</span>
+                      <span class="dash-r">117</span>
+                      <span class="dash-r"><strong>24%</strong></span>
+                      <span class="dash-r">11時間</span>
+                      <span>2026/08/03</span>
+                    </div>
+                    <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
+                      <span class="dash-clamp2"><span data-min-lv="3">SV-10244<br>マーケティングサミット2026 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10244</span></span>
+                      <span>グループ⑥<br><span class="dash-sub-muted">URL</span></span>
+                      <span class="dash-r">1,208</span>
+                      <span class="dash-r">447</span>
+                      <span class="dash-r"><strong>37%</strong></span>
+                      <span class="dash-r">7時間</span>
+                      <span>2026/08/04</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-note">作業グループ①〜⑧は名刺データ化の作業分割単位です(data-entry/index.html と同じ表記)。遷移先での絞り込み受け口は未整備のため、行押下は条件なしでデータ入力対象一覧へ移動します。<br><a href="data-entry/index.html" style="color:var(--a-accent)">データ入力対象一覧へ →</a></div>
+              </div>
+
+            </div>
+
           </div>
         </main>
     </div>

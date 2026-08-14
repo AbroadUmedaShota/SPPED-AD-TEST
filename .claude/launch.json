@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-mock",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["scripts/dev-server.py", "8765"],
+      "port": 8765
+    },
+    {
+      "name": "bugreport-form",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "02_dashboard/speed-ad-不具合報告-form", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}
