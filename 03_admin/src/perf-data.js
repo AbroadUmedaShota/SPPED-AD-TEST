@@ -26,6 +26,45 @@
     function num(n) { return n.toLocaleString('ja-JP'); }
     function rate(o, w) { return w ? Math.round(o / w * 100) + '%' : '—'; }
 
+    // 機械配分した明細の端数を配り直し、合計を月合計へ厳密に合わせる。
+    // 差分を1行へまとめて寄せると、その行の正解件数が作業件数を超えて頭打ちになり、
+    // はみ出た分が黙って消えて合計が合わなくなる。件数の多い行から1件ずつ配る。
+    // 順序は w → o → s。o は w を超えられないため、先に w を確定させる必要がある
+    function reconcile(rows, t) {
+        if (!rows.length) { return rows; }
+        var order = rows.map(function (r, i) { return i; })
+            .sort(function (a, b) { return rows[b].w - rows[a].w; });
+
+        // 件数の多い行から1件ずつ配る。cap は行ごとの上限(なければ null)
+        function spread(k, target, cap) {
+            var diff = target - rows.reduce(function (a, r) { return a + r[k]; }, 0);
+            var guard = 0;
+            while (diff !== 0 && guard++ < 20000) {
+                var moved = false;
+                for (var x = 0; x < order.length && diff !== 0; x++) {
+                    var r = rows[order[x]];
+                    var step = diff > 0 ? 1 : -1;
+                    var next = r[k] + step;
+                    if (next < 0 || (cap && next > cap(r))) { continue; }
+                    r[k] = next;
+                    diff -= step;
+                    moved = true;
+                }
+                if (!moved) { break; }
+            }
+        }
+
+        // 作業件数を先に確定させる。ここで正解件数との関係を見てしまうと、
+        // 丸めで全行が o == w になったとき1件も動かせず差分が残る
+        spread('w', t.w, null);
+        // 作業件数が減った行の正解件数を上限へ落としてから、正解件数を配り直す。
+        // 各行の上限の合計は作業件数の合計 = t.w で、t.o <= t.w なので必ず配りきれる
+        rows.forEach(function (r) { if (r.o > r.w) { r.o = r.w; } });
+        spread('o', t.o, function (r) { return r.w; });
+        spread('s', t.s, null);
+        return rows;
+    }
+
     function totals(oid, m) {
         var d = PERF[oid].m[m];
         if (d) { return { w: d.w, o: d.o, s: d.s }; }
@@ -93,20 +132,88 @@
             var s = Math.round(t.s * weights[i] / wsum);
             return { d: x.d, dow: x.dow, w: w, o: o, s: s };
         });
-        // 丸め誤差は一番件数の多い日に寄せて、月合計と厳密に一致させる
-        ['w', 'o', 's'].forEach(function (k) {
-            var sum = rows.reduce(function (a, r) { return a + r[k]; }, 0);
-            var maxI = 0;
-            rows.forEach(function (r, i) { if (r.w > rows[maxI].w) { maxI = i; } });
-            rows[maxI][k] += (t[k] - sum);
-            if (rows[maxI].o > rows[maxI].w) { rows[maxI].o = rows[maxI].w; }
+        return reconcile(rows, t);
+    }
+
+    // その月に会社が作業した案件。2026-07 は営業日カレンダー(SCR-A-008)のアサインと同じ。
+    // 06・05 は当時の実績として置いた過去分。作業日が月をまたぐ案件は両方の月に現れる
+    var SURVEYS_BY_GROUP = {
+        abroad: {
+            '2026-07': [
+                ['SV-10236', 'スマート物流EXPO 来場者アンケート'],
+                ['SV-10233', '地方創生フォーラム 参加者アンケート'],
+                ['SV-10229', 'グリーンエネルギー展 来場者アンケート'],
+                ['SV-10227', 'スタートアップピッチ2026 来場者アンケート']
+            ],
+            '2026-06': [
+                ['SV-10209', '観光インバウンドサミット 来場者アンケート'],
+                ['SV-10201', '産業機械フェア 来場者アンケート']
+            ],
+            '2026-05': [
+                ['SV-10192', '印刷・パッケージ総合展 来場者アンケート'],
+                ['SV-10188', 'SaaS Expo 2026 来場者アンケート']
+            ]
+        },
+        officeworks: {
+            '2026-07': [
+                ['SV-10250', '食品・飲料展 出展者アンケート'],
+                ['SV-10238', 'BtoB EXPO 東京 2026 来場者アンケート'],
+                ['SV-10236', 'スマート物流EXPO 来場者アンケート'],
+                ['SV-10229', 'グリーンエネルギー展 来場者アンケート'],
+                ['SV-10218', 'ものづくりワールド 来場者アンケート'],
+                ['SV-10214', 'フードテックジャパン 出展者アンケート']
+            ],
+            '2026-06': [
+                ['SV-10214', 'フードテックジャパン 出展者アンケート'],
+                ['SV-10201', '産業機械フェア 来場者アンケート'],
+                ['SV-10196', 'アグリビジネス展 出展者アンケート']
+            ],
+            '2026-05': [
+                ['SV-10192', '印刷・パッケージ総合展 来場者アンケート'],
+                ['SV-10188', 'SaaS Expo 2026 来場者アンケート'],
+                ['SV-10183', '住宅リフォームフェア 来場者アンケート']
+            ]
+        },
+        datapartners: {
+            '2026-07': [
+                ['SV-10221', '医薬品研究セミナー 参加者アンケート'],
+                ['SV-10218', 'ものづくりワールド 来場者アンケート']
+            ],
+            '2026-06': [
+                ['SV-10205', 'デザイントレンド展 来場者アンケート'],
+                ['SV-10196', 'アグリビジネス展 出展者アンケート']
+            ],
+            '2026-05': [
+                ['SV-10183', '住宅リフォームフェア 来場者アンケート']
+            ]
+        }
+    };
+
+    // 案件別実績(モック)。日別と同じ月合計を、案件へ固定ウェイトで配分する。
+    // 日別・案件別は同じ明細を別の軸で集計したものなので、どちらも月合計と一致させる
+    function surveys(oid, m) {
+        var t = totals(oid, m);
+        var list = (SURVEYS_BY_GROUP[opGroup(oid)] || {})[m] || [];
+        if (!list.length) { return []; }
+        // 同じ会社でもオペレーターごとに配分が変わるよう、IDの数値を種にしてずらす
+        var seed = parseInt(oid.replace(/\D/g, ''), 10) || 1;
+        var weights = list.map(function (x, i) { return 5 + ((seed + i * 11 + parseInt(x[0].slice(3), 10)) % 6); });
+        var wsum = weights.reduce(function (a, b) { return a + b; }, 0);
+        var baseRate = t.w ? t.o / t.w : 0;
+        var rows = list.map(function (x, i) {
+            var w = Math.round(t.w * weights[i] / wsum);
+            // 案件によって名刺の状態が違うので正答率にも差を付ける
+            var wob = (((seed + i * 5) % 7) - 3) * 0.011;
+            var o = Math.min(w, Math.max(0, Math.round(w * (baseRate + wob))));
+            var s = Math.round(t.s * weights[i] / wsum);
+            return { sid: x[0], title: x[1], w: w, o: o, s: s };
         });
-        return rows;
+        return reconcile(rows, t);
     }
 
     window.PerfData = {
         PERF: PERF, UNIT: UNIT, GROUPS: GROUPS, MONTHS: MONTHS, TREND_MONTHS: TREND_MONTHS,
         num: num, rate: rate, totals: totals, groupTotals: groupTotals,
-        opGroup: opGroup, groupBreakdown: groupBreakdown, daily: daily
+        opGroup: opGroup, groupBreakdown: groupBreakdown, daily: daily, surveys: surveys
     };
 })();

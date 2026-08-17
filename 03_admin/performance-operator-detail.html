@@ -66,15 +66,17 @@
               <div id="odBreakdown"></div>
             </div>
 
-            <div class="perf-sec">日別実績 <span class="perf-sec-note">土日を除く稼働日ごとの内訳</span></div>
-            <div class="perf-table perf-daily-scroll">
-              <div data-grid="daily" style="position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
-                <span>日付</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span>
-              </div>
-              <div id="odDaily"></div>
+            <div class="perf-sec">内訳 <span class="perf-sec-note" id="odBreakNote">担当した案件ごとの内訳</span></div>
+            <div role="tablist" aria-label="内訳の切り替え" style="display:flex;gap:2px;border-bottom:2px solid var(--a-border)">
+              <button id="odTabSv" role="tab" aria-selected="true" aria-controls="odDetailPane" onclick="odTab('survey')" style="background:none;border:none;border-bottom:2px solid var(--a-accent);margin-bottom:-2px;padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit">アンケート別</button>
+              <button id="odTabDay" role="tab" aria-selected="false" aria-controls="odDetailPane" onclick="odTab('daily')" style="background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 18px;font-size:13.5px;color:var(--a-fg-muted);cursor:pointer;font-family:inherit">日別</button>
             </div>
+            <section id="odDetailPane" role="tabpanel" aria-labelledby="odTabSv" class="perf-table perf-daily-scroll" style="margin-top:12px">
+              <div id="odDetailHead" data-grid="survey" style="position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px"></div>
+              <div id="odDaily"></div>
+            </section>
 
-            <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">正答率は 95% 未満を<span style="color:var(--a-warn);font-weight:700">この色</span>で示す。日別は入力を確定した日を基準に集計する。</div>
+            <div id="odDetailNote" style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)"></div>
           </div>
         </main>
     </div>
@@ -96,11 +98,18 @@
     if (!D.PERF[oid]) { oid = 'OP-0058'; }
     var month = '2026-07';
     var openG = -1; // 展開中の作業グループ(①〜⑧)の添字。-1は全閉
+    var detailTab = 'survey'; // 内訳の下段。survey(アンケート別・既定) / daily(日別)
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     var GRIDS = {
         trend: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
         bd: 'display:grid;grid-template-columns:minmax(240px,230fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px',
-        daily: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr);align-items:center;padding:0 18px'
+        daily: 'display:grid;grid-template-columns:minmax(130px,120fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr);align-items:center;padding:0 18px',
+        // 案件名は長いので1列目を広く取る。数値列は日別と同じ幅で揃え、タブを切り替えても列がずれないようにする
+        survey: 'display:grid;grid-template-columns:minmax(280px,300fr) minmax(130px,70fr) minmax(130px,70fr) minmax(100px,52fr) minmax(140px,70fr);align-items:center;padding:0 18px'
     };
     document.querySelectorAll('[data-grid]').forEach(function (el) {
         el.setAttribute('style', GRIDS[el.getAttribute('data-grid')] + ';' + el.getAttribute('style'));
@@ -171,15 +180,73 @@
 
         renderBreakdown();
 
-        // 日別実績(平日のみ・月合計と一致するよう機械配分)
-        var daily = '';
-        D.daily(oid, month).forEach(function (r) {
-            daily += '<div style="' + GRIDS.daily + ';height:36px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums">'
+        renderDetail();
+    }
+
+    // 内訳の下段。アンケート別と日別は同じ月合計を別の軸で割ったもので、どちらも合計は一致する。
+    // 案件別は「どの案件にどれだけ手が入ったか」、日別は「いつ稼働したか」を見るためのもの
+    function renderDetail() {
+        var head = document.getElementById('odDetailHead');
+        var body = document.getElementById('odDaily');
+        var note = document.getElementById('odDetailNote');
+        var sec = document.getElementById('odBreakNote');
+        var rowStyle = ';height:36px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px;font-variant-numeric:tabular-nums';
+        // 中身を入れ替えるので先頭へ戻す。日別(行数が多い)で下までスクロールしたまま
+        // アンケート別へ切り替えると、途中から表示されて先頭の案件が見えない。
+        // 横位置も戻す。幅が狭いと表が横スクロールするため、月を切り替えたときに
+        // 右へ寄ったままになり、1列目のアンケート名が隠れる
+        var pane = document.getElementById('odDetailPane');
+        if (pane) { pane.scrollTop = 0; pane.scrollLeft = 0; }
+
+        if (detailTab === 'survey') {
+            head.setAttribute('data-grid', 'survey');
+            head.setAttribute('style', GRIDS.survey + ';position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px');
+            head.innerHTML = '<span>アンケート</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span>'
+                + '<span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span>';
+            var rows = D.surveys(oid, month);
+            body.innerHTML = rows.length ? rows.map(function (r) {
+                return '<div style="' + GRIDS.survey + rowStyle + '">'
+                    + '<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px" title="' + esc(r.sid + ' ' + r.title) + '">'
+                    + '<a href="survey-detail.html?id=' + r.sid + '">' + r.sid + '</a> ' + esc(r.title) + '</span>'
+                    + cell(D.num(r.w), true) + cell(D.num(r.o), true) + rateCell(r.o, r.w) + cell(D.num(r.s), true) + '</div>';
+            }).join('') : '<div style="padding:16px 18px;font-size:12.5px;color:var(--a-fg-faint)">この月に担当した案件はありません。</div>';
+            sec.textContent = '担当した案件ごとの内訳';
+            note.innerHTML = '正答率は 95% 未満を<span style="color:var(--a-warn);font-weight:700">この色</span>で示す。'
+                + '案件別は名刺の所属アンケートを基準に集計する。合計は当月サマリと一致する。';
+            return;
+        }
+
+        head.setAttribute('data-grid', 'daily');
+        head.setAttribute('style', GRIDS.daily + ';position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px');
+        head.innerHTML = '<span>日付</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span>'
+            + '<span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span>';
+        body.innerHTML = D.daily(oid, month).map(function (r) {
+            return '<div style="' + GRIDS.daily + rowStyle + '">'
                 + cell(month.replace('-', '/') + '/' + String(r.d).padStart(2, '0') + '(' + r.dow + ')', false)
                 + cell(D.num(r.w), true) + cell(D.num(r.o), true) + rateCell(r.o, r.w) + cell(D.num(r.s), true) + '</div>';
-        });
-        document.getElementById('odDaily').innerHTML = daily;
+        }).join('');
+        sec.textContent = '土日を除く稼働日ごとの内訳';
+        note.innerHTML = '正答率は 95% 未満を<span style="color:var(--a-warn);font-weight:700">この色</span>で示す。'
+            + '日別は入力を確定した日を基準に集計する。合計は当月サマリと一致する。';
     }
+
+    var TABS = { survey: 'odTabSv', daily: 'odTabDay' };
+    window.odTab = function (name) {
+        if (!TABS[name]) { return; }
+        detailTab = name;
+        Object.keys(TABS).forEach(function (k) {
+            var on = (k === name);
+            var btn = document.getElementById(TABS[k]);
+            if (!btn) { return; }
+            btn.setAttribute('aria-selected', on ? 'true' : 'false');
+            btn.style.borderBottomColor = on ? 'var(--a-accent)' : 'transparent';
+            btn.style.color = on ? 'var(--a-accent)' : 'var(--a-fg-muted)';
+            btn.style.fontWeight = on ? '700' : '400';
+        });
+        var pane = document.getElementById('odDetailPane');
+        if (pane) { pane.setAttribute('aria-labelledby', TABS[name]); }
+        renderDetail();
+    };
 
     window.odToggleGroup = function (gi) {
         openG = (openG === gi) ? -1 : gi;
