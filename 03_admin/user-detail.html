@@ -45,7 +45,7 @@
             <div class="admin-2col" style="margin-top:16px">
               <div style="display:flex;flex-direction:column;gap:16px">
                 <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">アカウント情報 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">管理者による編集(代行)が可能</span></div>
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">アカウント情報 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">利用者に代わって管理者が編集できます</span></div>
                   <div data-slot="inviteBand" hidden style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--a-info-bg);border:1px solid var(--a-info-border);border-radius:6px;font-size:11.5px;color:var(--a-info-fg);line-height:1.7"><span data-slot="inviteText" style="min-width:0"></span><span style="flex-shrink:0;display:flex;gap:8px"><button onclick="pOpen('mResendInvite')" style="background:var(--a-surface);color:var(--a-accent-deep);border:1px solid var(--a-info-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待を再送</button><button onclick="pOpen('mCancelInvite')" style="background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">招待をキャンセル</button></span></div>
                   <div data-slot="acctFields" style="display:grid;grid-template-columns:96px 1fr;gap:10px 12px;padding-top:12px;font-size:13px;align-items:center">
                   <span style="color:var(--a-fg-muted2)">会社名</span><input aria-label="会社名" value="(株)マーケットビジョン" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit">
@@ -72,8 +72,21 @@
                   <div id="udGroups" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
                   <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">グループはアンケートを複数名で共同編集する単位です(名刺データ化の作業グループ①〜⑧とは別の概念)。グループの作成・メンバーの追加・権限の変更はユーザー側の画面で行い、本画面では参照のみとします。</div>
                 </div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアカウントに対する操作</span></div>
+                  <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
+                </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">紐づくアンケート<span data-slot="svCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="surveys" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">アンケート管理で絞り込む</button></div>
+                  <div id="udSurveys" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
+                </div>
+                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">請求状況<span data-slot="blCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
+                  <div data-slot="unpaidBand" hidden style="margin-top:10px"></div>
+                  <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
+                </div>
                 <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
                   <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">パスワード操作</div>
                   <div data-slot="pwBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px">
@@ -85,18 +98,35 @@
                   <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:18px">メール送信履歴 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">送信した記録のみ。到達の確認は行わない</span></div>
                   <div data-slot="mailBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
                 </div>
-                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">紐づくアンケート<span data-slot="svCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="surveys" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">アンケート管理で絞り込む</button></div>
-                  <div id="udSurveys" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
+                <!-- 対応履歴。メール送信履歴・監査ログと同じ「この利用者に何があったか」の記録なので、
+                     右列の記録系の並びに置く。1枠の自由記述だと分量が増えたときに目で探すことになるため
+                     1件ずつの記録として持ち、既定は直近だけ見せて残りは畳む。
+                     顧客のデータを書き換える代行変更ではなく運営自身の記録なので、
+                     アカウント情報の「変更理由が必須の保存」とは別に追記する -->
+                <div data-slot="memoEmpty" hidden style="background:var(--a-surface);border:1px dashed var(--a-border-strong);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                  <span style="font-size:12px;color:var(--a-fg-muted2)">対応履歴はありません</span>
+                  <button onclick="pUdMemoAdd()" style="flex:none;background:none;border:none;padding:0;font-size:12.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit;text-decoration:underline">記録を追加</button>
                 </div>
-                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">請求状況<span data-slot="blCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
-                  <div data-slot="unpaidBand" hidden style="margin-top:10px"></div>
-                  <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
-                </div>
-                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアカウントに対する操作</span></div>
-                  <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
+                <div data-slot="memoCard" style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                    <span>対応履歴 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">運営内で共有する記録。利用者には表示されません</span></span>
+                    <span data-slot="memoMeta" style="font-weight:400;color:var(--a-fg-faint);white-space:nowrap"></span>
+                  </div>
+                  <div data-slot="memoList" style="margin-top:4px"></div>
+                  <div data-slot="memoMore" hidden style="margin-top:8px">
+                    <button onclick="pUdMemoToggle()" style="background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit;text-decoration:underline"><span data-slot="memoMoreLabel">すべて表示</span></button>
+                    <span data-slot="memoCount" style="margin-left:8px;font-size:11.5px;color:var(--a-fg-faint)"></span>
+                  </div>
+                  <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--a-border-soft)">
+                    <div style="display:flex;gap:8px;align-items:flex-start">
+                      <label style="flex:none"><span style="display:block;font-size:11px;font-weight:700;color:var(--a-fg-muted)">対応日</span><input data-slot="memoDate" type="date" aria-label="対応日" value="2026-07-31" style="margin-top:4px;border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 9px;font-size:12.5px;font-family:inherit;color:var(--a-fg-strong)"></label>
+                      <label style="flex:1;min-width:0"><span style="display:block;font-size:11px;font-weight:700;color:var(--a-fg-muted)">内容</span><textarea data-slot="memoNew" aria-label="対応内容" rows="2" placeholder="例) 請求書の宛名変更の依頼で電話。次回発行分から反映すると回答" style="margin-top:4px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:12.5px;font-family:inherit;line-height:1.7;color:var(--a-fg-strong);background:var(--a-surface);resize:vertical"></textarea></label>
+                    </div>
+                    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                      <span style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">記録は追記のみで、担当者と記録日が残ります。</span>
+                      <button onclick="pUdMemoAppend()" style="flex:none;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">記録を追加</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -412,14 +442,19 @@
     }
 
     // ---- 未保存で離れるときの確認(§4.2 / 01_admin_common_ui.md §8) ----
+    // 未保存は「アカウント情報・契約」と「対応履歴」で別に持つ。保存の単位が違うため、
+    // 片方を保存したときにもう片方の未保存を消してしまわないようにする
+    var acctDirty = false;
+    var memoDirty = false;
     var dirty = false;
+    function syncDirty() { dirty = acctDirty || memoDirty; }
     var leaveTo = '';
     var initialPremium = null;
     document.addEventListener('DOMContentLoaded', function () {
         // 入力欄は2ブロック(アカウント情報と契約)ある。どちらの変更も未保存として扱う
         document.querySelectorAll('[data-slot="acctFields"]').forEach(function (box) {
-            box.addEventListener('input', function () { dirty = true; });
-            box.addEventListener('change', function () { dirty = true; });
+            box.addEventListener('input', function () { acctDirty = true; syncDirty(); });
+            box.addEventListener('change', function () { acctDirty = true; syncDirty(); });
         });
         paintSurveys();
         paintBills();
@@ -434,7 +469,97 @@
         window.pClose('mLeaveUser');
         location.href = leaveTo;
     };
-    window.pUdClean = function () { dirty = false; };
+    window.pUdClean = function () { acctDirty = false; syncDirty(); };
+
+    // ---- 対応履歴 ----
+    // 顧客のデータを書き換える代行変更ではなく運営自身の記録なので、変更理由までは求めない。
+    // 1件ごとに対応日と担当を残す。担当が替わっても経緯を辿れるようにするため
+    var MEMOS = {
+        'U-1052': [
+            { date: '2026/07/28', by: '佐藤 由紀', text: '請求書の宛名を「経理部御中」へ変更してほしいと電話。次回発行分から反映すると回答。' },
+            { date: '2026/07/20', by: '山本 彩', text: '日中は電話がつながりにくいため、連絡はメールを希望との申し出。以後メールで対応。' },
+            { date: '2026/07/12', by: '佐藤 由紀', text: '名刺データ化の納期について問い合わせ。超特急は会期終了日の翌営業日から1営業日と案内。' },
+            { date: '2026/06/30', by: '佐藤 由紀', text: 'プレミアム契約の更新について確認の連絡。継続の意向あり。' }
+        ],
+        'U-1038': [
+            { date: '2026/07/02', by: '山本 彩', text: 'アカウント停止。会期直前の解約申し出により、契約書§7に沿って当月分は請求する旨を説明し合意。' },
+            { date: '2026/06/28', by: '山本 彩', text: '解約の相談。理由は社内方針の変更とのこと。違約金の有無を確認したいと依頼あり。' }
+        ]
+    };
+    // 既定は直近2件だけ出す。全件を常に開くと、下にある監査ログまで押し下がる
+    var MEMO_SHOW = 2;
+    var memoOpen = false;
+    var memoRows = [];
+    function memoEsc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function renderMemo() {
+        var list = document.querySelector('[data-slot="memoList"]');
+        var more = document.querySelector('[data-slot="memoMore"]');
+        var label = document.querySelector('[data-slot="memoMoreLabel"]');
+        var count = document.querySelector('[data-slot="memoCount"]');
+        var meta = document.querySelector('[data-slot="memoMeta"]');
+        var card = document.querySelector('[data-slot="memoCard"]');
+        var empty = document.querySelector('[data-slot="memoEmpty"]');
+        if (!list || !card || !empty) { return; }
+        if (!memoRows.length) { card.hidden = true; empty.hidden = false; return; }
+        empty.hidden = true;
+        card.hidden = false;
+        if (meta) { meta.textContent = '最終記録 ' + memoRows[0].date + ' ' + memoRows[0].by; }
+        var shown = memoOpen ? memoRows : memoRows.slice(0, MEMO_SHOW);
+        list.innerHTML = shown.map(function (r, i) {
+            return '<div style="padding:10px 0' + (i ? ';border-top:1px solid var(--a-border-soft)' : '') + '">'
+                + '<div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px;color:var(--a-fg-muted2)">'
+                + '<span style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--a-fg-muted)">' + memoEsc(r.date) + '</span>'
+                + '<span>' + memoEsc(r.by) + '</span></div>'
+                + '<div style="margin-top:3px;font-size:13px;line-height:1.8;white-space:pre-wrap">' + memoEsc(r.text) + '</div>'
+                + '</div>';
+        }).join('');
+        var rest = memoRows.length - MEMO_SHOW;
+        if (more) { more.hidden = rest <= 0; }
+        if (label) { label.textContent = memoOpen ? '直近だけ表示' : 'すべて表示'; }
+        if (count) { count.textContent = memoOpen ? '全 ' + memoRows.length + ' 件' : '他 ' + rest + ' 件'; }
+    }
+    window.pUdMemoToggle = function () { memoOpen = !memoOpen; renderMemo(); };
+    function paintMemo(uid) {
+        memoRows = (MEMOS[uid] || []).slice();
+        memoOpen = false;
+        renderMemo();
+    }
+    // 履歴が無い利用者でも、記録を足すときはカードを開く
+    window.pUdMemoAdd = function () {
+        var card = document.querySelector('[data-slot="memoCard"]');
+        var empty = document.querySelector('[data-slot="memoEmpty"]');
+        if (card) { card.hidden = false; }
+        if (empty) { empty.hidden = true; }
+        var box = document.querySelector('[data-slot="memoNew"]');
+        if (box) { box.focus(); }
+    };
+    window.pUdMemoAppend = function () {
+        var box = document.querySelector('[data-slot="memoNew"]');
+        var dateEl = document.querySelector('[data-slot="memoDate"]');
+        if (!box || !box.value.trim()) {
+            window.pToast('対応内容を入力してください', 'error');
+            if (box) { box.focus(); }
+            return;
+        }
+        // モックのため保存はせず、画面の一覧へ足すだけ。担当は表示シナリオの操作者とする
+        memoRows.unshift({
+            date: (dateEl && dateEl.value ? dateEl.value.replace(/-/g, '/') : '2026/07/31'),
+            by: '運営 マスター',
+            text: box.value.trim()
+        });
+        box.value = '';
+        memoDirty = false;
+        syncDirty();
+        renderMemo();
+        window.pToast('対応履歴に記録しました');
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.querySelector('[data-slot="memoNew"]');
+        if (box) { box.addEventListener('input', function () { memoDirty = true; syncDirty(); }); }
+        paintMemo(document.documentElement.getAttribute('data-current-id'));
+    });
 
     // ---- プラン(プレミアム↔通常)変更は書面契約に基づく例外的な代行操作(§7.4) ----
     // 変更したときだけ理由入力を必須にし、保存確認モーダルへ明記する
