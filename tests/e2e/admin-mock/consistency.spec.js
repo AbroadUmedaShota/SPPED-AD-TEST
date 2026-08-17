@@ -403,18 +403,22 @@ test.describe('R-19 〜 R-23 表示の読み取りやすさ', () => {
       document.querySelectorAll('#billingList [data-pg]').forEach((r) => {
         const coupon = (r.getAttribute('data-f-coupon') || '').trim();
         const btn = [...r.querySelectorAll('button')].find((b) => /クーポン/.test(b.textContent));
-        if (btn) { out.push({ coupon, label: btn.textContent.trim() }); }
+        if (btn) { out.push({ coupon, label: btn.textContent.trim(), title: (btn.getAttribute('title') || '').trim() }); }
       });
       return out;
     });
     expect(labels.length).toBeGreaterThan(0);
     for (const x of labels) {
       // 名詞1語（「クーポン」だけ）では何が起きるか分からない。
-      // (例外) は自動化方針(01_admin_common_ui.md §7.4・2026-08-12)による例外操作の明示
-      expect(x.label, 'ボタンが動詞になっていない').toMatch(/を(適用|変更)\(例外\)$/);
+      // 「(例外)」の但し書きは 2026-08-17 にラベルから外した。自動化方針
+      // (01_admin_common_ui.md §7.4)は変わっていないので、例外操作である説明は
+      // 補足表示(title)で残す。ラベルと説明の両方を検査し、説明だけ落ちるのを防ぐ
+      expect(x.label, 'ボタンが動詞になっていない').toMatch(/を(適用|変更)$/);
       const applied = x.coupon && x.coupon !== '—';
       expect(x.label, `クーポン=${x.coupon || 'なし'} の行のラベルが合っていない`)
-        .toBe(applied ? 'クーポンを変更(例外)' : 'クーポンを適用(例外)');
+        .toBe(applied ? 'クーポンを変更' : 'クーポンを適用');
+      expect(x.title, `${x.label} に例外操作である説明がない`).toMatch(/例外的な操作/);
+      expect(x.title, `${x.label} の説明が通常の流れに触れていない`).toMatch(/通常は申込時/);
     }
   });
 
