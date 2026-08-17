@@ -762,6 +762,10 @@ window.calTemplateDl = function () {
     // 帯は週をまたぐため、42マスの平坦なグリッドではなく週ごとのグリッドを積む。
     // 1週 = 背景セル(grid-row 1/-1) + 日番号(row 1) + 帯レーン(row 2〜) + 日計(最終row)
     function collectBands(week) {
+        // 営業日タブは帯を持たないため、レーンの確保もあふれの計上も行わない。
+        // 計上してしまうと、描いていない作業帯のあふれが「他N件」として
+        // 会期の件数の横に並び、その日の会期が増えたように読める
+        if (!isAsg()) { return { bands: [], over: {} }; }
         var first = week[0], last = week[6];
         var list = [];
         Object.keys(CAL.surveys).forEach(function (sid) {
