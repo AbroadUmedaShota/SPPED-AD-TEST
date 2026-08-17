@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="紙で配って持ち帰って入力する今のやり方と、SPEED AD を4つの場面で比べました。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23171a21'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Helvetica,Arial' font-size='44' font-weight='700' fill='%23f0930f'%3ESA%3C/text%3E%3C/svg%3E">
+<meta name="robots" content="noindex, nofollow">
+<title>SPEED AD 現状比較型ランディングページ</title>
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans+JP:wght@400;500;700;900" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+  /* デザイントークンは speed-ad LP（design_handoff_speed_ad_lp）に合わせる */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: #ffffff; font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif; color: #1a1d24; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid #b35c00; outline-offset: 2px; }
+  a:hover { color: #ee8500; }
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .75s cubic-bezier(.22,.61,.36,1), transform .75s cubic-bezier(.22,.61,.36,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+  .topbar { display: flex; align-items: center; padding: 22px 44px; background: #f2efe9; }
+  .topbar .logo { font-size: 27px; font-weight: 900; letter-spacing: 1px; font-family: Helvetica, 'Noto Sans JP', sans-serif; }
+  .topbar nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .topbar .sep { color: #b9b5ac; }
+  .topbar .btn { margin-left: 30px; padding: 11px 30px; background: #171a21; border: 1.5px solid #ee8500; border-radius: 8px; color: #ffffff; font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .topbar .btn:hover { background: #2a2e38; color: #ffffff; }
+
+
+  /* 背景写真は speed-ad / compare LP と同じ見せ方（右配置・左端/下端をマスクでフェード） */
+  .hero { min-height: 520px; display: flex; align-items: center; }
+  .hero .wrap { width: 100%; }
+  /* speed-ad LP と同じく画面右上に幅880pxで置く。左端・下端に加えて上端もフェードさせ、`n     右寄せのナビが写真の暗部に重ならないようにする（speed-ad はナビが中央のため上端フェード無し） */
+  .hero-img { position: absolute; top: 0; right: 0; width: 880px; height: auto; display: block; z-index: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%), linear-gradient(to bottom, transparent 0, #000 13%, #000 70%, transparent 94%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 0, #000 14%), linear-gradient(to bottom, transparent 0, #000 13%, #000 70%, transparent 94%);
+    mask-composite: intersect; }
+  .hero { background: #f2efe9; padding: 46px 0 56px; }
+  .hero h1 { font-size: 40px; font-weight: 700; line-height: 1.62; letter-spacing: 3px; }
+  .hero h1 em { font-style: normal; color: #ee8500; }
+  .hero p { margin-top: 22px; font-size: 15.5px; font-weight: 500; line-height: 2.15; letter-spacing: 1px; color: #3d4048; max-width: 760px; }
+  .hero .now { margin-top: 28px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero .now div { display: flex; align-items: center; gap: 12px; padding: 13px 20px; background: #faf9f5; border: 1px solid #e6e3dc; border-radius: 8px; font-size: 13.5px; font-weight: 700; letter-spacing: .5px; color: #4a4d55; }
+  .hero .now .ar { color: #c9c5bc; font-weight: 900; }
+
+
+  /* ヘッダー・ヒーロー・認証バッジ列は同じ面。space-between で空く余白が
+     白く抜けないよう、包む側にも背景を持たせる。 */
+  .hero-block { position: relative; overflow: hidden; background: #f2efe9; }
+  .hero-block > .topbar, .hero-block > .hero, .hero-block > .trust-band { position: relative; z-index: 1; background: transparent; }
+
+  /* 認証バッジ列（speed-ad LP と同じ構成） */
+  .trust-band { background: #f2efe9; }
+  .trust-band .wrap { display: flex; align-items: center; gap: 34px; padding-top: 28px; padding-bottom: 32px; border-top: 1px solid #ddd8cf; }
+  .t-item { display: flex; align-items: center; gap: 16px; font-size: 13px; font-weight: 700; line-height: 1.85; letter-spacing: .5px; color: #4a4d55; }
+  .t-item img { width: 46px; height: 46px; display: block; flex: none; }
+  .t-item svg { display: block; flex: none; }
+  .t-sep { width: 1px; height: 44px; background: #c9c5bc; flex: none; }
+
+  h2 { font-size: 27px; font-weight: 700; letter-spacing: 4px; text-align: center; }
+  .lead { margin-top: 12px; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-align: center; color: #3d4048; }
+
+  /* 比較表 */
+  .cmp-sec { padding: 66px 0 62px; }
+  .cmp { margin-top: 32px; border: 1px solid #ebe8e1; border-radius: 8px; overflow: hidden; }
+  .chead { display: grid; grid-template-columns: 210px minmax(0,1fr) minmax(0,1fr); }
+  .chead > div { padding: 15px 24px; font-size: 14.5px; font-weight: 700; letter-spacing: 1px; }
+  .chead .k { background: #f0ede5; font-size: 13px; color: #6f6b64; }
+  .chead .a { background: #efece5; color: #6f6b64; }
+  .chead .b { background: #171a21; color: #ffffff; }
+  .crow { display: grid; grid-template-columns: 210px minmax(0,1fr) minmax(0,1fr); border-top: 1px solid #eceae4; }
+  .crow > div { padding: 22px 24px; font-size: 13.5px; font-weight: 500; line-height: 2; letter-spacing: .5px; }
+  .crow .k { background: #faf9f5; font-size: 14px; font-weight: 700; line-height: 1.7; }
+  .crow .a { background: #fcfbf8; color: #6f6b64; }
+  .crow .b { color: #3d4048; }
+  .crow .b b { font-weight: 700; color: #1a1d24; }
+  .crow .tag { display: inline-block; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .crow .a .tag { background: #eceae4; color: #6f6b64; }
+  .crow .b .tag { background: #f7f0e2; color: #b06d00; }
+
+  /* 費用の乗り方 */
+  .where { background: #fcfbf8; padding: 64px 0 62px; }
+  .wrow { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  .wcard { border-radius: 8px; padding: 28px 32px 30px; }
+  .wcard.a { background: #ffffff; border: 1px solid #e6e3dc; }
+  .wcard.b { background: #171a21; color: #ffffff; }
+  .wcard .k { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #6f6b64; }
+  .wcard.b .k { color: #f0930f; }
+  .wcard h3 { margin-top: 10px; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+  .wcard p { margin-top: 14px; font-size: 13.5px; font-weight: 500; line-height: 2.05; letter-spacing: .5px; color: #4a4d55; }
+  .wcard.b p { color: #d9d7d2; }
+  .wcard ul { margin-top: 16px; list-style: none; }
+  .wcard li { padding: 9px 0; border-top: 1px solid #eceae4; font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+  .wcard.b li { border-top-color: #2b2f38; }
+  .wcard li span { color: #ee8500; margin-right: 8px; }
+
+  .speed { padding: 54px 0 50px; }
+  .stable { margin-top: 30px; border: 1px solid #ebe8e1; border-radius: 8px; overflow: hidden; }
+  .strow { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; }
+  .strow > div { padding: 13px 20px; font-size: 14px; font-weight: 700; letter-spacing: .5px; }
+  .sthead > div { background: #f0ede5; font-size: 13px; color: #6f6b64; }
+  .strow + .strow > div { border-top: 1px solid #eceae4; }
+  .strow.hl > div { background: #f7f0e2; }
+  .pill { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: #171a21; color: #f0930f; font-size: 10.5px; font-weight: 700; vertical-align: middle; }
+  .snote { margin-top: 16px; font-size: 13.5px; font-weight: 700; line-height: 2; letter-spacing: .5px; color: #4a4d55; }
+
+
+  /* 導入の流れ */
+  .stp-sec { background: #ffffff; padding: 62px 0 58px; }
+  .stp-row { margin-top: 32px; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 22px; }
+  .stp { background: #ffffff; border: 1px solid #ebe8e1; border-top: 3px solid #f0930f; border-radius: 8px; padding: 22px 22px 24px; box-shadow: 0 1px 3px rgba(30,30,30,.05); }
+  .stp .n { font-size: 11.5px; font-weight: 900; letter-spacing: 2px; color: #f0930f; }
+  .stp h3 { margin-top: 10px; font-size: 16.5px; font-weight: 700; letter-spacing: 1px; line-height: 1.6; }
+  .stp p { margin-top: 10px; font-size: 12.5px; font-weight: 500; line-height: 2; letter-spacing: .5px; color: #4a4d55; }
+  .cta-sec { background: #fcfbf8; padding: 58px 0 66px; }
+  .cta-row { margin-top: 28px; display: flex; justify-content: center; gap: 36px; }
+  .cta-card { width: 520px; border-radius: 8px; padding: 26px 32px 28px; text-align: center; }
+  .cta-card.dark { background: #171a21; color: #ffffff; }
+  .cta-card.light { background: #ffffff; border: 1.5px solid #f0930f; }
+  .cta-card .k { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #6f6b64; }
+  .cta-card.dark .k { color: #a9adb5; }
+  .cta-card h3 { margin-top: 6px; font-size: 25px; font-weight: 900; letter-spacing: 2px; }
+  .cta-card p { margin-top: 12px; font-size: 13px; font-weight: 500; line-height: 1.95; }
+  .cta-card.dark p { color: #d9d7d2; }
+  .cta-card .b { display: flex; align-items: center; justify-content: center; gap: 14px; height: 52px; margin-top: 18px; border-radius: 6px; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .cta-card.dark .b { border: 1.5px solid #ee8500; }
+  .cta-card.dark .b:hover { background: #2a2e38; color: #ffffff; }
+  .cta-card.light .b { background: #171a21; color: #ffffff; }
+  .cta-card.light .b:hover { background: #2a2e38; color: #ffffff; }
+
+  .footer { background: #15181f; display: flex; align-items: center; justify-content: space-between; padding: 28px 60px; }
+  .footer-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 500; color: #c9c7c2; }
+  .footer-links span { color: #5a5e66; }
+  .footer-links a:hover { color: #f0930f; }
+  .footer .copy { font-size: 12.5px; color: #c9c7c2; }
+
+  /* 1画面1セクション（speed-ad LP の Responsive behavior に合わせる）
+     セレクタはIDで指定する。クラス名はLP間で衝突するため使わない。 */
+  @media (min-width: 1440px) and (min-height: 760px) {
+    .hero-block { min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    #hikaku, #where, #speed, #cospa, #steps, #contact {
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero-block">
+  <img class="hero-img" src="../assets/hero-photo-v2.png" alt="アンケート用紙とQRコード、スマホの回答画面">
+<div class="topbar">
+  <div class="logo">SPEED AD</div>
+  <nav>
+    <a href="#hikaku">4場面の比較</a><span class="sep">|</span>
+    <a href="#where">費用の乗り方</a><span class="sep">|</span>
+    <a href="#speed">速度プラン</a>
+  </nav>
+  <a href="#contact" class="btn">お見積り・お問い合わせ</a>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>紙で配って、持ち帰って入力して、<br>個別にメール。<em>今のまま</em>ですか。</h1>
+      <p>SPEED AD は、展示会で回収するアンケートの回答と名刺のデータ化を、Web上のひとつの流れにまとめるサービスです。展示会の後にやっている作業を置き換えると何がどう変わるのかを、4つの場面で並べました。費用の話も、金額の大小ではなく「どこに乗るのか」で比べています。</p>
+      <div class="now">
+        <div>紙で配って回収</div>
+        <div class="ar">→</div>
+        <div>名刺を持ち帰って入力</div>
+        <div class="ar">→</div>
+        <div>集計・メールを個別作業</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 認証バッジ列 -->
+<div class="trust-band">
+  <div class="wrap">
+    <div class="t-item">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 4 L34 9 V21 c0 9-6.5 13-14 15.5 -7.5-2.5-14-6.5-14-15.5 V9 Z" stroke="#171a21" stroke-width="1.5" stroke-linejoin="round"></path>
+        <path d="M24 15.5 a5 5 0 1 0 0 9" stroke="#171a21" stroke-width="1.6" stroke-linecap="round"></path>
+      </svg>
+      <div>SPEED ADは、株式会社アブロードアウトソーシング<br>（東京都千代田区）が提供しています。</div>
+    </div>
+    <div class="t-sep"></div>
+    <div class="t-item">
+      <img src="../assets/pmark.png" alt="プライバシーマーク">
+      <div>プライバシーマーク<br>認定事業者</div>
+    </div>
+    <div class="t-sep"></div>
+    <div class="t-item">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="15" stroke="#171a21" stroke-width="1.4"></circle>
+        <ellipse cx="20" cy="20" rx="6.5" ry="15" stroke="#171a21" stroke-width="1.4"></ellipse>
+        <path d="M5 20 H35 M7.5 12.5 H32.5 M7.5 27.5 H32.5" stroke="#171a21" stroke-width="1.4"></path>
+      </svg>
+      <div>ISO/IEC 27001:2013<br>ISO 9001:2015</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="cmp-sec" id="hikaku">
+  <div class="wrap">
+    <h2>4つの場面で並べる</h2>
+    <div class="lead">会期当日から、追客を始めるまでの流れです。</div>
+
+    <div class="cmp">
+      <div class="chead">
+        <div class="k">場面</div>
+        <div class="a">今のやり方</div>
+        <div class="b">SPEED AD</div>
+      </div>
+
+      <div class="crow">
+        <div class="k">会期当日<br>回収する</div>
+        <div class="a"><span class="tag">作業</span>アンケート用紙を印刷して配り、書いてもらって回収する。名刺は別に受け取って束にしておく。</div>
+        <div class="b"><span class="tag">作業</span>QRコードを読んでもらい、<b>来場者のスマホで回答</b>してもらう。名刺も<b>来場者が同じ画面から撮影して送信</b>する。</div>
+      </div>
+
+      <div class="crow">
+        <div class="k">会期後<br>データにする</div>
+        <div class="a"><span class="tag">作業</span>持ち帰った名刺を、社内の誰かが1枚ずつ入力する。手が空いた人からになるので、着手の時期が読みにくい。</div>
+        <div class="b"><span class="tag">作業</span>送信された名刺が<b>OCR＋人力の二重チェック</b>でデータになる。納期は速度プランで選べる。</div>
+      </div>
+
+      <div class="crow">
+        <div class="k">会期後<br>突き合わせる</div>
+        <div class="a"><span class="tag">作業</span>アンケート用紙の束と名刺の束を、記憶と付箋を頼りに1件ずつ照合する。</div>
+        <div class="b"><span class="tag">作業</span><b>回答と名刺が1件のリードとして紐付いた状態</b>で管理画面に並ぶ。突き合わせる工程がない。</div>
+      </div>
+
+      <div class="crow">
+        <div class="k">会期後<br>追客する</div>
+        <div class="a"><span class="tag">作業</span>入力と照合が終わってから、宛名を差し替えながら個別にメールを送る。</div>
+        <div class="b"><span class="tag">作業</span>そのままお礼メールを送る。<b>100通まで0円、101通目以降は1通1円（税別）</b>。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="where" id="where">
+  <div class="wrap">
+    <h2>費用が、どこに乗るか</h2>
+    <div class="lead">金額の大小ではなく、何に対して払っているかが変わります。</div>
+    <div class="wrow">
+      <div class="wcard a">
+        <div class="k">今のやり方</div>
+        <h3>社内の時間に乗る</h3>
+        <p>印刷代のような直接の出費は小さくても、入力と照合にかかった時間は社内の人件費として消えます。枚数が増えるほど時間が伸び、その分だけ追客の着手が遅れます。</p>
+        <ul>
+          <li><span>—</span>かかった時間は請求書に出てこない</li>
+          <li><span>—</span>繁忙期は着手が後ろ倒しになる</li>
+          <li><span>—</span>入力の品質は担当者によって変わる</li>
+        </ul>
+      </div>
+      <div class="wcard b">
+        <div class="k">SPEED AD</div>
+        <h3>データ化した枚数に乗る</h3>
+        <p>名刺データ化の料金は、速度プランの単価 × 実際の枚数の実費精算です。データ化の依頼をしない月は発生しません。急ぐ会期だけ単価の高い速度プランを選ぶ、という調整ができます。</p>
+        <ul>
+          <li><span>✓</span>月額基本料金はスタンダードなら0円</li>
+          <li><span>✓</span>初期費用・システム導入費用は0円</li>
+          <li><span>✓</span>プランと見込み枚数から、事前に見積もれる</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="speed" id="speed">
+  <div class="wrap">
+    <h2>速度プラン（名刺データ化）</h2>
+    <div class="lead">アンケートごとに、名刺データ化の設定画面で選びます。</div>
+    <div class="stable">
+      <div class="strow sthead"><div>プラン</div><div>単価（税別）</div><div>項目数</div><div>納期</div></div>
+      <div class="strow"><div>お試し</div><div>0円／枚</div><div>2項目</div><div>6営業日</div></div>
+      <div class="strow hl"><div>通常</div><div>50円／枚</div><div>10項目</div><div>6営業日</div></div>
+      <div class="strow"><div>特急</div><div>100円／枚</div><div>10項目</div><div>3営業日</div></div>
+      <div class="strow"><div>超特急</div><div>150円／枚</div><div>10項目</div><div>1営業日</div></div>
+      <div class="strow"><div>オンデマンド<span class="pill">プレミアム限定</span></div><div>200円／枚</div><div>10項目</div><div>当日</div></div>
+    </div>
+    <div class="snote">
+      名刺データ化の料金は、速度プランの単価 × 実際の枚数の実費精算です。<br>
+      実際の枚数が見込み枚数を下回った場合も、見込み枚数の半数分は請求対象になります。<br>
+      お礼メール送信は100通まで無料、101通目以降は1通1円（税別）です。<br>
+      左の「今のやり方」は、多くの展示会運用で見られる進め方を並べたもので、特定の会社の運用を指すものではありません。
+    </div>
+  </div>
+</div>
+
+<!-- コスパ -->
+<div class="cospa" id="cospa" style="background:#171a21; color:#ffffff; padding:64px 0 66px">
+  <div class="wrap">
+    <div style="text-align:center; font-size:12px; font-weight:700; letter-spacing:2px; color:#f0930f">COST PER LEAD</div>
+    <h2 style="margin-top:12px; color:#ffffff">リード1件、50円台。</h2>
+    <div class="lead" style="color:#d9d7d2">月額基本料金0円のスタンダードプランで、通常プラン・300枚・お礼メール300通の場合の概算です。</div>
+
+    <div class="cospa-calc" style="margin-top:34px; display:flex; align-items:stretch; justify-content:center; gap:18px; flex-wrap:wrap">
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">月額基本料金</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">0</span><span style="font-size:15px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">スタンダードプラン（税別）</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＋</div>
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">名刺データ化</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">50</span><span style="font-size:15px; font-weight:900; color:#ee8500">円／枚</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">通常プラン・10項目（税別）</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＋</div>
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">お礼メール</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">0</span><span style="font-size:15px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">100通まで無料の範囲内</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＝</div>
+      <div style="flex:1 1 230px; max-width:280px; background:#ffffff; color:#1a1d24; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#6f6b64">リード1件あたり</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:40px; font-weight:900">50.7</span><span style="font-size:16px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#6f6b64">枚数が増えるほど50円に近づきます</div>
+      </div>
+    </div>
+
+    <div style="margin-top:44px; text-align:center; font-size:17px; font-weight:700; letter-spacing:2px">その50円台で、手元に残るもの</div>
+    <div class="cospa-get" style="margin-top:22px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:18px">
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">10項目の名刺データ</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">OCR＋人力の二重チェックで確定</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">アンケートの回答</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">来場者が自分のスマホで回答した内容</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">紐付いた1件のリード</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">回答と名刺が同じ管理画面に並ぶ</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">集計とCSV出力</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">そのまま社内の仕組みへ渡せる</div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px; text-align:center; font-size:12px; font-weight:500; line-height:1.95; color:#8e9299">
+      名刺データ化の料金は、速度プランの単価 × 実際の枚数の実費精算です。上の金額は条件を置いた概算で、正式な金額はお見積りでご案内します。
+    </div>
+  </div>
+</div>
+
+<!-- 導入の流れ -->
+<div class="stp-sec" id="steps">
+  <div class="wrap">
+    <h2>導入の流れ</h2>
+    <div class="lead">アカウントをつくってから、会期後の追客までの4段です。</div>
+    <div class="stp-row">
+      <div class="stp">
+        <div class="n">STEP 1</div>
+        <h3>アカウントを登録する</h3>
+        <p>月額基本料金0円のスタンダードプランから始められます。初期費用・システム導入費用はかかりません。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 2</div>
+        <h3>アンケートを作り、QRを発行する</h3>
+        <p>専門知識は要りません。運用担当者が画面上で作成・編集でき、保存するとQRコードを発行できます。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 3</div>
+        <h3>名刺データ化を申し込む</h3>
+        <p>名刺のデータ化を使う場合は、アンケートごとに速度プランと見込み枚数を設定して依頼を確定します。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 4</div>
+        <h3>会期中から、会期後の追客へ</h3>
+        <p>来場者がQRを読んで回答し、同じ画面から名刺を撮影して送信。データ化された名刺は回答と紐付き、お礼メール・集計・CSV出力へ進みます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-sec" id="contact">
+  <div class="wrap">
+    <h2>まずは無料で。　次の出展から置き換えられます。</h2>
+    <div class="cta-row">
+      <div class="cta-card dark">
+        <div class="k">すぐにはじめる</div>
+        <h3>無料ではじめる</h3>
+        <p>月額基本料金0円のスタンダードプランで、次の出展からそのまま試せます。名刺データ化のお試しは2項目まで0円です。</p>
+        <a href="#contact" class="b">無料ではじめる<span>›</span></a>
+      </div>
+      <div class="cta-card light">
+        <div class="k">金額を確定させたい</div>
+        <h3>お見積り・お問い合わせ</h3>
+        <p>想定枚数と納期をお知らせいただければ、正式なお見積りをご案内します。今の運用のどこを置き換えるかからご相談ください。</p>
+        <a href="#contact" class="b">お見積り・お問い合わせ<span>›</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-links">
+    <a href="#">利用規約</a><span>|</span>
+    <a href="#">特定商取引法に基づく表記</a><span>|</span>
+    <a href="#">プライバシーポリシー</a><span>|</span>
+    <a href="#contact">お見積り・お問い合わせ</a>
+  </div>
+  <div class="copy">&copy; Abroad Outsourcing Co., Ltd.</div>
+</div>
+
+<script>
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var targets = document.querySelectorAll('.hero-copy > *, .stp, .stp, .cmp-sec h2, .cmp-sec .lead, .cmp > div, .where h2, .where .lead, .wcard, .speed h2, .speed .lead, .stable, .snote, .cospa h2, .cospa .lead, .cospa-calc, .cospa-get > div, .cta-sec h2, .cta-row > div');
+    targets.forEach(function (el) { el.classList.add('reveal'); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var siblings = Array.prototype.filter.call(el.parentNode.children, function (c) {
+          return c.classList.contains('reveal');
+        });
+        var idx = Math.min(siblings.indexOf(el), 6);
+        el.style.transitionDelay = (idx > 0 ? idx * 90 : 0) + 'ms';
+        el.classList.add('in');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -10% 0px' });
+    targets.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+<script src="../switcher.js"></script>
+<script>if (window.__lpSwitcher) window.__lpSwitcher('cost-vs-now');</script>
+</body>
+</html>

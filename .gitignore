@@ -71,3 +71,7 @@ tmp-*.png
 /テスト成果物_名刺フロー/report/
 /テスト成果物_全画面/report/
 /worklog/
+
+# LP のスタンドアロン版は lp/build-standalone.mjs が生成する出力。
+# 画像を base64 で埋め込むため 26MB 超になる。ソースから再生成できるので追跡しない
+/lp/standalone/

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="出展の規模を入れると、SPEED AD の概算費用とリード1件あたりの単価が出ます。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23171a21'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Helvetica,Arial' font-size='44' font-weight='700' fill='%23f0930f'%3ESA%3C/text%3E%3C/svg%3E">
+<meta name="robots" content="noindex, nofollow">
+<title>SPEED AD 料金シミュレーション型ランディングページ</title>
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans+JP:wght@400;500;700;900" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+  /* デザイントークンは speed-ad LP（design_handoff_speed_ad_lp）に合わせる */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: #ffffff; font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif; color: #1a1d24; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid #b35c00; outline-offset: 2px; }
+  a:hover { color: #ee8500; }
+
+  /* リビール（JSで .reveal を付与→ .in で表示。JS失敗時は常時表示） */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .75s cubic-bezier(.22,.61,.36,1), transform .75s cubic-bezier(.22,.61,.36,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+  /* ヘッダー */
+  .topbar { display: flex; align-items: center; padding: 22px 44px; background: #f2efe9; }
+  .topbar .logo { font-size: 27px; font-weight: 900; letter-spacing: 1px; font-family: Helvetica, 'Noto Sans JP', sans-serif; }
+  .topbar nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .topbar .sep { color: #b9b5ac; }
+  .topbar .btn { margin-left: 30px; padding: 11px 30px; background: #171a21; border: 1.5px solid #ee8500; border-radius: 8px; color: #ffffff; font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .topbar .btn:hover { background: #2a2e38; color: #ffffff; }
+
+  /* ヒーロー
+     シミュレーターを別セクションへ出したので、他の料金LPと同じく
+     写真を背景に敷ける（右配置・左端/下端をマスクでフェード）。 */
+  .hero { min-height: 520px; display: flex; align-items: center; }
+  .hero .wrap { width: 100%; }
+  .hero-img { position: absolute; top: 0; right: 0; width: 880px; height: auto; display: block; z-index: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%), linear-gradient(to bottom, transparent 0, #000 13%, #000 70%, transparent 94%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 0, #000 14%), linear-gradient(to bottom, transparent 0, #000 13%, #000 70%, transparent 94%);
+    mask-composite: intersect; }
+  .hero { background: #f2efe9; padding: 46px 0 56px; }
+  .hero h1 { font-size: 38px; font-weight: 700; line-height: 1.55; letter-spacing: 3px; }
+  .hero h1 em { font-style: normal; font-size: 46px; font-weight: 900; color: #ee8500; }
+  .hero p { margin-top: 16px; font-size: 15.5px; font-weight: 500; line-height: 2.15; letter-spacing: 1px; color: #3d4048; max-width: 620px; }
+
+  /* シミュレーター */
+  /* 左の入力カードと右の概算カードは高さを揃える（stretch）。
+     概算側は縦フレックスにして、注記とCTAを下端へ寄せる。 */
+  .sim { margin-top: 24px; display: grid; grid-template-columns: minmax(0,1fr) 420px; gap: 32px; align-items: stretch; }
+  .sim-in { background: #ffffff; border: 1px solid #ebe8e1; border-radius: 10px; padding: 22px 28px 22px; box-shadow: 0 1px 5px rgba(30,30,30,.07); }
+  .fld { padding: 11px 0; border-bottom: 1px solid #eceae4; }
+  .fld:first-child { padding-top: 0; }
+  .fld:last-child { border-bottom: 0; padding-bottom: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .fld > label, .fld > .fldlabel { display: block; font-size: 13.5px; font-weight: 700; letter-spacing: 1px; margin-bottom: 9px; }
+  .fld .hint { font-size: 12px; font-weight: 500; color: #6f6b64; letter-spacing: .5px; margin-top: 6px; line-height: 1.75; }
+  .seg { display: flex; gap: 10px; }
+  .seg button { flex: 1; padding: 11px 8px; border: 1.5px solid #e6e3dc; border-radius: 6px; background: #ffffff; font-family: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: .5px; color: #6f6b64; cursor: pointer; }
+  .seg button[aria-pressed="true"] { border-color: #ee8500; background: #fdf6ec; color: #1a1d24; }
+  .num { display: flex; align-items: center; gap: 12px; }
+  .num input { width: 130px; padding: 10px 12px; border: 1.5px solid #e6e3dc; border-radius: 6px; font-family: inherit; font-size: 17px; font-weight: 700; text-align: right; color: #1a1d24; }
+  .num input:focus-visible { outline: 2px solid #b35c00; outline-offset: 2px; border-color: #b35c00; }
+  .num .unit { font-size: 13.5px; font-weight: 700; color: #6f6b64; }
+  .spd { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+  .spd button { padding: 10px 4px; border: 1.5px solid #e6e3dc; border-radius: 6px; background: #ffffff; font-family: inherit; font-size: 12.5px; font-weight: 700; color: #6f6b64; cursor: pointer; line-height: 1.5; }
+  .spd button span { display: block; font-size: 10.5px; font-weight: 500; color: #6f6b64; margin-top: 3px; }
+  .spd button[aria-pressed="true"] { border-color: #ee8500; background: #fdf6ec; color: #1a1d24; }
+  .spd button[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+
+  /* 結果 */
+  .sim-out { background: #171a21; border-radius: 10px; padding: 22px 28px 22px; color: #ffffff; display: flex; flex-direction: column; }
+  .sim-out .cap { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #f0930f; }
+  .sim-out .rows { margin-top: 18px; }
+  .sim-out .r { display: flex; align-items: baseline; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #2b2f38; font-size: 13.5px; font-weight: 500; color: #d9d7d2; letter-spacing: .5px; }
+  .sim-out .r b { font-size: 16px; font-weight: 700; color: #ffffff; }
+  .sim-out .r .sub { display: block; font-size: 11.5px; font-weight: 500; color: #8e9299; margin-top: 3px; }
+  .sim-out .total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 18px; }
+  .sim-out .total span { font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .sim-out .total .v { font-size: 40px; font-weight: 900; color: #ee8500; letter-spacing: 0; }
+  .sim-out .total .v i { font-style: normal; font-size: 18px; font-weight: 900; margin-left: 3px; }
+  .sim-out .per { display: flex; align-items: baseline; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid #2b2f38; }
+  .sim-out .per span { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #d9d7d2; }
+  .sim-out .per .pv { font-size: 26px; font-weight: 900; color: #ffffff; letter-spacing: 0; }
+  .sim-out .per .pv i { font-style: normal; font-size: 14px; font-weight: 900; margin-left: 3px; }
+  .sim-out .note { margin-top: auto; padding-top: 18px; font-size: 11.5px; font-weight: 500; line-height: 1.95; color: #8e9299; }
+  .sim-out .cta { display: flex; align-items: center; justify-content: center; gap: 14px; height: 50px; margin-top: 18px; border: 1.5px solid #ee8500; border-radius: 6px; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .sim-out .cta:hover { background: #2a2e38; color: #ffffff; }
+
+
+  /* ヘッダー・ヒーロー・認証バッジ列は同じ面。space-between で空く余白が
+     白く抜けないよう、包む側にも背景を持たせる。 */
+  .hero-block { position: relative; overflow: hidden; background: #f2efe9; }
+  .hero-block > .topbar, .hero-block > .hero, .hero-block > .trust-band { position: relative; z-index: 1; background: transparent; }
+
+  /* 認証バッジ列（speed-ad LP と同じ構成） */
+  .trust-band { background: #f2efe9; }
+  .trust-band .wrap { display: flex; align-items: center; gap: 34px; padding-top: 28px; padding-bottom: 32px; border-top: 1px solid #ddd8cf; }
+  .t-item { display: flex; align-items: center; gap: 16px; font-size: 13px; font-weight: 700; line-height: 1.85; letter-spacing: .5px; color: #4a4d55; }
+  .t-item img { width: 46px; height: 46px; display: block; flex: none; }
+  .t-item svg { display: block; flex: none; }
+  .t-sep { width: 1px; height: 44px; background: #c9c5bc; flex: none; }
+
+  .sim-sec { padding: 56px 0 52px; }
+
+  /* 内訳の説明 */
+  .mech { background: #fcfbf8; padding: 68px 0 62px; }
+  h2 { font-size: 27px; font-weight: 700; letter-spacing: 4px; text-align: center; }
+  .lead { margin-top: 12px; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-align: center; color: #3d4048; }
+  .formula { margin-top: 30px; background: #f6f2ea; border-radius: 6px; padding: 18px 24px; display: flex; align-items: center; justify-content: center; gap: 40px; font-size: 16px; font-weight: 700; letter-spacing: 1px; flex-wrap: wrap; }
+  .formula i { font-style: normal; color: #ee8500; font-size: 22px; }
+  .layers { margin-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 22px; }
+  .layer { background: #ffffff; border: 1px solid #ebe8e1; border-radius: 8px; padding: 24px 26px 26px; box-shadow: 0 1px 3px rgba(30,30,30,.05); }
+  .layer .n { font-size: 12px; font-weight: 900; letter-spacing: 2px; color: #f0930f; }
+  .layer h3 { margin-top: 10px; font-size: 17px; font-weight: 700; letter-spacing: 1px; }
+  .layer p { margin-top: 10px; font-size: 13px; font-weight: 500; line-height: 2; letter-spacing: .5px; color: #4a4d55; }
+
+  /* 速度プラン表 */
+  .speed { padding: 68px 0 62px; }
+  .stable { margin-top: 30px; border: 1px solid #ebe8e1; border-radius: 8px; overflow: hidden; }
+  .strow { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; }
+  .strow > div { padding: 13px 20px; font-size: 14px; font-weight: 700; letter-spacing: .5px; }
+  .sthead > div { background: #f0ede5; font-size: 13px; color: #6f6b64; }
+  .strow + .strow > div { border-top: 1px solid #eceae4; }
+  .pill { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: #171a21; color: #f0930f; font-size: 10.5px; font-weight: 700; vertical-align: middle; }
+  .snote { margin-top: 16px; font-size: 13.5px; font-weight: 700; line-height: 2; letter-spacing: .5px; color: #4a4d55; }
+
+  /* CTA */
+
+  /* 導入の流れ */
+  .stp-sec { background: #ffffff; padding: 62px 0 58px; }
+  .stp-row { margin-top: 32px; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 22px; }
+  .stp { background: #ffffff; border: 1px solid #ebe8e1; border-top: 3px solid #f0930f; border-radius: 8px; padding: 22px 22px 24px; box-shadow: 0 1px 3px rgba(30,30,30,.05); }
+  .stp .n { font-size: 11.5px; font-weight: 900; letter-spacing: 2px; color: #f0930f; }
+  .stp h3 { margin-top: 10px; font-size: 16.5px; font-weight: 700; letter-spacing: 1px; line-height: 1.6; }
+  .stp p { margin-top: 10px; font-size: 12.5px; font-weight: 500; line-height: 2; letter-spacing: .5px; color: #4a4d55; }
+  .cta-sec { background: #fcfbf8; padding: 60px 0 68px; }
+  .cta-row { margin-top: 28px; display: flex; justify-content: center; gap: 36px; }
+  .cta-card { width: 520px; border-radius: 8px; padding: 26px 32px 28px; text-align: center; }
+  .cta-card.dark { background: #171a21; color: #ffffff; }
+  .cta-card.light { background: #ffffff; border: 1.5px solid #f0930f; }
+  .cta-card .k { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #6f6b64; }
+  .cta-card.dark .k { color: #a9adb5; }
+  .cta-card h3 { margin-top: 6px; font-size: 25px; font-weight: 900; letter-spacing: 2px; }
+  .cta-card p { margin-top: 12px; font-size: 13px; font-weight: 500; line-height: 1.95; }
+  .cta-card.dark p { color: #d9d7d2; }
+  .cta-card .b { display: flex; align-items: center; justify-content: center; gap: 14px; height: 52px; margin-top: 18px; border-radius: 6px; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .cta-card.dark .b { border: 1.5px solid #ee8500; }
+  .cta-card.dark .b:hover { background: #2a2e38; color: #ffffff; }
+  .cta-card.light .b { background: #171a21; color: #ffffff; }
+  .cta-card.light .b:hover { background: #2a2e38; color: #ffffff; }
+
+  /* フッター */
+  .footer { background: #15181f; display: flex; align-items: center; justify-content: space-between; padding: 28px 60px; }
+  .footer-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 500; color: #c9c7c2; }
+  .footer-links span { color: #5a5e66; }
+  .footer-links a:hover { color: #f0930f; }
+  .footer .copy { font-size: 12.5px; color: #c9c7c2; }
+
+  /* 1画面1セクション（speed-ad LP の Responsive behavior に合わせる）
+     セレクタはIDで指定する。クラス名はLP間で衝突するため使わない。 */
+  @media (min-width: 1440px) and (min-height: 760px) {
+    .hero-block { min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    #mech, #speed, #cospa, #sim, #steps, #contact {
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero-block">
+  <img class="hero-img" src="../assets/hero-photo-v2.png" alt="アンケート用紙とQRコード、スマホの回答画面">
+<div class="topbar">
+  <div class="logo">SPEED AD</div>
+  <nav>
+    <a href="#mech">料金の柱</a><span class="sep">|</span>
+    <a href="#speed">速度プラン（データ化）</a><span class="sep">|</span>
+    <a href="#sim">試算</a>
+  </nav>
+  <a href="#contact" class="btn">お見積り・お問い合わせ</a>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>月額基本料金 <em>0</em> 円。<br>リード1件、<em>50</em> 円台。</h1>
+      <p>SPEED AD は、展示会で回収するアンケートの回答と名刺のデータ化を、Web上のひとつの流れにまとめるサービスです。<br>料金の柱は、月額基本料金・名刺データ化・お礼メールの3つ。何にいくらかかるのかを順に見たあと、出展の規模を入れて試せます。</p>
+    </div>
+  </div>
+</div>
+<!-- 認証バッジ列 -->
+<div class="trust-band">
+  <div class="wrap">
+    <div class="t-item">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 4 L34 9 V21 c0 9-6.5 13-14 15.5 -7.5-2.5-14-6.5-14-15.5 V9 Z" stroke="#171a21" stroke-width="1.5" stroke-linejoin="round"></path>
+        <path d="M24 15.5 a5 5 0 1 0 0 9" stroke="#171a21" stroke-width="1.6" stroke-linecap="round"></path>
+      </svg>
+      <div>SPEED ADは、株式会社アブロードアウトソーシング<br>（東京都千代田区）が提供しています。</div>
+    </div>
+    <div class="t-sep"></div>
+    <div class="t-item">
+      <img src="../assets/pmark.png" alt="プライバシーマーク">
+      <div>プライバシーマーク<br>認定事業者</div>
+    </div>
+    <div class="t-sep"></div>
+    <div class="t-item">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="15" stroke="#171a21" stroke-width="1.4"></circle>
+        <ellipse cx="20" cy="20" rx="6.5" ry="15" stroke="#171a21" stroke-width="1.4"></ellipse>
+        <path d="M5 20 H35 M7.5 12.5 H32.5 M7.5 27.5 H32.5" stroke="#171a21" stroke-width="1.4"></path>
+      </svg>
+      <div>ISO/IEC 27001:2013<br>ISO 9001:2015</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="mech" id="mech">
+  <div class="wrap">
+    <h2>料金の3つの柱</h2>
+    <div class="lead">初期費用・システム導入費用はかかりません。オプションの加算やクーポンの適用は別途あります。</div>
+    <div class="formula">
+      <span>月額基本料金</span><i>＋</i><span>速度プランの単価 <i>×</i> 実際の枚数</span><i>＋</i><span>お礼メール</span>
+    </div>
+    <div class="layers">
+      <div class="layer">
+        <div class="n">01</div>
+        <h3>月額基本料金</h3>
+        <p>スタンダードは0円（税別）。多言語切り替えと日本語以外の名刺のデータ化を使う場合はプレミアム（月額10,000円・税別）になります。出展のない月も同じ金額です。</p>
+      </div>
+      <div class="layer">
+        <div class="n">02</div>
+        <h3>名刺データ化</h3>
+        <p>速度プランの単価 × 実際の枚数の実費精算です。プランと見込み枚数は、アンケートごとに名刺データ化の設定画面で申し込みます。お試しは2項目まで0円です。</p>
+      </div>
+      <div class="layer">
+        <div class="n">03</div>
+        <h3>お礼メール</h3>
+        <p>お礼メール送信は100通まで無料、101通目以降は1通1円（税別）です。会期の規模が小さいうちは、この欄は0円のままになります。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="speed" id="speed">
+  <div class="wrap">
+    <h2>速度プラン（名刺データ化）</h2>
+    <div class="lead">アンケートごとに、名刺データ化の設定画面で選びます。</div>
+    <div class="stable">
+      <div class="strow sthead"><div>プラン</div><div>単価（税別）</div><div>項目数</div><div>納期</div></div>
+      <div class="strow"><div>お試し</div><div>0円／枚</div><div>2項目</div><div>6営業日</div></div>
+      <div class="strow"><div>通常</div><div>50円／枚</div><div>10項目</div><div>6営業日</div></div>
+      <div class="strow"><div>特急</div><div>100円／枚</div><div>10項目</div><div>3営業日</div></div>
+      <div class="strow"><div>超特急</div><div>150円／枚</div><div>10項目</div><div>1営業日</div></div>
+      <div class="strow"><div>オンデマンド<span class="pill">プレミアム限定</span></div><div>200円／枚</div><div>10項目</div><div>当日</div></div>
+    </div>
+    <div class="snote">
+      名刺データ化の料金は、速度プランの単価 × 実際の枚数の実費精算です。<br>
+      実際の枚数が見込み枚数を下回った場合も、見込み枚数の半数分は請求対象になります。<br>
+      新規のお申し込みは初月無料で、翌月1日から課金が始まります。いつでも解約でき、解約後も契約期間の終了日まで利用できます。<br>
+      お礼メール送信は100通まで無料、101通目以降は1通1円（税別）です。<br>
+      外国語名刺のデータ化には追加費用が発生する場合があります。
+    </div>
+  </div>
+</div>
+
+<!-- コスパ -->
+<div class="cospa" id="cospa" style="background:#171a21; color:#ffffff; padding:64px 0 66px">
+  <div class="wrap">
+    <div style="text-align:center; font-size:12px; font-weight:700; letter-spacing:2px; color:#f0930f">COST PER LEAD</div>
+    <h2 style="margin-top:12px; color:#ffffff">リード1件、50円台。</h2>
+    <div class="lead" style="color:#d9d7d2">月額基本料金0円のスタンダードプランで、通常プラン・300枚・お礼メール300通の場合の概算です。名刺1枚＝リード1件として計算しています。</div>
+
+    <div class="cospa-calc" style="margin-top:34px; display:flex; align-items:stretch; justify-content:center; gap:18px; flex-wrap:wrap">
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">月額基本料金</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">0</span><span style="font-size:15px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">スタンダードプラン（税別）</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＋</div>
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">名刺データ化</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">50</span><span style="font-size:15px; font-weight:900; color:#ee8500">円／枚</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">通常プラン・10項目（税別）</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＋</div>
+      <div style="flex:1 1 200px; max-width:250px; background:#1e222b; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#a9adb5">お礼メール</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:34px; font-weight:900">0</span><span style="font-size:15px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#8e9299">100通まで無料の範囲内</div>
+      </div>
+      <div style="display:flex; align-items:center; font-size:24px; font-weight:900; color:#ee8500">＝</div>
+      <div style="flex:1 1 230px; max-width:280px; background:#ffffff; color:#1a1d24; border-radius:8px; padding:20px 22px 22px; text-align:center">
+        <div style="font-size:12.5px; font-weight:700; letter-spacing:1px; color:#6f6b64">リード1件あたり</div>
+        <div style="margin-top:8px; line-height:1.1"><span style="font-size:40px; font-weight:900">50.7</span><span style="font-size:16px; font-weight:900; color:#ee8500">円</span></div>
+        <div style="margin-top:8px; font-size:11.5px; font-weight:500; line-height:1.85; color:#6f6b64">枚数が増えるほど50円に近づきます</div>
+      </div>
+    </div>
+
+    <div style="margin-top:44px; text-align:center; font-size:17px; font-weight:700; letter-spacing:2px">その50円台で、手元に残るもの</div>
+    <div class="cospa-get" style="margin-top:22px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:18px">
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">10項目の名刺データ</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">OCR＋人力の二重チェックで確定</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">アンケートの回答</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">来場者が自分のスマホで回答した内容</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">紐付いた1件のリード</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">回答と名刺が同じ管理画面に並ぶ</div>
+      </div>
+      <div style="background:#1e222b; border-top:3px solid #ee8500; border-radius:6px; padding:20px 20px 22px">
+        <div style="font-size:15px; font-weight:700; letter-spacing:1px">集計とCSV出力</div>
+        <div style="margin-top:9px; font-size:12.5px; font-weight:500; line-height:1.95; color:#a9adb5">そのまま社内の仕組みへ渡せる</div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px; text-align:center; font-size:12px; font-weight:500; line-height:1.95; color:#8e9299">
+      名刺データ化の料金は、速度プランの単価 × 実際の枚数の実費精算です。上の金額は条件を置いた概算で、正式な金額はお見積りでご案内します。
+    </div>
+  </div>
+</div>
+
+<!-- 導入の流れ -->
+<div class="stp-sec" id="steps">
+  <div class="wrap">
+    <h2>導入の流れ</h2>
+    <div class="lead">アカウントをつくってから、会期後の追客までの4段です。</div>
+    <div class="stp-row">
+      <div class="stp">
+        <div class="n">STEP 1</div>
+        <h3>アカウントを登録する</h3>
+        <p>月額基本料金0円のスタンダードプランから始められます。初期費用・システム導入費用はかかりません。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 2</div>
+        <h3>アンケートを作り、QRを発行する</h3>
+        <p>専門知識は要りません。運用担当者が画面上で作成・編集でき、保存するとQRコードを発行できます。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 3</div>
+        <h3>名刺データ化を申し込む</h3>
+        <p>名刺のデータ化を使う場合は、アンケートごとに速度プランと見込み枚数を設定して依頼を確定します。</p>
+      </div>
+      <div class="stp">
+        <div class="n">STEP 4</div>
+        <h3>会期中から、会期後の追客へ</h3>
+        <p>来場者がQRを読んで回答し、同じ画面から名刺を撮影して送信。データ化された名刺は回答と紐付き、お礼メール・集計・CSV出力へ進みます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sim-sec" id="sim">
+  <div class="wrap">
+    <h2>出展の規模で試す</h2>
+    <div class="lead">プランと見込み枚数を選ぶと、その場で概算とリード1件あたりが出ます。名刺1枚＝リード1件として計算しています。</div>
+    <div class="sim">
+      <div class="sim-in">
+        <div class="fld">
+          <span class="fldlabel" id="plan-label">プラン</span>
+          <div class="seg" id="plan" role="group" aria-labelledby="plan-label">
+            <button type="button" data-plan="standard" aria-pressed="true">スタンダード<br>月額 0円</button>
+            <button type="button" data-plan="premium" aria-pressed="false">プレミアム<br>月額 10,000円</button>
+          </div>
+          <div class="hint">プレミアムは多言語切り替え、日本語以外の名刺のデータ化、データ保存期間 最長1年、オンデマンドが使えます。</div>
+        </div>
+
+        <div class="fld">
+          <label for="cards">データ化する名刺の見込み枚数</label>
+          <div class="num">
+            <input id="cards" type="number" min="0" max="100000" step="10" value="300" inputmode="numeric">
+            <span class="unit">枚</span>
+          </div>
+          <div class="hint">試算できるのは100,000枚までです。実際のデータ化枚数が見込みの半分を下回った場合も、最低請求条件により見込みの半分ぶんが請求対象になります。</div>
+        </div>
+
+        <div class="fld">
+          <span class="fldlabel" id="speed-label">速度プラン</span>
+          <div class="spd" id="speedsel" role="group" aria-labelledby="speed-label">
+            <button type="button" data-speed="trial" aria-pressed="false">お試し<span>0円／枚</span></button>
+            <button type="button" data-speed="normal" aria-pressed="true">通常<span>50円／枚</span></button>
+            <button type="button" data-speed="express" aria-pressed="false">特急<span>100円／枚</span></button>
+            <button type="button" data-speed="super" aria-pressed="false">超特急<span>150円／枚</span></button>
+            <button type="button" data-speed="ondemand" aria-pressed="false" aria-describedby="ondemand-note">オンデマンド<span>200円／枚</span></button>
+          </div>
+          <span id="ondemand-note" class="sr-only">オンデマンドはプレミアムプランでのみ選べます。</span>
+          <div class="hint" id="speedhint">通常は10項目・6営業日です。</div>
+        </div>
+
+        <div class="fld">
+          <label for="mails">お礼メールの送信通数</label>
+          <div class="num">
+            <input id="mails" type="number" min="0" max="100000" step="10" value="300" inputmode="numeric">
+            <span class="unit">通</span>
+          </div>
+          <div class="hint">100通までは0円、101通目以降が1通1円（税別）です。</div>
+        </div>
+      </div>
+
+      <div class="sim-out">
+        <div class="cap">概算</div>
+        <div class="rows">
+          <div class="r"><span>月額基本料金<span class="sub" id="r-plan-sub">スタンダード</span></span><b id="r-plan">0円</b></div>
+          <div class="r"><span>名刺データ化<span class="sub" id="r-card-sub">通常 50円／枚 × 300枚</span></span><b id="r-card">15,000円</b></div>
+          <div class="r"><span>お礼メール<span class="sub" id="r-mail-sub">300通のうち200通が課金対象</span></span><b id="r-mail">200円</b></div>
+        </div>
+        <div class="total"><span>合計（税別）</span><span class="v" id="r-total">15,200<i>円</i></span></div>
+        <div class="per"><span>リード1件あたり</span><span class="pv" id="r-per">51<i>円</i></span></div>
+        <div class="note">ここに出る金額は見込み枚数にもとづく概算です。正式な金額はお見積りでご案内します。</div>
+        <p class="sr-only" id="sim-live" aria-live="polite"></p>
+        <a href="#contact" class="cta">この条件で見積りを依頼する</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-sec" id="contact">
+  <div class="wrap">
+    <h2>まずは無料で。　試算はそのまま見積りにできます。</h2>
+    <div class="cta-row">
+      <div class="cta-card dark">
+        <div class="k">すぐにはじめる</div>
+        <h3>無料ではじめる</h3>
+        <p>月額基本料金0円のスタンダードプランで、そのまま運用をはじめられます。名刺データ化のお試しは2項目まで0円です。</p>
+        <a href="#contact" class="b">無料ではじめる<span>›</span></a>
+      </div>
+      <div class="cta-card light">
+        <div class="k">金額を確定させたい</div>
+        <h3>お見積り・お問い合わせ</h3>
+        <p>想定枚数と納期をお知らせいただければ、正式なお見積りをご案内します。試算と条件が違う場合もご相談ください。</p>
+        <a href="#contact" class="b">お見積り・お問い合わせ<span>›</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-links">
+    <a href="#">利用規約</a><span>|</span>
+    <a href="#">特定商取引法に基づく表記</a><span>|</span>
+    <a href="#">プライバシーポリシー</a><span>|</span>
+    <a href="#contact">お見積り・お問い合わせ</a>
+  </div>
+  <div class="copy">&copy; Abroad Outsourcing Co., Ltd.</div>
+</div>
+
+<script>
+  /* 料金シミュレーター。単価・項目数・納期は lp/pricing-data.js の正本と同じ値。
+     HTMLの表は静的に持っているので、このスクリプトが落ちても料金は読める。 */
+  (function () {
+    var SPEED = {
+      trial:    { label: 'お試し',       unit: 0,   items: '2項目',  lead: '6営業日', premiumOnly: false },
+      normal:   { label: '通常',         unit: 50,  items: '10項目', lead: '6営業日', premiumOnly: false },
+      express:  { label: '特急',         unit: 100, items: '10項目', lead: '3営業日', premiumOnly: false },
+      super:    { label: '超特急',       unit: 150, items: '10項目', lead: '1営業日', premiumOnly: false },
+      ondemand: { label: 'オンデマンド', unit: 200, items: '10項目', lead: '当日',    premiumOnly: true }
+    };
+    var PLAN = { standard: { label: 'スタンダード', monthly: 0 }, premium: { label: 'プレミアム', monthly: 10000 } };
+    var MAIL_FREE = 100, MAIL_UNIT = 1;
+
+    var state = { plan: 'standard', speed: 'normal' };
+    var $ = function (id) { return document.getElementById(id); };
+    var yen = function (n) { return n.toLocaleString('ja-JP') + '円'; };
+    /* type="number" の max は打ち込みを止めないので、JS 側で丸める */
+    var MAX_INPUT = 100000;
+    var intOf = function (el) {
+      var v = parseInt(el.value, 10);
+      if (isNaN(v) || v < 0) return 0;
+      return Math.min(v, MAX_INPUT);
+    };
+    function clampInput(el) {
+      var v = parseInt(el.value, 10);
+      if (isNaN(v)) return;                    /* 入力途中の空欄はそのまま通す */
+      if (v > MAX_INPUT) el.value = String(MAX_INPUT);
+      else if (v < 0) el.value = '0';
+    }
+
+    function render() {
+      var cards = intOf($('cards'));
+      var mails = intOf($('mails'));
+      var sp = SPEED[state.speed];
+      var pl = PLAN[state.plan];
+
+      var cardCost = sp.unit * cards;
+      var billable = Math.max(0, mails - MAIL_FREE);
+      var mailCost = billable * MAIL_UNIT;
+      var total = pl.monthly + cardCost + mailCost;
+
+      $('r-plan').textContent = yen(pl.monthly);
+      $('r-plan-sub').textContent = pl.label;
+      $('r-card').textContent = yen(cardCost);
+      $('r-card-sub').textContent = sp.label + ' ' + sp.unit + '円／枚 × ' + cards.toLocaleString('ja-JP') + '枚';
+      $('r-mail').textContent = yen(mailCost);
+      $('r-mail-sub').textContent = billable === 0
+        ? mails.toLocaleString('ja-JP') + '通。100通まで無料の範囲内'
+        : mails.toLocaleString('ja-JP') + '通のうち' + billable.toLocaleString('ja-JP') + '通が課金対象';
+      $('r-total').innerHTML = total.toLocaleString('ja-JP') + '<i>円</i>';
+      /* リード1件あたり。名刺1枚＝リード1件として、合計を枚数で割る（小数第1位まで） */
+      $('r-per').innerHTML = cards > 0
+        ? (Math.round((total / cards) * 10) / 10).toLocaleString('ja-JP') + '<i>円</i>'
+        : '<i>—</i>';
+      announce(total, cards);
+      $('speedhint').textContent = sp.label + 'は' + sp.items + '・' + sp.lead + 'です。'
+        + (sp.premiumOnly ? 'プレミアムプランでのみ選べます。' : '');
+    }
+
+    /* 入力のたびに読み上げると煩いので、手が止まってから1回だけ通知する */
+    var liveTimer;
+    function announce(total, cards) {
+      clearTimeout(liveTimer);
+      liveTimer = setTimeout(function () {
+        var per = cards > 0 ? (Math.round((total / cards) * 10) / 10).toLocaleString('ja-JP') + '円' : '算出なし';
+        $('sim-live').textContent = '概算 合計 ' + yen(total) + '、リード1件あたり ' + per + '。';
+      }, 700);
+    }
+
+    /* オンデマンドはプレミアム限定。スタンダード選択中は押せなくする */
+    function syncSpeedAvailability() {
+      Array.prototype.forEach.call($('speedsel').querySelectorAll('button'), function (b) {
+        var sp = SPEED[b.dataset.speed];
+        var blocked = sp.premiumOnly && state.plan !== 'premium';
+        /* disabled はフォーカス順から外れて理由が読まれないため aria-disabled を使う */
+        b.setAttribute('aria-disabled', blocked ? 'true' : 'false');
+        if (blocked && state.speed === b.dataset.speed) { setSpeed('normal'); }
+      });
+    }
+
+    function setPressed(container, attr, value) {
+      Array.prototype.forEach.call(container.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', b.dataset[attr] === value ? 'true' : 'false');
+      });
+    }
+    function setSpeed(key) { state.speed = key; setPressed($('speedsel'), 'speed', key); }
+
+    $('plan').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      state.plan = b.dataset.plan;
+      setPressed($('plan'), 'plan', state.plan);
+      syncSpeedAvailability();
+      render();
+    });
+    $('speedsel').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || b.getAttribute('aria-disabled') === 'true') return;
+      setSpeed(b.dataset.speed);
+      render();
+    });
+    ['cards', 'mails'].forEach(function (id) {
+      var el = $(id);
+      el.addEventListener('input', function () { clampInput(el); render(); });
+      /* 空欄・不正値のまま離れたら 0 に戻す */
+      el.addEventListener('blur', function () {
+        if (isNaN(parseInt(el.value, 10))) el.value = '0';
+        clampInput(el);
+        render();
+      });
+    });
+
+    syncSpeedAvailability();
+    render();
+  })();
+
+  /* スクロールリビール（初期非表示クラスはJSで付与する） */
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var targets = document.querySelectorAll('.hero-copy > *, .stp, .stp, .sim-sec h2, .sim-sec .lead, .sim > div, .mech h2, .mech .lead, .formula, .layer, .speed h2, .speed .lead, .stable, .snote, .cospa h2, .cospa .lead, .cospa-calc, .cospa-get > div, .cta-sec h2, .cta-row > div');
+    targets.forEach(function (el) { el.classList.add('reveal'); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var siblings = Array.prototype.filter.call(el.parentNode.children, function (c) {
+          return c.classList.contains('reveal');
+        });
+        var idx = Math.min(siblings.indexOf(el), 6);
+        el.style.transitionDelay = (idx > 0 ? idx * 90 : 0) + 'ms';
+        el.classList.add('in');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -10% 0px' });
+    targets.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+<script src="../switcher.js"></script>
+<script>if (window.__lpSwitcher) window.__lpSwitcher('cost-simulator');</script>
+</body>
+</html>
