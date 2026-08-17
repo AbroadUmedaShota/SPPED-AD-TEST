@@ -1340,8 +1340,8 @@ window.calTemplateDl = function () {
                     btns += '<button onclick="calRecruitOpen(\'' + sid + '\')" style="background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">増員を依頼</button>';
                 }
                 btns += rs === '募集完了'
-                    ? '<button onclick="calRecruitReopen(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の再募集は例外時のみ使い、充足と矛盾したら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">再募集(例外)</button>'
-                    : '<button onclick="calRecruitClose(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の締切は例外時のみ使い、不足へ戻ったら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">募集締切(例外)</button>';
+                    ? '<button onclick="calRecruitReopen(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の再募集は例外時のみ使い、充足と矛盾したら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">再募集する</button>'
+                    : '<button onclick="calRecruitClose(\'' + sid + '\')" title="募集状態は充足に応じて自動で切り替わります。手動の締切は例外時のみ使い、不足へ戻ったら自動判定へ戻ります" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">募集を締め切る</button>';
             }
         }
         return '<div style="border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';border-radius:6px;padding:9px 11px;'
