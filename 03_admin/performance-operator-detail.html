@@ -150,6 +150,8 @@
     }
 
     function paint() {
+        // Lv1ではページ本文がガード表示に差し替えられるため描画しない
+        if (!document.querySelector('[data-slot="opname"]')) { return; }
         var p = D.PERF[oid];
         var gid = D.opGroup(oid);
         var t = D.totals(oid, month);

@@ -114,6 +114,8 @@
     }
 
     function paint() {
+        // Lv1ではページ本文がガード表示に差し替えられるため描画しない
+        if (!document.querySelector('[data-slot="gname"]')) { return; }
         var t = D.groupTotals(gid, month);
         var g = D.GROUPS[gid];
         document.querySelector('[data-slot="gname"]').textContent = g.name;
