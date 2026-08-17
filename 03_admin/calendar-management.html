@@ -48,7 +48,7 @@
               </div>
             </div>
             <div role="tablist" aria-label="表示の切り替え" style="display:flex;gap:2px;border-bottom:2px solid var(--a-border)">
-              <button id="calTabCal" role="tab" aria-selected="true" aria-controls="calPane" onclick="calTab('calendar')" style="background:none;border:none;border-bottom:2px solid var(--a-accent);margin-bottom:-2px;padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit">営業日・会期</button>
+              <button id="calTabCal" role="tab" aria-selected="true" aria-controls="calPane" onclick="calTab('calendar')" style="background:none;border:none;border-bottom:2px solid var(--a-accent);margin-bottom:-2px;padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit">営業日</button>
               <button id="calTabAsg" role="tab" aria-selected="false" aria-controls="calPane" onclick="calTab('assign')" style="background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 18px;font-size:13.5px;color:var(--a-fg-muted);cursor:pointer;font-family:inherit">アサイン</button>
             </div>
             <section id="calPane" role="tabpanel" aria-labelledby="calTabCal">
@@ -189,7 +189,7 @@
       </div>
       <label style="display:block"><span style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted)">本文</span><textarea id="calRecBody" aria-label="本文" rows="5" style="margin-top:6px;width:100%;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 12px;font-size:12.5px;font-family:inherit;line-height:1.8;color:var(--a-fg-strong);background:var(--a-surface);resize:vertical"></textarea></label>
       <div id="calRecErr" role="alert" hidden style="font-size:12px;color:var(--a-danger);font-weight:700"></div>
-      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">送信すると対象案件は「追加募集中」になり、宛先の会社から追加でアサインできる状態になります。</div>
+      <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">送信すると対象のアンケートは「追加募集中」になり、宛先の会社から追加でアサインできる状態になります。</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
       <button onclick="pClose('mRecruit')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">キャンセル</button>
@@ -278,7 +278,7 @@ window.calTemplateDl = function () {
 
 <script>
 // 営業日カレンダー(モック)。表示範囲は2026年6月〜8月、データはアンケート管理から導出した静的セット。
-// 画面は2タブ構成。営業日・会期タブは休業日設定と会期の俯瞰、アサインタブは作業期間と人員の過不足を扱う。
+// 画面は2タブ構成。営業日タブは休業日設定と会期の俯瞰、アサインタブは作業期間と人員の過不足を扱う。
 // 会期と作業期間を1枚に重ねると1週あたり最大10本の帯が積まれて読めなくなるため、目的ごとに分けている。
 // 休業日・振替営業日の背景色はタブをまたいで常に出す(切り替わるのは帯と集計だけ)。
 // アサインは案件(アンケート)単位で、担当は会期の全日を通す。日ごとの過不足は集計で導く。
@@ -323,10 +323,10 @@ window.calTemplateDl = function () {
     // 案件単位のアサイン。会社ごとの投入人数で持つ。誰を出すかは各社が社内で決める運用のため
     // 個人名までは扱わない。担当は会期の全日を通しての割当
     var S = {
-        tab: 'calendar',    // calendar(営業日・会期) / assign(アサイン)
+        tab: 'calendar',    // calendar(営業日) / assign(アサイン)
         ym: '2026-07', sel: TODAY, selSv: null,
         // 表示モードはタブごとに使える組み合わせが違う(VIEWS)。会期は月をまたぐことが少ないので
-        // 営業日・会期タブは単月で足り、作業期間が月末を越えて伸びるアサインタブに前後2週を置く
+        // 営業日タブは単月で足り、作業期間が月末を越えて伸びるアサインタブに前後2週を置く
         view: 'single',     // single(単月) / around(前後2週) / year(年間)
         reg: { w: { 0: true, 6: true }, hol: true },
         ind: {
@@ -536,7 +536,7 @@ window.calTemplateDl = function () {
 
     // ---- 絞り込み ----
     // 絞り込みは充足状態と担当会社で絞る道具なのでアサインタブのもの。
-    // 営業日・会期タブに持ち越すと、絞り込んだまま切り替えたときに会期が黙って消える
+    // 営業日タブに持ち越すと、絞り込んだまま切り替えたときに会期が黙って消える
     function passFilter(sid) {
         if (!isAsg()) { return true; }
         var st = svState(sid);
@@ -562,23 +562,22 @@ window.calTemplateDl = function () {
     // 営業日設定を変えると作業日がずれるため、再描画のたびに作り直す
     function invalidateWork() { _byWorkDay = null; _wd = {}; }
 
-    // 帯のセグメント。営業日・会期タブは会期だけを1本出す。
-    // アサインタブはオンデマンドが会期＝作業なので1本、それ以外は会期と作業期間の2本
+    // 帯のセグメント。帯を持つのはアサインタブだけで、1案件につき作業期間の1本を描く。
+    // 営業日タブは休業日の設定に集中する。会期の帯を並べても、休業日を足して動くのは
+    // 納期であって会期ではないため判断材料にならず、アサインタブとは出る案件が違って
+    // 見比べたときに混乱を招く。会期は日付詳細と月の集計で確認する。
+    // オンデマンドは会期＝作業日なので、作業期間の帯がそのまま会期を表す
     function segmentsOf(sid) {
-        var v = CAL.surveys[sid], w = workDays(sid);
-        if (!isAsg()) { return [{ kind: 'event', s: v.s, e: v.e }]; }
-        if (!TURNAROUND[v.plan]) { return [{ kind: 'work', s: v.s, e: v.e }]; }
-        var segs = [{ kind: 'event', s: v.s, e: v.e }];
-        if (w.length) { segs.push({ kind: 'work', s: w[0], e: w[w.length - 1] }); }
-        return segs;
+        if (!isAsg()) { return []; }
+        var w = workDays(sid);
+        return w.length ? [{ kind: 'work', s: w[0], e: w[w.length - 1] }] : [];
     }
-    // レーン確保の単位。アサインタブは会期開始から納期までの通し区間で押さえ、2本を同じレーンへ載せる。
-    // 営業日・会期タブは会期しか描かないので、納期まで押さえると帯の無い区間がレーンを塞ぐ
+    // レーン確保の単位。描く区間と一致させる。
+    // 描かない区間まで押さえると、帯の無いところがレーンを塞いで他の案件が下へ押し出される
     function unionSpan(sid) {
         var v = CAL.surveys[sid];
-        if (!isAsg()) { return { s: v.s, e: v.e }; }
-        var d = dueDate(sid);
-        return { s: v.s, e: d > v.e ? d : v.e };
+        var w = workDays(sid);
+        return w.length ? { s: w[0], e: w[w.length - 1] } : { s: v.s, e: v.e };
     }
 
     // 不足は案件ごとの不足分の合計で数える。過剰な案件が別案件の不足を打ち消さないようにするため
@@ -637,7 +636,7 @@ window.calTemplateDl = function () {
     }
 
     // ---- 営業日設定の影響(納期のずれ) ----
-    // 営業日・会期タブには作業期間の帯を出さないため、休業日を動かした結果が画面から読めない。
+    // 営業日タブには作業期間の帯を出さないため、休業日を動かした結果が画面から読めない。
     // 変更の前後で納期を比べて、動いた案件をその場に残す(トーストと違い消えないので後から追える)
     function dueSnapshot() {
         var out = {};
@@ -808,55 +807,32 @@ window.calTemplateDl = function () {
         return { bands: out, over: over };
     }
 
+    // 帯を描くのはアサインタブだけで、1案件につき作業期間の1本を描く(segmentsOf)
     function bandHtml(b) {
         var sid = b.sid, v = CAL.surveys[sid], st = svState(sid);
-        var isWork = b.kind === 'work';
         var load = dailyLoad(sid), sup = supplyOf(sid);
-        var beyond = isWork && beyondCapacity(sid);
-        // 営業日・会期タブは帯に納期を出さないぶん、補足表示で納期区分と納期を読めるようにする
-        var aria = sid + ' ' + v.title + (isWork
-            ? ' 作業期間 納期' + md(dueDate(sid)) + ' ' + planLabel(sid)
-                + ' 必要' + load + '枚/日 供給' + sup + '枚/日 '
-                + (beyond ? '全社総動員でも不足' : BAND[st].label)
-            : ' 会期 ' + md(v.s) + 'から' + md(v.e)
-                + (isAsg() ? '（名刺の回収期間。データ化は納期区分に応じて後日）'
-                    : ' ' + planLabel(sid) + ' 納期' + md(dueDate(sid))));
+        var beyond = beyondCapacity(sid);
+        var aria = sid + ' ' + v.title
+            + ' 作業期間 ' + md(v.s) + 'の会期ぶん 納期' + md(dueDate(sid)) + ' ' + planLabel(sid)
+            + ' 必要' + load + '枚/日 供給' + sup + '枚/日 '
+            + (beyond ? '全社総動員でも不足' : BAND[st].label);
 
-        // アサインタブの会期は帯にせず、作業期間の帯へつながる細い線として置く。
-        // 同じ高さの帯を2本並べると1案件が2件に見えるため、高さで主従を付ける。
-        // 色は付けない(充足は作業期間の話で、名刺を集めている間の過不足という概念がない)
-        if (isAsg() && !isWork) {
-            return '<div role="button" tabindex="0" aria-label="' + esc(aria) + '" title="' + esc(aria) + '"'
-                + ' onclick="calPick(\'' + sid + '\')"'
-                + ' style="grid-row:' + (2 + b.lane) + ';grid-column:' + (b.col + 1) + '/span ' + b.span + ';'
-                + 'margin:0 ' + (b.contR ? '0' : '3px') + ' 2px ' + (b.contL ? '0' : '3px') + ';'
-                + 'height:18px;display:flex;align-items:center;cursor:pointer;min-width:0">'
-                // 線の色は枠線トークンではなく文字トークンを使う。--a-border-strong だと
-                // セル背景とのコントラストが 1.5〜2.0:1 で、非テキストの基準(3:1)に届かない
-                + '<span aria-hidden="true" style="flex:1;height:3px;border-radius:2px;background:'
-                + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-fg-faint)') + '"></span></div>';
-        }
-
-        // 会期は破線グレーで情報のみ。人員の充足色は作業期間側に乗せる
-        var c = isWork ? BAND[st]
-            : { sym: '', fg: 'var(--a-fg-muted)', bg: 'var(--a-surface-2)', bd: 'var(--a-border-strong)', hatch: false };
+        var c = BAND[st];
         // 終了案件は過不足を問う対象ではないので、日次ではなく総枚数を実績として出す
-        var tail = !isWork ? ''
-            : st === 'done' ? (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚'
+        var tail = st === 'done' ? (CAL.exp[sid] || 0).toLocaleString('ja-JP') + '枚'
             : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
             : sup.toLocaleString('ja-JP') + '/' + load.toLocaleString('ja-JP') + '枚';
         // 記号は独立した span に置く。省略表示の検査は葉要素の文字と title の先頭一致を見るため、
-        // 記号を混ぜると「・ SV-10229」と title「SV-10229 …」がずれて全文が読めない扱いになる。
-        // 会期を線にしたぶん、案件名は作業期間の帯が持つ(幅が足りなければ省略され、補足表示で読める)
+        // 記号を混ぜると「・ SV-10229」と title「SV-10229 …」がずれて全文が読めない扱いになる
         var head = sid + ' ' + v.title;
-        var sym = beyond ? '⚠' : BAND[st].sym;
-        var hatch = (isWork && c.hatch)
+        var sym = beyond ? '⚠' : c.sym;
+        var hatch = c.hatch
             ? 'background-image:repeating-linear-gradient(135deg,rgba(0,0,0,0) 0 5px,' + c.bd + ' 5px 6px);' : '';
         var radL = b.contL ? '0' : '4px', radR = b.contR ? '0' : '4px';
         var inner = (b.contL ? '<span style="flex:none">◀</span>' : '')
-            + (isWork ? '<span aria-hidden="true" style="flex:none;font-weight:700">' + sym + '</span>' : '')
-            + '<span title="' + esc(sid + ' ' + v.title) + '" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' + (isWork ? ';font-weight:700' : '') + '">' + esc(head) + '</span>'
-            + '<span style="flex:none;font-variant-numeric:tabular-nums' + (isWork ? ';font-weight:700' : '') + '">' + tail + '</span>'
+            + '<span aria-hidden="true" style="flex:none;font-weight:700">' + sym + '</span>'
+            + '<span title="' + esc(sid + ' ' + v.title) + '" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700">' + esc(head) + '</span>'
+            + '<span style="flex:none;font-variant-numeric:tabular-nums;font-weight:700">' + tail + '</span>'
             + (b.contR ? '<span style="flex:none">▶</span>' : '');
         return '<div role="button" tabindex="0" aria-label="' + esc(aria) + '" title="' + esc(aria) + '"'
             + ' onclick="calPick(\'' + sid + '\')"'
@@ -865,13 +841,15 @@ window.calTemplateDl = function () {
             + 'display:flex;align-items:center;gap:5px;height:18px;padding:0 6px;box-sizing:border-box;cursor:pointer;'
             + 'min-width:0;overflow:hidden;'
             + 'font-size:10.5px;line-height:18px;color:' + c.fg + ';background-color:' + c.bg + ';' + hatch
-            + 'border:1px ' + (isWork ? 'solid ' : 'dashed ') + c.bd + ';border-radius:' + radL + ' ' + radR + ' ' + radR + ' ' + radL + ';'
+            + 'border:1px solid ' + c.bd + ';border-radius:' + radL + ' ' + radR + ' ' + radR + ' ' + radL + ';'
             + (sid === S.selSv ? 'box-shadow:0 0 0 2px var(--a-accent);' : '') + '">' + inner + '</div>';
     }
 
     function weekHtml(week, ym, isLast, dim) {
         var col = collectBands(week);
-        var used = 1;
+        // 帯が1本も無い週はレーン行を作らない。営業日タブは帯を持たないため、
+        // 空の20px行が全週に残るとマスが無駄に高くなる
+        var used = col.bands.length ? 1 : 0;
         col.bands.forEach(function (b) { if (b.lane + 1 > used) { used = b.lane + 1; } });
         var rows = ['auto'];
         for (var i = 0; i < used; i++) { rows.push('20px'); }
@@ -917,7 +895,7 @@ window.calTemplateDl = function () {
         col.bands.forEach(function (b) { h += bandHtml(b); });
 
         // 日計。その日に作業が走る案件の必要枚数と供給枚数の合計、および不足している案件の数。
-        // 営業日・会期タブでは人員の話をしないため、レーンからあふれた件数だけを出す。
+        // 営業日タブでは人員の話をしないため、レーンからあふれた件数だけを出す。
         // 中身の無いセルは div ごと出さない(空の div でも padding のぶん行が伸びるため)
         week.forEach(function (is, i) {
             var txt = '', tip = '';
@@ -939,8 +917,18 @@ window.calTemplateDl = function () {
                         : '')
                     + (a.live.length
                         ? '必要 ' + a.load.toLocaleString('ja-JP') + '枚/日 ・ 供給 ' + a.supply.toLocaleString('ja-JP') + '枚/日'
-                            + (a.lackCases ? ' ・ 不足のある案件 ' + a.lackCases + '件(合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日)' : '')
+                            + (a.lackCases ? ' ・ 不足のあるアンケート ' + a.lackCases + '件(合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日)' : '')
                         : '');
+            } else {
+                // 営業日タブは帯を持たないため、その日に会期がある件数だけを置く。件数が無いと
+                // 月の集計行が「会期のある案件 11件」と出しているのにどの日を選べばよいか分からず、
+                // 日付を総当たりすることになる。休業日の判断を邪魔しないよう案件名は出さない
+                var evs = svOf(is);
+                if (evs.length) {
+                    txt = '<span style="color:var(--a-fg-muted)">会期 <strong style="font-variant-numeric:tabular-nums;color:var(--a-fg)">'
+                        + evs.length + '</strong>件</span>';
+                    tip = evs.map(function (sid) { return sid + ' ' + CAL.surveys[sid].title; }).join('\n');
+                }
             }
             if (col.over[i]) { txt += '<span style="color:var(--a-fg-faint)"> 他' + col.over[i] + '件</span>'; }
             if (!txt) { return; }
@@ -1024,18 +1012,10 @@ window.calTemplateDl = function () {
     var NARROW = window.matchMedia('(max-width: 900px)');
     function isNarrow() { return NARROW.matches; }
 
-    // その日に並べる案件。アサインタブは作業のある案件を先に、会期だけの案件を後に置く
+    // その日に並べる案件。マス目と同じ範囲を出す。営業日タブは帯を持たないので行にも案件を並べず、
+    // 会期は件数だけを置く(マス目と同じ約束)
     function rowItems(is) {
-        var out = [], seen = {};
-        if (isAsg()) {
-            workOf(is).forEach(function (sid) {
-                if (passFilter(sid)) { out.push({ sid: sid, work: true }); seen[sid] = 1; }
-            });
-        }
-        svOf(is).forEach(function (sid) {
-            if (passFilter(sid) && !seen[sid]) { out.push({ sid: sid, work: false }); seen[sid] = 1; }
-        });
-        return out;
+        return isAsg() ? workOf(is).filter(passFilter) : [];
     }
 
     function dayRowHtml(is) {
@@ -1044,22 +1024,24 @@ window.calTemplateDl = function () {
             : (w === 0 ? 'var(--a-danger)' : (w === 6 ? 'var(--a-accent)' : 'var(--a-fg)'));
         var lab = t.t === 'hol' ? '休業日' + (t.memo ? '(' + esc(t.memo) + ')' : '')
             : (t.t === 'sub' ? '振替営業日' : '');
-        var body = rowItems(is).map(function (it) {
-            var sid = it.sid, v = CAL.surveys[sid], st = svState(sid), c = BAND[st];
-            // マス目と同じ約束にする。作業は記号つきの枠、会期は線
-            var badge = it.work
-                ? '<span style="flex:none;color:' + c.fg + ';font-weight:700">' + (beyondCapacity(sid) ? '⚠' : c.sym) + '</span>'
-                : '<span aria-hidden="true" style="flex:none;width:14px;height:3px;border-radius:2px;background:var(--a-fg-faint)"></span>';
-            // 営業日・会期タブは全行が会期なので注記しない。幅は案件名へ回す
-            var tail = !it.work ? (isAsg() ? '会期' : '')
-                : st === 'done' ? ''
+        // 営業日タブはマス目と同じく会期を件数だけで置く。日を選べば右の詳細に案件が出る
+        var evs = isAsg() ? [] : svOf(is);
+        var ev = evs.length
+            ? '<div title="' + esc(evs.map(function (s) { return s + ' ' + CAL.surveys[s].title; }).join('\n')) + '"'
+                + ' style="font-size:11.5px;color:var(--a-fg-muted);padding-top:3px">会期 <strong style="font-variant-numeric:tabular-nums;color:var(--a-fg)">'
+                + evs.length + '</strong>件</div>'
+            : '';
+        var body = rowItems(is).map(function (sid) {
+            var v = CAL.surveys[sid], st = svState(sid), c = BAND[st];
+            var badge = '<span style="flex:none;color:' + c.fg + ';font-weight:700">' + (beyondCapacity(sid) ? '⚠' : c.sym) + '</span>';
+            var tail = st === 'done' ? ''
                 : lv() <= 2 ? '自社 ' + mineOf(sid) + '人'
                 : supplyOf(sid).toLocaleString('ja-JP') + '/' + dailyLoad(sid).toLocaleString('ja-JP') + '枚';
             return '<div role="button" tabindex="0" onclick="calPick(\'' + sid + '\')"'
                 + ' title="' + esc(sid + ' ' + v.title) + '"'
                 + ' style="display:flex;align-items:center;gap:6px;margin-top:4px;padding:5px 8px;border-radius:5px;'
                 + 'border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';'
-                + (it.work ? 'background-color:' + c.bg + ';' : '')
+                + 'background-color:' + c.bg + ';'
                 + 'font-size:11.5px;cursor:pointer;min-width:0">' + badge
                 + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
                 + sid + ' ' + esc(v.title) + '</span>'
@@ -1077,7 +1059,8 @@ window.calTemplateDl = function () {
             + '</div>'
             + '<div style="flex:1;min-width:0">'
             + (lab ? '<div style="font-size:11.5px;font-weight:700;color:var(--a-fg-muted2)">' + lab + '</div>' : '')
-            + (body || (lab ? '' : '<div style="font-size:11.5px;color:var(--a-fg-faint);padding-top:3px">—</div>'))
+            + ev
+            + (body || (lab || ev ? '' : '<div style="font-size:11.5px;color:var(--a-fg-faint);padding-top:3px">—</div>'))
             + '</div></div>';
     }
 
@@ -1157,12 +1140,12 @@ window.calTemplateDl = function () {
     }
 
     // 年間ビュー: 月×指標の一覧表。図は使わず数値で俯瞰する。
-    // 営業日・会期タブ専用のため、人員の過不足ではなく営業日の姿と案件の多寡だけを並べる
+    // 営業日タブ専用のため、人員の過不足ではなく営業日の姿と案件の多寡だけを並べる
     function yearRender() {
         var y = parseInt(S.ym.slice(0, 4), 10);
         var COLS = 'display:grid;grid-template-columns:minmax(90px,70fr) minmax(110px,80fr) minmax(160px,110fr) minmax(150px,105fr);align-items:center;padding:0 18px';
         var h = '<div style="' + COLS + ';height:40px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">'
-            + '<span>月</span><span style="text-align:right">営業日数</span><span style="text-align:right">休業・振替の個別設定</span><span style="text-align:right">会期のある案件</span></div>';
+            + '<span>月</span><span style="text-align:right">営業日数</span><span style="text-align:right">休業・振替の個別設定</span><span style="text-align:right">会期のあるアンケート</span></div>';
         for (var m = 1; m <= 12; m++) {
             var ym = y + '-' + pad2(m);
             var dim = new Date(y, m, 0).getDate();
@@ -1190,12 +1173,12 @@ window.calTemplateDl = function () {
                 + '<span style="text-align:right">' + (svN ? svN + '件' : '—') + '</span>'
                 + '</div>';
         }
-        h += '<div style="padding:9px 18px;font-size:11px;color:var(--a-fg-faint)">営業日数は定休日・祝日・個別設定を反映した日数。会期のある案件は、その月に会期がかかるアンケートの件数。</div>';
+        h += '<div style="padding:9px 18px;font-size:11px;color:var(--a-fg-faint)">営業日数は定休日・祝日・個別設定を反映した日数。会期のあるアンケートは、その月に会期がかかるアンケートの件数。</div>';
         document.getElementById('calGrid').innerHTML = h;
     }
     window.calYearPick = function (ym) { S.view = 'single'; S.ym = ym; calRender(); };
 
-    // 営業日・会期タブの月サマリ。休業日を動かすときに効く数だけを1行で置く
+    // 営業日タブの月サマリ。休業日を動かすときに効く数だけを1行で置く
     function summaryCalRender(el) {
         var y = parseInt(S.ym.slice(0, 4), 10), m = parseInt(S.ym.slice(5, 7), 10);
         var dim = new Date(y, m, 0).getDate();
@@ -1216,7 +1199,7 @@ window.calTemplateDl = function () {
         el.innerHTML = '<div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--a-fg-muted)">'
             + '<span style="font-weight:700;font-size:13px;color:var(--a-fg)">この月</span>'
             + part('営業日', biz, '日') + part('休業日', hol, '日')
-            + part('個別設定', ind, '件') + part('会期のある案件', svN, '件')
+            + part('個別設定', ind, '件') + part('会期のあるアンケート', svN, '件')
             + '</div>';
     }
 
@@ -1244,7 +1227,7 @@ window.calTemplateDl = function () {
         // 並べて置くと合計に足したくなるため「うち」を付けて内訳であることを示す
         el.innerHTML =
             '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;font-size:12.5px">'
-            + '<span style="font-weight:700;font-size:13px">この月の案件</span>'
+            + '<span style="font-weight:700;font-size:13px">この月のアンケート</span>'
             + part('未アサイン', cnt.none, true) + part('不足(深刻)', cnt.critical, true) + part('不足', cnt.short, true)
             + (cnt.beyond
                 ? '<span title="未アサイン・不足のうち、増員では解決しない件数です。納期区分か受注量の見直しが要ります" style="color:var(--a-danger);font-weight:700;cursor:help">⚠ うち総動員でも不足 <strong style="font-variant-numeric:tabular-nums">' + cnt.beyond + '件</strong></span>'
@@ -1261,7 +1244,7 @@ window.calTemplateDl = function () {
             + '<div style="display:flex;align-items:center;gap:16px">'
             + '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
             + '<input type="checkbox" id="calShortOnly" onchange="calShortOnly(this)"' + (S.shortOnly ? ' checked' : '') + '>不足のみ表示</label>'
-            + '<label title="データ化が済んだ案件をカレンダーから外します。件数は上の集計に残ります" style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
+            + '<label title="データ化が済んだアンケートをカレンダーから外します。件数は上の集計に残ります" style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--a-fg);cursor:pointer">'
             + '<input type="checkbox" id="calHideDone" onchange="calHideDone(this)"' + (S.hideDone ? ' checked' : '') + '>終了を隠す</label>'
             + '</div>';
         if (focused === 'calShortOnly' || focused === 'calHideDone') { document.getElementById(focused).focus(); }
@@ -1289,20 +1272,16 @@ window.calTemplateDl = function () {
             + sw('background:var(--a-surface);box-shadow:inset 0 0 0 2px var(--a-accent)', '選択中') + '</span>';
         if (!isAsg()) {
             el.innerHTML = days
-                + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">帯</span>'
-                + sw('background:var(--a-surface-2);border:1px dashed var(--a-border-strong)', '会期(名刺が集まる期間)') + '</span>'
-                + '<span>日付または帯を選択すると詳細を表示します。納期区分と納期は詳細で確認できます。</span>';
+                + '<span>「会期 N件」はその日に会期のあるアンケートの数です。日付を選ぶと右に一覧が出ます。</span>';
             return;
         }
         el.innerHTML = days
-            + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">案件</span>'
-            + '<span style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:3px;border-radius:2px;background:var(--a-fg-faint)"></span>会期(名刺の回収)</span>'
-            + sw('background:var(--a-surface-2);border:1px solid var(--a-border-strong)', '帯 = 作業期間(データ化する日)')
+            + '<span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-weight:700">帯 = データ化する日</span>'
             + sym('none') + sym('critical') + sym('short')
             + '<span style="display:flex;align-items:center;gap:4px"><span style="color:var(--a-danger);font-weight:700">⚠</span>総動員でも不足</span>'
             + sym('ok') + sym('over') + sym('done')
-            + '<span style="color:var(--a-fg-muted2)">充足色は帯(作業期間)にだけ付きます。不足(深刻)=充足率70%未満・人数過多=130%超(閾値は要確定)</span></span>'
-            + '<span>会期の線から帯までが1件の案件です。線または帯を選択すると詳細を表示します。</span>';
+            + '<span style="color:var(--a-fg-muted2)">不足(深刻)=充足率70%未満・人数過多=130%超(閾値は要確定)</span></span>'
+            + '<span>1本の帯が1件のアンケートです。会期は日付か帯を選ぶと右の詳細に出ます。</span>';
     }
 
     // ---- 右パネル ----
@@ -1327,7 +1306,7 @@ window.calTemplateDl = function () {
         var links = v.recon
             // データ入力対象一覧は項目グループ単位の全体キューで、案件では絞り込めない。
             // 照合結果一覧は sid を絞り込みへ適用した状態で開く
-            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのため案件では絞り込めません）" style="font-size:11px">名刺入力</a>'
+            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのためアンケートでは絞り込めません）" style="font-size:11px">名刺入力</a>'
                 + ' · <a href="reconciliation/index.html?sid=' + sid + '" title="' + sid + ' で絞り込んだ照合結果一覧を開きます" style="font-size:11px">照合 →</a>'
             : '';
         var rs = recruitState(sid);
@@ -1360,7 +1339,9 @@ window.calTemplateDl = function () {
                 ? '▲' + lackVol.toLocaleString('ja-JP') + '枚/日 不足（' + (st === 'critical' ? '深刻・' : '') + '充足率' + Math.round(fillRate(sid) * 100) + '%）'
                 : st === 'over' ? '◎ 人数過多（充足率' + Math.round(fillRate(sid) * 100) + '%）'
                 : c.label) + '</span>'
-            + '<span style="margin-left:auto;color:var(--a-fg-muted2)">' + rs + '</span></div>'
+            // 終了案件は充足状態も募集状態も「終了」を返すため、そのまま並べると同じ語が2つ出る
+            + (rs === c.label ? '' : '<span style="margin-left:auto;color:var(--a-fg-muted2)">' + rs + '</span>')
+            + '</div>'
             + (st === 'critical' || st === 'short' || st === 'none'
                 ? (load > maxSupply()
                     ? '<div style="margin-top:4px;background:var(--a-danger-bg);border:1px solid var(--a-danger-border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--a-danger);font-weight:700;line-height:1.6">'
@@ -1372,7 +1353,7 @@ window.calTemplateDl = function () {
                 : '')
             + (st === 'over'
                 ? '<div style="margin-top:3px;font-size:11px;color:var(--a-fg-muted2)">余剰 ' + (sup - load).toLocaleString('ja-JP') + '枚/日（平均換算で約 '
-                    + Math.floor((sup - load) / avgPerPerson()) + '人分）。他案件へ回せます</div>'
+                    + Math.floor((sup - load) / avgPerPerson()) + '人分）。他のアンケートへ回せます</div>'
                 : '')
             + '<div style="margin-top:5px;font-size:11.5px">' + groups + '</div>'
             + (btns ? '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">' + btns + '</div>' : '')
@@ -1380,13 +1361,13 @@ window.calTemplateDl = function () {
             + '</div>';
     }
 
-    // 営業日・会期タブの案件カード。人員の話は載せず、素性・納期・詳細への導線だけを出す
+    // 営業日タブの案件カード。人員の話は載せず、素性・納期・詳細への導線だけを出す
     function svCardLite(sid) {
         var v = CAL.surveys[sid];
         var links = v.recon
             // データ入力対象一覧は項目グループ単位の全体キューで、案件では絞り込めない。
             // 照合結果一覧は sid を絞り込みへ適用した状態で開く
-            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのため案件では絞り込めません）" style="font-size:11px">名刺入力</a>'
+            ? '<a href="data-entry/index.html" title="データ入力対象一覧へ移動します（全体キューのためアンケートでは絞り込めません）" style="font-size:11px">名刺入力</a>'
                 + ' · <a href="reconciliation/index.html?sid=' + sid + '" title="' + sid + ' で絞り込んだ照合結果一覧を開きます" style="font-size:11px">照合 →</a>'
             : '';
         return '<div style="border:1px solid ' + (sid === S.selSv ? 'var(--a-accent)' : 'var(--a-border-soft)') + ';border-radius:6px;padding:9px 11px;'
@@ -1417,7 +1398,7 @@ window.calTemplateDl = function () {
                 + '<button onclick="calDelAsk()" style="flex:none;background:var(--a-surface);color:var(--a-danger);border:1px solid var(--a-danger-border);border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">削除</button></div>'
             : '';
 
-        // 営業日・会期タブ: その日に会期のあるアンケートを並べ、詳細画面への入口にする
+        // 営業日タブ: その日に会期のあるアンケートを並べ、詳細画面への入口にする
         if (!isAsg()) {
             var evs = svOf(is);
             document.getElementById('calPanel').innerHTML = headHtml
@@ -1439,7 +1420,7 @@ window.calTemplateDl = function () {
                     : '<span style="color:var(--a-fg-muted2)">なし</span>')
                 + '</div>'
                 + (a.lackCases
-                    ? '<div style="margin-top:4px;color:var(--a-danger);font-weight:700">▲ 不足のある案件 ' + a.lackCases
+                    ? '<div style="margin-top:4px;color:var(--a-danger);font-weight:700">▲ 不足のあるアンケート ' + a.lackCases
                         + '件（合計 ' + a.lackVol.toLocaleString('ja-JP') + '枚/日 不足）</div>'
                     : '')
                 + (a.live.length && a.load > maxSupply()
@@ -1467,7 +1448,7 @@ window.calTemplateDl = function () {
                         + '<span style="flex:none;width:74px;text-align:right;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">' + g.vol.toLocaleString('ja-JP') + '枚/日</span></div>';
                 }).join('')
                 + (load.some(function (g) { return g.over; })
-                    ? '<div style="margin-top:5px;color:var(--a-danger);font-weight:700">▲ 同時に出せる人数を超えている会社があります（案件をまたいだ重複割当）</div>'
+                    ? '<div style="margin-top:5px;color:var(--a-danger);font-weight:700">▲ 同時に出せる人数を超えている会社があります（アンケートをまたいだ重複割当）</div>'
                     : '')
                 + '</div>'
             : '';
@@ -1539,9 +1520,11 @@ window.calTemplateDl = function () {
                         + ' aria-label="' + esc(g) + ' の投入人数" data-asg-group="' + esc(g) + '" data-asg-cap="' + cap + '" oninput="calAsgInput(this)"'
                         + ' style="flex:none;width:72px;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit;text-align:right;color:var(--a-fg-strong);background:var(--a-surface)">'
                     : '<span style="flex:none;width:72px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted)">' + tmpAsg[g] + '</span>')
-                + '<span title="' + esc(g + ' の稼働可能 ' + headroom(g) + '名' + (used ? '、うち ' + used + '名は作業日の重なる他案件で使用中' : '')) + '"'
+                + '<span title="' + esc(g + ' の稼働可能 ' + headroom(g) + '名' + (used ? '、うち ' + used + '名は作業日の重なる他のアンケートで使用中' : '')) + '"'
                 + ' style="flex:none;font-size:12px;color:' + (used ? 'var(--a-warn)' : 'var(--a-fg-muted2)') + '">/ ' + cap + '人'
-                + (used ? '（他案件 ' + used + '名）' : '') + '</span>'
+                // 「他 N名」だけだと追加で確保できる人数と読めてしまう。他のアンケートで
+                // 使用中である(=このアンケートには回せない)ことが分かる語を残す
+                + (used ? '（他アンケート ' + used + '名）' : '') + '</span>'
                 + '<span data-asg-vol="' + esc(g) + '" title="' + esc(g + ' は1人1日あたり ' + perPerson(g) + '枚') + '"'
                 + ' style="flex:none;width:86px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums;color:var(--a-fg-muted2)">'
                 + (tmpAsg[g] * perPerson(g)).toLocaleString('ja-JP') + '枚/日</span></div>';
@@ -1551,7 +1534,7 @@ window.calTemplateDl = function () {
         document.getElementById('calAsgOther').innerHTML =
             (zero.length ? '稼働可能なオペレーターがいないため入力できない会社: ' + zero.map(esc).join('・')
                 + '（オペレーター管理で有効なアカウントがありません）<br>' : '')
-            + '「/ N人」は、この案件の作業日にその会社から追加で確保できる人数です。作業日が重なる他案件で使っている分は差し引いています。<br>'
+            + '「/ N人」は、このアンケートの作業日にその会社から追加で確保できる人数です。作業日が重なる他のアンケートで使っている分は差し引いています。<br>'
             + (isLead ? '' : '自社以外の人数は参照のみです。変更が必要な場合は運営（Lv3以上）へ連絡してください。');
     }
     // 入力中の再描画はフォーカスを飛ばすため、集計表示だけを更新する
@@ -1790,7 +1773,7 @@ window.calTemplateDl = function () {
             g.innerHTML = '<option value="">担当会社: すべて</option>'
                 + GROUPS.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
         }
-        // 他画面からアサインタブへ直接入れるようにする(?tab=assign)。既定は営業日・会期。
+        // 他画面からアサインタブへ直接入れるようにする(?tab=assign)。既定は営業日タブ。
         // 表示モードは初回だけタブの既定から始める。以後のタブ切替では、切替先でも使える
         // モードならそのまま保つ(単月で見ていたのに勝手に切り替わると位置を見失う)
         var q = new URLSearchParams(location.search);
