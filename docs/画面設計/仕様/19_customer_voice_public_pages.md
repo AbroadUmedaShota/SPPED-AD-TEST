@@ -42,14 +42,14 @@ last_reviewed: 2026-08-18
 3. 機能紹介後のティザーセクション: 2 事例の要約カード + `詳細を見る`
 4. フッター常設リンク: `導入事例`
 
-`導入事例` 関連導線の遷移先は `https://support.speed-ad.com/customer-voices/` とする。`無料ではじめる` は `https://speed-ad.com/?intent=signup#top` でSPEED ADトップページの新規アカウント作成モーダルへ接続する。
+本番の `導入事例` 関連導線は `https://support.speed-ad.com/customer-voices/` を正規URLとする。静的モックでは `05_support/customer-voices/` へ相対遷移し、導入事例内のログイン・新規登録導線もリポジトリルートの `index.html` へ戻すことで、モックサイト内で確認を完結させる。
 
 ### 3.2. ページ間導線
 
 - 一覧ページから各詳細ページへ遷移できること
 - 各詳細ページ下部に `他の事例を見る` を配置し、一覧へ戻れること
-- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `https://speed-ad.com/?intent=signup#top` とする
-- 副 CTA は `ログインはこちら` とし、遷移先は `https://speed-ad.com/#top` とする
+- 静的モックの一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、ルート `index.html?intent=signup#top` へ相対遷移する
+- 静的モックの副 CTA は `ログインはこちら` とし、ルート `index.html#top` へ相対遷移する
 
 ### 3.3. ログイン前トップ復帰時の挙動
 
@@ -200,7 +200,7 @@ last_reviewed: 2026-08-18
 
 ## 7. 確認項目
 
-- `index.html` の 3 導線から `https://support.speed-ad.com/customer-voices/` へ到達できること
+- `index.html` の導入事例導線からモック内の `05_support/customer-voices/` へ到達できること
 - 一覧ページの各カードから正しい詳細ページへ遷移できること
 - 一覧ページに 3 件が表示され、オリエンタルモーター株式会社様が先頭に表示されること
 - ログイン前トップの先頭ティザーがオリエンタルモーター株式会社様になり、事例要約が通常の説明文として表示されること
