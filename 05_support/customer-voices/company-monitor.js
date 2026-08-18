@@ -10,7 +10,7 @@ import {
   renderParagraphs,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js?v=20260609-resilience';
+} from './shared.js?v=20260818-oriental-copy-v2';
 
 function setHtml(sectionId, bodyId, html) {
   const section = document.getElementById(sectionId);

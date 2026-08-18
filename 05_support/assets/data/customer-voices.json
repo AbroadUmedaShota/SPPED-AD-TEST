@@ -1,6 +1,58 @@
 {
-  "updatedAt": "2026-06-15",
+  "updatedAt": "2026-08-18",
   "voices": [
+    {
+      "slug": "oriental-motor",
+      "label": "オリエンタルモーター株式会社様",
+      "organizationType": "製造業",
+      "listingSummary": "既存のSPEED AD利用ユーザーからの紹介をきっかけに利用を開始。名刺データを翌営業日に納品し、利用中のCRMへの取り込みを翌々日に完了した事例です。",
+      "voicePageLabel": "オリエンタルモーター株式会社様",
+      "voicePageHeadline": "翌営業日に名刺データを納品。翌々日、利用中のCRMへ取り込み完了。",
+      "voicePageSummary": "既存のSPEED AD利用ユーザーからの紹介をきっかけに利用を開始。本事例では、名刺データを翌営業日に納品し、利用中のCRMへの取り込みを翌々日に完了しました。",
+      "voicePageHighlights": [
+        {
+          "label": "導入のきっかけ",
+          "value": "既存ユーザー様からの紹介"
+        },
+        {
+          "label": "名刺データの納品",
+          "value": "展示会終了後の翌営業日"
+        },
+        {
+          "label": "利用中CRMへの取り込み",
+          "value": "展示会終了後の翌々日"
+        }
+      ],
+      "voicePageImageCaption": "支給素材へ差し替え予定",
+      "usedFeatures": [
+        "名刺データの納品",
+        "利用中CRMへの取り込み"
+      ],
+      "overview": [
+        "オリエンタルモーター株式会社様は、既存のSPEED AD利用ユーザーからの紹介をきっかけに、サービスの利用を開始しました。",
+        "本事例では、名刺データを翌営業日に納品し、利用中のCRMへの取り込みを翌々日に完了しました。名刺データの納品から利用中のCRMへの取り込みまでを、短い日程で進められたことが大きなメリットです。"
+      ],
+      "operationImage": [
+        "利用開始｜既存のSPEED AD利用ユーザーからの紹介をきっかけに利用を開始",
+        "翌営業日｜名刺データを納品",
+        "翌々日｜利用中のCRMへの取り込みを完了"
+      ],
+      "outcome": [
+        "名刺データを翌営業日に受領できた",
+        "利用中のCRMへの取り込みを翌々日に完了できた",
+        "名刺データの納品から利用中のCRMへの取り込みまでを短い日程で進められた"
+      ],
+      "ctaLabel": "無料ではじめる",
+      "publishStatus": "published",
+      "heroImage": "img/customer-voices/oriental-motor-placeholder.png",
+      "accent": "#2757f5",
+      "accentStrong": "#1238b3",
+      "teaserTags": [
+        "既存ユーザーからの紹介",
+        "翌営業日のデータ納品",
+        "利用中CRMへの取り込みは翌々日"
+      ]
+    },
     {
       "slug": "company-monitor",
       "label": "展示会出展企業の活用事例",
