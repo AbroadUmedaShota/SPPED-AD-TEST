@@ -1614,6 +1614,7 @@ function createQuestionElement(question, index) {
                         <button type="button" id="${question.id}-eraser-tool" class="hw-btn" title="${hw('eraser')}" aria-label="${hw('eraser')}" aria-pressed="false">
                             <span class="material-icons">layers_clear</span>
                         </button>
+                        <span class="hw-divider" aria-hidden="true"></span>
                         <div class="hw-pop-wrap">
                             <button type="button" id="${question.id}-color-trigger" class="hw-btn" title="${hw('color')}" aria-label="${hw('color')}" aria-haspopup="true" aria-expanded="false">
                                 <span id="${question.id}-color-chip" class="hw-color-chip" style="background-color: #000000;"></span>
@@ -1627,7 +1628,7 @@ function createQuestionElement(question, index) {
                         </div>
                         <div class="hw-pop-wrap">
                             <button type="button" id="${question.id}-width-trigger" class="hw-btn" title="${hw('thickness')}" aria-label="${hw('thickness')}" aria-haspopup="true" aria-expanded="false">
-                                <span id="${question.id}-thickness-chip" class="hw-thickness-chip" style="height: 5px;"></span>
+                                <span id="${question.id}-thickness-chip" class="hw-thickness-chip" style="width: 9px; height: 9px;"></span>
                             </button>
                             <div id="${question.id}-width-popover" class="hw-popover" hidden>
                                 <button type="button" class="hw-btn" data-width="2" title="${hw('thicknessThin')}" aria-label="${hw('thicknessThin')}"><span class="hw-thickness-dot" style="width: 4px; height: 4px;"></span></button>
@@ -1635,12 +1636,14 @@ function createQuestionElement(question, index) {
                                 <button type="button" class="hw-btn" data-width="10" title="${hw('thicknessThick')}" aria-label="${hw('thicknessThick')}"><span class="hw-thickness-dot" style="width: 14px; height: 14px;"></span></button>
                             </div>
                         </div>
+                        <span class="hw-divider" aria-hidden="true"></span>
                         <button type="button" id="${question.id}-undo-btn" class="hw-btn" title="${hw('undo')}" aria-label="${hw('undo')}">
                             <span class="material-icons">undo</span>
                         </button>
                         <button type="button" id="${question.id}-redo-btn" class="hw-btn" title="${hw('redo')}" aria-label="${hw('redo')}">
                             <span class="material-icons">redo</span>
                         </button>
+                        <span class="hw-divider" aria-hidden="true"></span>
                         <button type="button" id="${question.id}-clear-btn" class="hw-btn" title="${hw('reset')}" aria-label="${hw('reset')}">
                             <span class="material-icons">delete</span>
                         </button>
@@ -1649,7 +1652,7 @@ function createQuestionElement(question, index) {
                         </button>
                     </div>
                     <div class="relative">
-                        <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}" role="img" aria-label="${hw('canvasLabel')}"></canvas>
+                        <canvas id="${canvasId}" class="border border-gray-200 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}" role="img" aria-label="${hw('canvasLabel')}"></canvas>
                         <div id="${question.id}-overlay" class="hw-overlay">
                             <button type="button" id="${question.id}-start-btn" class="hw-start-btn" aria-describedby="${question.id}-scroll-hint">
                                 <span class="material-icons" aria-hidden="true">edit</span>${hw('startDrawing')}
@@ -1939,7 +1942,10 @@ function createQuestionElement(question, index) {
                 function applyWidth(width) {
                     currentWidth = width;
                     ctx.lineWidth = width;
-                    thicknessChip.style.height = `${Math.min(width, 12)}px`;
+                    // トリガーのドット直径を太さに追従させる（2/5/10px → 6/9/13px）
+                    const chipSize = `${Math.min(width + 4, 14)}px`;
+                    thicknessChip.style.width = chipSize;
+                    thicknessChip.style.height = chipSize;
                     widthPopover.querySelectorAll('[data-width]').forEach((btn) => {
                         btn.classList.toggle('active', Number(btn.dataset.width) === width);
                     });

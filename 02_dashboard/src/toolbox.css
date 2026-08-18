@@ -1,5 +1,7 @@
 /* toolbox.css — 回答画面の手書き設問（handwriting_space）専用スタイル
    状態A(ロック中)=オーバーレイのみ / 状態B(描画中)=1段ツールバー。
+   デザインはこの画面のピル型ボタン言語（フッター送信=bg-blue-600の丸ピル）と
+   グローバルトークン（#E0E0E0系の枠・#6B6B6B のサブテキスト）に準拠する。
    状態遷移は survey-answer.js の handwriting_space ケースを参照 */
 
 .handwriting-container {
@@ -11,23 +13,30 @@
     display: none !important;
 }
 
+/* --- 表示時のフェードイン（[hidden] 解除で再発火する） --- */
+@keyframes hw-fade-in {
+    from { opacity: 0; transform: translateY(-2px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 /* --- ツールバー（描画中のみ表示・1段固定） ---
    キャンバスと同幅・同ボーダーで上辺にドッキングし、一体の枠に見せる */
 .hw-toolbar {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 2px;
-    min-height: 44px;
-    padding: 2px 4px;
+    gap: 4px;
+    min-height: 46px;
+    padding: 4px 6px;
     margin-bottom: 0;
     position: sticky;
     top: 0;
     z-index: 20;
-    background-color: #f9fafb;
-    border: 1px solid #9ca3af; /* canvas の border-gray-400 と揃える */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0; /* canvas の border-gray-200 と揃える */
     border-bottom: none;
-    border-radius: 6px 6px 0 0;
+    border-radius: 8px 8px 0 0;
+    animation: hw-fade-in 0.15s ease-out;
 }
 
 /* 描画中はツールバーと繋がるようキャンバス上辺の角丸を外す */
@@ -37,51 +46,71 @@
 }
 
 .hw-btn {
-    flex: 0 1 40px;
+    flex: 0 1 38px;
     min-width: 32px;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: transparent;
-    border: 2px solid transparent;
-    border-radius: 6px;
+    border: none;
+    border-radius: 9999px;
     cursor: pointer;
-    color: #374151;
+    color: #6b6b6b;
+}
+
+.hw-btn .material-icons {
+    font-size: 20px;
 }
 
 .hw-btn:hover {
-    background-color: #e5e7eb;
+    background-color: #f3f4f6;
 }
 
 .hw-btn:disabled {
-    opacity: 0.35;
+    color: #c7cbd1;
+    background-color: transparent;
     cursor: default;
 }
 
+/* 選択中は淡青の塗りで示す（枠線は使わない） */
 .hw-btn.active,
 .hw-btn[aria-pressed="true"] {
-    border-color: #2563eb;
     background-color: #dbeafe;
+    color: #1d4ed8;
 }
 
-/* 完了（スクロールに戻る）ボタン: 右端固定・primary。送信ボタン(bg-blue-600)と同色 */
+/* ツール群の区切り線 */
+.hw-divider {
+    flex: 0 0 auto;
+    width: 1px;
+    height: 20px;
+    background-color: #e5e7eb;
+    margin: 0 2px;
+}
+
+/* 完了（スクロールに戻る）: フッター送信ボタンと同じ丸ピル */
 .hw-done {
     flex: 0 0 auto;
     margin-left: auto;
     display: flex;
     align-items: center;
     gap: 4px;
-    height: 40px;
-    padding: 0 12px;
+    height: 34px;
+    padding: 0 14px;
     background-color: #2563eb;
     color: #ffffff;
     border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.hw-done .material-icons {
+    font-size: 16px;
 }
 
 .hw-done:hover {
@@ -96,10 +125,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    background-color: rgba(249, 250, 251, 0.8);
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
     border-radius: 6px;
     touch-action: pan-y;
+    animation: hw-fade-in 0.15s ease-out;
 }
 
 .hw-start-btn {
@@ -108,24 +140,32 @@
     gap: 6px;
     min-width: 44px;
     min-height: 44px;
-    padding: 10px 18px;
+    padding: 10px 20px;
     background-color: #2563eb;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 9999px;
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hw-start-btn .material-icons {
+    font-size: 18px;
 }
 
 .hw-start-btn:hover {
     background-color: #1d4ed8;
 }
 
+.hw-start-btn:active {
+    transform: scale(0.98);
+}
+
 .hw-scroll-hint {
     font-size: 12px;
-    color: #6b7280;
+    color: #6b6b6b;
 }
 
 /* --- ポップオーバー（色・太さ） --- */
@@ -136,38 +176,38 @@
 
 .hw-popover {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     left: 0;
     z-index: 30;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px;
+    gap: 10px;
+    padding: 10px;
     background-color: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    animation: hw-fade-in 0.15s ease-out;
 }
 
 .hw-swatch {
-    width: 32px;
-    height: 32px;
-    border: 2px solid transparent;
+    width: 28px;
+    height: 28px;
+    border: none;
     border-radius: 50%;
     cursor: pointer;
     padding: 0;
 }
 
 .hw-swatch.active {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px #dbeafe;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2563eb;
 }
 
 /* 色トリガー内の現在色インジケーター */
 .hw-color-chip {
-    width: 18px;
-    height: 18px;
-    border: 1px solid #9ca3af;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d1d5db;
     border-radius: 50%;
 }
 
@@ -176,8 +216,8 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     border: none;
     background-color: transparent;
@@ -191,7 +231,7 @@
     border-radius: 50%;
 }
 
-/* 太さプリセットのドットプレビューと、トリガー内の現在値表示 */
+/* 太さプリセットのドットと、トリガー内の現在値ドット（直径=太さに応じて変化） */
 .hw-thickness-dot {
     display: block;
     border-radius: 50%;
@@ -200,13 +240,24 @@
 
 .hw-thickness-chip {
     display: block;
-    width: 18px;
-    border-radius: 2px;
-    background-color: #374151;
+    border-radius: 50%;
+    background-color: #4b5563;
 }
 
-/* 小画面(〜389px)ではボタンを詰め、完了はアイコンのみにして1段を守る
-   （375px時: 最小構成幅 7×30+40+7+4=261px ≦ 実効幅293px。キャンバス同幅のまま収まる） */
+/* モーションを抑えたい環境ではフェードを無効化 */
+@media (prefers-reduced-motion: reduce) {
+    .hw-toolbar,
+    .hw-overlay,
+    .hw-popover {
+        animation: none;
+    }
+    .hw-start-btn:active {
+        transform: none;
+    }
+}
+
+/* 小画面(〜389px)ではボタンを詰め・区切りを外し、完了はアイコンのみにして1段を守る
+   （375px時: 最小構成幅 7×34+完了34+gap7+padding4=283px ≦ 実効幅293px） */
 @media (max-width: 389px) {
     .hw-toolbar {
         gap: 1px;
@@ -217,8 +268,13 @@
         width: 34px;
         min-width: 30px;
     }
+    .hw-divider {
+        display: none;
+    }
     .hw-done {
-        padding: 0 8px;
+        width: 34px;
+        padding: 0;
+        justify-content: center;
     }
     .hw-done .hw-done-label {
         display: none;
@@ -226,13 +282,13 @@
 }
 
 /* 極小幅(〜349px・iPhone SE 1st等)のみカード余白へ全幅で張り出す帯にする
-   （320px時: キャンバス同幅238pxでは最小構成261pxが入らないため。
+   （320px時: キャンバス同幅238pxでは最小構成283pxが入らないため。
      帯は左右ボーダーと角丸を外して意図した全幅ツールバーとして見せる） */
 @media (max-width: 349px) {
     .hw-toolbar {
         margin-inline: -1.5rem;
         border-inline: none;
-        border-bottom: 1px solid #9ca3af;
+        border-bottom: 1px solid #e0e0e0;
         border-radius: 0;
     }
 }
