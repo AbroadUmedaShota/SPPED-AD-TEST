@@ -1803,6 +1803,8 @@ function createQuestionElement(question, index) {
                 function setDrawMode(next, { reason = '' } = {}) {
                     if (mode === next) return;
                     mode = next;
+                    // ツールバーとキャンバスを一体の枠に見せる角丸切替（toolbox.css）
+                    toolbar.closest('.handwriting-container')?.classList.toggle('is-drawing', next === 'drawing');
                     if (next === 'drawing') {
                         // 同時に描画中にできる手書き設問は1問のみ
                         handwritingControllers.forEach((controller, id) => {

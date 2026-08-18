@@ -11,7 +11,8 @@
     display: none !important;
 }
 
-/* --- ツールバー（描画中のみ表示・1段固定） --- */
+/* --- ツールバー（描画中のみ表示・1段固定） ---
+   キャンバスと同幅・同ボーダーで上辺にドッキングし、一体の枠に見せる */
 .hw-toolbar {
     display: flex;
     flex-wrap: nowrap;
@@ -19,16 +20,20 @@
     gap: 2px;
     min-height: 44px;
     padding: 2px 4px;
-    margin-bottom: 8px;
-    /* カードの padding へ張り出し、320px 幅でも1段に収める */
-    margin-inline: -1rem;
+    margin-bottom: 0;
     position: sticky;
-    top: 8px;
+    top: 0;
     z-index: 20;
-    background-color: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    background-color: #f9fafb;
+    border: 1px solid #9ca3af; /* canvas の border-gray-400 と揃える */
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+}
+
+/* 描画中はツールバーと繋がるようキャンバス上辺の角丸を外す */
+.handwriting-container.is-drawing canvas {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .hw-btn {
@@ -200,13 +205,12 @@
     background-color: #374151;
 }
 
-/* 小画面(〜389px)ではボタンを詰め・張り出しを深くし、完了はアイコンのみにして1段を守る
-   （最小構成幅: ボタン7×30 + 完了40 + gap7 + padding4 = 261px ≦ 320px時の実効幅286px） */
+/* 小画面(〜389px)ではボタンを詰め、完了はアイコンのみにして1段を守る
+   （375px時: 最小構成幅 7×30+40+7+4=261px ≦ 実効幅293px。キャンバス同幅のまま収まる） */
 @media (max-width: 389px) {
     .hw-toolbar {
         gap: 1px;
         padding: 2px;
-        margin-inline: -1.5rem;
     }
     .hw-btn {
         flex-basis: 34px;
@@ -218,5 +222,17 @@
     }
     .hw-done .hw-done-label {
         display: none;
+    }
+}
+
+/* 極小幅(〜349px・iPhone SE 1st等)のみカード余白へ全幅で張り出す帯にする
+   （320px時: キャンバス同幅238pxでは最小構成261pxが入らないため。
+     帯は左右ボーダーと角丸を外して意図した全幅ツールバーとして見せる） */
+@media (max-width: 349px) {
+    .hw-toolbar {
+        margin-inline: -1.5rem;
+        border-inline: none;
+        border-bottom: 1px solid #9ca3af;
+        border-radius: 0;
     }
 }
