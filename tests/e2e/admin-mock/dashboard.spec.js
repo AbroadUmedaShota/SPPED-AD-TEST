@@ -49,20 +49,19 @@ const BLOCKS = {
   D: '会期中・終了間際のアンケート',
   NU: '直近の新規登録ユーザー',
   STUCK: '滞留している作業',
-  PAY: '入金の確認',
 };
 
 /** Lvごとのブロック可視性。§本文の「Lv別見出し数」記載どおり */
 const EXPECTED_BLOCKS = {
-  lv1: { B: true, C: false, NS: false, D: false, NU: false, STUCK: false, PAY: false },
-  lv2: { B: false, C: true, NS: false, D: false, NU: false, STUCK: true, PAY: false },
-  lv3: { B: false, C: true, NS: true, D: true, NU: true, STUCK: true, PAY: true },
-  lv4: { B: false, C: true, NS: true, D: true, NU: true, STUCK: true, PAY: true },
+  lv1: { B: true, C: false, NS: false, D: false, NU: false, STUCK: false },
+  lv2: { B: false, C: true, NS: false, D: false, NU: false, STUCK: true },
+  lv3: { B: false, C: true, NS: true, D: true, NU: true, STUCK: true },
+  lv4: { B: false, C: true, NS: true, D: true, NU: true, STUCK: true },
 };
 
-test.describe('ダッシュボードのブロック構成(2026-08-13最終確定版)', () => {
+test.describe('ダッシュボードのブロック構成(2026-08-18 入金の確認を撤去)', () => {
   for (const lv of ['lv1', 'lv2', 'lv3', 'lv4']) {
-    test(`${lv}: 7ブロックの表示/非表示が仕様どおり`, async ({ page }) => {
+    test(`${lv}: 6ブロックの表示/非表示が仕様どおり`, async ({ page }) => {
       await setLevel(page, lv);
       await openScreen(page, '/03_admin/index.html');
       const result = {};
@@ -82,7 +81,7 @@ test.describe('ダッシュボードのブロック構成(2026-08-13最終確定
     expect(await blockVisible(page, BLOCKS.STUCK), '滞留している作業が出ていない').toBe(true);
   });
 
-  const HEADING_COUNT = { lv1: 1, lv2: 2, lv3: 6, lv4: 6 };
+  const HEADING_COUNT = { lv1: 1, lv2: 2, lv3: 5, lv4: 5 };
   for (const [lv, n] of Object.entries(HEADING_COUNT)) {
     test(`${lv}: 見出し(.dash-sec)の可視数は${n}`, async ({ page }) => {
       await setLevel(page, lv);

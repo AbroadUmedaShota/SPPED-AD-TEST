@@ -438,28 +438,6 @@
                 <div class="dash-note">作業グループ①〜⑧は名刺データ化の作業分割単位です(data-entry/index.html と同じ表記)。遷移先での絞り込み受け口は未整備のため、行押下は条件なしでデータ入力対象一覧へ移動します。<br><a href="data-entry/index.html" style="color:var(--a-accent)">データ入力対象一覧へ →</a></div>
               </div>
 
-              <!-- 入金の確認(Lv3+)。支払方法は銀行振込のみで、入金は運営が銀行明細を見て
-                   入金確認日を記録する。自動照合を持たないため、確認しに行く合図として
-                   ここへ出す。件数・金額は billing-management.html の未入金9件から算出:
-                   期日超過=SV-10205/10209、期日間近=SV-10214/10218/10221 -->
-              <div data-min-lv="3">
-                <div class="dash-sec">入金の確認 <span class="dash-sec-note">入金確認日が未記録の請求。押すと請求管理へ移動します</span></div>
-                <div class="dash-cards">
-                  <div class="dash-card" tabindex="0" role="link" onclick="location.href='billing-management.html'">
-                    <div class="dash-card-label">支払期日を過ぎている</div>
-                    <div class="dash-card-num">2<span class="dash-card-unit">件</span></div>
-                    <div class="dash-card-sub">合計 250,064円</div>
-                    <div class="dash-card-link">請求管理 →</div>
-                  </div>
-                  <div class="dash-card" tabindex="0" role="link" onclick="location.href='billing-management.html'">
-                    <div class="dash-card-label">支払期日が2週間以内</div>
-                    <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
-                    <div class="dash-card-sub">合計 719,019円</div>
-                    <div class="dash-card-link">請求管理 →</div>
-                  </div>
-                </div>
-                <div class="dash-note">支払方法は銀行振込のみです。入金は自動で反映されないため、この件数を目安に銀行明細を確認し、請求管理から入金確認日を記録してください。「2週間以内」の区切りは実運用のレビューで決めます(※要確定)。<br><a href="billing-management.html" style="color:var(--a-accent)">請求管理へ →</a></div>
-              </div>
 
             </div>
 

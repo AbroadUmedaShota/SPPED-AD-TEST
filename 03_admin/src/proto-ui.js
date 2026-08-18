@@ -357,7 +357,7 @@
         company: '会社名', name: '氏名', mail: 'メールアドレス', code: 'コード', cname: 'クーポン名',
         status: '状態', plan: '納期区分', group: '所属グループ', lv: '権限', lang: '言語',
         month: '発行月', type: '操作種別', target: '対象', actor: '操作者', any: '氏名・メール・ID', from: '開始日', to: '終了日',
-        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム', unpaid: '入金未確認のみ',
+        coupon: 'クーポン', today: '本日会期のみ', isnew: '新着のみ', premium: 'プレミアム',
         survey: 'アンケート', invoice: '請求書'
     };
 

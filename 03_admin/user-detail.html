@@ -84,7 +84,6 @@
                 </div>
                 <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--a-border)"><span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">請求状況<span data-slot="blCount" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px"></span></span><button data-go="billing" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">請求管理で絞り込む</button></div>
-                  <div data-slot="unpaidBand" hidden style="margin-top:10px"></div>
                   <div id="udBills" data-page-size="5" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden"></div>
                 </div>
                 <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
@@ -227,7 +226,7 @@
     // pNotFound は src/proto-ui.js へ共通化(user-detail/survey-detail/reconciliation/detailの3重複を解消)
 
     var SURVEYS = {"U-1049": [{"sid": "SV-10262", "title": "人事・労務フォーラム 来場者アンケート", "period": "2026/08/03〜2026/08/05", "status": "会期前", "plan": "通常"}, {"sid": "SV-10227", "title": "スタートアップピッチ2026 来場者アンケート", "period": "2026/07/10〜2026/07/10", "status": "データ化完了", "plan": "お試し"}], "U-1052": [{"sid": "SV-10259", "title": "ITインフラEXPO 2026 来場者アンケート", "period": "2026/07/30〜2026/08/01", "status": "会期中", "plan": "特急"}, {"sid": "SV-10244", "title": "マーケティングサミット2026 来場者アンケート", "period": "2026/07/22〜2026/07/24", "status": "データ化中", "plan": "超特急"}], "U-1035": [{"sid": "SV-10257", "title": "医療機器・ヘルスケア展 来場者アンケート", "period": "2026/07/29〜2026/07/31", "status": "会期中", "plan": "通常"}, {"sid": "SV-10233", "title": "地方創生フォーラム 参加者アンケート", "period": "2026/07/16〜2026/07/16", "status": "データ化中", "plan": "通常"}], "U-1050": [{"sid": "SV-10250", "title": "食品・飲料展 出展者アンケート", "period": "2026/07/24〜2026/07/26", "status": "データ化完了", "plan": "オンデマンド"}], "U-1038": [{"sid": "SV-10238", "title": "BtoB EXPO 東京 2026 来場者アンケート", "period": "2026/07/21〜2026/07/23", "status": "データ化中", "plan": "オンデマンド"}], "U-1033": [{"sid": "SV-10236", "title": "スマート物流EXPO 来場者アンケート", "period": "2026/07/18〜2026/07/20", "status": "データ化中", "plan": "特急"}], "U-1031": [{"sid": "SV-10229", "title": "グリーンエネルギー展 来場者アンケート", "period": "2026/07/14〜2026/07/16", "status": "データ化完了", "plan": "超特急"}], "U-1026": [{"sid": "SV-10221", "title": "医薬品研究セミナー 参加者アンケート", "period": "2026/07/07〜2026/07/07", "status": "データ化完了", "plan": "特急"}], "U-1025": [{"sid": "SV-10218", "title": "ものづくりワールド 来場者アンケート", "period": "2026/07/02〜2026/07/04", "status": "データ化完了", "plan": "オンデマンド"}], "U-1022": [{"sid": "SV-10214", "title": "フードテックジャパン 出展者アンケート", "period": "2026/06/25〜2026/06/27", "status": "データ化完了", "plan": "通常"}], "U-1021": [{"sid": "SV-10209", "title": "観光インバウンドサミット 来場者アンケート", "period": "2026/06/19〜2026/06/20", "status": "データ化完了", "plan": "特急"}], "U-1019": [{"sid": "SV-10205", "title": "デザイントレンド展 来場者アンケート", "period": "2026/06/12〜2026/06/14", "status": "データ化完了", "plan": "超特急"}], "U-1017": [{"sid": "SV-10201", "title": "産業機械フェア 来場者アンケート", "period": "2026/06/05〜2026/06/07", "status": "データ化完了", "plan": "通常"}], "U-1016": [{"sid": "SV-10196", "title": "アグリビジネス展 出展者アンケート", "period": "2026/05/28〜2026/05/30", "status": "データ化完了", "plan": "お試し"}], "U-1014": [{"sid": "SV-10192", "title": "印刷・パッケージ総合展 来場者アンケート", "period": "2026/05/21〜2026/05/23", "status": "データ化完了", "plan": "通常"}], "U-1012": [{"sid": "SV-10188", "title": "SaaS Expo 2026 来場者アンケート", "period": "2026/05/14〜2026/05/16", "status": "データ化完了", "plan": "オンデマンド"}], "U-1009": [{"sid": "SV-10183", "title": "住宅リフォームフェア 来場者アンケート", "period": "2026/05/08〜2026/05/10", "status": "データ化完了", "plan": "特急"}], "U-1007": [{"sid": "SV-10179", "title": "環境ソリューション展 来場者アンケート", "period": "2026/04/23〜2026/04/25", "status": "データ化完了", "plan": "通常"}], "U-1002": [{"sid": "SV-10174", "title": "AI活用カンファレンス 参加者アンケート", "period": "2026/04/15〜2026/04/15", "status": "データ化完了", "plan": "超特急"}]};
-    var BILLS = {"U-1002": [{"sid": "SV-10174", "month": "2026年04月", "bill": "2026/04/23", "due": "2026/05/23", "amount": 77816, "paid": "2026/05/20", "title": "AI活用カンファレンス 参加者アンケート"}], "U-1007": [{"sid": "SV-10179", "month": "2026年05月", "bill": "2026/05/03", "due": "2026/06/02", "amount": 42842, "paid": "2026/05/29", "title": "環境ソリューション展 来場者アンケート"}], "U-1009": [{"sid": "SV-10183", "month": "2026年05月", "bill": "2026/05/16", "due": "2026/06/15", "amount": 121504, "paid": "2026/06/12", "title": "住宅リフォームフェア 来場者アンケート"}], "U-1012": [{"sid": "SV-10188", "month": "2026年05月", "bill": "2026/05/22", "due": "2026/06/21", "amount": 432166, "paid": "2026/06/18", "title": "SaaS Expo 2026 来場者アンケート"}], "U-1014": [{"sid": "SV-10192", "month": "2026年05月", "bill": "2026/05/29", "due": "2026/06/28", "amount": 89660, "paid": "2026/06/25", "title": "印刷・パッケージ総合展 来場者アンケート"}], "U-1017": [{"sid": "SV-10201", "month": "2026年06月", "bill": "2026/06/13", "due": "2026/07/13", "amount": 112814, "paid": "2026/07/10", "title": "産業機械フェア 来場者アンケート"}], "U-1019": [{"sid": "SV-10205", "month": "2026年06月", "bill": "2026/06/20", "due": "2026/07/20", "amount": 156638, "paid": "", "title": "デザイントレンド展 来場者アンケート"}], "U-1021": [{"sid": "SV-10209", "month": "2026年06月", "bill": "2026/06/27", "due": "2026/07/27", "amount": 93426, "paid": "", "title": "観光インバウンドサミット 来場者アンケート"}], "U-1022": [{"sid": "SV-10214", "month": "2026年07月", "bill": "2026/07/05", "due": "2026/08/04", "amount": 67475, "paid": "", "title": "フードテックジャパン 出展者アンケート"}], "U-1025": [{"sid": "SV-10218", "month": "2026年07月", "bill": "2026/07/10", "due": "2026/08/09", "amount": 624005, "paid": "", "title": "ものづくりワールド 来場者アンケート"}], "U-1026": [{"sid": "SV-10221", "month": "2026年07月", "bill": "2026/07/15", "due": "2026/08/14", "amount": 27539, "paid": "", "title": "医薬品研究セミナー 参加者アンケート"}], "U-1031": [{"sid": "SV-10229", "month": "2026年07月", "bill": "2026/07/22", "due": "2026/08/21", "amount": 298880, "paid": "", "title": "グリーンエネルギー展 来場者アンケート"}], "U-1035": [{"sid": "SV-10233", "month": "2026年07月", "bill": "2026/07/24", "due": "2026/08/23", "amount": 20912, "paid": "", "title": "地方創生フォーラム 参加者アンケート"}], "U-1050": [{"sid": "SV-10250", "month": "2026年08月", "bill": "2026/08/04", "due": "2026/09/03", "amount": 432050, "paid": "", "title": "食品・飲料展 出展者アンケート"}], "U-1033": [{"sid": "SV-10236", "month": "未発行", "bill": "", "due": "", "amount": 179175, "paid": "", "title": "スマート物流EXPO 来場者アンケート"}], "U-1038": [{"sid": "SV-10238", "month": "未発行", "bill": "", "due": "", "amount": 426020, "paid": "", "title": "BtoB EXPO 東京 2026 来場者アンケート"}], "U-1052": [{"sid": "SV-10244", "month": "未発行", "bill": "", "due": "", "amount": 112848, "paid": "", "title": "マーケティングサミット2026 来場者アンケート"}], "U-1049": [{"sid": "SV-10227", "month": "2026年07月", "bill": "2026/07/18", "due": "2026/08/17", "amount": 256, "paid": "", "title": "スタートアップピッチ2026 来場者アンケート"}], "U-1016": [{"sid": "SV-10196", "month": "2026年06月", "bill": "2026/06/08", "due": "2026/07/08", "amount": 584, "paid": "2026/07/05", "title": "アグリビジネス展 出展者アンケート"}]};
+    var BILLS = {"U-1002": [{"sid": "SV-10174", "month": "2026年04月", "bill": "2026/04/23", "due": "2026/05/23", "amount": 77816, "title": "AI活用カンファレンス 参加者アンケート"}], "U-1007": [{"sid": "SV-10179", "month": "2026年05月", "bill": "2026/05/03", "due": "2026/06/02", "amount": 42842, "title": "環境ソリューション展 来場者アンケート"}], "U-1009": [{"sid": "SV-10183", "month": "2026年05月", "bill": "2026/05/16", "due": "2026/06/15", "amount": 121504, "title": "住宅リフォームフェア 来場者アンケート"}], "U-1012": [{"sid": "SV-10188", "month": "2026年05月", "bill": "2026/05/22", "due": "2026/06/21", "amount": 432166, "title": "SaaS Expo 2026 来場者アンケート"}], "U-1014": [{"sid": "SV-10192", "month": "2026年05月", "bill": "2026/05/29", "due": "2026/06/28", "amount": 89660, "title": "印刷・パッケージ総合展 来場者アンケート"}], "U-1017": [{"sid": "SV-10201", "month": "2026年06月", "bill": "2026/06/13", "due": "2026/07/13", "amount": 112814, "title": "産業機械フェア 来場者アンケート"}], "U-1019": [{"sid": "SV-10205", "month": "2026年06月", "bill": "2026/06/20", "due": "2026/07/20", "amount": 156638, "title": "デザイントレンド展 来場者アンケート"}], "U-1021": [{"sid": "SV-10209", "month": "2026年06月", "bill": "2026/06/27", "due": "2026/07/27", "amount": 93426, "title": "観光インバウンドサミット 来場者アンケート"}], "U-1022": [{"sid": "SV-10214", "month": "2026年07月", "bill": "2026/07/05", "due": "2026/08/04", "amount": 67475, "title": "フードテックジャパン 出展者アンケート"}], "U-1025": [{"sid": "SV-10218", "month": "2026年07月", "bill": "2026/07/10", "due": "2026/08/09", "amount": 624005, "title": "ものづくりワールド 来場者アンケート"}], "U-1026": [{"sid": "SV-10221", "month": "2026年07月", "bill": "2026/07/15", "due": "2026/08/14", "amount": 27539, "title": "医薬品研究セミナー 参加者アンケート"}], "U-1031": [{"sid": "SV-10229", "month": "2026年07月", "bill": "2026/07/22", "due": "2026/08/21", "amount": 298880, "title": "グリーンエネルギー展 来場者アンケート"}], "U-1035": [{"sid": "SV-10233", "month": "2026年07月", "bill": "2026/07/24", "due": "2026/08/23", "amount": 20912, "title": "地方創生フォーラム 参加者アンケート"}], "U-1050": [{"sid": "SV-10250", "month": "2026年08月", "bill": "2026/08/04", "due": "2026/09/03", "amount": 432050, "title": "食品・飲料展 出展者アンケート"}], "U-1033": [{"sid": "SV-10236", "month": "未発行", "bill": "", "due": "", "amount": 179175, "title": "スマート物流EXPO 来場者アンケート"}], "U-1038": [{"sid": "SV-10238", "month": "未発行", "bill": "", "due": "", "amount": 426020, "title": "BtoB EXPO 東京 2026 来場者アンケート"}], "U-1052": [{"sid": "SV-10244", "month": "未発行", "bill": "", "due": "", "amount": 112848, "title": "マーケティングサミット2026 来場者アンケート"}], "U-1049": [{"sid": "SV-10227", "month": "2026年07月", "bill": "2026/07/18", "due": "2026/08/17", "amount": 256, "title": "スタートアップピッチ2026 来場者アンケート"}], "U-1016": [{"sid": "SV-10196", "month": "2026年06月", "bill": "2026/06/08", "due": "2026/07/08", "amount": 584, "title": "アグリビジネス展 出展者アンケート"}]};
     var BADGE = { '会期前': 'status-inactive', '会期中': 'status-info',
                   'データ化中': 'status-limit_reached', 'データ化完了': 'status-active' };
     function esc(t) {
@@ -319,45 +318,12 @@
     }
 
     // ---- 請求状況(§4.5) ----
-    var BL_COLS = '100px minmax(140px,1fr) 100px 100px 108px';
-    var TODAY = '2026/07/31';   // モックの現在日(ヘッダーの表示に合わせる)
-    // 銀行振込のみのため入金は運営が手作業で消し込む。未記録＝未入金ではないので、
-    // 督促対象は「期日を過ぎて未記録」だけに絞る(15_admin_billing.md §4.7)
-    function payState(b) {
-        if (!b.bill) { return 'unissued'; }
-        if (b.paid) { return 'paid'; }
-        return (b.due && b.due < TODAY) ? 'overdue' : 'waiting';
-    }
-    var PAY_LABEL = {
-        unissued: '<span style="color:var(--a-fg-faint)">—</span>',
-        waiting: '<span style="font-size:11.5px;color:var(--a-fg-muted);background:var(--a-surface-2);border:1px solid var(--a-border);'
-            + 'border-radius:4px;padding:1px 8px">入金待ち</span>',
-        overdue: '<span style="font-size:11.5px;font-weight:700;color:var(--a-danger);background:var(--a-danger-bg);'
-            + 'border:1px solid var(--a-danger-border);border-radius:4px;padding:1px 8px">期日超過</span>'
-    };
+    var BL_COLS = '100px minmax(140px,1fr) 100px 100px';
     function paintBills() {
         var box = document.getElementById('udBills');
         var list = BILLS[uid()] || [];
-        // 未発行の請求は入金の対象ではないので数に入れない
-        var unpaid = list.filter(function (b) { return payState(b) !== 'paid' && payState(b) !== 'unissued'; });
-        var overdue = list.filter(function (b) { return payState(b) === 'overdue'; });
         var cnt = document.querySelector('[data-slot="blCount"]');
         if (cnt) { cnt.textContent = '全 ' + list.length + ' 件'; }
-        var band = document.querySelector('[data-slot="unpaidBand"]');
-        if (band) {
-            band.hidden = !unpaid.length;
-            if (unpaid.length) {
-                var warn = overdue.length > 0;
-                band.innerHTML = '<div role="button" tabindex="0" onclick="pUdUnpaid()" '
-                    + 'style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:'
-                    + (warn ? 'var(--a-danger-bg)' : 'var(--a-surface-2)') + ';border:1px solid '
-                    + (warn ? 'var(--a-danger-border)' : 'var(--a-border)') + ';border-radius:6px;font-size:12px;color:'
-                    + (warn ? 'var(--a-danger)' : 'var(--a-fg-muted)') + ';cursor:pointer">'
-                    + '<span style="font-weight:700">入金未確認 ' + unpaid.length + ' 件</span>'
-                    + '<span>' + (warn ? 'うち期日超過 ' + overdue.length + ' 件。' : '支払期日前です。')
-                    + '請求管理でこのユーザーの入金未確認だけを表示する →</span></div>';
-            }
-        }
         if (!box) { return; }
         if (!list.length) {
             box.innerHTML = EMPTY.replace('{t}', 'このユーザーに紐づく請求はありません。');
@@ -365,7 +331,7 @@
         }
         box.innerHTML = '<div style="' + HEAD + ';grid-template-columns:' + BL_COLS + '">'
             + '<span>請求月</span><span>対象アンケート</span><span style="text-align:right;'
-            + 'padding-right:20px">請求金額</span><span>支払期日</span><span>入金確認日</span></div>'
+            + 'padding-right:20px">請求金額</span><span>支払期日</span></div>'
             + list.map(function (b, i) {
                 return '<div tabindex="0" role="link" class="proto-row-hover" style="' + ROW
                     + ';grid-template-columns:' + BL_COLS
@@ -377,17 +343,9 @@
                     + '<span style="text-align:right;padding-right:20px;font-weight:700">'
                     + yen(b.amount) + '</span>'
                     + '<span style="font-size:12px;color:var(--a-fg-muted)">' + (b.due || '—') + '</span>'
-                    + (b.paid
-                        ? '<span style="font-size:12px;color:var(--a-fg-muted)">' + b.paid + '</span>'
-                        : PAY_LABEL[payState(b)])
                     + '</div>';
             }).join('');
     }
-    window.pUdUnpaid = function () {
-        // billing-management.html の data-filter-keys(survey,uid,company,name,coupon)に
-        // unpaid キーは無いため、成立する uid だけで絞り込む
-        location.href = 'billing-management.html?uid=' + uid();
-    };
     window.pUdBilling = function () { location.href = 'billing-management.html?uid=' + uid(); };
 
     // ---- アカウント状態ごとの出し分け(§4.6・§7.1) ----
