@@ -179,3 +179,32 @@ test('グループ名が 請求管理 と アンケート詳細 で揃う', asyn
     expect(t, `${r.sid} のグループが 請求管理=「${r.group}」／アンケート詳細=「${t}」`).toContain(r.group);
   }
 });
+
+test.describe('ダッシュボードの案件パイプラインが実データと同数', () => {
+  // 2026-08-18 の全体レビューで、会期前カード(3件)とデータ化中カード(6件)が実データ
+  // (1件・4件)と食い違っているのを目視で検出した。カード件数を突合するテストが無く
+  // 見逃されていたため追加する。固定値ではなくステータス行数と比べ、データを増やしても
+  // 検査が追従するようにする
+  test('会期前・会期中・データ化中・照合待ちのカード件数が一覧のステータス行数と揃う', async ({ page }) => {
+    const sm = await listRows(page, '/03_admin/survey-management.html', 'surveysList');
+    const rc = await listRows(page, '/03_admin/reconciliation/index.html', 'reconList');
+    const byStatus = (s) => sm.filter((r) => r.status === s).length;
+
+    await openScreen(page, '/03_admin/index.html'); // 既定Lv4
+    const cards = await page.evaluate(() => {
+      const out = {};
+      document.querySelectorAll('.dash-card').forEach((c) => {
+        const label = (c.querySelector('.dash-card-label') || { textContent: '' }).textContent.replace(/\s+/g, '');
+        const n = (c.querySelector('.dash-card-num') || { textContent: '' }).textContent;
+        if (!(label in out)) { out[label] = parseInt(n.replace(/[^\d]/g, ''), 10); }
+      });
+      return out;
+    });
+
+    expect(cards['会期前(7日以内に開始)'], '会期前カードがアンケート管理の会期前行数と違う').toBe(byStatus('会期前'));
+    expect(cards['会期中'], '会期中カードがアンケート管理の会期中行数と違う').toBe(byStatus('会期中'));
+    expect(cards['名刺データ化中'], 'データ化中カードがアンケート管理のデータ化中行数と違う').toBe(byStatus('データ化中'));
+    expect(cards['照合待ち'], '照合待ちカードが照合結果一覧のデータ化中(進行中)行数と違う')
+      .toBe(rc.filter((r) => r.status === 'データ化中').length);
+  });
+});

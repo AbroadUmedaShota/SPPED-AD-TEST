@@ -211,15 +211,17 @@
             <div data-min-lv="2">
               <div class="dash-sec">案件パイプライン <span class="dash-sec-note">受注から納品までの各段階の件数(単位: 件〈アンケート〉)</span></div>
               <div class="dash-cards">
-                <!-- 会期前(7日以内に開始)。Lv2は survey-management.html にアクセスできないため遷移なしカードにする(※要確認: Lv2への表示可否) -->
+                <!-- 会期前(7日以内に開始)。件数はアンケート管理の会期前ステータス行数と同数にする
+                     (同数原則。2026-08-18 の全体レビューで 3件表示と実データ1件の食い違いを検出し修正)。
+                     Lv2は survey-management.html にアクセスできないため遷移なしカードにする(※要確認: Lv2への表示可否) -->
                 <div class="dash-card dash-card-static" data-min-lv="2" data-max-lv="2" style="display:none">
                   <div class="dash-card-label">会期前<br>(7日以内に開始)</div>
-                  <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
                   <div class="dash-card-sub">詳細はLv3以上で確認できます</div>
                 </div>
                 <div class="dash-card" data-min-lv="3" tabindex="0" role="link" onclick="location.href='survey-management.html'">
                   <div class="dash-card-label">会期前<br>(7日以内に開始)</div>
-                  <div class="dash-card-num">3<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-num">1<span class="dash-card-unit">件</span></div>
                   <div class="dash-card-link">アンケート管理 →</div>
                 </div>
                 <!-- 会期中(D一覧の会期中2行と同数) -->
@@ -233,9 +235,12 @@
                   <div class="dash-card-num">2<span class="dash-card-unit">件</span></div>
                   <div class="dash-card-link">アンケート管理 →</div>
                 </div>
+                <!-- 件数はアンケート管理のデータ化中ステータス行数と同数にする(同数原則。
+                     2026-08-18 の全体レビューで 6件表示と実データ4件の食い違いを検出し修正)。
+                     サブ表示の入力待ち名刺・進捗はデータ入力対象一覧の合計と一致させてある -->
                 <div class="dash-card" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
                   <div class="dash-card-label">名刺データ化中</div>
-                  <div class="dash-card-num">6<span class="dash-card-unit">件</span></div>
+                  <div class="dash-card-num">4<span class="dash-card-unit">件</span></div>
                   <div class="dash-card-sub">入力待ち名刺 4,219件・進捗67%</div>
                   <div class="dash-card-link">データ入力対象一覧 →</div>
                 </div>

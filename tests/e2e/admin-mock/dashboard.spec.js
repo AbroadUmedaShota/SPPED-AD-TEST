@@ -249,15 +249,9 @@ test.describe('滞留している作業(下段2カラム・復活)', () => {
     expect(progress).toEqual(['12%', '18%', '24%', '37%']);
   });
 
-  test('Lv2はアンケートIDのみでタイトルは出さない', async ({ page }) => {
-    await setLevel(page, 'lv2');
-    await openScreen(page, '/03_admin/index.html');
-    const t = await page.locator('#dashStuckTbl .dash-trow').first().innerText();
-    expect(t).toContain('SV-10236');
-    expect(t).not.toContain('スマート物流EXPO');
-  });
-
-  for (const lv of ['lv3', 'lv4']) {
+  // 2026-08-18: Lv2にもタイトルを表示する仕様へ変更(照合結果一覧のLv2開示範囲と整合)。
+  // 旧「Lv2はIDのみ」の検査は撤去し、全レベルで併記を確認する
+  for (const lv of ['lv2', 'lv3', 'lv4']) {
     test(`${lv}はアンケートIDにタイトルを併記する`, async ({ page }) => {
       await setLevel(page, lv);
       await openScreen(page, '/03_admin/index.html');
