@@ -74,7 +74,8 @@
                 </div>
                 <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
                   <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアカウントに対する操作</span></div>
-                  <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px"></div>
+                  <!-- 記録が増えても伸ばさないよう約6件分の高さでスクロールさせる(2026-08-18) -->
+                  <div id="udLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px;max-height:264px;overflow-y:auto"></div>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:16px">
@@ -95,7 +96,8 @@
                   </div>
                   <div data-slot="pwNote" hidden style="margin-top:8px;font-size:11.5px;color:var(--a-warn);line-height:1.7"></div>
                   <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border);margin-top:18px">メール送信履歴 <span style="font-weight:400;color:var(--a-fg-faint);margin-left:6px">送信した記録のみ。到達の確認は行わない</span></div>
-                  <div data-slot="mailBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px"></div>
+                  <!-- 送信履歴が増えても伸ばさないようスクロールさせる(2026-08-18) -->
+                  <div data-slot="mailBox" style="padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;max-height:264px;overflow-y:auto"></div>
                 </div>
                 <!-- 対応履歴。メール送信履歴・監査ログと同じ「この利用者に何があったか」の記録なので、
                      右列の記録系の並びに置く。1枠の自由記述だと分量が増えたときに目で探すことになるため

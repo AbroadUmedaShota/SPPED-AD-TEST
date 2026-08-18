@@ -69,8 +69,10 @@
         <span style="font-size:12px;font-weight:700;color:var(--a-fg-muted)">設問構成<span data-slot="qNote" style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">全4問・会期前は通常編集として変更できます</span></span>
         <button data-slot="qEditBtn" onclick="pQOpen()" style="flex-shrink:0;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">設問を編集</button>
       </div>
-      <div id="qList" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow:hidden">
-        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11px;font-weight:700;color:var(--a-fg-muted)"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
+      <!-- 設問が増えても枠を伸ばさない(2026-08-18)。見出し+4問分(約170px)で高さを固定し、
+           5問以降はスクロールで見る。見出し行は sticky でスクロール中も残す -->
+      <div id="qList" style="margin-top:10px;border:1px solid var(--a-border);border-radius:6px;overflow-y:auto;overflow-x:hidden;max-height:170px">
+        <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:0 12px;height:32px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:11px;font-weight:700;color:var(--a-fg-muted);position:sticky;top:0;z-index:1"><span>No</span><span>設問文</span><span>設問タイプ</span><span>必須</span></div>
         <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">1</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">本日のご来場のきっかけを教えてください</span><span style="font-size:11.5px;color:var(--a-fg-muted)">単一選択</span><span style="font-size:11px;color:var(--a-danger);font-weight:700">必須</span></div>
         <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">2</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ご興味のある製品分野</span><span style="font-size:11.5px;color:var(--a-fg-muted)">複数選択</span><span style="font-size:11px;color:var(--a-danger);font-weight:700">必須</span></div>
         <div style="display:grid;grid-template-columns:44px minmax(200px,1fr) 150px 64px;column-gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--a-border-soft);font-size:12.5px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums">3</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">導入をご検討の時期</span><span style="font-size:11.5px;color:var(--a-fg-muted)">単一選択</span><span style="font-size:11px;color:var(--a-fg-faint)">任意</span></div>
@@ -81,6 +83,15 @@
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
                   <button onclick="pOpen('mConfirmRequestMail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">確認依頼メールを送信</button>
                   <button data-slot="saveBasic" onclick="pOpen('mConfirmSaveSurvey')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">変更を保存</button>
+                </div>
+              </div>
+              <!-- 監査ログ。2026-08-18 に右カラムから左カラムへ移動(ユーザー指示)。
+                   記録が増えても伸ばさないよう約6件分の高さでスクロールさせる -->
+              <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
+                <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアンケートに対する操作</span></div>
+                <div id="sdLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px;max-height:264px;overflow-y:auto">
+                  <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(2026/08/04→2026/08/03開始)<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
+                  <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:var(--a-fg-faint)">実行者: 本人(U-1049)</span></span></div>
                 </div>
               </div>
               </div>
@@ -172,13 +183,6 @@
                       <span style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.7">記録は追記のみで、担当者と記録日が残ります。</span>
                       <button onclick="pSdMemoAppend()" style="flex:none;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">記録を追加</button>
                     </div>
-                  </div>
-                </div>
-                <div style="background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:22px">
-                  <div style="font-size:12px;font-weight:700;color:var(--a-fg-muted);padding-bottom:8px;border-bottom:1px solid var(--a-border)">監査ログ<span style="font-weight:400;color:var(--a-fg-faint);margin-left:8px">このアンケートに対する操作</span></div>
-                  <div id="sdLog" style="padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:12px">
-                    <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/30 15:41</span><span>会期日時を変更(2026/08/04→2026/08/03開始)<br><span style="color:var(--a-fg-faint)">実行者: admin@abroad-o.com・理由: 主催者からの会期前倒し連絡</span></span></div>
-                    <div style="display:flex;gap:10px"><span style="color:var(--a-fg-faint);font-variant-numeric:tabular-nums;flex:none">2026/07/28 09:15</span><span>アンケートを作成<br><span style="color:var(--a-fg-faint)">実行者: 本人(U-1049)</span></span></div>
                   </div>
                 </div>
               </div>

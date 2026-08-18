@@ -414,6 +414,10 @@ body.sidebar-locked {
     background: var(--a-surface);
     border-radius: 10px;
     box-shadow: 0 20px 60px rgba(12, 18, 30, .4);
+    /* 中身が伸びてもビューポートを超えない(2026-08-18)。超えた分はダイアログ内スクロール。
+       自前で高さを管理するモーダル(88vh固定+内部スクロール等)はインライン指定が優先される */
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
 }
 
 /* 一覧行ホバー(prototype 準拠) */
