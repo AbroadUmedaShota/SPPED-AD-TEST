@@ -190,55 +190,45 @@
     animation: hw-fade-in 0.15s ease-out;
 }
 
-.hw-swatch {
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 0;
-}
-
-.hw-swatch.active {
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2563eb;
-}
-
-/* 色トリガー内の現在色インジケーター */
-.hw-color-chip {
-    width: 20px;
-    height: 20px;
-    border: 1px solid #d1d5db;
-    border-radius: 50%;
-}
-
-/* カスタム色: 虹色リング+「+」で「自由に選べる」導線を明示する。
-   native の color input は透明にして上に重ね、クリックを受けさせる */
-.hw-custom-wrap {
+/* 色選択: ボタン自体がカラーピッカー。虹色リングの中に現在色を見せ、
+   透明にした native の color input を上に重ねて、タップで OS のピッカーを直接開く */
+.hw-color-btn {
     position: relative;
-    flex: 0 0 auto;
-    width: 28px;
-    height: 28px;
+    flex: 0 1 38px;
+    min-width: 32px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+}
+
+.hw-color-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.hw-color-ring {
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: conic-gradient(#f44336, #ff9800, #ffeb3b, #4caf50, #2196f3, #9c27b0, #f44336);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 3px;
+    box-sizing: border-box;
 }
-.hw-custom-wrap::before {
-    content: '';
-    position: absolute;
-    inset: 4px;
+
+.hw-color-chip {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    background-color: #ffffff;
+    border: 2px solid #ffffff;
+    box-sizing: border-box;
 }
-.hw-custom-wrap::after {
-    content: '+';
-    position: absolute;
-    color: #6b6b6b;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1;
-}
+
 .hw-custom-color {
     position: absolute;
     inset: 0;

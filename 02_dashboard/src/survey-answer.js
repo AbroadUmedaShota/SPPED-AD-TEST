@@ -1615,19 +1615,12 @@ function createQuestionElement(question, index) {
                             <span class="material-icons">layers_clear</span>
                         </button>
                         <span class="hw-divider" aria-hidden="true"></span>
-                        <div class="hw-pop-wrap">
-                            <button type="button" id="${question.id}-color-trigger" class="hw-btn" title="${hw('color')}" aria-label="${hw('color')}" aria-haspopup="true" aria-expanded="false">
+                        <span class="hw-color-btn" title="${hw('color')}">
+                            <span class="hw-color-ring" aria-hidden="true">
                                 <span id="${question.id}-color-chip" class="hw-color-chip" style="background-color: #000000;"></span>
-                            </button>
-                            <div id="${question.id}-color-popover" class="hw-popover" hidden>
-                                <button type="button" class="hw-swatch active" data-color="#000000" style="background-color: #000000;" title="${hw('colorBlack')}" aria-label="${hw('colorBlack')}"></button>
-                                <button type="button" class="hw-swatch" data-color="#DC2626" style="background-color: #DC2626;" title="${hw('colorRed')}" aria-label="${hw('colorRed')}"></button>
-                                <button type="button" class="hw-swatch" data-color="#2563EB" style="background-color: #2563EB;" title="${hw('colorBlue')}" aria-label="${hw('colorBlue')}"></button>
-                                <span class="hw-custom-wrap" title="${hw('customColor')}">
-                                    <input type="color" id="${question.id}-custom-color" class="hw-custom-color" value="#000000" aria-label="${hw('customColor')}">
-                                </span>
-                            </div>
-                        </div>
+                            </span>
+                            <input type="color" id="${question.id}-custom-color" class="hw-custom-color" value="#000000" aria-label="${hw('color')}">
+                        </span>
                         <div class="hw-pop-wrap">
                             <button type="button" id="${question.id}-width-trigger" class="hw-btn" title="${hw('thickness')}" aria-label="${hw('thickness')}" aria-haspopup="true" aria-expanded="false">
                                 <span id="${question.id}-thickness-chip" class="hw-thickness-chip" style="width: 9px; height: 9px;"></span>
@@ -1688,8 +1681,6 @@ function createQuestionElement(question, index) {
                 const doneBtn = document.getElementById(`${question.id}-done-btn`);
                 const penTool = document.getElementById(`${question.id}-pen-tool`);
                 const eraserTool = document.getElementById(`${question.id}-eraser-tool`);
-                const colorTrigger = document.getElementById(`${question.id}-color-trigger`);
-                const colorPopover = document.getElementById(`${question.id}-color-popover`);
                 const colorChip = document.getElementById(`${question.id}-color-chip`);
                 const customColor = document.getElementById(`${question.id}-custom-color`);
                 const widthTrigger = document.getElementById(`${question.id}-width-trigger`);
@@ -1790,7 +1781,7 @@ function createQuestionElement(question, index) {
                 }
 
                 function closePopovers(exceptTarget = null, { restoreFocus = false } = {}) {
-                    [[colorTrigger, colorPopover], [widthTrigger, widthPopover]].forEach(([trigger, popover]) => {
+                    [[widthTrigger, widthPopover]].forEach(([trigger, popover]) => {
                         if (popover.hidden) return;
                         if (exceptTarget && (popover.contains(exceptTarget) || trigger.contains(exceptTarget))) return;
                         setExpanded(trigger, popover, false);
@@ -1910,7 +1901,7 @@ function createQuestionElement(question, index) {
                     updateToolButtons();
                 });
 
-                // 色（ポップオーバー）
+                // 色（ボタン自体がカラーピッカー。タップで OS のピッカーが直接開く）
                 function applyColor(color) {
                     currentColor = color;
                     ctx.strokeStyle = color;
@@ -1919,26 +1910,9 @@ function createQuestionElement(question, index) {
                     tool = 'pen';
                     ctx.globalCompositeOperation = 'source-over';
                     updateToolButtons();
-                    colorPopover.querySelectorAll('.hw-swatch').forEach((swatch) => {
-                        swatch.classList.toggle('active', (swatch.dataset.color || '').toLowerCase() === color.toLowerCase());
-                    });
                 }
 
-                colorTrigger.addEventListener('click', () => {
-                    const open = colorPopover.hidden;
-                    closePopovers();
-                    setExpanded(colorTrigger, colorPopover, open);
-                });
-
-                colorPopover.querySelectorAll('.hw-swatch').forEach((swatch) => {
-                    swatch.addEventListener('click', () => {
-                        applyColor(swatch.dataset.color);
-                        setExpanded(colorTrigger, colorPopover, false);
-                    });
-                });
-
                 customColor.addEventListener('input', (e) => applyColor(e.target.value));
-                customColor.addEventListener('change', () => setExpanded(colorTrigger, colorPopover, false));
 
                 // 太さ（ポップオーバー・3プリセット）
                 function applyWidth(width) {

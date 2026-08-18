@@ -235,12 +235,24 @@ test.describe('手書き設問: 履歴・復元', () => {
 });
 
 test.describe('手書き設問: ポップオーバー', () => {
-  test('色ポップオーバーの開閉・プリセット選択がトリガーに反映される', async ({ page }) => {
+  test('色ボタンのカラーピッカーで選んだ色がチップに反映される', async ({ page }) => {
     await openRealSurvey(page);
     await startDrawingMode(page, HW);
 
-    const trigger = page.locator(`#${HW}-color-trigger`);
-    const popover = page.locator(`#${HW}-color-popover`);
+    // ボタン自体が native の color input（タップで OS のピッカーが直接開く）
+    const colorInput = page.locator(`#${HW}-custom-color`);
+    await expect(colorInput).toBeVisible();
+    await colorInput.fill('#dc2626');
+    const chipColor = await page.evaluate((id) => document.getElementById(`${id}-color-chip`).style.backgroundColor, HW);
+    expect(chipColor).toBe('rgb(220, 38, 38)');
+  });
+
+  test('太さポップオーバーの開閉・外側クリック・プリセット選択', async ({ page }) => {
+    await openRealSurvey(page);
+    await startDrawingMode(page, HW);
+
+    const trigger = page.locator(`#${HW}-width-trigger`);
+    const popover = page.locator(`#${HW}-width-popover`);
 
     await trigger.click();
     await expect(popover).toBeVisible();
@@ -253,23 +265,8 @@ test.describe('手書き設問: ポップオーバー', () => {
     await expect(popover).toBeHidden();
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
-    // 赤を選ぶとポップオーバーが閉じ、トリガーのチップが赤になる
+    // 再度開いてプリセットを選ぶと閉じて選択状態が変わる
     await trigger.click();
-    await popover.locator('[data-color="#DC2626"]').click();
-    await expect(popover).toBeHidden();
-    const chipColor = await page.evaluate((id) => document.getElementById(`${id}-color-chip`).style.backgroundColor, HW);
-    expect(chipColor).toBe('rgb(220, 38, 38)');
-  });
-
-  test('太さポップオーバーでプリセットを選ぶと閉じて選択状態が変わる', async ({ page }) => {
-    await openRealSurvey(page);
-    await startDrawingMode(page, HW);
-
-    const trigger = page.locator(`#${HW}-width-trigger`);
-    const popover = page.locator(`#${HW}-width-popover`);
-
-    await trigger.click();
-    await expect(popover).toBeVisible();
     await popover.locator('[data-width="10"]').click();
     await expect(popover).toBeHidden();
     await expect(page.locator(`#${HW}-width-popover [data-width="10"]`)).toHaveClass(/active/);
