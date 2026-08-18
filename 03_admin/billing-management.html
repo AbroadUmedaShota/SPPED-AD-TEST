@@ -177,7 +177,7 @@
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px">
-      <button data-slot="bdCoupon" onclick="pCouponFromDetail()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">クーポンを適用</button>
+      <!-- クーポン適用の入口は一覧の行ボタンへ一本化(2026-08-18)。詳細モーダルは閲覧に徹する -->
       <button data-initial-focus onclick="pClose('mBillDetail')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">閉じる</button>
     </div>
   </div>
@@ -321,13 +321,8 @@
         put('mBillDetail', 'bdDeliv', b.deliv + (b.done ? '' : '(予定)'));
         put('mBillDetail', 'bdBill', b.bill || '未請求');
         put('mBillDetail', 'bdDue', b.due || '未確定');
-        var cb = slot('mBillDetail', 'bdCoupon');
-        cb.style.display = b.done ? '' : 'none';
-        cb.textContent = b.coupon ? '適用中のクーポン' : 'クーポンを適用';
         window.pOpen('mBillDetail');
     };
-
-    window.pCouponFromDetail = function () { window.pCoupon(cur); };
 
     window.pCoupon = function (sid) {
         var b = BILLS[sid];
