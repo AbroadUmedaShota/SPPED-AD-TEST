@@ -1,6 +1,6 @@
 import { resolveSupportBasePath } from '../assets/js/utils.js';
 
-const VOICE_COLLECTION_VERSION = '20260818-oriental-copy-v2';
+const VOICE_COLLECTION_VERSION = '20260818-oriental-story-v3';
 const VOICE_FETCH_TIMEOUT_MS = 5000;
 const VOICE_RETRY_DELAY_MS = 600;
 const VOICE_FETCH_ATTEMPTS = 2;

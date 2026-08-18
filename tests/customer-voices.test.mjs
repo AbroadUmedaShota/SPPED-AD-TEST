@@ -17,20 +17,24 @@ test('Oriental Motor is the first published customer voice with approved summary
   assert.equal(new Set(slugs).size, slugs.length, 'customer voice slugs must be unique');
   assert.equal(voice.slug, 'oriental-motor');
   assert.equal(voice.voicePageLabel, 'オリエンタルモーター株式会社様');
-  assert.equal(voice.voicePageHeadline, '翌営業日に名刺データを納品。翌々日、利用中のCRMへ取り込み完了。');
+  assert.equal(voice.voicePageHeadline, '展示会後の名刺を、翌々日には利用中のCRMへ。');
   assert.equal(
     voice.listingSummary,
-    '既存のSPEED AD利用ユーザーからの紹介をきっかけに利用を開始。名刺データを翌営業日に納品し、利用中のCRMへの取り込みを翌々日に完了した事例です。'
+    '既存ユーザー様からの紹介をきっかけに利用を開始。展示会終了後の翌営業日に名刺データを納品し、翌々日にはSPEED ADが利用中のCRMへの取り込みまで完了した事例です。'
+  );
+  assert.equal(
+    voice.voicePageSummary,
+    '既存ユーザー様の紹介をきっかけに利用を開始。本事例では、展示会終了後の翌営業日に名刺データを納品し、その翌日にはSPEED ADが利用中のCRMへの取り込みまで完了しました。データ納品だけで終わらず、CRMで活用できる状態まで一連で進められたことが、大きなメリットとなりました。'
   );
   assert.deepEqual(voice.voicePageHighlights, [
     { label: '導入のきっかけ', value: '既存ユーザー様からの紹介' },
-    { label: '名刺データの納品', value: '展示会終了後の翌営業日' },
-    { label: '利用中CRMへの取り込み', value: '展示会終了後の翌々日' },
+    { label: '展示会終了後 翌営業日', value: '名刺データを納品' },
+    { label: '展示会終了後 翌々日', value: 'SPEED ADがCRM取り込みまで完了' },
   ]);
   assert.deepEqual(voice.outcome, [
-    '名刺データを翌営業日に受領できた',
-    '利用中のCRMへの取り込みを翌々日に完了できた',
-    '名刺データの納品から利用中のCRMへの取り込みまでを短い日程で進められた',
+    '展示会終了後の翌営業日に、名刺データを受領できた',
+    '翌々日には、SPEED ADによる利用中CRMへの取り込みまで完了した',
+    '名刺データ化からCRMで活用できる状態まで、一連の流れで進められた',
   ]);
   assert.equal(voice.quote, undefined);
   assert.equal(voice.publicQuoteAuthor, undefined);
@@ -47,15 +51,27 @@ test('Oriental Motor detail route has canonical metadata and no testimonial quot
   assert.match(html, /<meta property="og:image" content="https:\/\/support\.speed-ad\.com\/assets\/img\/customer-voices\/oriental-motor-placeholder\.png">/);
   assert.match(html, /data-voice-slug="oriental-motor"/);
   assert.doesNotMatch(html, /<blockquote\b|担当者コメント|ご担当者のコメント/);
-  assert.match(html, /本ページは、確認済みの導入事例をもとに構成した要約です。/);
-  assert.match(html, /紹介をきっかけに始まった、名刺データ活用の流れ/);
-  assert.match(html, /名刺データ納品から、利用中のCRM取り込みまで/);
-  assert.match(html, /名刺情報を、[\s\S]*次の活用へ[\s\S]*スムーズにつなぐ。/);
+  assert.match(html, /展示会後の名刺を、[\s\S]*翌々日には[\s\S]*利用中の[\s\S]*CRMへ。/);
+  assert.match(html, /紹介をきっかけに、[\s\S]*CRM活用までを一連で依頼/);
+  assert.match(html, /展示会終了から翌々日まで。[\s\S]*活用できるデータへ/);
+  assert.match(html, /データ納品で終わらない、[\s\S]*一連対応のメリット/);
+  assert.match(html, /名刺データ化から、[\s\S]*利用中CRMへの[\s\S]*取り込みまで。/);
+  assert.doesNotMatch(html, /実名掲載許諾済み|固有情報は掲載していません|編集注記|確認済みの導入事例|同一日程を保証/);
+  assert.match(html, /class="voice-footer oriental-footer"/);
+  assert.match(html, /class="oriental-signal"/);
+  assert.match(html, /D\+1[\s\S]*名刺データを納品/);
+  assert.match(html, /D\+2[\s\S]*CRM取り込み完了/);
+  assert.doesNotMatch(html, /Zen\+Old\+Mincho|支給素材へ差し替え予定/);
+  assert.match(html, /導入事例一覧/);
   assert.match(script, /item\.slug === 'oriental-motor'/);
+  assert.match(script, /展示会後の名刺を、翌々日には利用中のCRMへ。/);
   assert.match(script, /renderParagraphs\(voice\.overview\)/);
   assert.match(script, /renderTimeline\(voice\.operationImage\)/);
   assert.match(script, /renderBullets\(voice\.outcome\)/);
   assert.match(style, /\.voice-oriental-motor/);
+  assert.match(style, /\.oriental-signal/);
+  assert.match(style, /--oriental-canvas: #f7f9fc/);
+  assert.match(style, /\.voice-oriental-motor \.oriental-footer/);
   await access(heroImagePath);
 });
 
