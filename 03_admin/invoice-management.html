@@ -50,6 +50,10 @@
                 <div tabindex="0" role="button" data-pg="2" data-f-month="2026/04" data-f-company="(株)テクノブレイン" data-f-uid="U-1002" data-f-invoice="INV-2026-04-001" class="proto-row-hover" onclick="pInvoice('INV-2026-04-001')" style="display:grid;grid-template-columns:minmax(96px,56fr) minmax(176px,180fr) minmax(124px,60fr) minmax(136px,66fr) minmax(146px,70fr) minmax(126px,60fr) 136px;align-items:center;padding:0 16px;min-height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer"><span style="font-weight:500">2026/04</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">(株)テクノブレイン</span><span style="text-align:right">10,000 円</span><span style="text-align:right">77,400 円</span><span style="text-align:right">416 円</span><span style="text-align:right;font-weight:700">96,597 円</span><span style="text-align:right;font-size:11.5px;color:var(--a-accent)">請求書を表示</span></div>
               <div id="invoiceList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
+            <!-- 合計行: 絞り込み結果(全ページ分)の請求合計(税込)の総額。値はスクリプトが再計算する -->
+            <div style="margin-top:12px;display:flex;justify-content:flex-end;font-size:12.5px;color:var(--a-fg);font-variant-numeric:tabular-nums">
+              <span>絞り込み結果 <span id="invoiceSumN">—</span> 通の総額(税込・全ページ分) <strong id="invoiceSumTotal" style="font-size:13.5px">—</strong></span>
+            </div>
             <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
               <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="invoiceList-total">16</span> 件中 <span id="invoiceList-range">1〜10</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('invoiceList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div id="invoiceList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('invoiceList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('invoiceList',1)" style="border:1px solid var(--a-accent);background:var(--a-accent-bg);color:var(--a-on-accent);border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜16" onclick="pPage('invoiceList',2)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">2</button><button onclick="pPageStep('invoiceList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
@@ -102,6 +106,39 @@ window.pInvoiceClose = function () {
     document.querySelector('#mInvoiceDetail [data-slot="ivFrame"]').src = 'about:blank';
     window.pClose('mInvoiceDetail');
 };
+
+// 合計行の再計算。絞り込み(data-out)で対象が変わるたびに拾い直す
+(function () {
+    'use strict';
+    var timer = null;
+    function yen(n) { return n.toLocaleString('ja-JP') + ' 円'; }
+    function recalc() {
+        var list = document.getElementById('invoiceList');
+        if (!list) { return; }
+        var n = 0, total = 0;
+        list.querySelectorAll('[data-pg]:not([data-out])').forEach(function (r) {
+            var c = r.children[5];
+            var v = c ? parseInt(String(c.textContent).replace(/[^\d]/g, ''), 10) : NaN;
+            if (isNaN(v)) { return; }
+            n++; total += v;
+        });
+        var en = document.getElementById('invoiceSumN');
+        var et = document.getElementById('invoiceSumTotal');
+        if (en) { en.textContent = String(n); }
+        if (et) { et.textContent = yen(total); }
+    }
+    function queue() { clearTimeout(timer); timer = setTimeout(recalc, 60); }
+    function wire() {
+        var list = document.getElementById('invoiceList');
+        if (!list) { return; }
+        new MutationObserver(queue).observe(list, {
+            subtree: true, attributes: true, attributeFilter: ['data-out']
+        });
+        recalc();
+    }
+    document.addEventListener('DOMContentLoaded', wire);
+    if (document.readyState !== 'loading') { wire(); }
+})();
 </script>
 
 </body>

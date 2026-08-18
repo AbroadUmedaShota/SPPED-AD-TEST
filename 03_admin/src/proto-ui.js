@@ -253,6 +253,12 @@
                 if (ny === null) { return -1; }
                 d = nx - ny;
             } else {
+                // 文字列比較でも値が無い行(— や空)は数値のときと同様に末尾へ寄せる
+                // (納期日など「—」混在の列で、— が昇順の先頭に固まるのを防ぐ)
+                var ex = (!x || x === '—'), ey = (!y || y === '—');
+                if (ex && ey) { return 0; }
+                if (ex) { return 1; }
+                if (ey) { return -1; }
                 d = x.localeCompare(y, 'ja');
             }
             return dir === 'asc' ? d : -d;
