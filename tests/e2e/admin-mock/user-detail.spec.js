@@ -159,3 +159,44 @@ test.describe('所属グループ（§4.4）', () => {
     expect(await page.locator('#udGroups button, #udGroups select, #udGroups input').count()).toBe(0);
   });
 });
+
+test.describe('対応履歴の横断表示と登録確認（2026-08-18）', () => {
+  test('作成したグループアンケートの記録が出典バッジ付きで混ざる（U-1052）', async ({ page }) => {
+    await open(page, 'U-1052');
+    const t = await page.locator('[data-slot="memoCard"]').innerText();
+    // 既定の直近2件に、本人への記録(07/28)とSV-10244の記録(07/27)が並ぶ
+    expect(t).toContain('請求書の宛名');
+    expect(t).toContain('SV-10244 アンケートの件');
+  });
+
+  test('グループのメンバーにも、そのグループで作成されたアンケートの記録が出る（U-1049）', async ({ page }) => {
+    await open(page, 'U-1049');
+    const t = await page.locator('[data-slot="memoCard"]').innerText();
+    expect(t, '自作アンケートの記録が出ない').toContain('SV-10262 アンケートの件');
+    expect(t, 'グループ経由のアンケートの記録が出ない').toContain('SV-10244 アンケートの件');
+  });
+
+  test('アンケート詳細側には利用者への記録を出さない（集約はユーザー詳細のみ）', async ({ page }) => {
+    await openScreen(page, '/03_admin/survey-detail.html?id=SV-10244');
+    const t = await page.locator('[data-slot="memoCard"]').innerText();
+    expect(t).toContain('納品予定の前倒し');
+    expect(t, '利用者への記録が漏れ出ている').not.toContain('請求書の宛名');
+  });
+
+  test('記録の追加は確認ダイアログを通し、確定で一覧に載る', async ({ page }) => {
+    await open(page, 'U-1052');
+    await page.fill('[data-slot="memoNew"]', '確認ダイアログの検査記録');
+    await page.click('[data-slot="memoCard"] button:has-text("記録を追加")');
+    await expect(page.locator('#mConfirmMemo')).toBeVisible();
+    await expect(page.locator('#mConfirmMemo')).toContainText('確認ダイアログの検査記録');
+    // キャンセルでは登録されず、入力は保持される
+    await page.click('#mConfirmMemo button:has-text("キャンセル")');
+    await expect(page.locator('#mConfirmMemo')).toBeHidden();
+    expect(await page.inputValue('[data-slot="memoNew"]')).toBe('確認ダイアログの検査記録');
+    // 確定で一覧の先頭に載る
+    await page.click('[data-slot="memoCard"] button:has-text("記録を追加")');
+    await page.click('#mConfirmMemo button:has-text("記録する")');
+    await expect(page.locator('#mConfirmMemo')).toBeHidden();
+    await expect(page.locator('[data-slot="memoList"]')).toContainText('確認ダイアログの検査記録');
+  });
+});
