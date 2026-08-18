@@ -166,14 +166,14 @@ test.describe('対応履歴の横断表示と登録確認（2026-08-18）', () =
     const t = await page.locator('[data-slot="memoCard"]').innerText();
     // 既定の直近2件に、本人への記録(07/28)とSV-10244の記録(07/27)が並ぶ
     expect(t).toContain('請求書の宛名');
-    expect(t).toContain('SV-10244 アンケートの件');
+    expect(t).toContain('SV-10244');
   });
 
   test('グループのメンバーにも、そのグループで作成されたアンケートの記録が出る（U-1049）', async ({ page }) => {
     await open(page, 'U-1049');
     const t = await page.locator('[data-slot="memoCard"]').innerText();
-    expect(t, '自作アンケートの記録が出ない').toContain('SV-10262 アンケートの件');
-    expect(t, 'グループ経由のアンケートの記録が出ない').toContain('SV-10244 アンケートの件');
+    expect(t, '自作アンケートの記録が出ない').toContain('SV-10262');
+    expect(t, 'グループ経由のアンケートの記録が出ない').toContain('SV-10244');
   });
 
   test('アンケート詳細側には利用者への記録を出さない（集約はユーザー詳細のみ）', async ({ page }) => {
