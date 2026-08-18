@@ -25,6 +25,36 @@ const state = {
     hasUnsavedChanges: false,
 };
 
+// --- 手書き設問（handwriting_space）の共有状態 ---
+const HW_HISTORY_LIMIT = 20; // undo履歴の上限（ImageData の無制限保持を防ぐ）
+const handwritingControllers = new Map(); // questionId -> controller（描画中の排他・復元委譲・リサイズ通知）
+let hwGlobalHandlersBound = false;
+
+function bindHandwritingGlobalHandlers() {
+    if (hwGlobalHandlersBound) return;
+    hwGlobalHandlersBound = true;
+
+    // ポップオーバーは外側タップ・Escape で閉じる
+    document.addEventListener('click', (e) => {
+        handwritingControllers.forEach((controller) => controller.closePopovers(e.target));
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        handwritingControllers.forEach((controller) => controller.closePopovers(null, { restoreFocus: true }));
+    });
+
+    // 幅が変わったときだけ再スケール（モバイルのURLバー由来の高さ変化には反応させない）
+    let resizeTimer = null;
+    const onResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            handwritingControllers.forEach((controller) => controller.handleResize());
+        }, 200);
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+}
+
 // --- DOM要素 ---
 let DOMElements = {}; // DOM要素の参照を保持するオブジェクト
 
@@ -1226,15 +1256,9 @@ function populateFormWithDraft() {
             if (dateInput) dateInput.value = datePart || '';
             if (timeInput) timeInput.value = timePart || '';
         } else if (type === 'handwriting_space') {
-            const canvas = document.getElementById(`${questionId}-canvas`);
-            if (canvas && answer) {
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0);
-                };
-                img.src = answer;
-            }
+            // 復元は canvas 初期化側と同一経路に集約（コントローラ未登録なら
+            // 初期化処理の末尾が state.answers を読んで復元するため no-op でよい）
+            handwritingControllers.get(questionId)?.restoreFromDataUrl(answer);
         } else if (elements.length > 0) { // elements を使う他のタイプ
             if (elements[0].type === 'radio') {
                 elements.forEach(el => {
@@ -1294,6 +1318,7 @@ function renderSurveyTitle() {
 function renderQuestions() {
     const form = DOMElements.surveyForm;
     form.innerHTML = ''; // 既存の設問をクリア
+    handwritingControllers.clear(); // 全再生成（言語切替等）で古いクロージャを破棄
 
     if (!Array.isArray(state.surveyData.questions) || state.surveyData.questions.length === 0) {
         form.innerHTML = `<p class="text-center text-on-surface-variant">${t('common.noQuestions')}</p>`;
@@ -1573,50 +1598,66 @@ function createQuestionElement(question, index) {
             controlArea.innerHTML = `<p class="text-on-surface-variant">${resolveSurveyText(question.text)}</p>`;
             // 説明カードには凡例や枠線が不要な場合があるため、スタイルを調整
             break;
-        case 'handwriting_space':
+        case 'handwriting_space': {
             const canvasId = `${question.id}-canvas`;
             const handwritingConfig = question.meta?.handwritingConfig || { canvasHeight: 200 };
             const canvasHeight = handwritingConfig.canvasHeight || 200;
+            const hw = (key) => t(`surveyAnswer.handwriting.${key}`);
 
-            // ツールボックスのHTMLを定義
+            // 状態A(ロック中)=オーバーレイのみ / 状態B(描画中)=1段ツールバー
             controlArea.innerHTML = `
                 <div class="handwriting-container">
-                    <div class="toolbox">
-                        <div class="tool-group">
-                            <button type="button" id="${question.id}-pen-tool" class="tool-button" title="${t('surveyAnswer.handwriting.penOn')}">
-                                <span class="material-icons">edit</span>
+                    <div id="${question.id}-toolbar" class="hw-toolbar" role="toolbar" aria-label="${hw('toolbarLabel')}" hidden>
+                        <button type="button" id="${question.id}-pen-tool" class="hw-btn active" title="${hw('pen')}" aria-label="${hw('pen')}" aria-pressed="true">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button type="button" id="${question.id}-eraser-tool" class="hw-btn" title="${hw('eraser')}" aria-label="${hw('eraser')}" aria-pressed="false">
+                            <span class="material-icons">layers_clear</span>
+                        </button>
+                        <div class="hw-pop-wrap">
+                            <button type="button" id="${question.id}-color-trigger" class="hw-btn" title="${hw('color')}" aria-label="${hw('color')}" aria-haspopup="true" aria-expanded="false">
+                                <span id="${question.id}-color-chip" class="hw-color-chip" style="background-color: #000000;"></span>
                             </button>
-                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="${t('surveyAnswer.handwriting.eraser')}" disabled>
-                                <span class="material-icons">layers_clear</span>
-                            </button>
-                        </div>
-                        <div class="tool-group">
-                            <input type="color" id="${question.id}-color-picker" class="color-palette" title="${t('surveyAnswer.handwriting.colorPalette')}" value="#000000">
-                            <input type="range" id="${question.id}-thickness-slider" class="thickness-slider" min="1" max="20" value="5" title="${t('surveyAnswer.handwriting.penThickness')}">
-                        </div>
-                        <div class="tool-group">
-                            <button type="button" id="${question.id}-undo-btn" class="tool-button" title="${t('surveyAnswer.handwriting.undo')}">
-                                <span class="material-icons">undo</span>
-                            </button>
-                            <button type="button" id="${question.id}-redo-btn" class="tool-button" title="${t('surveyAnswer.handwriting.redo')}">
-                                <span class="material-icons">redo</span>
-                            </button>
-                        </div>
-                         <div class="tool-group">
-                            <button type="button" id="${question.id}-clear-btn" class="tool-button" title="${t('surveyAnswer.handwriting.reset')}">
-                                <span class="material-icons">delete</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="relative">
-                        <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}"></canvas>
-                        <div id="${question.id}-canvas-overlay" class="absolute inset-0 flex items-center justify-center bg-gray-50/80 rounded-md cursor-pointer" title="${t('surveyAnswer.handwriting.tapToEnablePen')}">
-                            <div class="flex flex-col items-center gap-1 text-gray-400 pointer-events-none">
-                                <span class="material-icons text-3xl">edit_off</span>
-                                <span class="text-xs font-medium">${t('surveyAnswer.handwriting.penModeOff')}</span>
+                            <div id="${question.id}-color-popover" class="hw-popover" hidden>
+                                <button type="button" class="hw-swatch active" data-color="#000000" style="background-color: #000000;" title="${hw('colorBlack')}" aria-label="${hw('colorBlack')}"></button>
+                                <button type="button" class="hw-swatch" data-color="#DC2626" style="background-color: #DC2626;" title="${hw('colorRed')}" aria-label="${hw('colorRed')}"></button>
+                                <button type="button" class="hw-swatch" data-color="#2563EB" style="background-color: #2563EB;" title="${hw('colorBlue')}" aria-label="${hw('colorBlue')}"></button>
+                                <input type="color" id="${question.id}-custom-color" class="hw-custom-color" value="#000000" title="${hw('customColor')}" aria-label="${hw('customColor')}">
                             </div>
                         </div>
+                        <div class="hw-pop-wrap">
+                            <button type="button" id="${question.id}-width-trigger" class="hw-btn" title="${hw('thickness')}" aria-label="${hw('thickness')}" aria-haspopup="true" aria-expanded="false">
+                                <span id="${question.id}-thickness-chip" class="hw-thickness-chip" style="height: 5px;"></span>
+                            </button>
+                            <div id="${question.id}-width-popover" class="hw-popover" hidden>
+                                <button type="button" class="hw-btn" data-width="2" title="${hw('thicknessThin')}" aria-label="${hw('thicknessThin')}"><span class="hw-thickness-dot" style="width: 4px; height: 4px;"></span></button>
+                                <button type="button" class="hw-btn active" data-width="5" title="${hw('thicknessMedium')}" aria-label="${hw('thicknessMedium')}"><span class="hw-thickness-dot" style="width: 8px; height: 8px;"></span></button>
+                                <button type="button" class="hw-btn" data-width="10" title="${hw('thicknessThick')}" aria-label="${hw('thicknessThick')}"><span class="hw-thickness-dot" style="width: 14px; height: 14px;"></span></button>
+                            </div>
+                        </div>
+                        <button type="button" id="${question.id}-undo-btn" class="hw-btn" title="${hw('undo')}" aria-label="${hw('undo')}">
+                            <span class="material-icons">undo</span>
+                        </button>
+                        <button type="button" id="${question.id}-redo-btn" class="hw-btn" title="${hw('redo')}" aria-label="${hw('redo')}">
+                            <span class="material-icons">redo</span>
+                        </button>
+                        <button type="button" id="${question.id}-clear-btn" class="hw-btn" title="${hw('reset')}" aria-label="${hw('reset')}">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        <button type="button" id="${question.id}-done-btn" class="hw-done">
+                            <span class="material-icons" aria-hidden="true">check</span><span class="hw-done-label">${hw('done')}</span>
+                        </button>
                     </div>
+                    <div class="relative">
+                        <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}" role="img" aria-label="${hw('canvasLabel')}"></canvas>
+                        <div id="${question.id}-overlay" class="hw-overlay">
+                            <button type="button" id="${question.id}-start-btn" class="hw-start-btn" aria-describedby="${question.id}-scroll-hint">
+                                <span class="material-icons" aria-hidden="true">edit</span>${hw('startDrawing')}
+                            </button>
+                            <p id="${question.id}-scroll-hint" class="hw-scroll-hint">${hw('scrollHint')}</p>
+                        </div>
+                    </div>
+                    <span id="${question.id}-hw-status" class="sr-only" role="status" aria-live="polite"></span>
                 </div>
             `;
 
@@ -1626,86 +1667,88 @@ function createQuestionElement(question, index) {
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
-                // DPIスケーリングで高解像度ディスプレイに対応。
-                // 表示サイズ(CSSピクセル)を固定し、描画バッファのみ dpr 倍にする。
-                // （表示サイズを固定しないと iPhone 等で表示高さが dpr 倍に化ける）
-                const dpr = window.devicePixelRatio || 1;
-                const rect = canvas.getBoundingClientRect();
-                const cssWidth = rect.width;
-                const cssHeight = canvasHeight;
-                canvas.style.width = `${cssWidth}px`;
-                canvas.style.height = `${cssHeight}px`;
-                canvas.width = Math.round(cssWidth * dpr);
-                canvas.height = Math.round(cssHeight * dpr);
-                ctx.scale(dpr, dpr);
-
                 // 描画状態
                 let drawing = false;
                 let tool = 'pen'; // 'pen' or 'eraser'
-                let penModeActive = false;
+                let mode = 'locked'; // 'locked'(スクロール可) | 'drawing'(描画中)
+                let currentColor = '#000000';
+                let currentWidth = 5;
+                let cssWidth = canvas.getBoundingClientRect().width;
+                const cssHeight = canvasHeight;
 
-                const canvasOverlay = document.getElementById(`${question.id}-canvas-overlay`);
+                // DOM参照
+                const toolbar = document.getElementById(`${question.id}-toolbar`);
+                const overlay = document.getElementById(`${question.id}-overlay`);
+                const startBtn = document.getElementById(`${question.id}-start-btn`);
+                const doneBtn = document.getElementById(`${question.id}-done-btn`);
+                const penTool = document.getElementById(`${question.id}-pen-tool`);
+                const eraserTool = document.getElementById(`${question.id}-eraser-tool`);
+                const colorTrigger = document.getElementById(`${question.id}-color-trigger`);
+                const colorPopover = document.getElementById(`${question.id}-color-popover`);
+                const colorChip = document.getElementById(`${question.id}-color-chip`);
+                const customColor = document.getElementById(`${question.id}-custom-color`);
+                const widthTrigger = document.getElementById(`${question.id}-width-trigger`);
+                const widthPopover = document.getElementById(`${question.id}-width-popover`);
+                const thicknessChip = document.getElementById(`${question.id}-thickness-chip`);
+                const undoBtn = document.getElementById(`${question.id}-undo-btn`);
+                const redoBtn = document.getElementById(`${question.id}-redo-btn`);
+                const clearBtn = document.getElementById(`${question.id}-clear-btn`);
+                const statusEl = document.getElementById(`${question.id}-hw-status`);
 
-                function setPenMode(active) {
-                    penModeActive = active;
-                    canvas.style.touchAction = active ? 'none' : 'auto';
-                    if (canvasOverlay) canvasOverlay.style.display = active ? 'none' : 'flex';
-                    penTool.classList.toggle('active', active && tool === 'pen');
-                    eraserTool.disabled = !active;
-                    if (!active) {
-                        tool = 'pen';
-                        ctx.globalCompositeOperation = 'source-over';
-                        ctx.strokeStyle = colorPicker.value;
-                        eraserTool.classList.remove('active');
-                        penTool.classList.remove('active');
-                    }
+                // DPIスケーリングで高解像度ディスプレイに対応。
+                // 表示サイズ(CSSピクセル)を固定し、描画バッファのみ dpr 倍にする。
+                // （表示サイズを固定しないと iPhone 等で表示高さが dpr 倍に化ける）
+                function setupBackingStore() {
+                    const dpr = window.devicePixelRatio || 1;
+                    canvas.style.width = `${cssWidth}px`;
+                    canvas.style.height = `${cssHeight}px`;
+                    canvas.width = Math.round(cssWidth * dpr);
+                    canvas.height = Math.round(cssHeight * dpr);
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.scale(dpr, dpr);
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.strokeStyle = currentColor;
+                    ctx.lineWidth = currentWidth;
+                    ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
                 }
-                
+                setupBackingStore();
+
                 // 履歴管理
                 let history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
                 let historyIndex = 0;
 
-                // ツールボタン
-                const penTool = document.getElementById(`${question.id}-pen-tool`);
-                const eraserTool = document.getElementById(`${question.id}-eraser-tool`);
-                const colorPicker = document.getElementById(`${question.id}-color-picker`);
-                const thicknessSlider = document.getElementById(`${question.id}-thickness-slider`);
-                const undoBtn = document.getElementById(`${question.id}-undo-btn`);
-                const redoBtn = document.getElementById(`${question.id}-redo-btn`);
-                const clearBtn = document.getElementById(`${question.id}-clear-btn`);
-
-                // 初期設定
-                ctx.strokeStyle = colorPicker.value;
-                ctx.lineWidth = thicknessSlider.value;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                updateHistoryButtons();
-
-
                 // --- 関数定義 ---
 
                 function updateToolButtons() {
-                    penTool.classList.toggle('active', penModeActive && tool === 'pen');
-                    eraserTool.classList.toggle('active', penModeActive && tool === 'eraser');
+                    penTool.classList.toggle('active', tool === 'pen');
+                    eraserTool.classList.toggle('active', tool === 'eraser');
+                    penTool.setAttribute('aria-pressed', tool === 'pen' ? 'true' : 'false');
+                    eraserTool.setAttribute('aria-pressed', tool === 'eraser' ? 'true' : 'false');
                 }
 
                 function updateHistoryButtons() {
                     undoBtn.disabled = historyIndex <= 0;
                     redoBtn.disabled = historyIndex >= history.length - 1;
                 }
-                
-                function saveState() {
+
+                function pushHistory({ markDirty = true } = {}) {
                     // Redoの履歴を削除
                     if (historyIndex < history.length - 1) {
                         history = history.slice(0, historyIndex + 1);
                     }
                     history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
                     historyIndex++;
+                    // 上限超過分は古い方から捨てる
+                    while (history.length > HW_HISTORY_LIMIT) {
+                        history.shift();
+                        historyIndex--;
+                    }
                     updateHistoryButtons();
-                    
+
                     // stateを更新して自動保存をトリガー
                     state.answers[question.id] = canvas.toDataURL();
-                    state.hasUnsavedChanges = true;
+                    if (markDirty) state.hasUnsavedChanges = true;
                 }
 
                 function restoreState(index) {
@@ -1713,10 +1756,93 @@ function createQuestionElement(question, index) {
                     ctx.putImageData(history[index], 0, 0);
                     historyIndex = index;
                     updateHistoryButtons();
-                    
+
                     // stateを更新
                     state.answers[question.id] = canvas.toDataURL();
                     state.hasUnsavedChanges = true;
+                }
+
+                // ドラフト・言語切替からの復元。宛先サイズを指定して dpr・幅の違いを吸収し、
+                // 復元結果を履歴の起点として積む（積まないと直後の undo で全消去される）
+                function restoreFromDataUrl(dataUrl, { markDirty = false } = {}) {
+                    if (!dataUrl) return;
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.save();
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.restore();
+                        ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
+                        pushHistory({ markDirty });
+                    };
+                    img.src = dataUrl;
+                }
+
+                // ポップオーバー開閉
+                function setExpanded(trigger, popover, open) {
+                    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    popover.hidden = !open;
+                }
+
+                function closePopovers(exceptTarget = null, { restoreFocus = false } = {}) {
+                    [[colorTrigger, colorPopover], [widthTrigger, widthPopover]].forEach(([trigger, popover]) => {
+                        if (popover.hidden) return;
+                        if (exceptTarget && (popover.contains(exceptTarget) || trigger.contains(exceptTarget))) return;
+                        setExpanded(trigger, popover, false);
+                        if (restoreFocus) trigger.focus();
+                    });
+                }
+
+                // 描画中にキャンバスが画面外へ出たら自動でロックへ戻す（「完了」押し忘れ対策）
+                const visObserver = new IntersectionObserver((entries) => {
+                    if (mode === 'drawing' && entries.some((entry) => !entry.isIntersecting)) {
+                        setDrawMode('locked', { reason: 'scrollout' });
+                    }
+                }, { threshold: 0 });
+
+                function setDrawMode(next, { reason = '' } = {}) {
+                    if (mode === next) return;
+                    mode = next;
+                    if (next === 'drawing') {
+                        // 同時に描画中にできる手書き設問は1問のみ
+                        handwritingControllers.forEach((controller, id) => {
+                            if (id !== question.id) controller.lock('exclusive');
+                        });
+                        overlay.hidden = true;
+                        toolbar.hidden = false;
+                        canvas.style.touchAction = 'none';
+                        visObserver.observe(canvas);
+                        statusEl.textContent = t('surveyAnswer.handwriting.drawingStatus');
+                        penTool.focus();
+                    } else {
+                        drawing = false;
+                        toolbar.hidden = true;
+                        overlay.hidden = false;
+                        canvas.style.touchAction = 'auto';
+                        visObserver.disconnect();
+                        closePopovers();
+                        tool = 'pen';
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = currentColor;
+                        updateToolButtons();
+                        statusEl.textContent = t('surveyAnswer.handwriting.drawingEnded');
+                        // 自動ロック（排他・スクロールアウト・リサイズ）ではフォーカスを奪わない
+                        if (reason === 'done') startBtn.focus();
+                    }
+                }
+
+                // 幅が実際に変わったときだけ再スケール（回転・リサイズで描画が破綻しないための最小対応。
+                // 履歴は起点リセットし、直前の見た目だけ引き継ぐ）
+                function handleResize() {
+                    const newWidth = canvas.getBoundingClientRect().width;
+                    if (!newWidth || Math.abs(newWidth - cssWidth) <= 1) return;
+                    const snapshot = canvas.toDataURL();
+                    if (mode === 'drawing') setDrawMode('locked', { reason: 'resize' });
+                    cssWidth = newWidth;
+                    setupBackingStore();
+                    history = [];
+                    historyIndex = -1;
+                    restoreFromDataUrl(snapshot);
                 }
 
                 const getPos = (e) => {
@@ -1732,8 +1858,10 @@ function createQuestionElement(question, index) {
                 };
 
                 const startDrawing = (e) => {
-                    if (!penModeActive) return;
+                    if (mode !== 'drawing') return;
                     e.preventDefault();
+                    // touchstart は preventDefault で click にならないため、ここでも閉じる
+                    closePopovers();
                     drawing = true;
                     const pos = getPos(e);
                     ctx.beginPath();
@@ -1741,7 +1869,7 @@ function createQuestionElement(question, index) {
                 };
 
                 const draw = (e) => {
-                    if (!drawing || !penModeActive) return;
+                    if (!drawing || mode !== 'drawing') return;
                     e.preventDefault();
                     const pos = getPos(e);
                     ctx.lineTo(pos.x, pos.y);
@@ -1752,47 +1880,80 @@ function createQuestionElement(question, index) {
                     if (!drawing) return;
                     drawing = false;
                     ctx.closePath();
-                    saveState();
+                    pushHistory();
                 };
 
                 // --- イベントリスナー設定 ---
 
+                // 状態遷移
+                startBtn.addEventListener('click', () => setDrawMode('drawing'));
+                doneBtn.addEventListener('click', () => setDrawMode('locked', { reason: 'done' }));
+
                 // ツール選択
                 penTool.addEventListener('click', () => {
-                    if (!penModeActive) {
-                        // ペンモードをオン
-                        setPenMode(true);
-                    } else if (tool !== 'pen') {
-                        // 消しゴムからペンに切り替え
-                        tool = 'pen';
-                        ctx.globalCompositeOperation = 'source-over';
-                        ctx.strokeStyle = colorPicker.value;
-                        updateToolButtons();
-                    } else {
-                        // ペンモードをオフ
-                        setPenMode(false);
-                    }
+                    tool = 'pen';
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = currentColor;
+                    updateToolButtons();
                 });
 
                 eraserTool.addEventListener('click', () => {
-                    if (!penModeActive) return;
                     tool = 'eraser';
                     ctx.globalCompositeOperation = 'destination-out';
                     updateToolButtons();
                 });
 
-
-                // プロパティ変更
-                colorPicker.addEventListener('input', (e) => {
-                    ctx.strokeStyle = e.target.value;
-                    // ペンモードに戻す
+                // 色（ポップオーバー）
+                function applyColor(color) {
+                    currentColor = color;
+                    ctx.strokeStyle = color;
+                    colorChip.style.backgroundColor = color;
+                    // 色を選んだらペンに戻す
                     tool = 'pen';
                     ctx.globalCompositeOperation = 'source-over';
                     updateToolButtons();
+                    colorPopover.querySelectorAll('.hw-swatch').forEach((swatch) => {
+                        swatch.classList.toggle('active', (swatch.dataset.color || '').toLowerCase() === color.toLowerCase());
+                    });
+                }
+
+                colorTrigger.addEventListener('click', () => {
+                    const open = colorPopover.hidden;
+                    closePopovers();
+                    setExpanded(colorTrigger, colorPopover, open);
                 });
 
-                thicknessSlider.addEventListener('input', (e) => {
-                    ctx.lineWidth = e.target.value;
+                colorPopover.querySelectorAll('.hw-swatch').forEach((swatch) => {
+                    swatch.addEventListener('click', () => {
+                        applyColor(swatch.dataset.color);
+                        setExpanded(colorTrigger, colorPopover, false);
+                    });
+                });
+
+                customColor.addEventListener('input', (e) => applyColor(e.target.value));
+                customColor.addEventListener('change', () => setExpanded(colorTrigger, colorPopover, false));
+
+                // 太さ（ポップオーバー・3プリセット）
+                function applyWidth(width) {
+                    currentWidth = width;
+                    ctx.lineWidth = width;
+                    thicknessChip.style.height = `${Math.min(width, 12)}px`;
+                    widthPopover.querySelectorAll('[data-width]').forEach((btn) => {
+                        btn.classList.toggle('active', Number(btn.dataset.width) === width);
+                    });
+                }
+
+                widthTrigger.addEventListener('click', () => {
+                    const open = widthPopover.hidden;
+                    closePopovers();
+                    setExpanded(widthTrigger, widthPopover, open);
+                });
+
+                widthPopover.querySelectorAll('[data-width]').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        applyWidth(Number(btn.dataset.width));
+                        setExpanded(widthTrigger, widthPopover, false);
+                    });
                 });
 
                 // 履歴操作
@@ -1807,10 +1968,13 @@ function createQuestionElement(question, index) {
                         restoreState(historyIndex + 1);
                     }
                 });
-                
+
                 clearBtn.addEventListener('click', () => {
+                    ctx.save();
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    saveState(); // クリアした状態を保存
+                    ctx.restore();
+                    pushHistory(); // クリアした状態を保存
                 });
 
                 // 描画イベント
@@ -1822,8 +1986,24 @@ function createQuestionElement(question, index) {
                 canvas.addEventListener('touchmove', draw, { passive: false });
                 canvas.addEventListener('touchend', stopDrawing);
 
+                updateHistoryButtons();
+
+                // 排他・復元・リサイズを外部から扱えるようコントローラ登録
+                handwritingControllers.set(question.id, {
+                    closePopovers,
+                    handleResize,
+                    restoreFromDataUrl,
+                    lock: (reason) => setDrawMode('locked', { reason }),
+                });
+                bindHandwritingGlobalHandlers();
+
+                // 既存回答（ドラフト・言語切替前の入力）があれば復元する
+                if (state.answers[question.id]) {
+                    restoreFromDataUrl(state.answers[question.id]);
+                }
             }, 0);
             break;
+        }
         case 'image_upload': {
             const imageInput = document.createElement('input');
             imageInput.type = 'file';

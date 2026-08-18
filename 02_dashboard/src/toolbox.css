@@ -1,70 +1,222 @@
-/* toolbox.css */
+/* toolbox.css — 回答画面の手書き設問（handwriting_space）専用スタイル
+   状態A(ロック中)=オーバーレイのみ / 状態B(描画中)=1段ツールバー。
+   状態遷移は survey-answer.js の handwriting_space ケースを参照 */
+
 .handwriting-container {
     position: relative;
 }
 
-.toolbox {
+/* Tailwind CDN の class と競合しても hidden 属性を確実に効かせる */
+.handwriting-container [hidden] {
+    display: none !important;
+}
+
+/* --- ツールバー（描画中のみ表示・1段固定） --- */
+.hw-toolbar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 12px;
-    padding: 8px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
+    gap: 2px;
+    min-height: 44px;
+    padding: 2px 4px;
     margin-bottom: 8px;
+    /* カードの padding へ張り出し、320px 幅でも1段に収める */
+    margin-inline: -1rem;
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-.tool-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 8px;
-}
-
-.tool-group:not(:last-child) {
-    border-right: 1px solid #ccc;
-}
-
-
-.tool-button {
-    background-color: transparent;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    padding: 6px;
-    cursor: pointer;
+.hw-btn {
+    flex: 0 1 40px;
+    min-width: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #374151;
 }
 
-.tool-button:hover {
-    background-color: #e0e0e0;
+.hw-btn:hover {
+    background-color: #e5e7eb;
 }
 
-.tool-button.active {
-    border-color: #007bff;
-    background-color: #cce5ff;
+.hw-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
 }
 
-.color-palette {
+.hw-btn.active,
+.hw-btn[aria-pressed="true"] {
+    border-color: #2563eb;
+    background-color: #dbeafe;
+}
+
+/* 完了（スクロールに戻る）ボタン: 右端固定・primary。送信ボタン(bg-blue-600)と同色 */
+.hw-done {
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 40px;
+    padding: 0 12px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hw-done:hover {
+    background-color: #1d4ed8;
+}
+
+/* --- ロック中オーバーレイ（リスナは付けない。スクロールを素通しさせる） --- */
+.hw-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: rgba(249, 250, 251, 0.8);
+    border-radius: 6px;
+    touch-action: pan-y;
+}
+
+.hw-start-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 18px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.hw-start-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.hw-scroll-hint {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* --- ポップオーバー（色・太さ） --- */
+.hw-pop-wrap {
+    position: relative;
+    display: flex;
+}
+
+.hw-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hw-swatch {
+    width: 32px;
+    height: 32px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+}
+
+.hw-swatch.active {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px #dbeafe;
+}
+
+/* 色トリガー内の現在色インジケーター */
+.hw-color-chip {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #9ca3af;
+    border-radius: 50%;
+}
+
+/* カスタム色の native color input */
+.hw-custom-color {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border: none;
     background-color: transparent;
     cursor: pointer;
 }
-.color-palette::-webkit-color-swatch-wrapper {
+.hw-custom-color::-webkit-color-swatch-wrapper {
     padding: 0;
 }
-.color-palette::-webkit-color-swatch {
-    border: 1px solid #999;
+.hw-custom-color::-webkit-color-swatch {
+    border: 1px dashed #9ca3af;
     border-radius: 50%;
 }
 
-.thickness-slider {
-    width: 100px;
+/* 太さプリセットのドットプレビューと、トリガー内の現在値表示 */
+.hw-thickness-dot {
+    display: block;
+    border-radius: 50%;
+    background-color: #374151;
+}
+
+.hw-thickness-chip {
+    display: block;
+    width: 18px;
+    border-radius: 2px;
+    background-color: #374151;
+}
+
+/* 小画面(〜389px)ではボタンを詰め・張り出しを深くし、完了はアイコンのみにして1段を守る
+   （最小構成幅: ボタン7×30 + 完了40 + gap7 + padding4 = 261px ≦ 320px時の実効幅286px） */
+@media (max-width: 389px) {
+    .hw-toolbar {
+        gap: 1px;
+        padding: 2px;
+        margin-inline: -1.5rem;
+    }
+    .hw-btn {
+        flex-basis: 34px;
+        width: 34px;
+        min-width: 30px;
+    }
+    .hw-done {
+        padding: 0 8px;
+    }
+    .hw-done .hw-done-label {
+        display: none;
+    }
 }

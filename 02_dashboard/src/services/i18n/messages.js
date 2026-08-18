@@ -143,15 +143,27 @@ export const messages = {
         close: '閉じる'
       },
       handwriting: {
-        penOn: 'ペンモードをオンにする',
+        pen: 'ペン',
         eraser: '消しゴム',
-        colorPalette: 'カラーパレット',
-        penThickness: 'ペンの太さ',
+        color: '色',
+        colorBlack: '黒',
+        colorRed: '赤',
+        colorBlue: '青',
+        customColor: 'カスタム色',
+        thickness: '太さ',
+        thicknessThin: '細（2px）',
+        thicknessMedium: '中（5px）',
+        thicknessThick: '太（10px）',
         undo: '戻る',
         redo: '進む',
         reset: 'リセット',
-        tapToEnablePen: 'タップしてペンモードをオン',
-        penModeOff: 'ペンモードがオフです'
+        startDrawing: '描画を開始',
+        scrollHint: 'スクロールはそのままできます',
+        done: '完了',
+        toolbarLabel: '手書き編集ツール',
+        canvasLabel: '手書き回答欄',
+        drawingStatus: '描画中',
+        drawingEnded: '描画を終了しました'
       }
     },
     thankYouScreen: {
@@ -322,15 +334,27 @@ export const messages = {
         close: 'Close'
       },
       handwriting: {
-        penOn: 'Turn pen mode on',
+        pen: 'Pen',
         eraser: 'Eraser',
-        colorPalette: 'Color palette',
-        penThickness: 'Pen thickness',
+        color: 'Color',
+        colorBlack: 'Black',
+        colorRed: 'Red',
+        colorBlue: 'Blue',
+        customColor: 'Custom color',
+        thickness: 'Thickness',
+        thicknessThin: 'Thin (2px)',
+        thicknessMedium: 'Medium (5px)',
+        thicknessThick: 'Thick (10px)',
         undo: 'Undo',
         redo: 'Redo',
         reset: 'Reset',
-        tapToEnablePen: 'Tap to turn pen mode on',
-        penModeOff: 'Pen mode is off'
+        startDrawing: 'Start drawing',
+        scrollHint: 'You can keep scrolling',
+        done: 'Done',
+        toolbarLabel: 'Handwriting tools',
+        canvasLabel: 'Handwriting area',
+        drawingStatus: 'Drawing',
+        drawingEnded: 'Drawing ended'
       }
     },
     thankYouScreen: {
