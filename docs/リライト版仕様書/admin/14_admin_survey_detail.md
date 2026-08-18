@@ -62,7 +62,7 @@ screen_id: SCR-A-005
 
 - アンケートの横断検索・一覧・作成・削除（`13_admin_survey_management.md`）
 - 名刺データの入力・照合作業（`19_admin_data_input_list.md`、`21_admin_matching_list.md`）
-- 請求金額と入金状態の操作（`15_admin_billing.md`）
+- 請求金額の確認（`15_admin_billing.md`）
 - 利用者向けのアンケート作成画面の要件（`docs/リライト版仕様書/user/` で扱う）
 
 ## 4. 画面要件

@@ -100,7 +100,7 @@
               <div id="auditList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('auditList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('auditList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜16" onclick="pPage('auditList',2)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">2</button><button onclick="pPageStep('auditList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">›</button></div>
             </div>
             <!-- 種別「入金情報の変更」とサンプル行は 2026-08-18 の決定(入金管理をシステムで行わない・
-                 請求関連は請求金額が見えるだけにする)で撤去。仕様書(15_admin_billing.md §4.7)への反映は未了 -->
+                 請求関連は請求金額が見えるだけにする)で撤去。仕様書(15_admin_billing.md ほか関連9ファイル)へも 2026-08-18 に反映済み -->
             <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">記録は追記のみ。画面から編集・削除は行えません。CSV出力の実行そのものも記録対象です。請求金額の直接編集は廃止、入金の管理はシステムの外で行う運用のため、種別「金額変更」「入金情報の変更」は置いていません。削除・停止・公開後の設問変更・手動アップロード・クーポン適用・代行変更など元に戻しにくい操作は理由の入力が必須です。IPアドレス・セッションIDは記録のみ行い、画面には表示しません。ログの保持期間(どこまで遡って表示・CSV出力できるか)は運用ルール確定待ちのため未定です(※要確定)。</div>
           </div>
         </main>

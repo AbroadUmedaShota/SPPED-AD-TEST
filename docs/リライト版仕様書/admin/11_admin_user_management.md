@@ -56,7 +56,7 @@ screen_id: SCR-A-002
 
 - 個別のアカウント情報の編集とパスワードの代行操作（`12_admin_user_detail.md`）
 - アンケートの内容と状態の操作（`13_admin_survey_management.md`）
-- 請求金額と入金状態の操作（`15_admin_billing.md`）
+- 請求金額の確認（`15_admin_billing.md`）
 - オペレーターアカウントの管理（`23_admin_operator_management.md`）
 
 ## 4. 画面要件

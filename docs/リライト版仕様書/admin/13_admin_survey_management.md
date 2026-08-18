@@ -56,7 +56,7 @@ screen_id: SCR-A-004
 
 - 個別アンケートの全設定の変更と公開後の変更（`14_admin_survey_detail.md`）
 - 名刺データの入力・照合作業（`19_admin_data_input_list.md`、`21_admin_matching_list.md`）
-- 請求金額と入金状態の操作（`15_admin_billing.md`）
+- 請求金額の確認（`15_admin_billing.md`）
 
 ## 4. 画面要件
 
