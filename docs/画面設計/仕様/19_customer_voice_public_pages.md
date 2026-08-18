@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-06-12
+last_reviewed: 2026-08-18
 ---
 
 # 公開「導入事例」ページ仕様
@@ -17,9 +17,10 @@ last_reviewed: 2026-06-12
 
 本番URLは `support.speed-ad.com` 配下を正本とする。導入事例はログイン・保存・申込などの動的機能を持たない静的な信頼補強コンテンツであるため、サポートサブドメインに配置する。
 
-対象ページは以下の 3 画面とする。
+対象ページは以下の 4 画面とする。
 
 - `https://support.speed-ad.com/customer-voices/`: 導入事例一覧ページ
+- `https://support.speed-ad.com/customer-voices/oriental-motor/`: オリエンタルモーター株式会社様の詳細ページ
 - `https://support.speed-ad.com/customer-voices/company-monitor/`: 先行導入企業の詳細ページ
 - `https://support.speed-ad.com/customer-voices/university-survey/`: アンケート機能を利用した大学の詳細ページ
 
@@ -28,6 +29,7 @@ last_reviewed: 2026-06-12
 - ログイン前トップで不足している信頼補強を行う
 - `無料ではじめる` 導線へ自然に復帰できる公開導線を用意する
 - 「フル活用」と「アンケート単機能活用」の両方を見せ、利用イメージの幅を伝える
+- 名刺データの翌営業日納品と翌々日のCRM取り込みという、導入後のスピードを具体的に伝える
 
 ## 3. 導線
 
@@ -40,14 +42,14 @@ last_reviewed: 2026-06-12
 3. 機能紹介後のティザーセクション: 2 事例の要約カード + `詳細を見る`
 4. フッター常設リンク: `導入事例`
 
-`導入事例` 関連導線の遷移先は `https://support.speed-ad.com/customer-voices/` とする。`無料ではじめる` は `https://speed-ad.com/?intent=signup#top` でSPEED ADトップページの新規アカウント作成モーダルへ接続する。
+本番の `導入事例` 関連導線は `https://support.speed-ad.com/customer-voices/` を正規URLとする。静的モックでは `05_support/customer-voices/` へ相対遷移し、導入事例内のログイン・新規登録導線もリポジトリルートの `index.html` へ戻すことで、モックサイト内で確認を完結させる。
 
 ### 3.2. ページ間導線
 
 - 一覧ページから各詳細ページへ遷移できること
 - 各詳細ページ下部に `他の事例を見る` を配置し、一覧へ戻れること
-- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `https://speed-ad.com/?intent=signup#top` とする
-- 副 CTA は `ログインはこちら` とし、遷移先は `https://speed-ad.com/#top` とする
+- 静的モックの一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、ルート `index.html?intent=signup#top` へ相対遷移する
+- 静的モックの副 CTA は `ログインはこちら` とし、ルート `index.html#top` へ相対遷移する
 
 ### 3.3. ログイン前トップ復帰時の挙動
 
@@ -59,8 +61,10 @@ last_reviewed: 2026-06-12
 ログイン前トップの現行実装状況は `24_public_login_front_requirements.md` を参照する。
 `/customer-voices/` 配下は、ログイン前トップから接続される公開の信頼補強導線として扱う。
 
-現行実装では、導入事例全体の編集正本は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` 配下の画像とする。ログイン前トップのティザーもルート `data/customer-voices.json` ではなく、support管理データ `05_support/assets/data/customer-voices.json` を参照し、`voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使う。公開事例ページ側では `voicePageLabel` / `voicePageSummary` があればそちらを優先する。
+現行実装では、導入事例全体の編集正本は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` 配下の画像とする。ログイン前トップのティザーもルート `data/customer-voices.json` ではなく、support管理データ `05_support/assets/data/customer-voices.json` を参照する。引用がある場合だけ `quote.text` と `publicQuoteAuthor` / `quote.author` を引用表示に使い、引用がない場合は `listingSummary` を通常の説明文として表示する。公開事例ページ側では `voicePageLabel` / `voicePageSummary` があればそちらを優先する。
 このため、承認前の事例は、ログイン前トップのティザーを含む公開表示で企業名・団体名・担当者名・固有製品名・特定しやすい画像を出さない完全匿名表現とする。実名掲載は、掲載許諾と表示文言の承認が完了した場合に限る。
+
+公開順は `customer-voices.json` の配列順とし、2026-08-18 時点ではオリエンタルモーター株式会社様を先頭にした 3 件構成とする。ログイン前トップはこの公開順の先頭 2 件を表示する。
 
 ## 4. 画面仕様
 
@@ -77,7 +81,7 @@ last_reviewed: 2026-06-12
 
 ### 4.2. 詳細ページ
 
-詳細ページは共通構成を基本とし、必要に応じて専用レイアウトを許容する。基本の表示順は以下とする。
+詳細ページは共通構成を基本とし、データの有無と掲載許諾の範囲に応じて専用レイアウトを許容する。基本の表示順は以下とする。
 
 1. 概要
 2. 導入前の課題
@@ -90,9 +94,11 @@ last_reviewed: 2026-06-12
 補足:
 
 - `company-monitor.html` は展示会出展企業の事例向けエディトリアルレイアウトを許容し、他の詳細ページは共通テンプレートを継続利用する
+- `oriental-motor/` は「ヒーロー、3要点、概要、利用の流れ、導入後のメリット、編集注記、CTA」の順とし、引用欄と導入前課題欄は設けない
 - 企業事例は「先行導入で得た価値」を主軸にする
 - 大学事例は「アンケート単機能でも成立する手軽さ」を主軸にする
 - 事例本文は要約表現を基本とし、承認前は完全匿名表現とする
+- 引用は必須ではない。引用の承認がない事例要約を、お客様発言のように見せる引用符や引用要素で表示しない
 - 承認済みの実名企業を公開表示する場合のみ、見出し・本文・引用者名・画像代替テキストなど、閲覧者に見える企業名には敬称を付ける
 - 正式所属、個人フルネーム、会議経緯、承認前の具体数値は掲載しない
 
@@ -121,9 +127,6 @@ last_reviewed: 2026-06-12
 - `organizationType`
 - `listingSummary`
 - `usedFeatures`
-- `challenge`
-- `outcome`
-- `quote`
 - `ctaLabel`
 - `publishStatus`
 
@@ -132,7 +135,10 @@ last_reviewed: 2026-06-12
 以下は任意項目として扱う。
 
 - `overview`
+- `challenge`
 - `operationImage`
+- `outcome`
+- `quote`
 - `heroImage`
 - `accent`
 - `accentStrong`
@@ -150,10 +156,14 @@ last_reviewed: 2026-06-12
 
 任意項目が未入力の場合、対応する表示ブロックは非表示とし、空セクションを出さない。
 
+`quote` と `publicQuoteAuthor` は任意とする。`quote.text` が未設定の場合は、引用本文、引用者名、引用セクションを完全に非表示にする。ログイン前トップでは `listingSummary` を通常の説明文として表示し、`<blockquote>` と著者名を出さない。
+
 ### 5.4. 利用した機能の説明メモ
 
 現行の `usedFeatures` は機能名の配列として扱い、一覧ページと詳細ページでは短いラベル表示に留める。
 今後、詳細ページの「利用した機能」をより具体的に見せる場合は、`usedFeatureNotes` のような任意項目を追加し、各機能について「何を使ったか」ではなく「その事例でどう使ったか」を 1 文で補足する。
+
+オリエンタルモーター株式会社様の事例では、CRM取り込みをSPEED ADの標準機能や自動連携と誤認させないため、`usedFeatures` を画面上の「ご利用内容」として扱い、`名刺データの納品` と `利用中CRMへの取り込み` という確認済みの対応内容を記載する。
 
 記載方針:
 
@@ -185,16 +195,21 @@ last_reviewed: 2026-06-12
 - 共通詳細描画は `customer-voices/detail.js` 相当
 - 展示会出展企業の事例専用描画は `customer-voices/company-monitor.js` 相当
 - 展示会出展企業の事例専用スタイルは `customer-voices/company-monitor.css` 相当
+- オリエンタルモーター株式会社様の事例専用描画は `customer-voices/oriental-motor.js`、専用スタイルは `customer-voices/oriental-motor.css` とする
+- オリエンタルモーター株式会社様の仮ビジュアルは `assets/img/customer-voices/oriental-motor-placeholder.png` とし、支給素材の受領後に差し替える
 
 ## 7. 確認項目
 
-- `index.html` の 3 導線から `https://support.speed-ad.com/customer-voices/` へ到達できること
+- `index.html` の導入事例導線からモック内の `05_support/customer-voices/` へ到達できること
 - 一覧ページの各カードから正しい詳細ページへ遷移できること
+- 一覧ページに 3 件が表示され、オリエンタルモーター株式会社様が先頭に表示されること
+- ログイン前トップの先頭ティザーがオリエンタルモーター株式会社様になり、事例要約が通常の説明文として表示されること
 - `https://speed-ad.com/?intent=signup#top` でサインアップモーダルが自動表示されること
 - `05_support/assets/data/customer-voices.json` の任意項目が欠けてもレイアウト崩れや空セクションがないこと
 - ログイン前トップの導入事例ティザーが `05_support/assets/data/customer-voices.json` の公開データを参照していること
 - JSON取得失敗時に `読み込み中` が残り続けず、企業名・担当者名を出さない汎用導線へ切り替わること
 - 画像取得失敗時にプレースホルダーが表示され、カード本文・詳細本文・CTAが操作可能なまま残ること
+- `quote` と `publicQuoteAuthor` がない場合に、引用欄、著者名、空セクションが表示されないこと
 - デスクトップ / タブレット / モバイルで表示崩れがないこと
 - コンソールエラー、リンク切れ、画像切れがないこと
 
@@ -223,3 +238,15 @@ last_reviewed: 2026-06-12
 | `quote` | 関係性の良さが前に出ており、担当者の実感がやや弱い | 会期後の整理負荷が下がり、次の営業アクションにつなげやすくなった実感に寄せる |
 | `voicePageHeadline` | ページの第一印象が要約文に依存しがち | 成果を一言で伝えるエディトリアル見出しを置く |
 | `voicePageHighlights` | 読み始める前に全体像を掴みにくい | `導入前` `回収導線` `導入後` の 3 カードで要点を先に見せる |
+
+## 9. オリエンタルモーター株式会社様の掲載方針
+
+- 実名掲載許諾済みの事例として、会社名を「オリエンタルモーター株式会社様」と表示する
+- 見出しは「翌営業日に名刺データを納品。翌々日、利用中のCRMへ取り込み完了。」とする
+- 既存のSPEED AD利用ユーザーからの紹介で利用を開始したこと、名刺データを翌営業日に納品できたこと、利用中のCRMへの取り込みを翌々日に完了できたことを正本情報とする
+- 3要点では、導入のきっかけを「既存ユーザー様からの紹介」、納品日を「展示会終了後の翌営業日」、CRM取り込み日を「展示会終了後の翌々日」と表示する
+- 内容は事例要約として掲載し、お客様の発言としての引用は作らない
+- 納品日とCRM取り込み日は本事例で確認できた完了結果として過去形で記載し、全顧客向けの納期保証、SLA、標準機能、自動連携として表現しない
+- CRM製品名、担当者名、案件名、枚数、具体日付は掲載しない
+- 支給素材の受領までは企業固有情報を含まない仮画像を使用し、画面上に「支給素材へ差し替え予定」と明示する
+- ロゴ、製品、社員、CRM製品名は推測で補完しない

@@ -179,16 +179,16 @@
   }
 
   function renderGenericCustomerVoiceTeaserCard() {
-    const detailUrl = 'https://support.speed-ad.com/customer-voices/';
+    const detailUrl = resolveAppPath('05_support/customer-voices/');
     const title = 'SPEED ADの活用事例を見る';
     return `
-      <a class="voice-teaser-card" href="${detailUrl}" target="_blank" rel="noopener noreferrer" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
+      <a class="voice-teaser-card" href="${detailUrl}" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
         <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
         <div class="voice-teaser-card__media voice-teaser-card__media--skeleton" aria-hidden="true"></div>
         <div class="voice-teaser-card__body">
           <span class="voice-teaser-card__pill">導入事例</span>
           <h3 class="voice-teaser-card__title">${title}</h3>
-          <blockquote class="voice-teaser-card__quote">展示会やアンケート運用での活用イメージを、公開可能な範囲で順次紹介しています。</blockquote>
+          <p class="voice-teaser-card__quote">展示会やアンケート運用での活用イメージを、公開可能な範囲で順次紹介しています。</p>
           <ul class="voice-teaser-card__chips" aria-label="確認できる内容">
             <li>展示会運用</li>
             <li>アンケート活用</li>
@@ -344,7 +344,7 @@
         customerVoiceTeaserGrid.innerHTML = renderGenericCustomerVoiceTeaserCard();
       };
       try {
-        const payload = await fetchJsonWithRetry(resolveAppPath('05_support/assets/data/customer-voices.json'));
+        const payload = await fetchJsonWithRetry(resolveAppPath('05_support/assets/data/customer-voices.json?v=20260818-oriental-copy-v2'));
         const voices = Array.isArray(payload?.voices)
           ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
           : [];
@@ -358,20 +358,26 @@
           const heroImage = resolveSupportAssetPath(voice.heroImage || 'img/top-kv.jpg');
           const orgType = voice.organizationType || voice.label || '';
           const title = voice.voicePageHeadline || voice.voicePageLabel || voice.label || '';
-          const quoteText = voice.teaserQuote || (voice.quote?.text ? voice.quote.text.slice(0, 100) + (voice.quote.text.length > 100 ? '…' : '') : '') || voice.listingSummary || '';
+          const hasApprovedQuote = Boolean(voice.quote?.text);
+          const teaserText = hasApprovedQuote
+            ? voice.teaserQuote || voice.quote.text.slice(0, 100) + (voice.quote.text.length > 100 ? '…' : '')
+            : voice.listingSummary || voice.voicePageSummary || '';
           const author = voice.publicQuoteAuthor || voice.quote?.author || '';
           const descriptor = voice.organizationDescriptor || '';
-          const detailUrl = `https://support.speed-ad.com/customer-voices/${voice.slug || ''}/`;
+          const detailUrl = resolveAppPath(`05_support/customer-voices/${voice.slug || ''}/`);
           const accent = voice.accent || '#f3e2c1';
           const accentStrong = voice.accentStrong || accent;
           const features = Array.isArray(voice.teaserTags) ? voice.teaserTags.slice(0, 4) : (Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 4) : []);
           const altText = title ? title + 'のイメージ' : '公開事例の写真';
           const featureChips = features.length
-            ? `<ul class="voice-teaser-card__chips" aria-label="活用した機能">${features.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>`
+            ? `<ul class="voice-teaser-card__chips" aria-label="事例のポイント">${features.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>`
             : '';
           const styleAttr = `style="--voice-accent: ${escapeHtml(accent)}; --voice-accent-strong: ${escapeHtml(accentStrong)};"`;
+          const teaserCopy = hasApprovedQuote
+            ? `<blockquote class="voice-teaser-card__quote">${escapeHtml(teaserText)}</blockquote>`
+            : `<p class="voice-teaser-card__quote">${escapeHtml(teaserText)}</p>`;
           return `
-            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
+            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
               <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
               <div class="voice-teaser-card__media" data-image-frame>
                 <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(altText)}" loading="lazy">
@@ -380,10 +386,10 @@
               <div class="voice-teaser-card__body">
                 ${orgType ? `<span class="voice-teaser-card__pill">${escapeHtml(orgType)}</span>` : ''}
                 ${title ? `<h3 class="voice-teaser-card__title">${escapeHtml(title)}</h3>` : ''}
-                <blockquote class="voice-teaser-card__quote">${escapeHtml(quoteText)}</blockquote>
+                ${teaserCopy}
                 ${featureChips}
                 ${descriptor ? `<p class="voice-teaser-card__descriptor">${escapeHtml(descriptor)}</p>` : ''}
-                ${author ? `<p class="voice-teaser-card__author">${escapeHtml(author)}</p>` : ''}
+                ${hasApprovedQuote && author ? `<p class="voice-teaser-card__author">${escapeHtml(author)}</p>` : ''}
                 <span class="voice-teaser-card__more" aria-hidden="true">詳細を見る <span aria-hidden="true">→</span></span>
               </div>
             </a>

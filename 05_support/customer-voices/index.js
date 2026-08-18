@@ -7,7 +7,7 @@ import {
   renderFeatureList,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js?v=20260609-resilience';
+} from './shared.js?v=20260818-oriental-copy-v2';
 
 function getVoicePageLabel(voice = {}) {
   return voice.voicePageLabel || voice.label || '';
