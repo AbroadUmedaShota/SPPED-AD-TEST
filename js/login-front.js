@@ -179,10 +179,10 @@
   }
 
   function renderGenericCustomerVoiceTeaserCard() {
-    const detailUrl = 'https://support.speed-ad.com/customer-voices/';
+    const detailUrl = resolveAppPath('05_support/customer-voices/');
     const title = 'SPEED ADの活用事例を見る';
     return `
-      <a class="voice-teaser-card" href="${detailUrl}" target="_blank" rel="noopener noreferrer" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
+      <a class="voice-teaser-card" href="${detailUrl}" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
         <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
         <div class="voice-teaser-card__media voice-teaser-card__media--skeleton" aria-hidden="true"></div>
         <div class="voice-teaser-card__body">
@@ -364,7 +364,7 @@
             : voice.listingSummary || voice.voicePageSummary || '';
           const author = voice.publicQuoteAuthor || voice.quote?.author || '';
           const descriptor = voice.organizationDescriptor || '';
-          const detailUrl = `https://support.speed-ad.com/customer-voices/${voice.slug || ''}/`;
+          const detailUrl = resolveAppPath(`05_support/customer-voices/${voice.slug || ''}/`);
           const accent = voice.accent || '#f3e2c1';
           const accentStrong = voice.accentStrong || accent;
           const features = Array.isArray(voice.teaserTags) ? voice.teaserTags.slice(0, 4) : (Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 4) : []);
@@ -377,7 +377,7 @@
             ? `<blockquote class="voice-teaser-card__quote">${escapeHtml(teaserText)}</blockquote>`
             : `<p class="voice-teaser-card__quote">${escapeHtml(teaserText)}</p>`;
           return `
-            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
+            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
               <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
               <div class="voice-teaser-card__media" data-image-frame>
                 <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(altText)}" loading="lazy">

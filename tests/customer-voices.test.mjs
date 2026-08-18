@@ -68,6 +68,32 @@ test('login teaser renders approved quotes and editorial summaries with differen
   assert.match(script, /hasApprovedQuote && author/);
 });
 
+test('mock customer voice navigation stays inside the local static site', async () => {
+  const loginHtml = await readFile('index.html', 'utf8');
+  const loginScript = await readFile('js/login-front.js', 'utf8');
+  const voicePages = await Promise.all([
+    readFile('05_support/customer-voices/index.html', 'utf8'),
+    readFile('05_support/customer-voices/oriental-motor/index.html', 'utf8'),
+    readFile('05_support/customer-voices/company-monitor/index.html', 'utf8'),
+    readFile('05_support/customer-voices/university-survey/index.html', 'utf8'),
+  ]);
+
+  assert.match(loginHtml, /href="05_support\/customer-voices\/"[^>]*>導入事例<\/a>/);
+  assert.match(loginHtml, /href="05_support\/customer-voices\/"[^>]*>すべての声を見る/);
+  assert.doesNotMatch(loginHtml, /<a\b[^>]*href="https:\/\/support\.speed-ad\.com\/customer-voices\//);
+  assert.match(loginScript, /resolveAppPath\('05_support\/customer-voices\/'\)/);
+  assert.match(loginScript, /resolveAppPath\(`05_support\/customer-voices\/\$\{voice\.slug \|\| ''\}\/`\)/);
+  assert.doesNotMatch(loginScript, /https:\/\/support\.speed-ad\.com\/customer-voices\//);
+
+  for (const html of voicePages) {
+    assert.doesNotMatch(html, /<a\b[^>]*href="https:\/\/(?:support\.)?speed-ad\.com\//);
+  }
+  assert.match(voicePages[0], /href="\.\.\/\.\.\/index\.html\?intent=signup#top"/);
+  for (const html of voicePages.slice(1)) {
+    assert.match(html, /href="\.\.\/\.\.\/\.\.\/index\.html#top"/);
+  }
+});
+
 test('customer voice specification records the named route and optional quote policy', async () => {
   const specification = await readFile('docs/画面設計/仕様/19_customer_voice_public_pages.md', 'utf8');
 
