@@ -240,6 +240,13 @@
     cursor: pointer;
 }
 
+/* input が透明なため、キーボードフォーカスの可視化はラッパー側で行う
+   （input type=color は Enter/Space でピッカーが開く） */
+.hw-color-btn:focus-within {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
 /* 太さプリセットのドットと、トリガー内の現在値ドット（直径=太さに応じて変化） */
 .hw-thickness-dot {
     display: block;
