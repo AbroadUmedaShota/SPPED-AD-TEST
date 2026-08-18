@@ -1623,7 +1623,9 @@ function createQuestionElement(question, index) {
                                 <button type="button" class="hw-swatch active" data-color="#000000" style="background-color: #000000;" title="${hw('colorBlack')}" aria-label="${hw('colorBlack')}"></button>
                                 <button type="button" class="hw-swatch" data-color="#DC2626" style="background-color: #DC2626;" title="${hw('colorRed')}" aria-label="${hw('colorRed')}"></button>
                                 <button type="button" class="hw-swatch" data-color="#2563EB" style="background-color: #2563EB;" title="${hw('colorBlue')}" aria-label="${hw('colorBlue')}"></button>
-                                <input type="color" id="${question.id}-custom-color" class="hw-custom-color" value="#000000" title="${hw('customColor')}" aria-label="${hw('customColor')}">
+                                <span class="hw-custom-wrap" title="${hw('customColor')}">
+                                    <input type="color" id="${question.id}-custom-color" class="hw-custom-color" value="#000000" aria-label="${hw('customColor')}">
+                                </span>
                             </div>
                         </div>
                         <div class="hw-pop-wrap">
