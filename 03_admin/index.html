@@ -388,7 +388,9 @@
 
               <!-- 滞留している作業(復活)。survey-detail.html でデータ化中ステータスの実在4件
                    (SV-10236/10238/10233/10244)を使用。総件数・納期は reconciliation/index.html の
-                   同IDの表示値と一致させてある(入力済・進捗率・経過・作業グループは本表独自の参考値)。 -->
+                   同IDの表示値と一致させてある(入力済・進捗率・経過・作業グループは本表独自の参考値)。
+                   Lv2にもタイトルを表示する(2026-08-18変更。照合結果一覧がLv2にタイトルを見せており
+                   開示範囲を揃えた。会社名・契約ユーザーはこの表に元々置いていない)。 -->
               <div data-min-lv="2">
                 <div class="dash-sec">滞留している作業 全4件 <span class="dash-sec-note">進捗が低い順・行押下でデータ入力対象一覧へ</span></div>
                 <div id="dashStuckTbl" class="dash-table">
@@ -398,7 +400,7 @@
                     </div>
                     <!-- 経過が24時間超の行は経過セルをwarn色で強調する(※要確認: 24時間という閾値) -->
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                      <span class="dash-clamp2"><span data-min-lv="3">SV-10236<br>スマート物流EXPO 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10236</span></span>
+                      <span class="dash-clamp2">SV-10236<br>スマート物流EXPO 来場者アンケート</span>
                       <span>グループ⑤<br><span class="dash-sub-muted">電話番号・FAX</span></span>
                       <span class="dash-r">2,180</span>
                       <span class="dash-r">262</span>
@@ -407,7 +409,7 @@
                       <span style="color:var(--a-danger);font-weight:700">2026/07/30</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                      <span class="dash-clamp2"><span data-min-lv="3">SV-10238<br>BtoB EXPO 東京 2026 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10238</span></span>
+                      <span class="dash-clamp2">SV-10238<br>BtoB EXPO 東京 2026 来場者アンケート</span>
                       <span>グループ③<br><span class="dash-sub-muted">会社・部署・役職</span></span>
                       <span class="dash-r">3,420</span>
                       <span class="dash-r">616</span>
@@ -416,7 +418,7 @@
                       <span>2026/07/31</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                      <span class="dash-clamp2"><span data-min-lv="3">SV-10233<br>地方創生フォーラム 参加者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10233</span></span>
+                      <span class="dash-clamp2">SV-10233<br>地方創生フォーラム 参加者アンケート</span>
                       <span>グループ①<br><span class="dash-sub-muted">メールアドレス</span></span>
                       <span class="dash-r">486</span>
                       <span class="dash-r">117</span>
@@ -425,7 +427,7 @@
                       <span>2026/08/03</span>
                     </div>
                     <div class="dash-trow" tabindex="0" role="link" onclick="location.href='data-entry/index.html'">
-                      <span class="dash-clamp2"><span data-min-lv="3">SV-10244<br>マーケティングサミット2026 来場者アンケート</span><span data-min-lv="2" data-max-lv="2">SV-10244</span></span>
+                      <span class="dash-clamp2">SV-10244<br>マーケティングサミット2026 来場者アンケート</span>
                       <span>グループ⑥<br><span class="dash-sub-muted">URL</span></span>
                       <span class="dash-r">1,208</span>
                       <span class="dash-r">447</span>

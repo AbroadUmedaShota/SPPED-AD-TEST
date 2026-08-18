@@ -37,7 +37,9 @@
             </div>
             <div data-filter-for="perfList" style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--a-fg-muted)">対象期間
-                <select id="perfMonth" onchange="perfSetMonth(this.value)" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-07">2026/07(当月)</option><option value="2026-06">2026/06</option><option value="2026-05">2026/05</option></select>
+                <select id="perfFrom" aria-label="対象期間(開始月)" onchange="perfSetRange('from')" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-05">2026/05</option><option value="2026-06">2026/06</option><option value="2026-07" selected>2026/07(当月)</option></select>
+                〜
+                <select id="perfTo" aria-label="対象期間(終了月)" onchange="perfSetRange('to')" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="2026-05">2026/05</option><option value="2026-06">2026/06</option><option value="2026-07" selected>2026/07(当月)</option></select>
               </label>
               <select aria-label="所属グループ" data-f-key="group" data-min-lv="3" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--a-fg-strong)"><option value="">所属グループ: すべて</option><option>アブロード本体</option><option>オフィスワークス株式会社</option><option>データパートナーズ株式会社</option></select>
               <button onclick="perfSearch()" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">表示</button>
@@ -121,7 +123,34 @@
 (function () {
     'use strict';
     var D = window.PerfData;
-    var month = '2026-07';
+    // 対象期間は開始月〜終了月の範囲。既定は当月のみ(従来の単月選択と同じ見え方)。
+    // 集計は月ごとの値の合算で、正答率は合算後の 正解件数/作業件数 から出し直す
+    var from = '2026-07';
+    var to = '2026-07';
+    function months() {
+        return D.MONTHS.slice().sort().filter(function (m) { return m >= from && m <= to; });
+    }
+    function rangeTotals(oid) {
+        var t = { w: 0, o: 0, s: 0 };
+        months().forEach(function (m) {
+            var x = D.totals(oid, m);
+            t.w += x.w; t.o += x.o; t.s += x.s;
+        });
+        return t;
+    }
+    function rangeGroupTotals(gid) {
+        var t = { w: 0, o: 0, s: 0, pay: 0, final: 0 };
+        months().forEach(function (m) {
+            var x = D.groupTotals(gid, m);
+            t.w += x.w; t.o += x.o; t.s += x.s; t.pay += x.pay; t.final += x.final;
+        });
+        return t;
+    }
+    function rangeLabel() {
+        var f = from.replace('-', '/');
+        var t = to.replace('-', '/');
+        return f === t ? f : f + '〜' + t;
+    }
 
     var GCOLS = 'display:grid;grid-template-columns:minmax(200px,230fr) minmax(140px,70fr) minmax(140px,70fr) minmax(110px,52fr) minmax(150px,70fr) minmax(150px,70fr) minmax(150px,70fr);align-items:center;padding:0 18px;height:46px;font-size:13px;font-variant-numeric:tabular-nums';
 
@@ -134,7 +163,7 @@
         Object.keys(D.GROUPS).forEach(function (gid) {
             var g = D.GROUPS[gid];
             if (only && g.name !== only) { return; }
-            var t = D.groupTotals(gid, month);
+            var t = rangeGroupTotals(gid);
             var rt = D.rate(t.o, t.w);
             var warn = parseInt(rt, 10) < 95 ? ';color:var(--a-warn)' : '';
             html += '<div data-pg="1" class="proto-row-hover" tabindex="0" role="link"'
@@ -154,7 +183,7 @@
 
     function paint() {
         Object.keys(D.PERF).forEach(function (oid) {
-            var t = D.totals(oid, month);
+            var t = rangeTotals(oid);
             function set(k, v) {
                 var el = document.querySelector('[data-slot="' + oid + '-' + k + '"]');
                 if (el) { el.textContent = v; }
@@ -163,7 +192,7 @@
             set('s', D.num(t.s)); set('p', D.num(t.w * D.UNIT) + ' 円');
         });
         var mm = document.getElementById('perfCsvMonth');
-        if (mm) { mm.textContent = month.replace('-', '/'); }
+        if (mm) { mm.textContent = rangeLabel(); }
         renderGroups();
     }
 
@@ -171,7 +200,16 @@
         window.pSearch('perfList');
         renderGroups();
     };
-    window.perfSetMonth = function (m) { month = m; paint(); };
+    // 開始>終了になったら、動かした側へもう片方を追従させる(範囲が反転したまま集計しない)
+    window.perfSetRange = function (which) {
+        from = document.getElementById('perfFrom').value;
+        to = document.getElementById('perfTo').value;
+        if (from > to) {
+            if (which === 'from') { to = from; document.getElementById('perfTo').value = to; }
+            else { from = to; document.getElementById('perfFrom').value = from; }
+        }
+        paint();
+    };
 
     var TABS = { groups: ['tabGroups', 'paneGroups'], operators: ['tabOps', 'paneOps'] };
     window.perfTab = function (name) {
