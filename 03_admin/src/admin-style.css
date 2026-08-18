@@ -495,3 +495,9 @@ main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { f
 .perf-card-label { font-size: 12px; color: var(--a-fg-muted); font-weight: 500; min-height: 34px; }
 .perf-card-num { margin-top: 2px; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.25; }
 .perf-card-unit { font-size: 12px; font-weight: 500; color: var(--a-fg-muted); margin-left: 3px; }
+
+/* 横断検索(ヘッダー)。1920px基準では表示し、一覧の列間引きと同じ1459px以下では
+   ヘッダーの残り幅が足りないため出さない(768px幅の横スクロール検査で溢れさせない) */
+@media (max-width: 1459px) {
+    .admin-global-search { display: none; }
+}

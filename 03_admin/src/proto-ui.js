@@ -483,6 +483,29 @@
         window.pFilter(listId, conds);
     }
 
+    // 横断検索(ヘッダー)。IDの頭書きで行き先を判定して直行し、ID以外は会社名として
+    // ユーザー管理の絞り込みへ渡す。行き先側の絞り込みは pApplyUrlFilter が受け取る。
+    // 存在しないIDは各詳細画面の「見つかりません」表示がそのまま受け止める
+    window.pGlobalSearch = function (ev) {
+        if (ev && ev.key !== 'Enter') { return; }
+        var box = document.getElementById('globalSearch');
+        var q = box ? box.value.trim() : '';
+        if (!q) { return; }
+        var s = q.toUpperCase();
+        var to;
+        if (/^U-\d+$/.test(s)) { to = 'user-detail.html?id=' + s; }
+        else if (/^SV-\d+$/.test(s)) { to = 'survey-detail.html?id=' + s; }
+        else if (/^OP-\d+$/.test(s)) { to = 'operator-management.html?any=' + s; }
+        else if (/^INV[-0-9]+$/.test(s)) { to = 'invoice-management.html?invoice=' + s; }
+        else if (/^CP-\d+$/.test(s)) { to = 'coupon-management.html?cid=' + s; }
+        else { to = 'user-management.html?company=' + encodeURIComponent(q); }
+        // ヘッダーのロゴリンクは注入時に基準パスへ解決済みのため、そこから 03_admin/ の
+        // 位置を得る(data-entry/ 等の下層ページからでも正しい相対位置になる)
+        var home = document.querySelector('#header-placeholder a[href]');
+        var base = home ? String(home.getAttribute('href')).replace(/index\.html(?:[?#].*)?$/, '') : '';
+        location.href = base + to;
+    };
+
     window.pPageStep = function (listId, delta) {
         var pager = document.getElementById(listId + '-pager');
         if (!pager) { return; }
