@@ -66,7 +66,7 @@ test.describe('横断検索', () => {
     await expect(page).toHaveURL(/03_admin\/user-detail\.html\?id=U-1052/);
   });
 
-  test('Lv2では表示しない（行き先がLv3画面のため・要確認事項）', async ({ page }) => {
+  test('Lv2では表示しない（行き先がLv3画面のため・2026-08-18確定）', async ({ page }) => {
     await page.addInitScript(() => {
       try { localStorage.setItem('adminMockLevel', 'lv2'); } catch (e) { /* 既定で進む */ }
     });

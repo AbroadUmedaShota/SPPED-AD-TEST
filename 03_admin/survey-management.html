@@ -47,7 +47,8 @@
               <!-- 納期日列の値は他画面と一致させる(同数原則): 会期中はダッシュボードの
                    「会期中・終了間際のアンケート」、データ化中は照合結果一覧(reconciliation/index.html)の
                    納期の日付部分と同値。会期前は納期未確定、データ化完了は他画面に値が無いため「—」
-                   (※要確認: 実データでは完了後も納期日を保持・表示するか)。
+                   (実データでは完了後も納期日を保持して表示する・2026-08-18確定。モックは完了行の
+                   納期日の値を他画面に持たないため「—」のまま)。
                    納期日を過ぎたデータ化中の行はダッシュボード滞留表と同じ強調にする。 -->
               <div id="surveysList" data-sortable data-filter-keys="sid,uid,company,name,status,plan,today,isnew" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
                 <div style="display:grid;grid-template-columns:58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(72px,45fr) minmax(84px,48fr) 184px;column-gap:8px;align-items:center;padding:0 16px;height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">

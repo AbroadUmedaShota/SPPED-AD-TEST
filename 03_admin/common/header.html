@@ -10,7 +10,7 @@
     <div class="flex items-center" style="gap:14px">
         <!-- 横断検索(2026-08-18)。IDの頭書き(U-/SV-/OP-/INV-/CP-)で行き先を判定して直行し、
              それ以外は会社名としてユーザー管理の絞り込みへ渡す(Enterで実行・実装は proto-ui.js の pGlobalSearch)。
-             行き先がほぼLv3画面のため表示はLv3+(※要確認)。1459px以下は一覧の列間引きと同じ基準で隠す -->
+             行き先がほぼLv3画面のため表示はLv3+で確定(2026-08-18)。1459px以下は一覧の列間引きと同じ基準で隠す -->
         <span class="admin-global-search"><input id="globalSearch" data-min-lv="3" data-lv-display="inline-block" type="search" aria-label="横断検索(ID・会社名)" placeholder="横断検索: ID・会社名" title="U-/SV-/OP-/INV-/CP- のIDは該当画面へ直行、それ以外は会社名としてユーザー管理を検索します(Enterで実行)" onkeydown="pGlobalSearch(event)" style="width:220px;box-sizing:border-box;border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;background:var(--a-surface);color:var(--a-fg-strong)"></span>
         <label title="モックの見せ分け(実際の認可制御ではない)。" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--a-fg-muted2);white-space:nowrap"><span class="admin-scenario-label">表示シナリオ</span>
             <select id="levelSelect" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;color:var(--a-fg-strong);min-width:160px;background:var(--a-surface)">
