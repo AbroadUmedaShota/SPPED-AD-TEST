@@ -511,4 +511,6 @@ main button:not([disabled]):hover, .proto-modal button:not([disabled]):hover { f
 @media (max-width: 640px) {
     .admin-clock, .admin-scenario-label, #themeToggleLabel, .admin-badge { display: none !important; }
     #levelSelect { min-width: 120px !important; }
+    /* モーダルはflexの縮小で幅自体は収まる(実測済み)が、画面端に張り付くため余白だけ与える */
+    .proto-modal { padding: 0 12px; }
 }
