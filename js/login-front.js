@@ -344,7 +344,7 @@
         customerVoiceTeaserGrid.innerHTML = renderGenericCustomerVoiceTeaserCard();
       };
       try {
-        const payload = await fetchJsonWithRetry(resolveAppPath('05_support/assets/data/customer-voices.json?v=20260818-oriental-copy-v2'));
+        const payload = await fetchJsonWithRetry(resolveAppPath('05_support/assets/data/customer-voices.json?v=20260818-oriental-story-v3'));
         const voices = Array.isArray(payload?.voices)
           ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
           : [];

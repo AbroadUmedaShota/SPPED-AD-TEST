@@ -1,5 +1,4 @@
 import {
-  applyImageFallback,
   escapeHtml,
   getPublishedVoices,
   getVoicePageLabel,
@@ -7,9 +6,8 @@ import {
   loadVoiceCollection,
   renderBullets,
   renderParagraphs,
-  resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js?v=20260818-oriental-copy-v2';
+} from './shared.js?v=20260818-oriental-story-v3';
 
 function setText(id, value) {
   const element = document.getElementById(id);
@@ -23,8 +21,8 @@ function setHeadline(value) {
   if (!element) {
     return;
   }
-  if (value === '翌営業日に名刺データを納品。翌々日、利用中のCRMへ取り込み完了。') {
-    element.innerHTML = '<span class="oriental-headline-line">翌営業日に<span class="oriental-phrase-nowrap">名刺データを</span><span class="oriental-phrase-nowrap">納品。</span></span><span class="oriental-headline-line">翌々日、<span class="oriental-phrase-nowrap">利用中のCRMへ</span><span class="oriental-phrase-nowrap">取り込み完了。</span></span>';
+  if (value === '展示会後の名刺を、翌々日には利用中のCRMへ。') {
+    element.innerHTML = '<span class="oriental-headline-line">展示会後の名刺を、</span><span class="oriental-headline-line">翌々日には</span><span class="oriental-headline-line"><span class="oriental-phrase-nowrap">利用中の</span><span class="oriental-phrase-nowrap">CRMへ。</span></span>';
     return;
   }
   element.textContent = value || '';
@@ -111,18 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     setText('voice-hero-company', label);
     setHeadline(voice.voicePageHeadline || summary || label);
     setText('voice-hero-summary', summary);
-    setText('voice-hero-caption', voice.voicePageImageCaption || '支給素材へ差し替え予定');
-
     const heroMeta = document.getElementById('voice-hero-meta');
     if (heroMeta) {
       heroMeta.innerHTML = renderMeta(voice);
-    }
-
-    const heroImage = document.getElementById('voice-hero-image');
-    if (heroImage) {
-      heroImage.src = resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg');
-      heroImage.alt = '名刺データ納品から利用中のCRM取り込みまでを表現した仮ビジュアル';
-      applyImageFallback(heroImage, '仮ビジュアルを表示できません');
     }
 
     setHtml('voice-highlights-section', 'voice-highlight-grid', renderHighlights(voice.voicePageHighlights));

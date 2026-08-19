@@ -1,11 +1,168 @@
-.voice-oriental-motor .company-story-hero__headline {
-  max-width: none;
-  font-size: clamp(2.35rem, 3.6vw, 3.1rem);
-  text-wrap: balance;
+:root {
+  --oriental-ink: #0b1220;
+  --oriental-muted: #5c667a;
+  --oriental-line: #dfe5ee;
+  --oriental-surface: #ffffff;
+  --oriental-canvas: #f7f9fc;
+  --oriental-blue: #2156e8;
+  --oriental-blue-dark: #123bb8;
+  --oriental-blue-soft: #edf3ff;
+}
+
+.voice-page.voice-oriental-motor {
+  --voice-company-ink: var(--oriental-ink);
+  --voice-company-muted: var(--oriental-muted);
+  --voice-company-line: var(--oriental-line);
+  --voice-company-paper: var(--oriental-surface);
+  min-width: 320px;
+  background: var(--oriental-canvas);
+  color: var(--oriental-ink);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+}
+
+.voice-page.voice-oriental-motor::before,
+.voice-page.voice-oriental-motor::after {
+  display: none;
+}
+
+.voice-oriental-motor .voice-header {
+  padding: 12px 0;
+  background: rgba(247, 249, 252, 0.86);
+  border-bottom: 1px solid rgba(223, 229, 238, 0.78);
+  backdrop-filter: blur(18px);
+}
+
+.voice-oriental-motor .voice-header__inner {
+  width: min(calc(100% - 48px), 1200px);
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.voice-oriental-motor .voice-brand__emblem {
+  width: 30px;
+  height: 30px;
+}
+
+.voice-oriental-motor .voice-brand__wordmark {
+  width: 104px;
+}
+
+.voice-oriental-motor .voice-brand__copy {
+  padding-left: 14px;
+  border-left: 1px solid var(--oriental-line);
+}
+
+.voice-oriental-motor .voice-brand__eyebrow {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.voice-oriental-motor .voice-brand__title {
+  font-size: 0.82rem;
+}
+
+.voice-oriental-motor .voice-nav__link {
+  color: var(--oriental-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.voice-oriental-motor .voice-button {
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.voice-oriental-motor .voice-button--primary {
+  background: var(--oriental-blue);
+  box-shadow: 0 10px 24px rgba(33, 86, 232, 0.18);
+}
+
+.voice-oriental-motor .voice-button--primary:hover {
+  background: var(--oriental-blue-dark);
+}
+
+.voice-oriental-motor .voice-button--secondary {
+  border-color: var(--oriental-line);
+  background: var(--oriental-surface);
+}
+
+.voice-oriental-motor .company-story-shell {
+  width: min(calc(100% - 48px), 1200px);
+}
+
+.voice-oriental-motor .company-story-hero,
+.voice-oriental-motor .company-story-highlights,
+.voice-oriental-motor .company-story-section,
+.voice-oriental-motor .company-story-panel,
+.voice-oriental-motor .company-story-cta,
+.voice-oriental-motor .voice-footer {
+  border-color: var(--oriental-line);
+  background: var(--oriental-surface);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.voice-oriental-motor .company-story-hero {
+  position: relative;
+  margin-top: 32px;
+  overflow: hidden;
+  border: 1px solid var(--oriental-line);
+  border-radius: 18px;
+}
+
+.voice-oriental-motor .company-story-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 42%;
+  height: 1px;
+  background: var(--oriental-blue);
 }
 
 .voice-oriental-motor .company-story-hero__body {
-  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  grid-template-columns: minmax(0, 1.28fr) minmax(360px, 0.72fr);
+  gap: clamp(44px, 6vw, 84px);
+  align-items: center;
+  padding: clamp(48px, 6vw, 76px);
+}
+
+.voice-oriental-motor .company-story-hero__eyebrow,
+.voice-oriental-motor .company-story-section__eyebrow,
+.voice-oriental-motor .company-story-panel__eyebrow {
+  color: var(--oriental-muted);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.voice-oriental-motor .company-story-hero__company {
+  margin-top: 22px;
+  color: var(--oriental-blue-dark);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.voice-oriental-motor .company-story-hero__headline {
+  max-width: 780px;
+  margin-top: 18px;
+  color: var(--oriental-ink);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: clamp(3rem, 4.8vw, 4.25rem);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
 }
 
 .oriental-headline-line {
@@ -16,181 +173,444 @@
   white-space: nowrap;
 }
 
-.voice-oriental-motor .company-story-hero__media {
-  background: #edf2f8;
+.voice-oriental-motor .company-story-hero__summary {
+  max-width: 720px;
+  margin-top: 28px;
+  color: var(--oriental-muted);
+  font-size: 0.98rem;
+  line-height: 1.9;
 }
 
-.voice-oriental-motor .company-story-hero__media::after {
-  display: none;
+.voice-oriental-motor .company-story-hero__meta {
+  gap: 8px;
+  margin-top: 26px;
 }
 
-.voice-oriental-motor .company-story-hero__caption {
-  right: 18px;
-  left: auto;
-  bottom: 18px;
-  width: fit-content;
-  max-width: calc(100% - 36px);
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(30, 34, 43, 0.9);
+.voice-oriental-motor .voice-pill {
+  padding: 6px 10px;
+  border: 1px solid #dbe5ff;
+  border-radius: 6px;
+  background: var(--oriental-blue-soft);
+  color: var(--oriental-blue-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.voice-oriental-motor .voice-hero__actions {
+  margin-top: 30px;
+}
+
+.oriental-signal {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid #263149;
+  border-radius: 16px;
+  background: #0b1220;
   color: #ffffff;
-  font-size: 0.76rem;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
+  box-shadow: 0 24px 54px rgba(11, 18, 32, 0.16);
+}
+
+.oriental-signal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(96, 165, 250, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.oriental-signal__header,
+.oriental-signal__footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: #8fa0bc;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.oriental-signal__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #a7f3d0;
+}
+
+.oriental-signal__status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.1);
+}
+
+.oriental-signal__track {
+  position: relative;
+  height: 1px;
+  margin: 20px 0 2px;
+  background: #263149;
+}
+
+.oriental-signal__track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--oriental-blue), #60a5fa);
+}
+
+.oriental-signal__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 28px;
+  gap: 16px;
+  align-items: center;
+  padding: 26px 0;
+  border-bottom: 1px solid #263149;
+}
+
+.oriental-signal__day,
+.oriental-signal__label,
+.oriental-signal__value {
+  margin: 0;
+}
+
+.oriental-signal__day {
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+  font-size: clamp(2.25rem, 3.8vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.oriental-signal__label {
+  color: #8fa0bc;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.oriental-signal__value {
+  margin-top: 6px;
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.oriental-signal__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 50%;
+  color: #93c5fd;
+  font-size: 0.72rem;
+}
+
+.oriental-signal__footer {
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.voice-oriental-motor .company-story-highlights {
+  margin-top: 18px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--oriental-line);
+  border-radius: 14px;
+}
+
+.voice-oriental-motor .company-story-highlights__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+
+.voice-oriental-motor .company-story-highlight {
+  min-height: 126px;
+  padding: 24px 26px;
+  border: 0;
+  border-right: 1px solid var(--oriental-line);
+  border-radius: 0;
+  background: var(--oriental-surface);
+}
+
+.voice-oriental-motor .company-story-highlight:last-child {
+  border-right: 0;
+}
+
+.voice-oriental-motor .company-story-highlight__label {
+  margin-bottom: 14px;
+  color: var(--oriental-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
 }
 
 .voice-oriental-motor .company-story-highlight__value {
-  font-family: var(--voice-company-serif);
-  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  color: var(--oriental-ink);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: clamp(1rem, 1.45vw, 1.18rem);
   font-weight: 700;
   line-height: 1.55;
 }
 
-.oriental-summary-section,
-.oriental-flow-section,
-.oriental-benefits-section,
-.oriental-editorial-note {
-  margin-top: 26px;
-}
-
-.oriental-summary-section .voice-detail-body {
+.voice-oriental-motor .oriental-summary-section,
+.voice-oriental-motor .oriental-flow-section,
+.voice-oriental-motor .oriental-benefits-section {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
+  grid-template-columns: minmax(240px, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(48px, 8vw, 112px);
+  margin-top: 84px;
+  padding: 0 0 84px;
+  border: 0;
+  border-bottom: 1px solid var(--oriental-line);
+  border-radius: 0;
+  background: transparent;
 }
 
-.oriental-summary-section .voice-detail-body p {
+.voice-oriental-motor .oriental-section-heading {
+  align-self: start;
+}
+
+.voice-oriental-motor .oriental-section-heading h2 {
+  margin: 18px 0 0;
+  color: var(--oriental-ink);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: clamp(1.65rem, 2.5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.voice-oriental-motor .oriental-summary-section .voice-detail-body {
+  display: block;
+}
+
+.voice-oriental-motor .oriental-summary-section .voice-detail-body p {
   margin: 0;
-  padding: 22px;
-  border: 1px solid rgba(29, 33, 44, 0.06);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--oriental-muted);
+  font-size: 1rem;
+  line-height: 2;
+}
+
+.voice-oriental-motor .oriental-summary-section .voice-detail-body p + p {
+  margin-top: 20px;
 }
 
 .voice-oriental-motor .oriental-flow-list {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.voice-oriental-motor .oriental-flow-list::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 19px;
+  width: 1px;
+  background: linear-gradient(var(--oriental-blue), #b8c8ee);
 }
 
 .voice-oriental-motor .oriental-flow-list .company-story-timeline__item {
-  grid-template-columns: 1fr;
-  gap: 14px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 0 0 32px;
+}
+
+.voice-oriental-motor .oriental-flow-list .company-story-timeline__item:last-child {
+  padding-bottom: 0;
 }
 
 .voice-oriental-motor .oriental-flow-list .company-story-timeline__index {
-  width: 48px;
-  height: 48px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #cdd9f5;
+  border-radius: 8px;
+  background: var(--oriental-surface);
+  color: var(--oriental-blue);
+  font-family: Inter, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
 }
 
 .voice-oriental-motor .oriental-flow-list .company-story-timeline__content {
-  min-height: 126px;
+  min-height: 0;
+  padding: 1px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .voice-oriental-motor .oriental-flow-step-label {
-  margin-bottom: 8px;
-  color: var(--voice-accent-strong);
-  font-size: 0.78rem;
+  margin: 0 0 6px;
+  color: var(--oriental-blue);
+  font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
 
-.voice-oriental-motor .company-story-section h2,
-.voice-oriental-motor .company-story-panel h2 {
-  text-wrap: balance;
+.voice-oriental-motor .oriental-flow-list .company-story-timeline__content p:last-child {
+  margin: 0;
+  color: var(--oriental-ink);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.65;
 }
 
-.oriental-benefits-section {
-  background:
-    linear-gradient(135deg, rgba(39, 87, 245, 0.1), rgba(255, 255, 255, 0.72)),
-    var(--voice-company-paper);
+.voice-oriental-motor .oriental-benefits-section {
+  background: transparent;
 }
 
-.oriental-benefits-section .voice-detail-list {
+.voice-oriental-motor .oriental-benefits-section .voice-detail-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 0;
   padding: 0;
   list-style: none;
+  counter-reset: benefits;
 }
 
-.oriental-benefits-section .voice-detail-list li {
+.voice-oriental-motor .oriental-benefits-section .voice-detail-list li {
   position: relative;
-  padding: 46px 20px 20px;
-  border: 1px solid rgba(39, 87, 245, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.76);
+  padding: 22px 48px 22px 46px;
+  border: 0;
+  border-top: 1px solid var(--oriental-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--oriental-ink);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  counter-increment: benefits;
 }
 
-.oriental-benefits-section .voice-detail-list li::before {
-  content: '✓';
+.voice-oriental-motor .oriental-benefits-section .voice-detail-list li:last-child {
+  border-bottom: 1px solid var(--oriental-line);
+}
+
+.voice-oriental-motor .oriental-benefits-section .voice-detail-list li::before {
+  content: '0' counter(benefits);
   position: absolute;
-  top: 17px;
-  left: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--voice-accent);
-  color: #ffffff;
-  font-size: 0.78rem;
+  top: 25px;
+  left: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: var(--oriental-blue);
+  font-family: Inter, sans-serif;
+  font-size: 0.7rem;
   font-weight: 800;
 }
 
-.oriental-editorial-note {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 20px 22px;
-  border: 1px solid rgba(39, 87, 245, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.62);
-}
-
-.oriental-editorial-note__icon {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--voice-accent-soft);
-  color: var(--voice-accent-strong);
-  font-family: var(--voice-company-serif);
-  font-weight: 700;
-}
-
-.oriental-editorial-note p {
-  margin: 1px 0 0;
-  color: var(--voice-company-muted);
+.voice-oriental-motor .oriental-benefits-section .voice-detail-list li::after {
+  content: '↗';
+  position: absolute;
+  top: 23px;
+  right: 2px;
+  color: #aab3c3;
   font-size: 0.9rem;
-  line-height: 1.82;
 }
 
 .voice-oriental-motor .oriental-cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 28px;
+  gap: 40px;
   align-items: center;
+  margin-top: 84px;
+  padding: clamp(36px, 5vw, 58px);
+  border: 1px solid #202b42;
+  border-radius: 16px;
+  background: #0b1220;
+  color: #ffffff;
 }
 
 .voice-oriental-motor .oriental-cta > div:first-child {
   max-width: 720px;
 }
 
+.voice-oriental-motor .oriental-cta .company-story-section__eyebrow {
+  color: #8fa0bc;
+}
+
 .voice-oriental-motor .oriental-cta h2 {
-  font-size: clamp(1.7rem, 2.2vw, 2.2rem);
+  margin: 18px 0 12px;
+  color: #ffffff;
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: clamp(1.75rem, 3vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.045em;
 }
 
 .oriental-cta-line {
   display: block;
 }
 
+.voice-oriental-motor .oriental-cta p {
+  color: #a8b3c7;
+  line-height: 1.8;
+}
+
 .voice-oriental-motor .oriental-cta .voice-cta__actions {
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 180px;
   margin-top: 0;
+}
+
+.voice-oriental-motor .oriental-cta .voice-button--secondary {
+  border-color: #34415b;
+  background: transparent;
+  color: #ffffff;
+}
+
+.voice-oriental-motor .oriental-footer {
+  margin-top: 24px;
+  padding: 22px 0 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.voice-oriental-motor .oriental-footer__label {
+  margin: 0;
+  color: var(--oriental-muted);
+  font-family: Inter, 'Noto Sans JP', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.oriental-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 22px;
 }
 
 #voice-overview-section[hidden],
@@ -199,42 +619,178 @@
   display: none;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1040px) {
   .voice-oriental-motor .company-story-hero__body {
     grid-template-columns: 1fr;
   }
 
-  .voice-oriental-motor .oriental-flow-list,
-  .oriental-benefits-section .voice-detail-list {
-    grid-template-columns: 1fr;
+  .oriental-signal {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 28px;
   }
 
-  .voice-oriental-motor .oriental-flow-list .company-story-timeline__content {
-    min-height: 0;
+  .oriental-signal__header,
+  .oriental-signal__track,
+  .oriental-signal__footer {
+    grid-column: 1 / -1;
+  }
+
+  .oriental-signal__step:nth-of-type(4) {
+    border-left: 1px solid #263149;
+    padding-left: 28px;
   }
 }
 
 @media (max-width: 820px) {
-  .oriental-summary-section .voice-detail-body,
+  .voice-oriental-motor .voice-header__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .voice-oriental-motor .voice-nav {
+    width: auto;
+  }
+
+  .voice-oriental-motor .oriental-summary-section,
+  .voice-oriental-motor .oriental-flow-section,
+  .voice-oriental-motor .oriental-benefits-section {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    margin-top: 64px;
+    padding-bottom: 64px;
+  }
+
   .voice-oriental-motor .oriental-cta {
     grid-template-columns: 1fr;
   }
 
   .voice-oriental-motor .oriental-cta .voice-cta__actions {
-    justify-content: flex-start;
+    flex-direction: row;
+    min-width: 0;
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 680px) {
+  .voice-oriental-motor .voice-header__inner,
+  .voice-oriental-motor .company-story-shell {
+    width: min(calc(100% - 32px), 1200px);
+  }
+
+  .voice-oriental-motor .voice-brand__copy,
+  .voice-oriental-motor .voice-nav__link {
+    display: none;
+  }
+
+  .voice-oriental-motor .voice-nav {
+    justify-content: flex-end;
+  }
+
+  .voice-oriental-motor .voice-button {
+    min-height: 44px;
+    padding: 0 16px;
+  }
+
+  .voice-oriental-motor .company-story-hero {
+    margin-top: 18px;
+    border-radius: 14px;
+  }
+
+  .voice-oriental-motor .company-story-hero__body {
+    gap: 38px;
+    padding: 34px 22px 22px;
+  }
+
   .voice-oriental-motor .company-story-hero__headline {
-    font-size: clamp(2.2rem, 12.8vw, 3.15rem);
+    font-size: clamp(2.35rem, 11vw, 3rem);
+    line-height: 1.16;
   }
 
-  .voice-oriental-motor .company-story-hero__media {
-    min-height: 300px;
+  .voice-oriental-motor .company-story-hero__summary {
+    font-size: 0.9rem;
+    line-height: 1.85;
   }
 
-  .oriental-editorial-note {
+  .voice-oriental-motor .voice-hero__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .oriental-signal {
+    display: block;
     padding: 18px;
+    border-radius: 12px;
+  }
+
+  .oriental-signal__step,
+  .oriental-signal__step:nth-of-type(4) {
+    grid-template-columns: 68px minmax(0, 1fr) 26px;
+    gap: 12px;
+    padding: 22px 0;
+    border-left: 0;
+  }
+
+  .oriental-signal__day {
+    font-size: 2.15rem;
+  }
+
+  .voice-oriental-motor .company-story-highlights__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voice-oriental-motor .company-story-highlight {
+    min-height: 0;
+    padding: 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--oriental-line);
+  }
+
+  .voice-oriental-motor .company-story-highlight:last-child {
+    border-bottom: 0;
+  }
+
+  .voice-oriental-motor .oriental-summary-section,
+  .voice-oriental-motor .oriental-flow-section,
+  .voice-oriental-motor .oriental-benefits-section {
+    gap: 28px;
+    margin-top: 52px;
+    padding-bottom: 52px;
+  }
+
+  .voice-oriental-motor .oriental-section-heading h2 {
+    font-size: 1.65rem;
+  }
+
+  .voice-oriental-motor .oriental-cta {
+    gap: 28px;
+    margin-top: 52px;
+    padding: 30px 22px;
+    border-radius: 14px;
+  }
+
+  .voice-oriental-motor .oriental-cta .voice-cta__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .voice-oriental-motor .oriental-footer {
+    align-items: flex-start;
+  }
+
+  .oriental-footer__nav {
+    display: grid;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-oriental-motor *,
+  .voice-oriental-motor *::before,
+  .voice-oriental-motor *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }
