@@ -155,3 +155,53 @@ test.describe('2カラムの画面は狭くなったら1カラムへ積む', () 
     });
   }
 });
+
+test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19・05 §6.2)', () => {
+  const PAGES = [
+    '/03_admin/index.html',
+    '/03_admin/user-management.html',
+    '/03_admin/survey-management.html',
+    '/03_admin/billing-management.html',
+    '/03_admin/invoice-management.html',
+    '/03_admin/coupon-management.html',
+    '/03_admin/audit-log.html',
+    '/03_admin/operator-management.html',
+    '/03_admin/performance-management.html?tab=operators',
+    '/03_admin/reconciliation/index.html',
+    '/03_admin/data-entry/index.html',
+  ];
+
+  test('ページも一覧の内部も横スクロールしない', async ({ page }) => {
+    for (const path of PAGES) {
+      await openAt(page, path, 390);
+      const over = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(over, path + ' @390px でページが ' + over + 'px 溢れている').toBeLessThanOrEqual(1);
+      // 情報を削る方針の検査: overflow-x:auto の一覧コンテナ内でもスクロールを出さない
+      const inner = await page.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('[id$="List"], #perfGroups, .dash-table, .dg-table').forEach((el) => {
+          if (el.offsetParent === null) { return; }
+          const d = el.scrollWidth - el.clientWidth;
+          if (d > 1) { out.push((el.id || el.className) + '+' + d + 'px'); }
+        });
+        return out;
+      });
+      expect(inner, path + ' の一覧内部が溢れている: ' + inner.join(', ')).toEqual([]);
+    }
+  });
+
+  test('ユーザー管理・アンケート管理は識別列だけ残る', async ({ page }) => {
+    await openAt(page, '/03_admin/user-management.html', 390);
+    const heads = await page.evaluate(() => [...document.querySelector('#usersList > div').children]
+      .filter((c) => getComputedStyle(c).display !== 'none')
+      .map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim()));
+    expect(heads).toEqual(['会社名', '氏名', '状態']);
+
+    await openAt(page, '/03_admin/survey-management.html', 390);
+    const heads2 = await page.evaluate(() => [...document.querySelector('#surveysList > div').children]
+      .filter((c) => getComputedStyle(c).display !== 'none')
+      .map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim()));
+    expect(heads2).toEqual(['タイトル', '作業ステータス', '納期日']);
+  });
+});

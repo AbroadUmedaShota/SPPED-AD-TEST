@@ -14,6 +14,17 @@
 .dg-row { display:grid; grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px; align-items:center; padding:0 20px; height:54px; border-bottom:1px solid var(--a-border-soft); font-size:13px; font-variant-numeric:tabular-nums }
 .dg-row.is-stuck { background:var(--a-warn-bg) }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  .dg-row { grid-template-columns: minmax(0,1fr) minmax(0,120fr) !important; }
+  .dg-row > :nth-child(2),
+  .dg-row > :nth-child(3),
+  .dg-row > :nth-child(4),
+  .dg-row > :nth-child(6) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -24,7 +35,7 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1">
         <div style="padding:18px 24px 40px">
           <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">データ入力対象一覧</span></div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
             <h1 style="margin:0;font-size:20px;font-weight:700">データ入力対象一覧</h1>
             <div style="display:flex;align-items:center;gap:12px">
               <span style="font-size:12px;color:var(--a-fg-muted2)">集計最終更新 2026/07/31 09:45</span>

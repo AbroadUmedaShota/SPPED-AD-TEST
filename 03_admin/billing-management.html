@@ -19,6 +19,20 @@
   #billingList .c-opt { display: none !important; }
 }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  #billingList > div { grid-template-columns: minmax(0,1fr) 104px !important; column-gap: 6px !important; }
+  #billingList > div > :nth-child(2),
+  #billingList > div > :nth-child(3),
+  #billingList > div > :nth-child(5),
+  #billingList > div > :nth-child(6),
+  #billingList > div > :nth-child(7),
+  #billingList > div > :nth-child(8),
+  #billingList > div > :nth-child(9) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -29,7 +43,7 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
             <div style="padding:18px 24px 40px">
               <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">請求管理</span></div>
-              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
                 <h1 style="margin:0;font-size:20px;font-weight:700">請求管理</h1>
                 <span style="font-size:12px;color:var(--a-fg-muted2)">既定の並び順: 支払期日の昇順</span>
               </div>
@@ -130,7 +144,7 @@
                 <span style="font-size:11.5px;color:var(--a-fg-faint)">データ化中の見込み額を含む</span>
                 <span>絞り込み結果 <span id="billingSumN">—</span> 件の請求金額合計(全ページ分) <strong id="billingSumTotal" style="font-size:13.5px">—</strong></span>
               </div>
-              <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
+              <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted);flex-wrap:wrap;row-gap:8px">
                 <span style="font-variant-numeric:tabular-nums">全 <span id="billingList-total">19</span> 件中 <span id="billingList-range">1〜10</span> 件を表示</span>
                 <div style="display:flex;align-items:center;gap:16px">
                   <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('billingList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>

@@ -152,6 +152,34 @@
         .tbl-stuck .dash-trow { grid-template-columns: minmax(120px,1fr) minmax(100px,140px) 64px 60px 72px 70px 86px !important; }
     }
     </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 84px !important; }
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(1),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(2),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(4),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(5),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(6),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(7),
+  .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(8) { display: none !important; }
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 84px !important; }
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(1),
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(3),
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(4),
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(6) { display: none !important; }
+  .tbl-newusers :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,120fr) minmax(0,90fr) !important; }
+  .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(1),
+  .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(4),
+  .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(5) { display: none !important; }
+  .tbl-stuck :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 52px 80px !important; }
+  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(2),
+  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(3),
+  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(4),
+  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(6) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">

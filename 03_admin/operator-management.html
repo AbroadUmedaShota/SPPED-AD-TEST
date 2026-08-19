@@ -18,6 +18,19 @@
   #operatorsList .c-opt { display: none !important; }
 }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  #operatorsList > div { grid-template-columns: minmax(0,1fr) 44px 78px !important; column-gap: 6px !important; }
+  #operatorsList > div > :nth-child(1),
+  #operatorsList > div > :nth-child(3),
+  #operatorsList > div > :nth-child(4),
+  #operatorsList > div > :nth-child(6),
+  #operatorsList > div > :nth-child(8),
+  #operatorsList > div > :nth-child(9) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -28,7 +41,7 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="2">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">オペレーター管理</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
               <h1 style="margin:0;font-size:20px;font-weight:700">オペレーター管理</h1>
               <div style="display:flex;gap:10px">
                 <button data-min-lv="3" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mOpGroup')">グループ作成</button>
@@ -89,7 +102,7 @@
               </div>
               <div id="operatorsList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
-            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted);flex-wrap:wrap;row-gap:8px">
               <span style="font-variant-numeric:tabular-nums">全 <span id="operatorsList-total">13</span> 名中 <span id="operatorsList-range">1〜10</span> 名を表示</span>
               <div style="display:flex;align-items:center;gap:16px">
                 <label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('operatorsList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label>

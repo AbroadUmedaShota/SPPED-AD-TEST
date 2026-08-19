@@ -19,6 +19,19 @@
   #surveysList > div > span:nth-child(6) { padding-right: 16px !important; }
 }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  #surveysList > div { grid-template-columns: minmax(0,1fr) 96px 84px !important; column-gap: 6px !important; }
+  #surveysList > div > :nth-child(1),
+  #surveysList > div > :nth-child(3),
+  #surveysList > div > :nth-child(4),
+  #surveysList > div > :nth-child(6),
+  #surveysList > div > :nth-child(7),
+  #surveysList > div > :nth-child(9) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -29,7 +42,7 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
             <div style="padding:18px 24px 40px">
               <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">アンケート管理</span></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
                 <h1 style="margin:0;font-size:20px;font-weight:700">アンケート管理</h1>
                 <button style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="pOpen('mSurvey')">＋ アンケートを作成</button>
               </div>
@@ -144,7 +157,7 @@
               </div>
               <div id="surveysList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
               </div>
-              <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
+              <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted);flex-wrap:wrap;row-gap:8px">
                 <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="surveysList-total">22</span> 件中 <span id="surveysList-range">1〜10</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('surveysList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
                 <div id="surveysList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('surveysList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('surveysList',1)" style="border:1px solid var(--a-accent);background:var(--a-accent-bg);color:var(--a-on-accent);border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜20" onclick="pPage('surveysList',2)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">2</button><button data-page="3" data-range="21〜22" onclick="pPage('surveysList',3)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">3</button><button onclick="pPageStep('surveysList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
               </div>

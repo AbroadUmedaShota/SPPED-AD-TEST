@@ -18,6 +18,18 @@
   #auditList .c-opt { display: none !important; }
 }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
+   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+@media (max-width: 640px) {
+  #auditList > div { grid-template-columns: 90px 104px minmax(0,1fr) !important; column-gap: 6px !important; }
+  #auditList > div > :nth-child(2),
+  #auditList > div > :nth-child(3),
+  #auditList > div > :nth-child(6),
+  #auditList > div > :nth-child(7),
+  #auditList > div > :nth-child(8) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -28,7 +40,7 @@
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="3">
           <div style="padding:18px 24px 40px">
             <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">監査ログ</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
               <h1 style="margin:0;font-size:20px;font-weight:700">監査ログ</h1>
               <button onclick="pOpen('mAuditCsv')" style="background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-border-strong);border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">CSV出力</button>
             </div>
@@ -95,7 +107,7 @@
               </div>
               <div id="auditList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
             </div>
-            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted)">
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted);flex-wrap:wrap;row-gap:8px">
               <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="auditList-total">16</span> 件中 <span id="auditList-range">1〜10</span> 件を表示(直近7日)</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('auditList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
               <div id="auditList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('auditList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('auditList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜16" onclick="pPage('auditList',2)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">2</button><button onclick="pPageStep('auditList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;font-size:12.5px;cursor:pointer;font-family:inherit">›</button></div>
             </div>
