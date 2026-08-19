@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedAd - データ入力対象一覧</title>
+    <title>SpeedAd - 入力画面</title>
     <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="../src/admin-style.css">
@@ -11,18 +11,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-.dg-row { display:grid; grid-template-columns:minmax(150px,190fr) minmax(120px,80fr) minmax(120px,80fr) minmax(120px,80fr) minmax(200px,220fr) 150px; align-items:center; padding:0 20px; height:54px; border-bottom:1px solid var(--a-border-soft); font-size:13px; font-variant-numeric:tabular-nums }
+.dg-row { display:grid; grid-template-columns:minmax(220px,1.8fr) minmax(140px,.9fr) minmax(170px,1.1fr) minmax(110px,.75fr) minmax(126px,.9fr); column-gap:16px; align-items:center; padding:0 20px; min-height:54px; border-bottom:1px solid var(--a-border-soft); font-size:13px; font-variant-numeric:tabular-nums }
+.dg-row > * { min-width:0 }
 .dg-row.is-stuck { background:var(--a-warn-bg) }
+.dg-item { display:flex; align-items:center; gap:8px; min-width:0; font-weight:700 }
+.dg-item-number { flex:none; font-size:15px }
+.dg-item-label { min-width:0; overflow-wrap:anywhere }
+.dg-number, .dg-progress, .dg-action { text-align:right }
+.dg-remaining { font-size:19px; font-weight:700; white-space:nowrap }
+.dg-assignee { font-size:16px; font-weight:700; white-space:nowrap }
+.dg-progress { display:flex; flex-direction:column; align-items:flex-end; gap:2px; line-height:1.3; white-space:nowrap }
+.dg-progress strong { font-size:17px; font-weight:700 }
+.dg-progress small { color:var(--a-fg-muted2); font-size:12px }
+.dg-status-badge { display:inline-flex; min-width:64px; align-items:center; justify-content:center; padding:3px 8px; border:1px solid transparent; border-radius:4px; font-size:12px; font-weight:700; line-height:1.2; white-space:nowrap }
+.dg-status-badge.is-stuck { color:var(--a-warn); background:var(--a-warn-bg); border-color:var(--a-warn-border) }
+.dg-item .dg-status-badge { min-width:auto; flex:none; padding:2px 6px; font-size:11px }
+.dg-action button { white-space:nowrap }
+.dg-row.is-empty { color:var(--a-fg-faint) }
+.dg-row.is-empty .dg-item { color:var(--a-fg-muted) }
 </style>
 <style>
+/* 中間幅では5列を圧縮して、デスクトップと同じ情報を横スクロールなしで閲覧できるようにする */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .dg-row { grid-template-columns:minmax(0,1.5fr) minmax(95px,.85fr) minmax(0,1fr) minmax(76px,.65fr) minmax(96px,.8fr); column-gap:10px; padding-left:14px; padding-right:14px; font-size:12px; }
+  .dg-remaining { font-size:17px; }
+  .dg-progress strong { font-size:16px; }
+  .dg-progress small { font-size:11px; }
+  .dg-action button { padding-left:10px !important; padding-right:10px !important; font-size:12px !important; }
+}
 /* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
    横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
 @media (max-width: 640px) {
-  .dg-row { grid-template-columns: minmax(0,1fr) 120px !important; }
-  .dg-row > :nth-child(2),
-  .dg-row > :nth-child(3),
-  .dg-row > :nth-child(4),
-  .dg-row > :nth-child(6) { display: none !important; }
+  .dg-row { grid-template-columns:minmax(0,1fr) 112px !important; column-gap:12px; padding-left:12px; padding-right:12px; }
+  .dg-row > :nth-child(n+3) { display:none !important; }
+  .dg-row--header { min-height:40px; }
+  .dg-remaining { font-size:16px; }
 }
 </style>
 </head>
@@ -34,11 +57,11 @@
         <div id="sidebar-placeholder"></div>
         <main class="flex-1 min-w-0" id="main-content" data-page-min-lv="1">
         <div style="padding:18px 24px 40px">
-          <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">データ入力対象一覧</span></div>
+          <div style="font-size:12px;color:var(--a-fg-muted2)">ホーム › <span style="color:var(--a-fg-strong)">入力画面</span></div>
           <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:6px;padding-bottom:14px;border-bottom:2px solid var(--a-border);flex-wrap:wrap;row-gap:8px">
-            <h1 style="margin:0;font-size:20px;font-weight:700">データ入力対象一覧</h1>
+            <h1 style="margin:0;font-size:20px;font-weight:700">入力画面</h1>
             <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:12px;color:var(--a-fg-muted2)">集計最終更新 2026/07/31 09:45</span>
+              <span style="font-size:12px;color:var(--a-fg-muted2)">集計最終更新：2026/07/31 09:45 JST</span>
             </div>
           </div>
           <div style="margin-top:18px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;padding:18px 22px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
@@ -52,55 +75,71 @@
             <div data-min-lv="4" data-lv-display="flex" style="flex:none;max-width:280px;display:flex;flex-direction:column;align-items:flex-start;gap:8px">
               <div style="font-size:12px;color:var(--a-fg-muted);font-weight:700">全グループ入力</div>
               <div style="font-size:11.5px;color:var(--a-fg-muted2);line-height:1.8">1枚の名刺の①〜⑧をまとめて入力します。</div>
-              <button onclick="location.href='form.html?g=all'" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">全グループ入力画面へ</button>
+              <button onclick="location.href='form.html?g=all'" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">全グループ入力を開始</button>
             </div>
           </div>
-          <div id="groupList" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
-            <div class="dg-row" style="height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
-              <span>作業グループ</span><span style="text-align:right">総件数</span><span style="text-align:right">入力済み</span><span style="text-align:right">未入力</span><span style="text-align:right;padding-right:36px">進捗</span><span></span>
+          <div id="groupList" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow:hidden">
+            <div class="dg-row dg-row--header" style="min-height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
+              <span>作業項目</span><span class="dg-number">残り作業件数</span><span class="dg-progress">進捗</span><span class="dg-number">入力中</span><span>操作</span>
             </div>
             <div class="dg-row" data-progress="78">
-              <span style="font-weight:700">グループ①<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">メールアドレス</span></span><span style="text-align:right">2,480</span><span style="text-align:right">1,933</span><span style="text-align:right">547</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">78%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,933 / 2,480</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=1'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">①</span><span class="dg-item-label">メールアドレス</span></span>
+              <span class="dg-number dg-remaining">547件</span>
+              <span class="dg-progress"><strong>78%</strong><small>1,933 / 2,480</small></span>
+              <span class="dg-number dg-assignee">2人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=1'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
             <div class="dg-row" data-progress="84">
-              <span style="font-weight:700">グループ②<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">姓・名</span></span><span style="text-align:right">1,860</span><span style="text-align:right">1,562</span><span style="text-align:right">298</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">84%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,562 / 1,860</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=2'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">②</span><span class="dg-item-label">姓・名</span></span>
+              <span class="dg-number dg-remaining">298件</span>
+              <span class="dg-progress"><strong>84%</strong><small>1,562 / 1,860</small></span>
+              <span class="dg-number dg-assignee">1人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=2'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
             <div class="dg-row" data-progress="39">
-              <span style="font-weight:700">グループ③<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">会社・部署・役職</span></span><span style="text-align:right">3,120</span><span style="text-align:right">1,206</span><span style="text-align:right">1,914</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">39%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,206 / 3,120</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=3'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">③</span><span class="dg-item-label">会社・部署・役職</span></span>
+              <span class="dg-number dg-remaining">1,914件</span>
+              <span class="dg-progress"><strong>39%</strong><small>1,206 / 3,120</small></span>
+              <span class="dg-number dg-assignee">4人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=3'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
             <div class="dg-row" data-progress="88">
-              <span style="font-weight:700">グループ④<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">郵便番号・住所</span></span><span style="text-align:right">926</span><span style="text-align:right">812</span><span style="text-align:right">114</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">88%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">812 / 926</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=4'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">④</span><span class="dg-item-label">郵便番号・住所</span></span>
+              <span class="dg-number dg-remaining">114件</span>
+              <span class="dg-progress"><strong>88%</strong><small>812 / 926</small></span>
+              <span class="dg-number dg-assignee">1人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=4'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
             <div class="dg-row" data-progress="30">
-              <span style="font-weight:700">グループ⑤<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">電話番号・FAX</span></span><span style="text-align:right">1,540</span><span style="text-align:right">462</span><span style="text-align:right">1,078</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">30%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">462 / 1,540</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=5'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">⑤</span><span class="dg-item-label">電話番号・FAX</span></span>
+              <span class="dg-number dg-remaining">1,078件</span>
+              <span class="dg-progress"><strong>30%</strong><small>462 / 1,540</small></span>
+              <span class="dg-number dg-assignee">3人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=5'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
             <div class="dg-row" data-progress="91">
-              <span style="font-weight:700">グループ⑥<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">URL</span></span><span style="text-align:right">2,072</span><span style="text-align:right">1,890</span><span style="text-align:right">182</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">91%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">1,890 / 2,072</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=6'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">⑥</span><span class="dg-item-label">URL</span></span>
+              <span class="dg-number dg-remaining">182件</span>
+              <span class="dg-progress"><strong>91%</strong><small>1,890 / 2,072</small></span>
+              <span class="dg-number dg-assignee">1人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=6'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
-            <div class="dg-row" style="color:var(--a-fg-faint)">
-              <span style="font-weight:700;color:var(--a-fg-muted)">グループ⑦<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-faint)">その他メモ</span></span><span style="text-align:right">0</span><span style="text-align:right">—</span><span style="text-align:right">—</span>
-              <span style="text-align:right;padding-right:36px;font-size:12px">対象なし</span>
-              <span style="text-align:right"><button disabled title="このグループに出題できる名刺がありません" style="background:var(--a-disabled-bg);color:var(--a-fg-faint);border:none;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:default;font-family:inherit">入力画面へ</button></span>
+            <div class="dg-row is-empty">
+              <span class="dg-item"><span class="dg-item-number">⑦</span><span class="dg-item-label">その他メモ</span></span>
+              <span class="dg-number dg-remaining">0件</span>
+              <span class="dg-progress"><strong>—</strong><small>対象なし</small></span>
+              <span class="dg-number dg-assignee">0人</span>
+              <span class="dg-action"><button disabled title="このグループに出題できる名刺がありません" style="background:var(--a-disabled-bg);color:var(--a-fg-faint);border:none;border-radius:6px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:default;font-family:inherit">対象なし</button></span>
             </div>
             <div class="dg-row" data-progress="87" style="border-bottom:none">
-              <span style="font-weight:700">グループ⑧<br><span style="font-weight:400;font-size:11.5px;color:var(--a-fg-muted2)">フリー入力</span></span><span style="text-align:right">684</span><span style="text-align:right">598</span><span style="text-align:right">86</span>
-              <span style="text-align:right;padding-right:36px;font-variant-numeric:tabular-nums"><strong style="font-size:17px;font-weight:700">87%</strong><span style="font-size:12px;color:var(--a-fg-muted2);margin-left:8px">598 / 684</span></span>
-              <span style="text-align:right"><button onclick="location.href='form.html?g=8'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力画面へ</button></span>
+              <span class="dg-item"><span class="dg-item-number">⑧</span><span class="dg-item-label">フリー入力</span></span>
+              <span class="dg-number dg-remaining">86件</span>
+              <span class="dg-progress"><strong>87%</strong><small>598 / 684</small></span>
+              <span class="dg-number dg-assignee">1人</span>
+              <span class="dg-action"><button onclick="location.href='form.html?g=8'" style="background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:7px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">入力を開始</button></span>
             </div>
           </div>
-          <div style="margin-top:12px;font-size:12px;color:var(--a-fg-muted2)">作業グループ①〜⑧は名刺データ化の作業分割単位です(会社・法人単位のグループとは別の概念)。進捗が最も低い2グループを<span style="background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:3px;padding:0 6px;margin:0 2px">滞留</span>として色付けします。</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--a-fg-muted2)">作業グループ①〜⑧は名刺データ化の作業分割単位です(会社・法人単位のグループとは別の概念)。進捗が最も低い2グループを作業項目内の「滞留」バッジと行背景で識別します。</div>
         </div>
         </main>
     </div>
@@ -109,7 +148,7 @@
 <script src="../src/proto-ui.js"></script>
 <script src="../src/proto-level.js"></script>
 <script>
-// 進捗が低い順に2グループを「滞留」として色付けする。出題対象が無いグループは対象外
+// 進捗が低い順に2グループを「滞留」として識別する。出題対象が無いグループは対象外
 (function () {
     var rows = Array.prototype.slice.call(document.querySelectorAll('#groupList .dg-row[data-progress]'));
     rows.sort(function (a, b) {
@@ -117,12 +156,14 @@
     });
     rows.slice(0, 2).forEach(function (r) {
         r.classList.add('is-stuck');
-        var label = r.firstElementChild;
-        var badge = document.createElement('span');
-        badge.textContent = '滞留';
-        badge.style.cssText = 'margin-left:8px;font-size:11px;font-weight:700;color:var(--a-warn);background:var(--a-warn-bg);border:1px solid var(--a-warn-border);border-radius:4px;padding:1px 7px;vertical-align:middle';
-        badge.title = '進捗が低く作業が溜まっているグループです';
-        label.insertBefore(badge, label.firstElementChild);
+        var item = r.querySelector('.dg-item');
+        if (item) {
+            var badge = document.createElement('span');
+            badge.className = 'dg-status-badge is-stuck';
+            badge.textContent = '滞留';
+            badge.title = '進捗が低く作業が溜まっているグループです';
+            item.appendChild(badge);
+        }
     });
 }());
 </script>
