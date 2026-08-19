@@ -22,6 +22,13 @@
   .admin-2col { grid-template-columns: minmax(0, 1fr); }
 }
 </style>
+<style>
+/* スマホ幅(640px以下・2026-08-19)。設問構成はoverflow-x:hiddenのままだと列が黙って
+   切れるため、スマホでは横スクロール可能へ切り替える(詳細画面は容器内スクロール許容) */
+@media (max-width: 640px) {
+  #qList { overflow-x: auto !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">

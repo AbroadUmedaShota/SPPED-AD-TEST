@@ -205,3 +205,28 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
     expect(heads2).toEqual(['タイトル', '作業ステータス', '納期日']);
   });
 });
+
+test('390pxで「黙って切れる」要素が無い(全画面・2026-08-19)', async ({ page }) => {
+  // 情報が消えるのは overflow:hidden 内で切れるとき。省略表示(ellipsis/clamp)と
+  // 横スクロール可能な容器(auto/scroll)は仕様内なので除外する
+  const { SCREENS } = require('./_screens');
+  for (const s of SCREENS) {
+    await openAt(page, s.path, 390);
+    const clipped = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('#main-content *').forEach((e) => {
+        const d = e.scrollWidth - e.clientWidth;
+        if (d <= 2 || e.clientWidth < 40) { return; }
+        const st = getComputedStyle(e);
+        if (st.textOverflow === 'ellipsis') { return; }
+        if (st.webkitLineClamp && st.webkitLineClamp !== 'none') { return; }
+        if (st.overflowX === 'auto' || st.overflowX === 'scroll') { return; }
+        if (st.overflowX === 'hidden' || st.overflow === 'hidden') {
+          out.push((e.id || e.tagName.toLowerCase()) + '+' + d + 'px');
+        }
+      });
+      return [...new Set(out)].slice(0, 5);
+    });
+    expect(clipped, s.name + ' @390px で切れている: ' + clipped.join(', ')).toEqual([]);
+  }
+});

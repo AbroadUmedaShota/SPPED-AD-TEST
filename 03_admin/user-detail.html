@@ -22,6 +22,14 @@
   .admin-2col { grid-template-columns: minmax(0, 1fr); }
 }
 </style>
+<style>
+/* スマホ幅(640px以下・2026-08-19)。カード内のテーブルは最小幅が390pxを超えるため、
+   overflow:hidden のままだと黙って切れる。スマホでは横スクロール可能へ切り替える
+   (詳細画面は容器内スクロール許容・05 §6.2) */
+@media (max-width: 640px) {
+  #udGroups, #udSurveys, #udBills { overflow-x: auto !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">

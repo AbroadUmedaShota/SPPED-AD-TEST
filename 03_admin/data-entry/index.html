@@ -18,7 +18,7 @@
 /* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
    横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
 @media (max-width: 640px) {
-  .dg-row { grid-template-columns: minmax(0,1fr) minmax(0,120fr) !important; }
+  .dg-row { grid-template-columns: minmax(0,1fr) 120px !important; }
   .dg-row > :nth-child(2),
   .dg-row > :nth-child(3),
   .dg-row > :nth-child(4),
