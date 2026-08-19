@@ -16,6 +16,24 @@
     .perf-sec-note { margin-left: 8px; font-weight: 400; font-size: 12px; color: var(--a-fg-muted2); }
     .perf-table { margin-top: 10px; background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto; }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。月次推移・内訳は「対象/作業件数/正答率」、
+   所属オペレーターは「氏名/作業件数/正答率」の3列へ間引き横スクロールを出さない */
+@media (max-width: 640px) {
+  [data-grid="trend"], [data-grid="bd"], #gdTrend > div, #gdBreakdown > div {
+    grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
+  }
+  [data-grid="trend"] > :nth-child(3), [data-grid="trend"] > :nth-child(5), [data-grid="trend"] > :nth-child(6), [data-grid="trend"] > :nth-child(7),
+  #gdTrend > div > :nth-child(3), #gdTrend > div > :nth-child(5), #gdTrend > div > :nth-child(6), #gdTrend > div > :nth-child(7),
+  [data-grid="bd"] > :nth-child(3), [data-grid="bd"] > :nth-child(5), [data-grid="bd"] > :nth-child(6),
+  #gdBreakdown > div > :nth-child(3), #gdBreakdown > div > :nth-child(5), #gdBreakdown > div > :nth-child(6) { display: none !important; }
+  [data-grid="ops"], #gdOps > div {
+    grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
+  }
+  [data-grid="ops"] > :nth-child(1), [data-grid="ops"] > :nth-child(4), [data-grid="ops"] > :nth-child(6), [data-grid="ops"] > :nth-child(7),
+  #gdOps > div > :nth-child(1), #gdOps > div > :nth-child(4), #gdOps > div > :nth-child(6), #gdOps > div > :nth-child(7) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">

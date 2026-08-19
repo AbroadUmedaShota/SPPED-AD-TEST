@@ -18,6 +18,23 @@
     /* 日別実績は行数が多いので高さを絞ってスクロールさせる */
     .perf-daily-scroll { max-height: 420px; overflow-y: auto; }
 </style>
+<style>
+/* スマホ段(640px以下・2026-08-19)。実績詳細も一覧と同じ方針で、全テーブルを
+   「対象/作業件数/正答率」の3列へ間引き横スクロールを出さない。
+   グリッドはJSがインラインで当てるため !important で上書きする。
+   5列の表(アンケート別・日別)への nth-child(6) は該当なしで無害 */
+@media (max-width: 640px) {
+  .perf-table [data-grid],
+  #odTrend > div, #odBreakdown > div, #odDetailPane > div, #odDaily > div {
+    grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
+  }
+  .perf-table [data-grid] > :nth-child(3), .perf-table [data-grid] > :nth-child(5), .perf-table [data-grid] > :nth-child(6),
+  #odTrend > div > :nth-child(3), #odTrend > div > :nth-child(5), #odTrend > div > :nth-child(6),
+  #odBreakdown > div > :nth-child(3), #odBreakdown > div > :nth-child(5), #odBreakdown > div > :nth-child(6),
+  #odDetailPane > div > :nth-child(3), #odDetailPane > div > :nth-child(5),
+  #odDaily > div > :nth-child(3), #odDaily > div > :nth-child(5) { display: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">

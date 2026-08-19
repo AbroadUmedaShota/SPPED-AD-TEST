@@ -106,6 +106,7 @@ test('1023px 以下ではサイドバーを引っ込める', async ({ page }) =>
 });
 
 test('どの幅でもページ全体が横スクロールしない', async ({ page }) => {
+  test.slow();  // 多ページ巡回で既定30秒に接近するため余裕を持たせる(2026-08-19)
   for (const w of [1920, 1366, 1024, 768]) {
     for (const path of ['/03_admin/index.html', '/03_admin/reconciliation/index.html',
       '/03_admin/reconciliation/detail.html', '/03_admin/data-entry/form.html']) {
@@ -167,11 +168,14 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
     '/03_admin/audit-log.html',
     '/03_admin/operator-management.html',
     '/03_admin/performance-management.html?tab=operators',
+    '/03_admin/performance-group-detail.html',
+    '/03_admin/performance-operator-detail.html',
     '/03_admin/reconciliation/index.html',
     '/03_admin/data-entry/index.html',
   ];
 
   test('ページも一覧の内部も横スクロールしない', async ({ page }) => {
+    test.slow();  // 多ページ巡回で既定30秒に接近するため余裕を持たせる(2026-08-19)
     for (const path of PAGES) {
       await openAt(page, path, 390);
       const over = await page.evaluate(
@@ -180,7 +184,7 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
       // 情報を削る方針の検査: overflow-x:auto の一覧コンテナ内でもスクロールを出さない
       const inner = await page.evaluate(() => {
         const out = [];
-        document.querySelectorAll('[id$="List"], #perfGroups, .dash-table, .dg-table').forEach((el) => {
+        document.querySelectorAll('[id$="List"], #perfGroups, .dash-table, .perf-table').forEach((el) => {
           if (el.offsetParent === null) { return; }
           const d = el.scrollWidth - el.clientWidth;
           if (d > 1) { out.push((el.id || el.className) + '+' + d + 'px'); }
@@ -207,6 +211,7 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
 });
 
 test('390pxで「黙って切れる」要素が無い(全画面・2026-08-19)', async ({ page }) => {
+  test.slow();  // 多ページ巡回で既定30秒に接近するため余裕を持たせる(2026-08-19)
   // 情報が消えるのは overflow:hidden 内で切れるとき。省略表示(ellipsis/clamp)と
   // 横スクロール可能な容器(auto/scroll)は仕様内なので除外する
   const { SCREENS } = require('./_screens');
