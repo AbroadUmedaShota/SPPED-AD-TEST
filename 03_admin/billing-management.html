@@ -23,14 +23,18 @@
 /* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
    横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
 @media (max-width: 640px) {
-  #billingList > div { grid-template-columns: minmax(0,1fr) 104px !important; column-gap: 6px !important; }
+  /* 操作列(9列目)は残して「詳細」だけ表示する。隠した請求先・ステータス・クーポン・
+     各期日は詳細(請求カルテ)モーダルで全て見られるが、入口の詳細ボタンごと隠すと
+     スマホで見る手段が消えるため(2026-08-19)。クーポン適用は操作なので隠す */
+  #billingList > div { grid-template-columns: minmax(0,1fr) 92px 62px !important; column-gap: 6px !important; }
   #billingList > div > :nth-child(2),
   #billingList > div > :nth-child(3),
   #billingList > div > :nth-child(5),
   #billingList > div > :nth-child(6),
   #billingList > div > :nth-child(7),
-  #billingList > div > :nth-child(8),
-  #billingList > div > :nth-child(9) { display: none !important; }
+  #billingList > div > :nth-child(8) { display: none !important; }
+  #billingList .row-act { grid-template-columns: 1fr !important; padding-left: 4px !important; }
+  #billingList .row-act > button:nth-child(2) { display: none !important; }
 }
 </style>
 </head>

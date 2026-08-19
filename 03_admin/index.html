@@ -164,20 +164,25 @@
   .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(6),
   .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(7),
   .tbl-dsurveys :is(.dash-thead,.dash-trow) > :nth-child(8) { display: none !important; }
+  /* 残す列は タイトル+作成日。作成日はマスタに無い本表限定の参考値のため隠すと見る手段が
+     消える。会期開始日は行押下先のアンケート詳細で見られるので隠す側にする(2026-08-19) */
   .tbl-newsurveys :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 84px !important; }
   .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(1),
   .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(3),
-  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(4),
+  .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(5),
   .tbl-newsurveys :is(.dash-thead,.dash-trow) > :nth-child(6) { display: none !important; }
   .tbl-newusers :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,120fr) minmax(0,90fr) !important; }
   .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(1),
   .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(4),
   .tbl-newusers :is(.dash-thead,.dash-trow) > :nth-child(5) { display: none !important; }
-  .tbl-stuck :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 52px 80px !important; }
+  /* 残す列は アンケート+経過+納期。経過(最終入力からの経過)は本表限定の参考値のため
+     隠すと見る手段が消える。進捗率は行押下先のデータ入力対象一覧の進捗から追えるので
+     隠す側にする(2026-08-19) */
+  .tbl-stuck :is(.dash-thead,.dash-trow) { grid-template-columns: minmax(0,1fr) 56px 80px !important; }
   .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(2),
   .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(3),
   .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(4),
-  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(6) { display: none !important; }
+  .tbl-stuck :is(.dash-thead,.dash-trow) > :nth-child(5) { display: none !important; }
 }
 </style>
 </head>

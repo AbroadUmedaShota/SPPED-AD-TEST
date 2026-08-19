@@ -18,23 +18,10 @@
     /* 日別実績は行数が多いので高さを絞ってスクロールさせる */
     .perf-daily-scroll { max-height: 420px; overflow-y: auto; }
 </style>
-<style>
-/* スマホ段(640px以下・2026-08-19)。実績詳細も一覧と同じ方針で、全テーブルを
-   「対象/作業件数/正答率」の3列へ間引き横スクロールを出さない。
-   グリッドはJSがインラインで当てるため !important で上書きする。
-   5列の表(アンケート別・日別)への nth-child(6) は該当なしで無害 */
-@media (max-width: 640px) {
-  .perf-table [data-grid],
-  #odTrend > div, #odBreakdown > div, #odDetailPane > div, #odDaily > div {
-    grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
-  }
-  .perf-table [data-grid] > :nth-child(3), .perf-table [data-grid] > :nth-child(5), .perf-table [data-grid] > :nth-child(6),
-  #odTrend > div > :nth-child(3), #odTrend > div > :nth-child(5), #odTrend > div > :nth-child(6),
-  #odBreakdown > div > :nth-child(3), #odBreakdown > div > :nth-child(5), #odBreakdown > div > :nth-child(6),
-  #odDetailPane > div > :nth-child(3), #odDetailPane > div > :nth-child(5),
-  #odDaily > div > :nth-child(3), #odDaily > div > :nth-child(5) { display: none !important; }
-}
-</style>
+<!-- スマホ段(640px以下)の列間引きは行わない(2026-08-19)。本ページの月次推移・内訳・
+     アンケート別・日別はここより深い遷移先が無い終端の表で、正解件数・スキップ回数・
+     報酬金額を列から隠すとスマホで見る手段が消えるため。当月分はサマリカードで見え、
+     過去月・内訳は横スクロール(data-phone-scroll)で全列を保持する(05 §6.2)。 -->
 </head>
 <body>
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -68,7 +55,7 @@
             </div>
 
             <div class="perf-sec">月次推移 <span class="perf-sec-note">直近6ヶ月。行は新しい月が上</span></div>
-            <div class="perf-table">
+            <div class="perf-table" data-phone-scroll>
               <div data-grid="trend" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
                 <span>対象月</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
               </div>
@@ -76,7 +63,7 @@
             </div>
 
             <div class="perf-sec">作業グループ①〜⑧×入力項目別の内訳 <span class="perf-sec-note">作業グループ行を押すと入力項目ごとの内訳を開きます</span></div>
-            <div class="perf-table">
+            <div class="perf-table" data-phone-scroll>
               <div data-grid="bd" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
                 <span>作業グループ / 入力項目</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
               </div>
@@ -88,7 +75,7 @@
               <button id="odTabSv" role="tab" aria-selected="true" aria-controls="odDetailPane" onclick="odTab('survey')" style="background:none;border:none;border-bottom:2px solid var(--a-accent);margin-bottom:-2px;padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--a-accent);cursor:pointer;font-family:inherit">アンケート別</button>
               <button id="odTabDay" role="tab" aria-selected="false" aria-controls="odDetailPane" onclick="odTab('daily')" style="background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 18px;font-size:13.5px;color:var(--a-fg-muted);cursor:pointer;font-family:inherit">日別</button>
             </div>
-            <section id="odDetailPane" role="tabpanel" aria-labelledby="odTabSv" class="perf-table perf-daily-scroll" style="margin-top:12px">
+            <section id="odDetailPane" role="tabpanel" aria-labelledby="odTabSv" class="perf-table perf-daily-scroll" data-phone-scroll style="margin-top:12px">
               <div id="odDetailHead" data-grid="survey" style="position:sticky;top:0;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px"></div>
               <div id="odDaily"></div>
             </section>

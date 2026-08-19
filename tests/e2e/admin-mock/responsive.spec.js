@@ -181,11 +181,15 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
       const over = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(over, path + ' @390px でページが ' + over + 'px 溢れている').toBeLessThanOrEqual(1);
-      // 情報を削る方針の検査: overflow-x:auto の一覧コンテナ内でもスクロールを出さない
+      // 情報を削る方針の検査: overflow-x:auto の一覧コンテナ内でもスクロールを出さない。
+      // ただし data-phone-scroll 付きの容器(監査ログ・実績詳細の終端表)は除外する。
+      // 遷移先の無い表は列を隠すと情報がスマホで見えなくなるため、間引かず
+      // 横スクロールで全列を保持する方針(2026-08-19・05 §6.2)
       const inner = await page.evaluate(() => {
         const out = [];
         document.querySelectorAll('[id$="List"], #perfGroups, .dash-table, .perf-table').forEach((el) => {
           if (el.offsetParent === null) { return; }
+          if (el.hasAttribute('data-phone-scroll')) { return; }
           const d = el.scrollWidth - el.clientWidth;
           if (d > 1) { out.push((el.id || el.className) + '+' + d + 'px'); }
         });
@@ -207,6 +211,31 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
       .filter((c) => getComputedStyle(c).display !== 'none')
       .map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim()));
     expect(heads2).toEqual(['タイトル', '作業ステータス', '納期日']);
+  });
+
+  test('残す列は「一覧にしか無い情報」を優先する(2026-08-19)', async ({ page }) => {
+    // 会期前表の作成日・滞留表の経過はこの表にしか無い参考値。行押下先で見られる列
+    // (会期開始日・進捗率)を隠す側にし、これらを残す。詳細は index.html の640px段コメント
+    await openAt(page, '/03_admin/index.html', 390);
+    const heads = await page.evaluate(() => {
+      const read = (sel) => [...document.querySelector(sel + ' .dash-thead').children]
+        .filter((c) => getComputedStyle(c).display !== 'none')
+        .map((c) => c.textContent.trim());
+      return { newsurveys: read('.tbl-newsurveys'), stuck: read('.tbl-stuck') };
+    });
+    expect(heads.newsurveys).toEqual(['タイトル', '作成日']);
+    expect(heads.stuck).toEqual(['アンケート', '経過', '納期']);
+
+    // 請求管理はカルテの入口(詳細ボタン)を残す。クーポン適用ボタンは隠れる
+    await openAt(page, '/03_admin/billing-management.html', 390);
+    const bill = await page.evaluate(() => {
+      const act = document.querySelector('#billingList [data-pg] .row-act');
+      const btns = [...act.querySelectorAll('button')]
+        .filter((b) => getComputedStyle(b).display !== 'none')
+        .map((b) => b.textContent.trim());
+      return btns;
+    });
+    expect(bill).toEqual(['詳細']);
   });
 });
 

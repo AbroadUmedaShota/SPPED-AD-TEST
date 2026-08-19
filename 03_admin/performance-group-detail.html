@@ -17,16 +17,11 @@
     .perf-table { margin-top: 10px; background: var(--a-surface); border: 1px solid var(--a-border); border-radius: 8px; overflow-x: auto; }
 </style>
 <style>
-/* スマホ段(640px以下・2026-08-19)。月次推移・内訳は「対象/作業件数/正答率」、
-   所属オペレーターは「氏名/作業件数/正答率」の3列へ間引き横スクロールを出さない */
+/* スマホ段(640px以下・2026-08-19)。所属オペレーターだけを「氏名/作業件数/正答率」の
+   3列へ間引く。隠す列(ID・正解件数・スキップ回数・報酬金額)は行押下先のオペレーター
+   実績詳細で見られるため。月次推移・内訳はここより深い遷移先が無い終端の表で、
+   隠すとスマホで見る手段が消えるため間引かず横スクロール(data-phone-scroll)で全列を保持する */
 @media (max-width: 640px) {
-  [data-grid="trend"], [data-grid="bd"], #gdTrend > div, #gdBreakdown > div {
-    grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
-  }
-  [data-grid="trend"] > :nth-child(3), [data-grid="trend"] > :nth-child(5), [data-grid="trend"] > :nth-child(6), [data-grid="trend"] > :nth-child(7),
-  #gdTrend > div > :nth-child(3), #gdTrend > div > :nth-child(5), #gdTrend > div > :nth-child(6), #gdTrend > div > :nth-child(7),
-  [data-grid="bd"] > :nth-child(3), [data-grid="bd"] > :nth-child(5), [data-grid="bd"] > :nth-child(6),
-  #gdBreakdown > div > :nth-child(3), #gdBreakdown > div > :nth-child(5), #gdBreakdown > div > :nth-child(6) { display: none !important; }
   [data-grid="ops"], #gdOps > div {
     grid-template-columns: minmax(0,1fr) 90px 64px !important; column-gap: 6px !important;
   }
@@ -66,7 +61,7 @@
             </div>
 
             <div class="perf-sec">月次推移 <span class="perf-sec-note">直近6ヶ月。行は新しい月が上</span></div>
-            <div class="perf-table">
+            <div class="perf-table" data-phone-scroll>
               <div data-grid="trend" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
                 <span>対象月</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">合計報酬金額</span><span style="text-align:right">最終報酬金額</span>
               </div>
@@ -74,7 +69,7 @@
             </div>
 
             <div class="perf-sec">作業グループ①〜⑧別の内訳 <span class="perf-sec-note" id="gdWorst"></span></div>
-            <div class="perf-table">
+            <div class="perf-table" data-phone-scroll>
               <div data-grid="bd" style="background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted);height:40px">
                 <span>作業グループ</span><span style="text-align:right">作業件数</span><span style="text-align:right">正解件数</span><span style="text-align:right">正答率</span><span style="text-align:right">スキップ回数</span><span style="text-align:right">報酬金額</span>
               </div>
