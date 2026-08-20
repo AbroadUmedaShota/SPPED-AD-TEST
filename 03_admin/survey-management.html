@@ -11,25 +11,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* 幅が足りない画面では余白と最小幅を詰めて9列全部を収め、横スクロールを避ける。
-   納期区分・回答数など全列が業務判断に使う情報のため、列は隠さない。
-   基準は1920px表示。1459px未満で適用する(他画面の一覧と同じ基準)。 */
+/* 一覧はデスクトップでは全項目を表示し、狭幅では操作列を右端に固定する。
+   10列目の操作を常に確認できるようにし、横スクロールが発生する幅でも行操作を失わない。 */
+#surveysList > div {
+  grid-template-columns: 58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(88px,40fr) minmax(72px,45fr) minmax(92px,48fr) 232px !important;
+}
 @media (max-width: 1459px) {
-  #surveysList > div { grid-template-columns: 58px minmax(144px,220fr) minmax(142px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(64px,40fr) minmax(72px,45fr) minmax(84px,48fr) 184px !important; column-gap: 6px !important; }
+  #surveysList > div { grid-template-columns: 58px minmax(144px,220fr) minmax(142px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(64px,40fr) minmax(72px,45fr) minmax(72px,45fr) minmax(88px,48fr) 208px !important; column-gap: 6px !important; }
   #surveysList > div > span:nth-child(6) { padding-right: 16px !important; }
+  #surveysList > div > :nth-child(10) { position: sticky; right: 0; z-index: 2; background: var(--a-surface); box-shadow: -6px 0 10px rgba(15, 23, 42, 0.08); }
+  #surveysList > div:first-child > :nth-child(10) { z-index: 3; background: var(--a-surface-2); }
+}
+@media (max-width: 1199px) {
+  /* サイドバーが残る1024px前後とタブレット幅では補助列を間引き、
+     タイトル・ステータス・件数・納品予定日・操作を1画面に収める。 */
+  #surveysList > div { grid-template-columns: minmax(0,1fr) 92px 78px 78px 92px 208px !important; column-gap: 6px !important; }
+  #surveysList > div > :nth-child(1),
+  #surveysList > div > :nth-child(3),
+  #surveysList > div > :nth-child(4),
+  #surveysList > div > :nth-child(8) { display: none !important; }
+  #surveysList > div > :nth-child(10) { position: static; box-shadow: none; }
+  #surveysList > div:first-child > :nth-child(10) { background: var(--a-surface-2); }
 }
 </style>
 <style>
-/* スマホ段(640px以下・2026-08-19)。最低限の閲覧に徹し、識別に必要な列だけ残して
-   横スクロールを出さない。操作列も隠す(操作はPC幅で行う)。ダッシュボードの640px段と同じ基準 */
+/* スマホ段(640px以下)。タイトル・ステータス・操作を残し、行から詳細と回答画面へ進める。
+   タイトル内に ID と納品予定日を補助表示し、固定列でタイトルが潰れないようにする。 */
 @media (max-width: 640px) {
-  #surveysList > div { grid-template-columns: minmax(0,1fr) 96px 84px !important; column-gap: 6px !important; }
+  #surveysList > div { grid-template-columns: minmax(0,1fr) 86px 104px !important; column-gap: 6px !important; }
   #surveysList > div > :nth-child(1),
   #surveysList > div > :nth-child(3),
   #surveysList > div > :nth-child(4),
   #surveysList > div > :nth-child(6),
   #surveysList > div > :nth-child(7),
+  #surveysList > div > :nth-child(8),
   #surveysList > div > :nth-child(9) { display: none !important; }
+  #surveysList > div > :nth-child(2)::before { content: attr(data-mobile-id); display: block; margin-bottom: 2px; color: var(--a-fg-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+  #surveysList > div > :nth-child(2)::after { content: attr(data-mobile-due); display: block; margin-top: 2px; color: var(--a-fg-muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #surveysList > div:first-child > :nth-child(2)::after { content: attr(data-mobile-due-label); color: var(--a-fg-muted); font-size: 10px; }
+  #surveysList > div > :nth-child(10) { position: static; display: flex !important; min-width: 0; padding-left: 0 !important; background: transparent; box-shadow: none; }
+  #surveysList .row-act { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+  #surveysList .row-act > button,
+  #surveysList .row-act > a { width: 100%; min-width: 0; padding: 4px 3px !important; font-size: 11px !important; }
 }
 </style>
 </head>
@@ -57,15 +80,12 @@
                 <button onclick="pSearch('surveysList')" style="background:var(--a-accent-bg);color:var(--a-on-accent);border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">検索</button>
                 <button onclick="pClearSearch('surveysList')" style="background:none;border:none;font-size:12.5px;color:var(--a-fg-muted);cursor:pointer;text-decoration:underline;font-family:inherit">条件をクリア</button>
               </div>
-              <!-- 納期日列の値は他画面と一致させる(同数原則): 会期中はダッシュボードの
+              <!-- 納品予定日列の値は他画面と一致させる(同数原則): 会期中はダッシュボードの
                    「会期中・終了間際のアンケート」、データ化中は照合結果一覧(reconciliation/index.html)の
-                   納期の日付部分と同値。会期前は納期未確定、データ化完了は他画面に値が無いため「—」
-                   (実データでは完了後も納期日を保持して表示する・2026-08-18確定。モックは完了行の
-                   納期日の値を他画面に持たないため「—」のまま)。
-                   納期日を過ぎたデータ化中の行はダッシュボード滞留表と同じ強調にする。 -->
-              <div id="surveysList" data-sortable data-filter-keys="sid,uid,company,name,status,plan,today,isnew" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
-                <div style="display:grid;grid-template-columns:58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(72px,45fr) minmax(84px,48fr) 184px;column-gap:8px;align-items:center;padding:0 16px;height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
-                  <span>ID</span><span>タイトル</span><span>会社名 / ユーザーID</span><span title="既定の並び順" style="color:var(--a-fg-muted)">会期 ▼</span><span>作業ステータス</span><span style="text-align:right;padding-right:40px">回答数</span><span>納期区分</span><span>納期日</span><span style="padding-left:12px">操作</span>
+                   納品予定日の日付部分と同値。会期前は納品予定日未確定、データ化完了後も保持して表示する。 -->
+              <div id="surveysList" data-sortable data-page-size="50" data-filter-keys="sid,uid,company,name,status,plan,today,isnew" style="margin-top:16px;background:var(--a-surface);border:1px solid var(--a-border);border-radius:8px;overflow-x:auto">
+                <div style="display:grid;grid-template-columns:58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(88px,40fr) minmax(72px,45fr) minmax(92px,48fr) 232px;column-gap:8px;align-items:center;padding:0 16px;height:44px;background:var(--a-surface-2);border-bottom:1px solid var(--a-border);font-size:12px;font-weight:700;color:var(--a-fg-muted)">
+                  <span>ID</span><span>タイトル</span><span>会社名 / ユーザーID</span><span title="既定の並び順" style="color:var(--a-fg-muted)">会期 ▼</span><span>作業ステータス</span><span style="text-align:right;padding-right:40px"><span data-answer-help title="実際のアンケート回答数と、回答に名刺画像がついた有効回答数は異なる場合があります。表示値は名刺画像付きの有効回答数です。">有効回答数</span></span><span>データ化件数</span><span>納期区分</span><span>納品予定日</span><span style="padding-left:12px">操作</span>
                 </div>
                 <div tabindex="0" role="link" data-f-sid="SV-10262" data-f-uid="U-1049" data-f-company="グロースパートナーズ(株)" data-f-name="三浦 沙織" data-f-status="会期前" data-f-plan="通常" data-f-isnew="1" data-pg="1" class="proto-row-hover" onclick="location.href='survey-detail.html?id=SV-10262'" style="display:grid;grid-template-columns:58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(72px,45fr) minmax(84px,48fr) 184px;column-gap:8px;align-items:center;padding:8px 16px;min-height:52px;border-bottom:1px solid var(--a-border-soft);font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer">
                   <span style="font-weight:500">SV-10262</span><span title="人事・労務フォーラム 来場者アンケート" style="padding-right:10px;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45"><span style="background:var(--a-info-bg);color:var(--a-accent);border:1px solid var(--a-info-border);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700">新着</span> 人事・労務フォーラム 来場者アンケート</span><span style="min-width:0;display:flex;flex-direction:column;gap:1px;font-size:12px;line-height:1.4"><span title="グロースパートナーズ(株)" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">グロースパートナーズ(株)</span><span style="font-size:11px;color:var(--a-fg-muted);font-variant-numeric:tabular-nums">U-1049</span></span><span style="font-size:12px;color:var(--a-fg-muted);line-height:1.5">2026/08/03<br>〜2026/08/05</span><span><span class="status-badge status-inactive">会期前</span></span><span style="text-align:right;font-variant-numeric:tabular-nums;padding-right:40px">0</span><span style="font-size:12px">通常</span><span style="color:var(--a-fg-faint)">—</span>
@@ -158,10 +178,9 @@
               <div id="surveysList-empty" style="display:none;padding:26px 18px;text-align:center;font-size:13px;color:var(--a-fg-faint)">条件に一致する行がありません。条件を変えるか「条件をクリア」で全件に戻せます。</div>
               </div>
               <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--a-fg-muted);flex-wrap:wrap;row-gap:8px">
-                <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="surveysList-total">22</span> 件中 <span id="surveysList-range">1〜10</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('surveysList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option>10</option><option>25</option><option>50</option></select></label></div>
-                <div id="surveysList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('surveysList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜10" onclick="pPage('surveysList',1)" style="border:1px solid var(--a-accent);background:var(--a-accent-bg);color:var(--a-on-accent);border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button data-page="2" data-range="11〜20" onclick="pPage('surveysList',2)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">2</button><button data-page="3" data-range="21〜22" onclick="pPage('surveysList',3)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">3</button><button onclick="pPageStep('surveysList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
+                <div style="display:flex;align-items:center;gap:16px"><span style="font-variant-numeric:tabular-nums">全 <span id="surveysList-total">22</span> 件中 <span id="surveysList-range">1〜22</span> 件を表示</span><label style="display:flex;align-items:center;gap:6px">表示件数 <select aria-label="表示件数" onchange="pPageSize('surveysList', parseInt(this.value, 10))" style="border:1px solid var(--a-border-strong);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:inherit"><option value="50">50</option></select></label></div>
+                <div id="surveysList-pager" data-current="1" style="display:flex;gap:4px;font-variant-numeric:tabular-nums"><button onclick="pPageStep('surveysList',-1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">‹</button><button data-page="1" data-range="1〜22" onclick="pPage('surveysList',1)" style="border:1px solid var(--a-accent);background:var(--a-accent-bg);color:var(--a-on-accent);border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer;font-family:inherit">1</button><button onclick="pPageStep('surveysList',1)" style="border:1px solid var(--a-border-strong);background:var(--a-surface);color:var(--a-fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:inherit">›</button></div>
               </div>
-              <div style="margin-top:12px;font-size:11.5px;color:var(--a-fg-faint)">作業ステータスの値集合は現行6値(作成中/会期中/データ化中/アップ待ち/アップ完了/データ化なし)を4値へ整理する案。ユーザー画面の表示ステータスは「会期終了（データ化中）」等の括弧付き7値(statusService)であり、内部・管理側の値との対応整理が必要。納品予定日は現行画面の「データ化完了予定日」に対応。データ化件数(現行の「実際の件数」)は請求の根拠のため請求管理で扱う。</div>
             </div>
         </main>
     </div>
@@ -236,6 +255,126 @@
 <script src="src/proto-level.js"></script>
 
 <script>
+var SURVEY_GRID = '58px minmax(150px,220fr) minmax(148px,150fr) minmax(78px,55fr) minmax(88px,60fr) minmax(88px,40fr) minmax(88px,40fr) minmax(72px,45fr) minmax(92px,48fr) 232px';
+var SURVEY_COUNT_HELP = '実際のアンケート回答数と、回答に名刺画像がついた有効回答数は異なる場合があります。表示値は名刺画像付きの有効回答数です。';
+var SURVEY_COUNT_INFO = {
+    'SV-10262': { total: 0, effective: 0, dataized: '—' },
+    'SV-10259': { total: 3842, effective: 3651, dataized: '—' },
+    'SV-10257': { total: 926, effective: 881, dataized: '—' },
+    'SV-10250': { total: 2150, effective: 2040, dataized: '2,040' },
+    'SV-10244': { total: 1208, effective: 1156, dataized: '1,024' },
+    'SV-10238': { total: 3420, effective: 3264, dataized: '2,940' },
+    'SV-10236': { total: 2864, effective: 2731, dataized: '2,312' },
+    'SV-10233': { total: 412, effective: 394, dataized: '338' },
+    'SV-10229': { total: 1980, effective: 1888, dataized: '1,888' },
+    'SV-10227': { total: 356, effective: 339, dataized: '339' },
+    'SV-10221': { total: 288, effective: 274, dataized: '274' },
+    'SV-10218': { total: 3105, effective: 2956, dataized: '2,956' },
+    'SV-10214': { total: 1472, effective: 1407, dataized: '1,407' },
+    'SV-10209': { total: 926, effective: 888, dataized: '888' },
+    'SV-10205': { total: 1038, effective: 996, dataized: '996' },
+    'SV-10201': { total: 2214, effective: 2110, dataized: '2,110' },
+    'SV-10196': { total: 684, effective: 650, dataized: '650' },
+    'SV-10192': { total: 1760, effective: 1676, dataized: '1,676' },
+    'SV-10188': { total: 2530, effective: 2408, dataized: '2,408' },
+    'SV-10183': { total: 1204, effective: 1148, dataized: '1,148' },
+    'SV-10179': { total: 842, effective: 804, dataized: '804' },
+    'SV-10174': { total: 516, effective: 492, dataized: '492' }
+};
+
+var pSurveyFormatCount = function (value) {
+    return Number(value || 0).toLocaleString('en-US');
+};
+
+// 一覧に有効回答数・データ化件数・実アンケート画面への導線を適用する。
+// 既存行と作成直後の行を同じ表示へそろえるため、画面固有のモックデータをここで整形する。
+var pSurveyListEnhance = function () {
+    var list = document.getElementById('surveysList');
+    if (!list) { return; }
+
+    var head = list.firstElementChild;
+    if (head) {
+        head.style.gridTemplateColumns = SURVEY_GRID;
+        var answerHead = head.children[5];
+        var answerHelp = answerHead && answerHead.querySelector('[data-answer-help]');
+        var titleHead = head.children[1];
+        if (titleHead) { titleHead.setAttribute('data-mobile-due-label', '納品予定日'); }
+        if (answerHead) {
+            answerHead.setAttribute('aria-label', '有効回答数。' + SURVEY_COUNT_HELP);
+            answerHead.style.cursor = 'help';
+        }
+        if (answerHelp) {
+            answerHelp.title = SURVEY_COUNT_HELP;
+            answerHelp.style.cursor = 'help';
+        }
+    }
+
+    list.querySelectorAll('[data-f-sid]').forEach(function (row) {
+        var sid = row.getAttribute('data-f-sid');
+        var currentAnswerCell = row.children[5];
+        var currentTotal = currentAnswerCell ? parseInt(currentAnswerCell.textContent.replace(/[^\d]/g, ''), 10) || 0 : 0;
+        var info = SURVEY_COUNT_INFO[sid] || { total: currentTotal, effective: currentTotal, dataized: '—' };
+        var totalText = pSurveyFormatCount(info.total);
+        var effectiveText = pSurveyFormatCount(info.effective);
+        var answerTitle = '実際のアンケート回答数: ' + totalText + '件 / 名刺画像付き有効回答数: ' + effectiveText + '件。表示値は有効回答数です。';
+
+        row.style.gridTemplateColumns = SURVEY_GRID;
+        row.setAttribute('data-f-total-answers', String(info.total));
+        row.setAttribute('data-f-effective-answers', String(info.effective));
+
+        var titleCell = row.children[1];
+        var dueCell = row.children[8];
+        if (titleCell) {
+            titleCell.setAttribute('data-mobile-id', sid);
+            titleCell.setAttribute('data-mobile-due', dueCell ? dueCell.textContent.replace(/\s+/g, ' ').trim() : '—');
+        }
+
+        if (currentAnswerCell) {
+            currentAnswerCell.classList.add('survey-answer-count');
+            currentAnswerCell.textContent = effectiveText;
+            currentAnswerCell.setAttribute('title', answerTitle);
+            currentAnswerCell.setAttribute('aria-label', '有効回答数 ' + effectiveText + '件。実際のアンケート回答数 ' + totalText + '件。名刺画像付きの回答のみを有効回答として表示。');
+            currentAnswerCell.setAttribute('data-total-answers', String(info.total));
+            currentAnswerCell.setAttribute('data-effective-answers', String(info.effective));
+            currentAnswerCell.style.cursor = 'help';
+        }
+
+        var dataizedCell = row.querySelector('[data-survey-dataized-count]');
+        if (!dataizedCell) {
+            dataizedCell = document.createElement('span');
+            dataizedCell.setAttribute('data-survey-dataized-count', '');
+            row.insertBefore(dataizedCell, row.children[6] || row.lastElementChild);
+        }
+        dataizedCell.textContent = info.dataized;
+        dataizedCell.setAttribute('aria-label', 'データ化件数 ' + info.dataized);
+        dataizedCell.style.textAlign = 'right';
+        dataizedCell.style.fontVariantNumeric = 'tabular-nums';
+        dataizedCell.style.paddingRight = '16px';
+
+        var actions = row.lastElementChild;
+        if (actions && actions.classList.contains('row-act')) {
+            if (!actions.querySelector('[data-survey-open]')) {
+                var openLink = document.createElement('a');
+                openLink.setAttribute('data-survey-open', '');
+                openLink.href = '../02_dashboard/survey-answer.html?surveyId=' + encodeURIComponent(sid);
+                openLink.target = '_blank';
+                openLink.rel = 'noopener';
+                openLink.textContent = '開く ↗';
+                openLink.setAttribute('aria-label', sid + ' の実アンケート画面を新しいタブで開く');
+                openLink.title = '実アンケート画面を新しいタブで開く';
+                openLink.style.cssText = 'display:block;background:var(--a-surface);color:var(--a-accent);border:1px solid var(--a-accent);border-radius:6px;padding:5px 6px;font-size:12px;font-weight:700;text-align:center;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+                openLink.addEventListener('click', function (event) { event.stopPropagation(); });
+                actions.insertBefore(openLink, actions.firstChild);
+            }
+            actions.classList.remove('slots-1', 'slots-2', 'slots-3');
+            actions.classList.add('slots-' + Math.min(actions.children.length, 3));
+        }
+    });
+};
+
+pSurveyListEnhance();
+if (window.pPageSize) { window.pPageSize('surveysList', 50); }
+
 // アンケートの作成を一覧へ反映する(モックのため再読込で戻る)
 window.pSurveySave = function () {
     var v = function (id) { var e = document.getElementById(id); return e ? String(e.value).trim() : ''; };
@@ -246,7 +385,7 @@ window.pSurveySave = function () {
 
     var list = document.getElementById('surveysList');
     var head = list.querySelector('[data-pg]');
-    var cols = head.getAttribute('style');
+    var cols = SURVEY_GRID;
     var max = 0;
     list.querySelectorAll('[data-f-sid]').forEach(function (r) {
         var n = parseInt(r.getAttribute('data-f-sid').replace(/\D/g, ''), 10);
@@ -269,7 +408,7 @@ window.pSurveySave = function () {
         + 'font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:center';
     var html = '<div tabindex="0" role="link" data-f-sid="' + sid + '" data-f-uid="' + uid
         + '" data-f-company="' + comp + '" data-f-name="' + who.replace(/^[\w-]+\s*/, '')
-        + '" data-f-status="会期前" data-f-plan="' + plan + '" data-f-isnew="1" data-pg="1"'
+        + '" data-f-status="会期前" data-f-plan="' + plan + '" data-f-total-answers="0" data-f-effective-answers="0" data-f-isnew="1" data-pg="1"'
         + ' class="proto-row-hover" onclick="location.href=\'survey-detail.html?id=' + sid + '\'"'
         + ' style="' + cols + '">'
         // [0] ID
@@ -291,19 +430,22 @@ window.pSurveySave = function () {
         + (t || '—') + '</span>'
         // [4] 作業ステータス
         + '<span><span class="status-badge status-inactive">会期前</span></span>'
-        // [5] 回答数
+        // [5] 有効回答数
         + '<span style="text-align:right;font-variant-numeric:tabular-nums;'
         + 'padding-right:40px">0</span>'
-        // [6] 納期区分
+        // [6] データ化件数
+        + '<span data-survey-dataized-count style="text-align:right;font-variant-numeric:tabular-nums;padding-right:16px">—</span>'
+        // [7] 納期区分
         + '<span style="font-size:12px">' + plan + '</span>'
-        // [6.5] 納期日(新規作成は会期前のため未確定。納期日列の追加に対する追従・2026-08-18)
+        // [8] 納品予定日(新規作成は会期前のため未確定)
         + '<span style="color:var(--a-fg-faint)">—</span>'
-        // [7] 操作(新規作成の状態は必ず会期前のため削除ボタンを含める。13_admin_survey_management.md §4.4)
+        // [9] 操作(新規作成の状態は必ず会期前のため削除ボタンを含める。13_admin_survey_management.md §4.4)
         + '<span class="row-act slots-2" style="padding-left:12px">'
         + '<button style="' + BTN_DANGER + '" onclick="event.stopPropagation();pMgmtDelOpen(\'' + sid + '\',\'' + title + '\')">削除</button>'
         + '<button style="' + BTN + '" onclick="event.stopPropagation();pOpen(\'mDl\')">データDL ▾</button>'
         + '</span></div>';
     head.insertAdjacentHTML('beforebegin', html);
+    pSurveyListEnhance();
     window.pClearSearch('surveysList');
     window.pToast(sid + ' を作成しました');
     window.pClose('mSurvey');

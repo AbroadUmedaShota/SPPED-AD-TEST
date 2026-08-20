@@ -57,6 +57,46 @@ test.describe('一覧のページング', () => {
   }
 });
 
+test.describe('アンケート管理の表示仕様', () => {
+  test('有効回答数・データ化件数・納品予定日と内訳ツールチップが表示される', async ({ page }) => {
+    const errors = await openScreen(page, '/03_admin/survey-management.html');
+    const info = await page.evaluate(() => {
+      const list = document.getElementById('surveysList');
+      const row = list.querySelector('[data-f-sid="SV-10259"]');
+      const head = list.firstElementChild;
+      const cells = row ? row.children : [];
+      const open = row && row.querySelector('[data-survey-open]');
+      return {
+        pageSize: list.getAttribute('data-page-size'),
+        selectedPageSize: document.querySelector('select[aria-label="表示件数"]').value,
+        visibleRows: [...list.querySelectorAll('[data-pg]')].filter((r) => getComputedStyle(r).display !== 'none').length,
+        heads: [...head.children].map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim()),
+        effective: cells[5] && cells[5].textContent.trim(),
+        total: row && row.getAttribute('data-f-total-answers'),
+        tooltip: cells[5] && cells[5].getAttribute('title'),
+        dataized: cells[6] && cells[6].textContent.trim(),
+        openHref: open && open.getAttribute('href'),
+        openTarget: open && open.getAttribute('target'),
+      };
+    });
+
+    expect(errors, `JSエラー: ${errors.join(' / ')}`).toEqual([]);
+    expect(info.pageSize).toBe('50');
+    expect(info.selectedPageSize).toBe('50');
+    expect(info.visibleRows).toBe(22);
+    expect(info.heads).toContain('有効回答数');
+    expect(info.heads).toContain('データ化件数');
+    expect(info.heads).toContain('納品予定日');
+    expect(info.effective).toBe('3,651');
+    expect(info.total).toBe('3842');
+    expect(info.tooltip).toContain('実際のアンケート回答数: 3,842件');
+    expect(info.tooltip).toContain('名刺画像付き有効回答数: 3,651件');
+    expect(info.dataized).toBe('—');
+    expect(info.openHref).toBe('../02_dashboard/survey-answer.html?surveyId=SV-10259');
+    expect(info.openTarget).toBe('_blank');
+  });
+});
+
 test.describe('一覧の並び替え', () => {
   for (const list of LISTS) {
     test(`${list.name}: 見出しを押すと昇順と降順が入れ替わる`, async ({ page }) => {

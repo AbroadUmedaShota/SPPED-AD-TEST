@@ -43,6 +43,29 @@ test.describe(`${NOTEBOOK}px で一覧が横スクロールしない`, () => {
   });
 });
 
+test.describe('アンケート管理のタブレット表示', () => {
+  for (const width of [1024, 768]) {
+    test(`${width}px では主要列と操作列を1画面に収める`, async ({ page }) => {
+      await openAt(page, '/03_admin/survey-management.html', width);
+      const info = await page.evaluate(() => {
+        const list = document.getElementById('surveysList');
+        const shown = (el) => [...el.children]
+          .filter((c) => getComputedStyle(c).display !== 'none')
+          .map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim());
+        return {
+          overflow: list.scrollWidth - list.clientWidth,
+          headers: shown(list.firstElementChild),
+          rowCells: [...list.querySelector('[data-pg]').children]
+            .filter((c) => getComputedStyle(c).display !== 'none').length,
+        };
+      });
+      expect(info.overflow, `${width}px で一覧が ${info.overflow}px 溢れている`).toBeLessThanOrEqual(1);
+      expect(info.headers).toEqual(['タイトル', '作業ステータス', '有効回答数', 'データ化件数', '納品予定日', '操作']);
+      expect(info.rowCells).toBe(6);
+    });
+  }
+});
+
 test.describe('照合結果一覧の段階的な列の間引き', () => {
   // 幅 → 見えているべき見出し（Lv4）
   const TIERS = [
@@ -199,7 +222,7 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
     }
   });
 
-  test('ユーザー管理・アンケート管理は識別列だけ残る', async ({ page }) => {
+  test('ユーザー管理・アンケート管理は識別列と主要操作を残す', async ({ page }) => {
     await openAt(page, '/03_admin/user-management.html', 390);
     const heads = await page.evaluate(() => [...document.querySelector('#usersList > div').children]
       .filter((c) => getComputedStyle(c).display !== 'none')
@@ -210,7 +233,7 @@ test.describe('スマホ幅(390px)は最低限の閲覧に徹する(2026-08-19�
     const heads2 = await page.evaluate(() => [...document.querySelector('#surveysList > div').children]
       .filter((c) => getComputedStyle(c).display !== 'none')
       .map((c) => c.textContent.replace(/[▲▼\s]+$/g, '').trim()));
-    expect(heads2).toEqual(['タイトル', '作業ステータス', '納期日']);
+    expect(heads2).toEqual(['タイトル', '作業ステータス', '操作']);
   });
 
   test('残す列は「一覧にしか無い情報」を優先する(2026-08-19)', async ({ page }) => {
