@@ -778,7 +778,7 @@ function startBizcardUploadFlow(targetSide = null) {
             </div>
             <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.frontPreview')}</p>
             <div class="bg-gray-100 p-4 rounded-lg">
-                <img src="${localImages.front}" alt="${t('surveyAnswer.front')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
+                <img src="${localImages.front}" alt="${t('surveyAnswer.front')}" class="max-w-full max-h-[max(150px,calc(100dvh_-_405px))] sm:max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
             </div>
             <p class="text-center text-sm mt-2 text-gray-500">${t('surveyAnswer.bizcard.ocrLanguage')}</p>
         `;
@@ -796,30 +796,32 @@ function startBizcardUploadFlow(targetSide = null) {
             footer.innerHTML = ''; 
             
             // 2. 正しいレイアウトを設定
-            footer.classList.remove('justify-end');
-            footer.classList.add('justify-between', 'w-full', 'items-center');
+            // スマホ幅では 3 ボタンを 1 行に並べると文言が文字単位で折り返すため、
+            // 1 段目に「撮り直す」「裏面をスキップ」、2 段目に「裏面を追加する」を全幅で置く。sm 以上は従来どおり 1 行。
+            footer.classList.remove('flex', 'justify-end');
+            footer.classList.add('grid', 'grid-cols-2', 'sm:flex', 'sm:justify-between', 'w-full', 'items-center');
 
             // 3. 「撮り直す」ボタンを作成して追加 (左側)
             const retakeButton = document.createElement('button');
-            retakeButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
+            retakeButton.className = 'justify-self-start whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
             retakeButton.textContent = t('surveyAnswer.bizcard.retake');
             retakeButton.onclick = () => showChoice('front');
             footer.appendChild(retakeButton);
 
-            // 4. 右側のボタン用コンテナを作成
+            // 4. 右側のボタン用コンテナを作成 (スマホ幅では contents にして子をフッターのグリッドに直接並べる)
             const rightContainer = document.createElement('div');
-            rightContainer.className = 'flex items-center gap-4';
+            rightContainer.className = 'contents sm:flex sm:items-center sm:gap-4';
 
             // 5. 「裏面をスキップ」ボタンを作成して追加
             const skipButton = document.createElement('button');
-            skipButton.className = 'text-sm font-medium text-primary hover:underline';
+            skipButton.className = 'justify-self-end whitespace-nowrap px-4 py-2 sm:px-0 text-sm font-medium text-primary hover:underline';
             skipButton.textContent = t('surveyAnswer.bizcard.skipBack');
             skipButton.onclick = showFinalConfirmation;
             rightContainer.appendChild(skipButton);
 
             // 6. 「裏面を追加する」ボタンを作成して追加
             const addBackButton = document.createElement('button');
-            addBackButton.className = 'px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark';
+            addBackButton.className = 'col-span-2 whitespace-nowrap px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark';
             addBackButton.textContent = t('surveyAnswer.bizcard.addBack');
             addBackButton.onclick = showBackChoice;
             rightContainer.appendChild(addBackButton);
@@ -922,7 +924,7 @@ function startBizcardUploadFlow(targetSide = null) {
             </div>
             <p class="text-center text-sm text-gray-600 mb-4">${t('surveyAnswer.bizcard.backPreview')}</p>
             <div class="bg-gray-100 p-4 rounded-lg">
-                <img src="${localImages.back}" alt="${t('surveyAnswer.back')}" class="max-w-full max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
+                <img src="${localImages.back}" alt="${t('surveyAnswer.back')}" class="max-w-full max-h-[max(150px,calc(100dvh_-_405px))] sm:max-h-[max(200px,calc(100dvh_-_375px))] object-contain mx-auto rounded-md shadow-md">
             </div>
         `;
         showModal(DOMElements.bizcardUploadModal, t('surveyAnswer.bizcard.confirmTitle'), body, {
