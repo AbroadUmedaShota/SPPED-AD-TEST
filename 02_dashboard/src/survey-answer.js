@@ -798,12 +798,13 @@ function startBizcardUploadFlow(targetSide = null) {
             // 2. 正しいレイアウトを設定
             // スマホ幅では 3 ボタンを 1 行に並べると文言が文字単位で折り返すため、
             // 1 段目に「撮り直す」「裏面をスキップ」、2 段目に「裏面を追加する」を全幅で置く。sm 以上は従来どおり 1 行。
+            // 1 段目の 2 ボタンは justify-self-stretch で列幅いっぱいに広げ、文言を列の中央に置く (文言の長さが違っても左右対称に見える)。
             footer.classList.remove('flex', 'justify-end');
             footer.classList.add('grid', 'grid-cols-2', 'sm:flex', 'sm:justify-between', 'w-full', 'items-center');
 
             // 3. 「撮り直す」ボタンを作成して追加 (左側)
             const retakeButton = document.createElement('button');
-            retakeButton.className = 'justify-self-start whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
+            retakeButton.className = 'justify-self-stretch whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
             retakeButton.textContent = t('surveyAnswer.bizcard.retake');
             retakeButton.onclick = () => showChoice('front');
             footer.appendChild(retakeButton);
@@ -814,7 +815,7 @@ function startBizcardUploadFlow(targetSide = null) {
 
             // 5. 「裏面をスキップ」ボタンを作成して追加
             const skipButton = document.createElement('button');
-            skipButton.className = 'justify-self-end whitespace-nowrap px-4 py-2 sm:px-0 text-sm font-medium text-primary hover:underline';
+            skipButton.className = 'justify-self-stretch whitespace-nowrap px-4 py-2 sm:px-0 text-sm font-medium text-primary hover:underline';
             skipButton.textContent = t('surveyAnswer.bizcard.skipBack');
             skipButton.onclick = showFinalConfirmation;
             rightContainer.appendChild(skipButton);

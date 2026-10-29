@@ -61,13 +61,13 @@
 -    <div v-else class="flex items-center p-4 bg-surface-container rounded-b-lg gap-3 justify-between w-full">
 +    <div v-else class="grid grid-cols-2 sm:flex sm:justify-between items-center p-4 bg-surface-container rounded-b-lg gap-3 w-full shrink-0">
 -      <button class="px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high" @click="$emit('retake')">
-+      <button class="justify-self-start whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high" @click="$emit('retake')">
++      <button class="justify-self-stretch whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high" @click="$emit('retake')">
          {{ labels.previewRetake }}
        </button>
 -      <div class="flex items-center gap-4">
 +      <div class="contents sm:flex sm:items-center sm:gap-4">
 -        <button class="text-sm font-medium text-primary hover:underline" @click="$emit('skip-back')">
-+        <button class="justify-self-end whitespace-nowrap px-4 py-2 sm:px-0 text-sm font-medium text-primary hover:underline" @click="$emit('skip-back')">
++        <button class="justify-self-stretch whitespace-nowrap px-4 py-2 sm:px-0 text-sm font-medium text-primary hover:underline" @click="$emit('skip-back')">
            {{ labels.skipBackShort }}
          </button>
 -        <button class="px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark" @click="$emit('add-back')">
@@ -84,7 +84,7 @@
 
 - **モーダルの高さを画面内に収める**: 本体を `max-h-[calc(100dvh-2rem)] flex flex-col` にし、ヘッダーとフッターを `shrink-0` で固定、本文を `overflow-y-auto grow` にします。画面より高い中身は本文の中でスクロールし、ボタンは常に下端に見えます。本文が `overflow-y: auto` になるので、`modalScrollManager` もこの本文をスクロール先として見つけられます。`100dvh` は iOS Safari のアドレスバーとツールバーを除いた高さです。`100vh` だとバーの裏まで含むので使いません。
 - **画像の高さに上限を付ける**: 640px 未満は `100dvh - 405px`（下限 150px）、640px 以上は `100dvh - 375px`（下限 200px）です。640px 未満で引く値が大きいのは、スマートフォン幅でフッターが 2 段になるためです。`object-contain` で縦横比は保ちます。表面と裏面で同じ class を使います。
-- **ボタンの文言を割らない**: 640px 未満では、フッターを 2 列のグリッドにします。1 段目の左に「撮り直す」、右に「裏面をスキップ」、2 段目に全幅の「裏面を追加する」が並びます。右側の入れ物を `contents` にして、3 ボタンを直接グリッドに並べています。DOM の順（撮り直す → スキップ → 追加）は変わらないので、Tab の順と読み上げの順は見た目の順と一致します。640px 以上は現行と同じ 1 行です。各ボタンには `whitespace-nowrap` を付けます。「裏面をスキップ」には `px-4 py-2` を足し、スマートフォンでのタップ範囲を高さ 20px から 36px に広げています（640px 以上は横の余白だけ外すので、見た目は現行と同じです）。
+- **ボタンの文言を割らない**: 640px 未満では、フッターを 2 列のグリッドにします。1 段目の左に「撮り直す」、右に「裏面をスキップ」、2 段目に全幅の「裏面を追加する」が並びます。右側の入れ物を `contents` にして、3 ボタンを直接グリッドに並べています。1 段目の 2 ボタンは `justify-self-stretch` で列の幅いっぱいに広げ、文言を列の中央に置きます。文言の長さが違っても、モーダルの中心から左右等距離に並びます（375px 幅で ±81px）。DOM の順（撮り直す → スキップ → 追加）は変わらないので、Tab の順と読み上げの順は見た目の順と一致します。640px 以上は現行と同じ 1 行です。各ボタンには `whitespace-nowrap` を付けます。「裏面をスキップ」には `px-4 py-2` を足し、スマートフォンでのタップ範囲を高さ 20px から 36px に広げています（640px 以上は横の余白だけ外すので、見た目は現行と同じです）。
 
 ### 2.2 BizcardFinalConfirmModal（ステップ3 最終確認）
 
