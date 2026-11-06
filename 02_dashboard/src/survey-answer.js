@@ -1184,9 +1184,9 @@ function openMagnifyModal(src) {
     if (!modal) return;
 
     modal.innerHTML = `
-        <button class="magnify-close-button absolute top-4 right-4 text-white text-5xl z-10 leading-none">&times;</button>
+        <button type="button" class="magnify-close-button absolute right-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white text-4xl leading-none shadow-lg" style="top: calc(1rem + env(safe-area-inset-top, 0px));" aria-label="${t('surveyAnswer.bizcard.closeButton')}">&times;</button>
         <div class="magnify-image-container p-4">
-            <img src="${src}" class="max-w-[90vw] max-h-[90vh] object-contain">
+            <img src="${src}" class="max-w-[90vw] max-h-[calc(100dvh-5rem)] object-contain">
         </div>
     `;
     modal.classList.remove('hidden');
