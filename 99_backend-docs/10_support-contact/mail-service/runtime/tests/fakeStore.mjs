@@ -9,8 +9,10 @@ import { noMailContext, noMailContextToken, validNoMailConfirmation } from '../n
 const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
-const withDigest = (catalog) => catalog.complete && Array.isArray(catalog.cases) && !catalog.digest ? { ...catalog,
-  digest: createHash('sha256').update(normalizeCatalogCases(catalog.cases).map((item) => JSON.stringify([item.caseId, item.handledStatus, item.closedAt])).join('\n')).digest('hex') } : catalog;
+// A complete Firestore catalog always has an immutable snapshot identity.
+const withDigest = (catalog) => catalog.complete && Array.isArray(catalog.cases) ? { ...catalog,
+  snapshotId: catalog.snapshotId === undefined ? 'fixture-catalog' : catalog.snapshotId,
+  digest: catalog.digest || createHash('sha256').update(normalizeCatalogCases(catalog.cases).map((item) => JSON.stringify([item.caseId, item.handledStatus, item.closedAt])).join('\n')).digest('hex') } : catalog;
 
 export function fakeStore(caseIds = [], initialSync = null) {
   const records = new Map();

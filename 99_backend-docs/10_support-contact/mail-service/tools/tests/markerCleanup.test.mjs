@@ -330,7 +330,15 @@ test('pending source-deletion history must be consumed under the marker before c
   assert(f.db.records.has(marker('gone')));
   await f.cleanup.cancel('before-history', blocked.planHash);
 
+  const at = '2026-11-10T09:00:00.000Z';
   const store = fakeStore([], f.db.records.get(`${root}/meta/sync`));
+  const catalog = await store.getCatalog();
+  const fixtureLease = await store.acquireSyncLease('fixture-catalog');
+  await store.setSyncState({ ...await store.getSyncState(), executionId: randomUUID(), mode: 'full',
+    cutoffAt: at, lastSuccessAt: at, failedCount: 0,
+    catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest }, fixtureLease);
+  await store.releaseSyncLease(fixtureLease);
+  f.db.records.set(`${root}/meta/sync`, await store.getSyncState());
   const firestore = createFirestoreStore(f.db);
   store.withAccess = firestore.withAccess;
   store.recordUnobservedDeletion = firestore.recordUnobservedDeletion;
@@ -341,7 +349,6 @@ test('pending source-deletion history must be consumed under the marker before c
     starts.push(startHistoryId);
     return { messageIds: [], deletedIds: startHistoryId === '100' ? ['gone'] : [], nextPageToken: null, historyId: f.state.historyId };
   };
-  const at = '2026-11-10T09:00:00.000Z';
   const execute = createMailService({ store, gmail: f.gmail, core: {}, now: () => new Date(at) });
   const sync = () => execute({ contractVersion: 1, operation: 'advanceSync', requestId: createRequestId(new Date(at)), issuedAt: at,
     actor: { email: 'staff@abroad-o.com', authMode: 'domain' },
