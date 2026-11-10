@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { EventEmitter } from 'node:events';
-import { authorizeMailbox, createProof, GMAIL_READONLY_SCOPE, listenForOAuthCallback, MAILBOX } from '../mailboxOnboarding.mjs';
+import { createHash } from 'node:crypto';
+import { authorizeMailbox, createProof, GMAIL_READONLY_SCOPE, listenForOAuthCallback, MAILBOX, MAILBOX_DISCLOSURE_VERSION } from '../mailboxOnboarding.mjs';
 import { confirmMailboxDisclosure, main, openSystemBrowser, parseArguments } from '../authorizeMailbox.mjs';
 
 const options = { execute: true, desktopClient: true, confirmMailbox: MAILBOX,
@@ -9,6 +10,7 @@ const options = { execute: true, desktopClient: true, confirmMailbox: MAILBOX,
   clientId: '1-test.apps.googleusercontent.com', clientSecret: 'synthetic-client-secret',
   retentionNotice: '合成試験の保存期間', deletionContact: 'synthetic-operator@example.com' };
 const canonicalSecretName = 'projects/1234567890/secrets/existing-mailbox';
+const acceptedAt = '2026-11-10T14:00:00.000Z';
 const fetchCallback = (url) => fetch(url, { signal: AbortSignal.timeout(5000) });
 
 function fixture(overrides = {}) {
@@ -27,6 +29,7 @@ function fixture(overrides = {}) {
     }
   };
   const adapters = {
+    now: () => new Date(acceptedAt),
     createOAuthClient: () => oauth,
     listen: async (state) => {
       calls.state = state;
@@ -55,7 +58,7 @@ test('explicit execution, desktop type, mailbox and existing secret target are r
   }
 });
 
-test('PKCE offline consent verifies the exact mailbox and writes only the runtime credential schema', async () => {
+test('PKCE offline consent atomically stores verified credentials and the exact accepted disclosure', async () => {
   const { adapters, calls } = fixture();
   const result = await authorizeMailbox(options, adapters);
   assert.equal(result.secretVersion, `${canonicalSecretName}/versions/2`);
@@ -73,16 +76,41 @@ test('PKCE offline consent verifies the exact mailbox and writes only the runtim
   assert.notEqual(calls.token[0].codeVerifier, auth.code_challenge);
   assert.equal(calls.profile.url, 'https://gmail.googleapis.com/gmail/v1/users/me/profile');
   assert.equal(calls.profile.request.redirect, 'error');
+  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION,
+    disclosureSha256: createHash('sha256').update(calls.disclosure, 'utf8').digest('hex'), acceptedAt, verifiedMailbox: MAILBOX };
   assert.deepEqual(calls.writes, [{ parent: canonicalSecretName,
-    payload: { clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: 'synthetic-refresh' }, callOptions: { retry: null } }]);
+    payload: { clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: 'synthetic-refresh',
+      consentReceipt: { ...receipt, disclosure: calls.disclosure } }, callOptions: { retry: null } }]);
   assert.equal(calls.closed, true);
   assert.match(calls.disclosure, /SPEED AD お問い合わせ確認アプリ/);
+  assert.match(calls.disclosure, /運営主体: アブロードアウトソーシング株式会社/);
   assert.ok(calls.disclosure.includes(GMAIL_READONLY_SCOPE));
   assert.ok(calls.disclosure.includes(options.retentionNotice));
   assert.match(calls.disclosure, /案件終了後3年間/);
+  assert.match(calls.disclosure, /迷惑メール・ゴミ箱を含み、下書きは除きます/);
+  assert.match(calls.disclosure, /関連が未確定のメールも本文を取得して照合/);
+  assert.match(calls.disclosure, /abroad-o.com の社員全員/);
+  assert.match(calls.disclosure, /対象メールの本文・添付、照合待ち、確認記録/);
+  assert.match(calls.disclosure, /本文は同期時の照合と閲覧時/);
+  assert.match(calls.disclosure, /添付名/);
   assert.ok(calls.disclosure.includes(options.deletionContact));
   assert.equal(calls.disclosure.includes(options.clientSecret), false);
-  assert.deepEqual(Object.keys(result).sort(), ['mailbox', 'secretVersion']);
+  assert.deepEqual(result.consentReceipt, receipt);
+  assert.doesNotMatch(JSON.stringify(result), /synthetic-client-secret|synthetic-refresh|synthetic-access/);
+  assert.deepEqual(Object.keys(result).sort(), ['consentReceipt', 'mailbox', 'secretVersion']);
+});
+
+test('consent receipt binds dynamic disclosure content and refuses an unavailable timestamp before cloud access', async () => {
+  const first = fixture();
+  const second = fixture();
+  const original = await authorizeMailbox(options, first.adapters);
+  const changed = await authorizeMailbox({ ...options, retentionNotice: '別の合成保存方針' }, second.adapters);
+  assert.notEqual(original.consentReceipt.disclosureSha256, changed.consentReceipt.disclosureSha256);
+  const invalid = fixture({ adapters: { now: () => new Date(NaN) } });
+  await assert.rejects(authorizeMailbox(options, invalid.adapters), /CONSENT_TIME_UNAVAILABLE/);
+  assert.deepEqual(invalid.calls.metadata, []);
+  assert.deepEqual(invalid.calls.opened, []);
+  assert.deepEqual(invalid.calls.writes, []);
 });
 
 test('disclosure requires affirmative acknowledgement immediately before browser consent', async () => {

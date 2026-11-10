@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 
 export const MAILBOX = 'customer@speed-ad.com';
 export const GMAIL_READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
+export const MAILBOX_DISCLOSURE_VERSION = '2026-11-10.1';
 const PROFILE_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/profile';
 const CALLBACK_PATH = '/oauth/callback';
 const CLEAN_CALLBACK_SCRIPT = "history.replaceState(null, '', '/complete');";
@@ -30,11 +31,13 @@ export function validateOnboardingOptions(options) {
 
 export function mailboxDisclosure(options) {
   return `SPEED AD お問い合わせ確認アプリ：Gmailデータの利用について
+説明version: ${MAILBOX_DISCLOSURE_VERSION}
+運営主体: アブロードアウトソーシング株式会社
 対象アカウント: ${MAILBOX}
 要求権限: ${GMAIL_READONLY_SCOPE}（メールと添付の読取り。送信・変更・削除の権限は要求しません。）
-目的: 対象期間の送受信メールを問い合わせ案件と照合し、本文・添付と確認記録をアプリで確認するためです。判断できないメールは照合待ちとして表示します。
-共有: アプリの認証を通った abroad-o.com の社員と公式窓口の利用者が、対象メール・照合待ち・確認記録を閲覧します。Google Cloud上で処理・保存します。
-保存: 件名、差出人・宛先、日時、メール/スレッドID、添付情報、案件との照合、確認者・日時、同期位置と監査記録をFirestoreへ保存します。本文・添付本体は取得して一時メモリと画面で処理し、Firestoreへ保存しません。継続読取りの資格情報はSecret Managerへ保存します。
+目的・取得範囲: 受付データから決まる対象期間の全送受信メールを列挙します。迷惑メール・ゴミ箱を含み、下書きは除きます。同期時に案件との関連が未確定のメールも本文を取得して照合し、判断できないメールは照合待ちとして表示します。後続同期では新着や変更も取得します。
+共有: アプリの認証を通った abroad-o.com の社員全員と公式窓口の利用者が、対象メールの本文・添付、照合待ち、確認記録を閲覧できます。問い合わせ対応のため、この範囲の人による閲覧に同意する場合だけ続行してください。Google Cloud上で処理・保存します。
+保存: 件名、差出人・宛先、日時、メール/スレッドID、添付名などの添付情報、案件との照合、確認者・日時、同期位置と監査記録をFirestoreへ保存します。本文は同期時の照合と閲覧時に、添付本体は閲覧時に取得し、一時メモリと画面で処理してFirestoreへ保存しません。継続読取りの資格情報と、この説明全文・説明version・hash・同意日時・確認済み窓口の同意記録を同じSecret Manager versionへ保存します。
 保存方針: Gmail由来の照合・確認記録は案件終了後3年間保存します。実施方法: ${options.retentionNotice.trim()}
 停止・削除: Googleアカウントの接続管理から本アプリのアクセスを取り消せます。取消し後も保存済みデータは残るため、削除申請は ${options.deletionContact} へ対象の案件ID/メールIDを連絡してください。取消しやアプリ側データ削除でGmailの元メールは削除しません。
 詳細: mail-service READMEの「データの管理・削除」を確認してください。
@@ -129,10 +132,15 @@ export async function listenForOAuthCallback(state, { timeoutMs = 300000 } = {})
 }
 
 /** Adapters are injected so tests never consent to Google or write a cloud secret. */
-export async function authorizeMailbox(options, { createOAuthClient, secretManager, openAuthorization, confirmDisclosure, listen = listenForOAuthCallback, fetchImpl = fetch, random = randomBytes }) {
+export async function authorizeMailbox(options, { createOAuthClient, secretManager, openAuthorization, confirmDisclosure, listen = listenForOAuthCallback, fetchImpl = fetch, random = randomBytes, now = () => new Date() }) {
   validateOnboardingOptions(options);
   requireValue(typeof confirmDisclosure === 'function', 'DISCLOSURE_CONFIRMATION_REQUIRED');
-  requireValue(await confirmDisclosure(mailboxDisclosure(options)) === true, 'DISCLOSURE_DECLINED');
+  const disclosure = mailboxDisclosure(options);
+  requireValue(await confirmDisclosure(disclosure) === true, 'DISCLOSURE_DECLINED');
+  let acceptedAt;
+  try { acceptedAt = new Date(now()).toISOString(); } catch { throw new OnboardingError('CONSENT_TIME_UNAVAILABLE'); }
+  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION,
+    disclosureSha256: createHash('sha256').update(disclosure, 'utf8').digest('hex'), acceptedAt, verifiedMailbox: MAILBOX };
   const secretName = await resolveSecretName(secretManager, options.secretName);
   const proof = createProof(random);
   const listener = await listen(proof.state);
@@ -161,7 +169,8 @@ export async function authorizeMailbox(options, { createOAuthClient, secretManag
     let profile;
     try { profile = await response.json(); } catch { throw new OnboardingError('MAILBOX_VERIFICATION_FAILED'); }
     requireValue(String(profile?.emailAddress || '').trim().toLowerCase() === MAILBOX, 'MAILBOX_MISMATCH');
-    const payload = Buffer.from(JSON.stringify({ clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: tokens.refresh_token }), 'utf8');
+    const payload = Buffer.from(JSON.stringify({ clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: tokens.refresh_token,
+      consentReceipt: { ...receipt, disclosure } }), 'utf8');
     let version;
     try {
       // addVersion is not idempotent. A failed/unknown result must be investigated, never retried automatically.
@@ -169,7 +178,7 @@ export async function authorizeMailbox(options, { createOAuthClient, secretManag
     } catch { throw new OnboardingError('SECRET_WRITE_UNCONFIRMED'); }
     const versionPrefix = `${secretName}/versions/`;
     requireValue(typeof version?.name === 'string' && version.name.startsWith(versionPrefix) && /^[1-9]\d*$/.test(version.name.slice(versionPrefix.length)), 'SECRET_WRITE_UNCONFIRMED');
-    return { secretVersion: version.name, mailbox: MAILBOX };
+    return { secretVersion: version.name, mailbox: MAILBOX, consentReceipt: receipt };
   } finally {
     listener.close();
   }

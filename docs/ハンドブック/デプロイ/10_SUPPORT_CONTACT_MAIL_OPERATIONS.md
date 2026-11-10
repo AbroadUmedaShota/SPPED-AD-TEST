@@ -28,6 +28,7 @@ OAuth clientの所属projectとSecret保存先のprojectは別に照合します
 | 確認事項 | 進められる条件 |
 | --- | --- |
 | 公式窓口 | `customer@speed-ad.com` 本人がGmail読取に同意し、対象期間の受信・送信メールと添付がこのメールボックスに保存されている。別アカウントからの代理送信など、保存されない経路は先に特定する。 |
+| 人による閲覧の同意記録 | 迷惑メール・ゴミ箱を含む対象期間の全送受信メール（下書き除外）の同期時本文照合と、認証済み `abroad-o.com` 社員全員・公式窓口による照合待ちを含む本文・添付の閲覧を説明する。窓口本人の明示入力後、Googleで窓口とscopeを確認し、説明全文・version・hash・同意日時・窓口を資格情報と同じSecret versionへ保存する。秘密を含まない成功receiptをprivate運用記録へ残す。 |
 | OAuthの本番条件 | 実際のOAuth project所有組織、Audience、公開状態、要求scopeを確認し、`gmail.readonly` の審査・セキュリティ評価または適用除外の根拠を確定する。ドメイン名の違い、利用人数の少なさ、窓口1件だけという理由でInternal・個人利用の例外を推定しない。 |
 | 継続認可 | ExternalかつTestingのOAuth projectでは、このscopeの認可とrefresh tokenは[7日で失効する](https://support.google.com/cloud/answer/15549945?hl=en)。本番の継続認可条件を整えてから窓口同意を取得する。毎週の再同意を本番運用の代用にしない。 |
 | 費用 | Cloud Run、Firestore、Secret Manager、Artifact Registry、ビルドに使うサービスの請求先、予算、費用確認の担当と頻度を確定する。審査・評価に費用が発生する場合はCloud利用料と分けて判断する。 |

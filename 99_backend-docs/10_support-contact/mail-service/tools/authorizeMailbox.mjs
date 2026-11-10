@@ -70,6 +70,7 @@ export async function main(args = process.argv.slice(2), env = process.env) {
     confirmDisclosure: confirmMailboxDisclosure
   });
   process.stdout.write(`Stored mailbox authorization: ${result.secretVersion}\n`);
+  process.stdout.write(`Mailbox consent receipt: ${JSON.stringify(result.consentReceipt)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

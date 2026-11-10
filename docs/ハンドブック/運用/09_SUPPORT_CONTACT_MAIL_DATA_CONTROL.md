@@ -10,15 +10,15 @@ last_reviewed: 2026-11-10
 
 ## 読取りと共有
 
-SPEED AD お問い合わせ確認アプリは `customer@speed-ad.com` に `https://www.googleapis.com/auth/gmail.readonly` を要求します。対象期間の送受信メールを問い合わせ案件と照合し、本文・添付・確認記録をアプリ内で確認する用途です。この権限はメールの送信・変更・削除を許しません。判断できないメールは照合待ちとして扱います。
+SPEED AD お問い合わせ確認アプリは `customer@speed-ad.com` に `https://www.googleapis.com/auth/gmail.readonly` を要求します。受付データから決まる対象期間の全送受信メールを、迷惑メール・ゴミ箱も含めて列挙し、下書きは除きます。同期時に案件との関連が未確定のメールも本文を取得して照合し、判断できないメールは照合待ちとして扱います。後続同期では新着や変更も取得します。本文・添付・確認記録をアプリ内で確認する用途であり、この権限はメールの送信・変更・削除を許しません。
 
-アプリの認証を通った `abroad-o.com` の社員と公式窓口の利用者が、案件メール・照合待ち・確認記録を閲覧します。処理と保存にはGoogle Cloudを使います。Google Workspaceから得た情報の利用は、[Google User Data Policy](https://developers.google.com/terms/api-services-user-data-policy)のLimited Use要件に従います。広告、販売、一般的なAIモデルの学習には利用しません。
+アプリの認証を通った `abroad-o.com` の社員全員と公式窓口の利用者が、メール本文・添付、照合待ち・確認記録を閲覧できます。認可時にこの人による閲覧範囲を明示し、窓口本人の同意を記録します。処理と保存にはGoogle Cloudを使います。Google Workspaceから得た情報の利用は、[Google User Data Policy](https://developers.google.com/terms/api-services-user-data-policy)のLimited Use要件に従います。広告、販売、一般的なAIモデルの学習には利用しません。
 
 | データ | 保存・処理先 |
 | --- | --- |
 | 件名、差出人・宛先、日時、メール/スレッドID、添付メタデータ、案件との照合、最初の確認者・日時、同期位置、監査・処理記録 | Firestoreの専用メール領域 |
-| メール本文・添付本体 | Gmailから取得し、サーバーの一時メモリと利用者画面で処理。Firestoreへ保存しない。利用者が保存したファイルは利用者側の管理対象 |
-| 継続読取り用のOAuth資格情報 | Secret Managerの特定version。利用者画面やログへ渡さない |
+| メール本文・添付本体 | 本文は同期時の照合と閲覧時に、添付本体は閲覧時にGmailから取得し、サーバーの一時メモリと利用者画面で処理。Firestoreへ保存しない。利用者が保存したファイルは利用者側の管理対象 |
+| 継続読取り用のOAuth資格情報、同意説明全文・version・SHA-256・同意日時・確認済み窓口 | 同じSecret Manager versionへまとめて保存。資格情報は利用者画面やログへ渡さない |
 | フォーム受付本文・フォーム添付・対応状態・内部メモ | 既存Sheet/Drive。Gmail連携を止めても残る |
 
 ## 認可前の説明
@@ -26,6 +26,8 @@ SPEED AD お問い合わせ確認アプリは `customer@speed-ad.com` に `https
 認可補助ツールは「案件終了後3年間」の方針を表示します。その実施方法の説明を `MAIL_DATA_RETENTION_NOTICE`、運用記録で決定した削除申請先メールを `MAIL_DATA_DELETION_CONTACT` としてプロセス環境に渡します。秘密ではありませんが、個人の連絡先や運用判断の実値は共有repoへ保存しません。説明は現実の運用と一致させます。単に設定した文章に自動削除の効力はありません。
 
 両方がない場合、または窓口がメールアドレスでない場合、ツールは認可を開始しません。対話端末で説明全文を表示し、所有者が「同意します」と入力した直後にGoogleの同意画面を開きます。`--execute`やパイプ入力だけでは同意になりません。Google画面でもアカウントと要求権限を確認してください。
+
+Google profileで公式窓口と読取scopeを確認できた後にだけ、資格情報と同意記録を1回のSecret version追加で保存します。記録には説明全文・説明version・SHA-256・明示入力時の日時・確認済み窓口が含まれます。成功時のCLI出力は秘密を含まない説明version・hash・日時・窓口のreceiptだけを返すので、採用したSecret versionとともにprivateの運用記録へ残します。説明の共有範囲や取得処理が変わる場合は説明versionを改め、窓口本人へ説明して再同意を記録します。書込みの成否が不明なときは自動再送しません。
 
 WindowsのPowerShell 7では、`mail-service` ディレクトリから次の補助スクリプトを実行できます。実際の既存Secret名、承認済みの保存期間説明、削除申請先を指定してください。前提はNode.js 24以降、依存パッケージの導入、Secret Managerへの認可済みADCです。
 
