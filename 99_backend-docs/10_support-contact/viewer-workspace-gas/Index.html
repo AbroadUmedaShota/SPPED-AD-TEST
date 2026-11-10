@@ -390,6 +390,7 @@
         <button type="button" id="unreviewedMailButton">未確認メール</button>
         <button type="button" id="pendingMailButton">照合待ち</button>
         <button type="button" id="syncMailButton" hidden>メール同期</button>
+        <button type="button" id="stopMailSyncButton" hidden>同期の続行を止める</button>
         <button type="button" id="mailSyncStatusButton">同期状態を更新</button>
         <button type="button" id="mailIssuesButton">全件確認の残件</button>
         <p class="mail-sync" id="mailSyncSummary" aria-live="polite">メール連携の状態は未取得です。</p>
@@ -1339,6 +1340,7 @@
       sync: null,
       syncProgress: null,
       syncBusy: false,
+      syncStopRequested: false,
       returnFocus: null,
     };
 
@@ -1493,6 +1495,14 @@
         const result = contactMailResult(await callServer('getContactMailSyncStatus'));
         if (serial !== contactMailState.syncSerial) return;
         contactMailState.sync = result.sync;
+        const progress = contactMailState.syncProgress;
+        if (progress && result.sync && result.sync.executionId === progress.executionId) {
+          if (result.sync.state === 'failed') {
+            progress.started = true;
+            progress.requestId = '';
+            progress.requestPayload = null;
+          } else if (['complete', 'needs_full_sync'].includes(result.sync.state)) contactMailState.syncProgress = null;
+        }
         element.textContent = renderContactMailSync(result.sync);
         renderContactMailSyncButton();
       } catch (error) {
@@ -1506,24 +1516,43 @@
       button.hidden = !viewerContext.allowed || viewerContext.authMode !== 'domain';
       button.disabled = contactMailState.syncBusy;
       const sync = contactMailState.sync;
-      button.textContent = contactMailState.syncBusy ? 'メール同期中...' : contactMailState.syncProgress || (sync && sync.state === 'running') ? 'メール同期を続行' : sync && sync.state === 'failed' ? 'メール同期を再開' : 'メール同期';
+      button.textContent = contactMailState.syncBusy ? 'メール同期中...' : (contactMailState.syncProgress || (sync && sync.state === 'running')) ? 'メール同期を続行' : sync && sync.state === 'failed' ? 'メール同期を再開' : 'メール同期';
+      const stopButton = document.getElementById('stopMailSyncButton');
+      stopButton.hidden = button.hidden || !contactMailState.syncBusy;
+      stopButton.disabled = contactMailState.syncStopRequested;
+      document.getElementById('mailSyncStatusButton').disabled = contactMailState.syncBusy;
       if (sync && Number.isInteger(sync.pendingCount)) document.getElementById('pendingMailButton').textContent = `照合待ち ${sync.pendingCount}件`;
       if (sync && Number.isInteger(sync.unreviewedCount)) document.getElementById('unreviewedMailButton').textContent = `未確認メール ${sync.unreviewedCount}件`;
     }
 
+    function stopContactMailSyncFromUi() {
+      if (!contactMailState.syncBusy) return;
+      contactMailState.syncStopRequested = true;
+      document.getElementById('mailSyncSummary').textContent = '同期の続行を止めます。送信済みの処理は中止せず、応答を待っています。';
+      renderContactMailSyncButton();
+    }
+
+    function callContactMailSync(options) {
+      return new Promise((resolve, reject) => {
+        const timer = window.setTimeout(() => reject(new Error('MAIL_UPSTREAM_TIMEOUT')), 120000);
+        callServer('advanceContactMailSync', options).then(resolve, reject).finally(() => window.clearTimeout(timer));
+      });
+    }
+
     async function advanceContactMailSyncFromUi() {
-      if (contactMailState.syncBusy || viewerContext.authMode !== 'domain') return;
+      if (contactMailState.syncBusy || !viewerContext.allowed || viewerContext.authMode !== 'domain') return;
       const serial = ++contactMailState.syncSerial;
       const element = document.getElementById('mailSyncSummary');
       const sync = contactMailState.sync || {};
       const progress = contactMailState.syncProgress || (['running', 'failed'].includes(sync.state) && sync.executionId ? { executionId: sync.executionId, started: true } : {});
       contactMailState.syncProgress = progress;
       contactMailState.syncBusy = true;
+      contactMailState.syncStopRequested = false;
       renderContactMailSyncButton();
       try {
         if (!progress.executionId) {
           element.textContent = '正本の受付IDを照合中...';
-          const catalogResult = contactMailResult(await callServer('advanceContactMailSync', progress.catalog ? { catalog: progress.catalog } : {}));
+          const catalogResult = contactMailResult(await callContactMailSync(progress.catalog ? { catalog: progress.catalog } : {}));
           if (serial !== contactMailState.syncSerial) return;
           const catalog = catalogResult.catalog;
           if (!catalog || typeof catalog.complete !== 'boolean' || !Number.isInteger(catalog.nextPageIndex) || !Number.isInteger(catalog.pageCount) || catalog.nextPageIndex > catalog.pageCount) throw new Error('MAIL_INVALID_RESPONSE');
@@ -1533,21 +1562,40 @@
           progress.executionId = window.crypto.randomUUID();
           progress.mode = sync.historyAvailable && sync.state !== 'needs_full_sync' ? 'history' : 'full';
         }
-        progress.requestId = progress.requestId || window.crypto.randomUUID();
-        const result = contactMailResult(await callServer('advanceContactMailSync', {
-          executionId: progress.executionId, requestId: progress.requestId,
-          ...(!progress.started ? { mode: progress.mode, catalogSnapshotId: progress.catalog.snapshotId, catalogDigest: progress.catalog.digest } : {}), ...(sync.state === 'failed' ? { resume: true } : {}),
-        }));
-        if (serial !== contactMailState.syncSerial) return;
-        progress.started = true;
-        progress.requestId = '';
-        contactMailState.sync = result.sync;
-        element.textContent = `${progress.periodText || ''} ${renderContactMailSync(result.sync)}`;
-        if (result.sync && ['complete', 'needs_full_sync'].includes(result.sync.state)) contactMailState.syncProgress = null;
+        for (let batch = 1; batch <= 20; batch++) {
+          if (contactMailState.syncStopRequested) {
+            element.textContent = '同期の続行を止めました。続行ボタンから再開できます。';
+            break;
+          }
+          if (!viewerContext.allowed || viewerContext.authMode !== 'domain') return;
+          progress.requestId = progress.requestId || window.crypto.randomUUID();
+          progress.requestPayload = progress.requestPayload || {
+            executionId: progress.executionId,
+            ...(!progress.started ? { mode: progress.mode, catalogSnapshotId: progress.catalog.snapshotId, catalogDigest: progress.catalog.digest } : {}), ...((contactMailState.sync || {}).state === 'failed' ? { resume: true } : {}),
+          };
+          const result = contactMailResult(await callContactMailSync({
+            ...progress.requestPayload, requestId: progress.requestId,
+          }));
+          if (serial !== contactMailState.syncSerial) return;
+          if (!result.sync || !['running', 'complete', 'needs_full_sync', 'failed'].includes(result.sync.state) || result.sync.executionId !== progress.executionId) throw new Error('MAIL_INVALID_RESPONSE');
+          progress.started = true;
+          progress.requestId = '';
+          progress.requestPayload = null;
+          contactMailState.sync = result.sync;
+          element.textContent = `${progress.periodText || ''} ${renderContactMailSync(result.sync)} この操作: ${batch}/20回。`;
+          renderContactMailSyncButton();
+          if (['complete', 'needs_full_sync'].includes(result.sync.state)) { contactMailState.syncProgress = null; break; }
+          if (result.sync.state !== 'running') break;
+          if (contactMailState.syncStopRequested) {
+            element.textContent += ' 続行を停止しました。送信済みの処理結果を反映しました。';
+            break;
+          }
+          if (batch === 20) element.textContent += ' この操作の上限に達しました。続行ボタンで次の処理へ進めます。';
+        }
       } catch (error) {
         if (serial !== contactMailState.syncSerial) return;
         if (['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT', 'MAIL_SYNC_BUSY'].includes(error.message)) contactMailState.syncProgress = null;
-        element.textContent = `${contactMailErrorText(error.message)} 続行ボタンから明示的に再確認できます。`;
+        element.textContent = `${contactMailErrorText(error.message)} 自動では再試行しません。送信済みの処理が終了したとは限りません。同期状態を更新するか、続行ボタンから明示的に再確認できます。`;
       } finally {
         if (serial === contactMailState.syncSerial) { contactMailState.syncBusy = false; renderContactMailSyncButton(); }
       }
@@ -1889,11 +1937,14 @@
       contactMailState.sync = null;
       contactMailState.syncProgress = null;
       contactMailState.syncBusy = false;
+      contactMailState.syncStopRequested = false;
       Object.assign(contactMailState.issues, { pageToken: '', history: [], result: null });
       clearContactMailView('case');
       closeContactMailQueue();
       document.getElementById('mailSyncSummary').textContent = '';
       document.getElementById('syncMailButton').hidden = true;
+      document.getElementById('stopMailSyncButton').hidden = true;
+      document.getElementById('mailSyncStatusButton').disabled = false;
       ++state.listRequestSerial;
       ++state.detailRequestSerial;
       ++state.saveRequestSerial;
@@ -1939,6 +1990,7 @@
       loadContactMailSyncStatus();
       renderContactMailSyncButton();
       document.getElementById('syncMailButton').addEventListener('click', advanceContactMailSyncFromUi);
+      document.getElementById('stopMailSyncButton').addEventListener('click', stopContactMailSyncFromUi);
       document.getElementById('mailSyncStatusButton').addEventListener('click', loadContactMailSyncStatus);
       document.getElementById('unreviewedMailButton').addEventListener('click', () => openContactMailQueue('unreviewed'));
       document.getElementById('pendingMailButton').addEventListener('click', () => openContactMailQueue('pending'));
