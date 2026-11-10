@@ -71,14 +71,17 @@ test('partial purge keeps mailbox closed and the same immutable plan resumes', a
   const extra = Object.fromEntries(Array.from({ length: 105 }, (_, index) => [`${root}/events/extra-${index}`, { messageId: 'mailA' }]));
   const { db, purge } = fixture(extra);
   const plan = await purge.plan(target, 'request');
-  db.failBatch(2);
+  const runTransaction = db.runTransaction.bind(db);
+  let transactions = 0;
+  db.runTransaction = (operation) => ++transactions === 4 ? Promise.reject(new Error('synthetic transaction failure')) : runTransaction(operation);
   await assert.rejects(purge.apply(target, 'request', plan.planHash));
   assert([...db.records.keys()].filter((key) => key.startsWith(`${root}/events/`)).length < 106);
   const store = createFirestoreStore(db);
   await assert.rejects(store.withAccess(() => store.getMessage('mailB')), { code: 'MAIL_MAINTENANCE' });
   assert.equal((await purge.plan(target, 'request')).mode, 'resume-required');
   await assert.rejects(purge.apply(target, 'different', plan.planHash), { code: 'MAIL_PURGE_PLAN_CHANGED' });
-  db.failBatch(0);
+  await assert.rejects(purge.cancelUnvalidated(target, 'request', plan.planHash), { code: 'MAIL_PURGE_CANCEL_UNSAFE' });
+  db.runTransaction = runTransaction;
   await purge.apply(target, 'request', plan.planHash);
   assert.equal((await store.withAccess(() => store.getMessage('mailB'))).caseId, other);
 });
@@ -119,7 +122,7 @@ test('expired exclusions use the server exclusion timestamp, preserve recent and
     [`${root}/messages/recent`]: { messageId: 'recent', matchState: 'excluded', sourceKind: 'mail', excludedAt: '2023-11-10T09:00:00.001Z' },
     [`${root}/messages/unknown`]: { messageId: 'unknown', matchState: 'excluded', sourceKind: 'mail' },
     [`${root}/messages/draft`]: { messageId: 'draft', matchState: 'excluded', sourceKind: 'draft' },
-    [`${root}/events/excluded`]: { messageId: 'expired', actor: 'private@example.com', at: '2023-11-10T09:00:00.000Z' }
+    [`${root}/events/excluded`]: { messageId: 'expired', actor: 'private@example.com', at: '2023-11-10T09:00:00.000Z', requestId: other }
   });
   const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-10T09:00:00.000Z') });
   const plan = await purge.planExpiredExclusions('expiry-20261110');
@@ -129,6 +132,83 @@ test('expired exclusions use the server exclusion timestamp, preserve recent and
   assert(!db.records.has(`${root}/messages/expired`));
   for (const id of ['recent', 'unknown', 'draft']) assert(db.records.has(`${root}/messages/${id}`));
   assert(![...db.records.keys()].some((key) => key.startsWith(`${root}/suppressedCases/`)));
+});
+
+test('review request UUIDs are not case references, while actual shared event cases still block', async () => {
+  const { db, purge } = fixture({ [`${root}/events/eventA`]: { type: 'mail.reviewed', messageId: 'mailA', requestId: other } });
+  const plan = await purge.plan(target, 'reviewed-case');
+  await purge.apply(target, 'reviewed-case', plan.planHash);
+  assert(!db.records.has(`${root}/events/eventA`));
+  const shared = fixture({ [`${root}/events/eventA`]: { messageId: 'mailA', requestId: target, next: { caseId: other } } });
+  await assert.rejects(shared.purge.plan(target, 'shared'), { code: 'MAIL_PURGE_SHARED_EVENT' });
+});
+
+test('unvalidated jobs recheck expiry after reopening, validation failure and interruption', async () => {
+  for (const scenario of ['reopened', 'validation-error', 'interrupted']) {
+    const cases = [{ caseId: target, handledStatus: '対応済み', closedAt: '2023-11-10T09:00:00.000Z' },
+      { caseId: other, handledStatus: '未対応', closedAt: null }];
+    const { db } = fixture({ [`${root}/meta/activeCatalog`]: { snapshotId: 'snapshot', total: 2, digest: catalogDigest(cases) },
+      [`${root}/catalogSnapshots/snapshot/pages/0000`]: { pageIndex: 0, cases } });
+    const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-10T09:00:00.000Z') });
+    const plan = await purge.planExpiredCase(target, scenario);
+    const reopen = () => {
+      const reopened = cases.map((item) => item.caseId === target ? { ...item, handledStatus: '未対応', closedAt: null } : item);
+      db.records.set(`${root}/meta/activeCatalog`, { snapshotId: 'snapshot', total: 2, digest: catalogDigest(reopened) });
+      db.records.set(`${root}/catalogSnapshots/snapshot/pages/0000`, { pageIndex: 0, cases: reopened });
+    };
+    const originalTransaction = db.runTransaction.bind(db);
+    const originalGetAll = db.getAll;
+    let transactions = 0;
+    db.runTransaction = async (operation) => {
+      const result = await originalTransaction(operation);
+      if (++transactions === 1) {
+        if (scenario === 'reopened') reopen();
+        if (scenario === 'validation-error') db.getAll = async () => { throw new Error('synthetic scan failure'); };
+        if (scenario === 'interrupted') throw new Error('synthetic process interruption');
+      }
+      return result;
+    };
+    await assert.rejects(purge.applyExpiredCase(target, scenario, plan.planHash));
+    assert.equal(db.records.get(`${root}/meta/purgeControl`).active.stage, 'validating');
+    assert(db.records.has(`${root}/messages/mailA`));
+    db.runTransaction = originalTransaction;
+    db.getAll = originalGetAll;
+    reopen();
+    await assert.rejects(purge.applyExpiredCase(target, scenario, plan.planHash), { code: 'MAIL_PURGE_NOT_EXPIRED' });
+    assert(db.records.has(`${root}/messages/mailA`));
+    assert(!db.records.has(`${root}/suppressedCases/${suppressionKey('case', target)}`));
+    await assert.rejects(purge.cancelUnvalidated(target, 'wrong', plan.planHash, false, true), { code: 'MAIL_PURGE_PLAN_CHANGED' });
+    assert.equal((await purge.cancelUnvalidated(target, scenario, plan.planHash, false, true)).mode, 'cancelled-unvalidated');
+    assert.equal(db.records.get(`${root}/meta/purgeControl`).active, undefined);
+    assert(!db.records.has(`${root}/meta/purgeJob`));
+    assert(db.records.has(`${root}/messages/mailA`));
+  }
+});
+
+test('a delayed duplicate purge cannot delete data created after the completed generation', async () => {
+  const { db, purge } = fixture();
+  const plan = await purge.plan(target, 'duplicate');
+  const originalTransaction = db.runTransaction.bind(db);
+  let transactions = 0;
+  let release;
+  let paused;
+  const waiting = new Promise((resolve) => { paused = resolve; });
+  db.runTransaction = async (operation) => {
+    if (++transactions === 3) {
+      paused();
+      await new Promise((resolve) => { release = resolve; });
+    }
+    return originalTransaction(operation);
+  };
+  const first = purge.apply(target, 'duplicate', plan.planHash);
+  await waiting;
+  const rejected = assert.rejects(first, { code: 'MAIL_MAINTENANCE' });
+  await purge.apply(target, 'duplicate', plan.planHash);
+  const newSync = { state: 'complete', historyId: 'new-generation' };
+  db.records.set(`${root}/meta/sync`, newSync);
+  release();
+  await rejected;
+  assert.deepEqual(db.records.get(`${root}/meta/sync`), newSync);
 });
 
 test('unknown collections and nested data block a partial deletion', async () => {
@@ -143,6 +223,10 @@ test('CLI requires exact target, request reference and apply plan before connect
   await assert.rejects(runPurgeCli(['--apply'], { createDatabase: async () => { connections++; } }), /MAIL_PURGE_INPUT_INVALID/);
   assert.equal(connections, 0);
   assert.throws(() => parsePurgeArguments(['--project', 'test-project', '--confirm-project', 'other-project']), /MAIL_PURGE_INPUT_INVALID/);
+  const cancellation = ['--project', 'test-project', '--confirm-project', 'test-project', '--database', '(default)',
+    '--case-id', target, '--request-reference', 'request', '--cancel-unvalidated', '--plan-hash', 'a'.repeat(64)];
+  assert.equal(parsePurgeArguments(cancellation)['--cancel-unvalidated'], true);
+  assert.throws(() => parsePurgeArguments([...cancellation, '--apply']), /MAIL_PURGE_INPUT_INVALID/);
 });
 
 

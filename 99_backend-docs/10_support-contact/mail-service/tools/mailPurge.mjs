@@ -16,6 +16,8 @@ const canonical = (value) => Array.isArray(value) ? value.map(canonical) : value
 const hash = (value) => createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
 const values = (value) => typeof value === 'string' ? [value] : Array.isArray(value) ? value.flatMap(values) :
   value && typeof value === 'object' ? Object.values(value).flatMap(values) : [];
+const caseReferences = (value) => !value || typeof value !== 'object' ? [] : Array.isArray(value) ? value.flatMap(caseReferences) :
+  Object.entries(value).flatMap(([key, item]) => key === 'caseId' || key === 'caseIds' || key.endsWith('CaseId') || key.endsWith('CaseIds') ? values(item).filter((id) => CASE_ID.test(id)) : caseReferences(item));
 const record = (snapshot) => ({ path: snapshot.ref.path, data: snapshot.data(), hash: hash(snapshot.data()) });
 
 export function createMailPurge({ db, projectId, databaseId = '(default)', now = () => new Date() }) {
@@ -93,7 +95,7 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
     assertMail(excluded || selected.every((item) => values(item.data.evidence || {}).filter((value) => CASE_ID.test(value)).every((value) => value === caseId)), 'MAIL_PURGE_AMBIGUOUS', 409);
     const targets = all.filter((item) => refers(item) || (!excluded && item.path === `${MAILBOX}/caseCoverage/${caseId}`));
     for (const item of targets.filter((entry) => entry.path.startsWith(`${MAILBOX}/events/`))) {
-      assertMail(values(item.data).filter((value) => CASE_ID.test(value)).every((value) => !excluded && value === caseId), 'MAIL_PURGE_SHARED_EVENT', 409);
+      assertMail(caseReferences(item.data).every((value) => !excluded && value === caseId), 'MAIL_PURGE_SHARED_EVENT', 409);
     }
     assertMail(targets.length <= MAX_TARGETS, 'MAIL_PURGE_TARGET_LIMIT', 409);
     const plan = { version: 1, projectId, databaseId, mailbox: MAILBOX, scope: excluded ? 'expired-exclusions' : expiryOnly ? 'expired-case' : 'case-request',
@@ -145,49 +147,91 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
         const [control, lease, sync] = await Promise.all([transaction.get(controlRef), transaction.get(leaseRef), transaction.get(syncRef)]);
         assertMail(Number.isSafeInteger(control.data()?.generation ?? 0), 'MAIL_MAINTENANCE', 503);
         assertMail(!control.data()?.active && !(lease.exists && Date.parse(lease.data().expiresAt) > now().getTime()) && sync.data()?.state !== 'running', 'MAIL_PURGE_BUSY', 409);
-        transaction.set(controlRef, { generation: (control.data()?.generation || 0) + 1, active: { planHash, caseHash: job.caseHash } });
+        transaction.set(controlRef, { generation: (control.data()?.generation || 0) + 1,
+          active: { planHash, caseHash: job.caseHash, stage: 'validating', nextOffset: 0 } });
         transaction.set(jobRef, job);
       });
+    }
+    const control = snapshotData(await controlRef.get());
+    const generation = control?.generation;
+    assertMail(Number.isSafeInteger(generation) && generation >= 0 && control?.active?.planHash === planHash, 'MAIL_MAINTENANCE', 503);
+    const locked = async (transaction) => {
+      const [controlSnapshot, jobSnapshot] = await Promise.all([transaction.get(controlRef), transaction.get(jobRef)]);
+      const current = snapshotData(controlSnapshot);
+      const currentJob = snapshotData(jobSnapshot);
+      assertMail(current?.generation === generation && current.active?.planHash === planHash && currentJob?.planHash === planHash,
+        'MAIL_MAINTENANCE', 503);
+      validateJob(currentJob);
+      assertMail(['validating', 'deleting'].includes(current.active.stage) && Number.isSafeInteger(current.active.nextOffset) &&
+        current.active.nextOffset >= 0 && current.active.nextOffset <= job.targets.length &&
+        (current.active.stage !== 'validating' || current.active.nextOffset === 0), 'MAIL_PURGE_JOB_INVALID', 409);
+      return current;
+    };
+    // A failed or interrupted validation is never a resumable deletion approval.
+    if (control.active.stage !== 'deleting') {
       const checked = await scan(caseId, requestReference, excluded, expiryOnly);
-      if (checked.planHash !== planHash) {
-        await db.runTransaction(async (transaction) => {
-          const control = snapshotData(await transaction.get(controlRef));
-          assertMail(control?.active?.planHash === planHash, 'MAIL_MAINTENANCE', 503);
-          transaction.set(controlRef, { generation: control.generation });
-          transaction.delete(jobRef);
-        });
-        assertMail(false, 'MAIL_PURGE_PLAN_CHANGED', 409);
-      }
+      assertMail(checked.planHash === planHash, 'MAIL_PURGE_PLAN_CHANGED', 409);
+      await db.runTransaction(async (transaction) => {
+        const current = await locked(transaction);
+        if (current.active.stage === 'deleting') return;
+        transaction.set(controlRef, { generation, active: { ...current.active, stage: 'deleting', nextOffset: 0 } });
+      });
     }
     // The gate stays closed after a partial failure; the same plan resumes idempotently.
-    const control = snapshotData(await controlRef.get());
-    assertMail(control?.active?.planHash === planHash, 'MAIL_MAINTENANCE', 503);
-    for (let offset = 0; offset < job.targets.length; offset += 25) {
+    while (await db.runTransaction(async (transaction) => {
+      const current = await locked(transaction);
+      const offset = current.active.nextOffset;
+      assertMail(current.active.stage === 'deleting' && Number.isSafeInteger(offset) && offset >= 0 && offset <= job.targets.length,
+        'MAIL_PURGE_JOB_INVALID', 409);
+      if (offset === job.targets.length) return false;
       const group = job.targets.slice(offset, offset + 25);
-      const found = await db.getAll(...group.map((item) => db.doc(item.path)));
+      const found = await Promise.all(group.map((item) => transaction.get(db.doc(item.path))));
       assertMail(found.every((item, index) => !item.exists || hash(item.data()) === group[index].hash), 'MAIL_PURGE_PLAN_CHANGED', 409);
-      const batch = db.batch();
-      for (const item of group) batch.delete(db.doc(item.path));
+      for (const item of group) transaction.delete(db.doc(item.path));
       for (const id of job.messageIds) if (group.some((item) => item.path === `${MAILBOX}/messages/${id}`)) {
-        batch.set(mailbox.collection('suppressedMessages').doc(suppressionKey('message', id)), { version: 1 });
+        transaction.set(mailbox.collection('suppressedMessages').doc(suppressionKey('message', id)), { version: 1 });
       }
       for (const id of job.receiptIds) if (group.some((item) => item.path === `${MAILBOX}/receipts/${id}`)) {
-        batch.set(mailbox.collection('suppressedRequests').doc(suppressionKey('request', id)), { version: 1 });
+        transaction.set(mailbox.collection('suppressedRequests').doc(suppressionKey('request', id)), { version: 1 });
       }
-      await batch.commit();
+      transaction.set(controlRef, { generation, active: { ...current.active, nextOffset: offset + group.length } });
+      return true;
+    })) {
+      // Each batch re-reads the current lock and progress inside its transaction.
     }
-    const remaining = job.targets.length ? await db.getAll(...job.targets.map((item) => db.doc(item.path))) : [];
-    assertMail(remaining.every((item) => !item.exists), 'MAIL_PURGE_INCOMPLETE', 503);
     await db.runTransaction(async (transaction) => {
-      const current = snapshotData(await transaction.get(controlRef));
-      assertMail(current?.active?.planHash === planHash, 'MAIL_MAINTENANCE', 503);
+      const current = await locked(transaction);
+      assertMail(current.active.stage === 'deleting' && current.active.nextOffset === job.targets.length, 'MAIL_PURGE_INCOMPLETE', 503);
+      const remaining = await Promise.all(job.targets.map((item) => transaction.get(db.doc(item.path))));
+      assertMail(remaining.every((item) => !item.exists), 'MAIL_PURGE_INCOMPLETE', 503);
       if (job.scope !== 'expired-exclusions') transaction.set(mailbox.collection('suppressedCases').doc(job.caseHash), { version: 1 });
       transaction.set(controlRef, { generation: current.generation });
       transaction.delete(jobRef);
     });
     return { ...publicPlan(job), mode: 'applied' };
   }
-  return { plan, apply, planExpiredCase: (caseId, reference) => plan(caseId, reference, false, true),
+  async function cancelUnvalidated(caseId, requestReference, planHash, excluded = false, expiryOnly = false) {
+    validate(caseId, requestReference, excluded);
+    assertMail(/^[a-f0-9]{64}$/.test(planHash || ''), 'MAIL_PURGE_PLAN_REQUIRED');
+    const job = await db.runTransaction(async (transaction) => {
+      const [controlSnapshot, jobSnapshot] = await Promise.all([transaction.get(controlRef), transaction.get(jobRef)]);
+      const control = snapshotData(controlSnapshot);
+      const currentJob = snapshotData(jobSnapshot);
+      validateJob(currentJob);
+      assertMail(currentJob.scope === (excluded ? 'expired-exclusions' : expiryOnly ? 'expired-case' : 'case-request') &&
+        currentJob.planHash === planHash && currentJob.caseHash === suppressionKey(excluded ? 'scope' : 'case', excluded ? 'expired-exclusions' : caseId) &&
+        currentJob.requestHash === suppressionKey('request-reference', requestReference), 'MAIL_PURGE_PLAN_CHANGED', 409);
+      assertMail(control?.active?.planHash === planHash && control.active.stage === 'validating' && control.active.nextOffset === 0,
+        'MAIL_PURGE_CANCEL_UNSAFE', 409);
+      const targets = await Promise.all(currentJob.targets.map((item) => transaction.get(db.doc(item.path))));
+      assertMail(targets.every((item) => item.exists), 'MAIL_PURGE_CANCEL_UNSAFE', 409);
+      transaction.set(controlRef, { generation: control.generation });
+      transaction.delete(jobRef);
+      return currentJob;
+    });
+    return { ...publicPlan(job), mode: 'cancelled-unvalidated' };
+  }
+  return { plan, apply, cancelUnvalidated, planExpiredCase: (caseId, reference) => plan(caseId, reference, false, true),
     applyExpiredCase: (caseId, reference, planHash) => apply(caseId, reference, planHash, false, true),
     planExpiredExclusions: (reference) => plan(null, reference, true),
     applyExpiredExclusions: (reference, planHash) => apply(null, reference, planHash, true) };
