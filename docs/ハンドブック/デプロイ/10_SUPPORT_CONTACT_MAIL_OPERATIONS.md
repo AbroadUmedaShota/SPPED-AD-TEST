@@ -8,6 +8,8 @@ last_reviewed: 2026-11-10
 
 第2段階の配備、手動同期、復旧、業務受入に使う手順です。画面・データの仕様は[仕様24](../../画面設計/仕様/24_support_contact_workspace_viewer_requirements.md)、RPCと同期の契約は[実行契約](../../../99_backend-docs/10_support-contact/mail-service/runtime/CONTRACT.md)を参照してください。
 
+対象値を入力して段階ごとに実行するCLIと読戻しは[配備コマンド](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md)を参照してください。変更コマンドは既定で計画表示だけを行い、対象・操作・費用条件を照合してから実行します。
+
 この文書は準備した手順であり、実行成功の記録ではありません。2026-11-10の読取り時点では専用Cloudプロジェクトに請求先がなく、第2段階のAPI・Cloud資源は未準備でした。実行直前に状態を再照合し、対象project、region、Git SHA、GAS配備version、image digest、設定・検証結果を既存の切替・受入記録へ残します。秘密値や実メール本文は記録へ貼りません。
 
 ## 1. 接続前に確定すること
