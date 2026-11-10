@@ -81,12 +81,37 @@ test('empty alternatives do not hide a nonempty body and nonempty plain text rem
   const html = part('<span>HTML body</span>', 'text/html');
   for (const [parts, expected] of [
     [[part(''), html], 'HTML body'],
+    [[part('\r\n \t'), html], 'HTML body'],
+    [[part('\u0000'), html], 'HTML body'],
     [[part('', 'text/html'), html], 'HTML body'],
+    [[part('<p> </p><br>', 'text/html'), html], 'HTML body'],
+    [[part('<script>hidden</script>', 'text/html'), html], 'HTML body'],
     [[part(''), html, part('plain body')], 'plain body'],
-    [[part(''), part('', 'text/html')], '']
+    [[part('\r\n'), html, part('plain body')], 'plain body'],
+    [[part(''), part('', 'text/html')], ''],
+    [[part('\r\n \t'), part('<p> </p>', 'text/html')], '']
   ]) {
     assert.equal(await readMessageText(message({ mimeType: 'multipart/alternative', parts })), expected);
   }
+});
+
+test('alternative content selection fetches bodies within one text budget and skips unused variants', async () => {
+  const htmlText = '<span>body</span>\r\n';
+  const plain = { mimeType: 'text/plain', body: { attachmentId: 'plain', size: 2 } };
+  const html = { mimeType: 'text/html', body: { attachmentId: 'html', size: Buffer.byteLength(htmlText) } };
+  const fetched = [];
+  const fetchAttachment = async (_id, attachmentId) => {
+    fetched.push(attachmentId);
+    return { data: Buffer.from(attachmentId === 'plain' ? '\r\n' : htmlText).toString('base64url') };
+  };
+  const mail = message({ mimeType: 'multipart/alternative', parts: [plain, html] });
+  assert.equal(await readMessageText(mail, fetchAttachment, { maxTextBytes: plain.body.size + html.body.size }), 'body\r\n');
+  assert.deepEqual(fetched, ['plain', 'html']);
+  await assert.rejects(readMessageText(mail, fetchAttachment, { maxTextBytes: plain.body.size + html.body.size - 1 }), /MAIL_SIZE_LIMIT/);
+  mail.payload.parts[0] = part('plain body');
+  fetched.length = 0;
+  assert.equal(await readMessageText(mail, fetchAttachment, { maxTextBytes: 10 }), 'plain body');
+  assert.deepEqual(fetched, []);
 });
 
 test('body stored behind attachmentId is fetched but is not a form attachment', async () => {

@@ -81,16 +81,28 @@ async function readPart(message, descriptor, fetchAttachment, maxBytes) {
   return { bytes, part };
 }
 
-function selectBodyParts(message, bodyParts) {
+async function selectBodyParts(message, bodyParts, readText) {
   const byPath = new Map(bodyParts.map((part) => [part.partId, part]));
-  function select(part, path) {
-    const children = (part.parts || []).map((child, index) => select(child, `${path}.${index}`));
+  const containsPlain = (path) => bodyParts.some((part) => part.mimeType === 'text/plain' && (part.partId === path || part.partId.startsWith(`${path}.`)));
+  async function select(part, path) {
+    const children = (part.parts || []).map((child, index) => ({ part: child, path: `${path}.${index}` }));
     const mimeType = String(part.mimeType || '').toLowerCase().split(';')[0].trim();
     if (mimeType === 'multipart/alternative') {
-      return children.find((parts) => parts.some((item) => item.mimeType === 'text/plain' && item.size > 0)) ||
-        children.find((parts) => parts.some((item) => item.size > 0)) || children.find((parts) => parts.length) || [];
+      const evaluated = new Map();
+      for (const child of children.filter((item) => containsPlain(item.path))) {
+        const values = await select(child.part, child.path);
+        evaluated.set(child.path, values);
+        if (values.some((item) => item.mimeType === 'text/plain' && /\S/u.test(item.text))) return values;
+      }
+      for (const child of children) {
+        const values = evaluated.has(child.path) ? evaluated.get(child.path) : await select(child.part, child.path);
+        if (values.some((item) => /\S/u.test(item.text))) return values;
+      }
+      return [];
     }
-    return [...(byPath.has(path) ? [byPath.get(path)] : []), ...children.flat()];
+    const values = byPath.has(path) ? [await readText(byPath.get(path))] : [];
+    for (const child of children) values.push(...await select(child.part, child.path));
+    return values;
   }
   return select(message.payload, '0');
 }
@@ -98,16 +110,14 @@ function selectBodyParts(message, bodyParts) {
 export async function readMessageText(message, fetchAttachment, options = {}) {
   const limits = { ...defaultLimits, ...options };
   const { bodyParts } = inspectMime(message, limits);
-  const selected = selectBodyParts(message, bodyParts);
   let total = 0;
-  const values = [];
-  for (const descriptor of selected) {
+  const selected = await selectBodyParts(message, bodyParts, async (descriptor) => {
     const { bytes, part } = await readPart(message, descriptor, fetchAttachment, limits.maxTextBytes - total);
     total += bytes.length;
     const text = decodeText(bytes, part.headers);
-    values.push(descriptor.mimeType === 'text/html' ? htmlToPlainText(text) : safeMailText(text));
-  }
-  return values.join('\n');
+    return { mimeType: descriptor.mimeType, text: descriptor.mimeType === 'text/html' ? htmlToPlainText(text) : safeMailText(text) };
+  });
+  return selected.map((part) => part.text).join('\n');
 }
 
 function previewType(bytes, declaredMime) {
