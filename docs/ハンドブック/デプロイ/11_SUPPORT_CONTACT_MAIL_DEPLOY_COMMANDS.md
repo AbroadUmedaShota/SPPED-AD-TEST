@@ -361,6 +361,8 @@ clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
 
 保全済みの受入済みGAS versionを`$PreviousGasVersion`に指定し、同じ配備IDへ`create-deployment --versionNumber $PreviousGasVersion`を適用して読戻します。Cloud Runに受入済みrevisionがある場合だけ、次を実行します。
 
+最初のメール記録削除後は固定の操作要求期限を検証する版、最初の案件一覧削除後は全書込み経路で `retiredCatalogs` を検査する版を巻戻し先にします。これらを満たさない版へのtraffic切替は、先に一覧登録を含むメール更新を停止し、その停止を確認してから実行します。整理済み一覧IDを無視する版では、遅延した送信が古い一覧を復活させるためです。
+
 ```powershell
 $PreviousRevision = '<verified-previous-accepted-revision>'
 if ($PreviousRevision -match '[<>\r\n,=]' -or -not $PreviousRevision.StartsWith("$Service-")) { throw 'Verified previous revision required.' }

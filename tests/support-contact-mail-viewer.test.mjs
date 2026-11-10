@@ -1333,6 +1333,42 @@ test('pending re-evaluation is explicit, bounded and domain-only', async () => {
   assert.throws(() => bridgeApp.api.reconcileContactMailPending({}), /権限/);
 });
 
+test('validated pending refresh recovers expired re-evaluation without resending an unknown request', async () => {
+  for (const code of ['MAIL_REQUEST_EXPIRED', 'MAIL_UPSTREAM_TIMEOUT']) {
+    let readback = 'valid';
+    let writes = 0;
+    const app = uiRuntime({
+      listContactMail: () => readback === 'failed' ? { ok: false, error: { code: 'MAIL_SERVICE_UNAVAILABLE' } } :
+        readback === 'invalid' ? { ...list([]), page: null } : list([]),
+      reconcileContactMailPending: () => ++writes === 1 ? { ok: false, error: { code } } :
+        { ok: true, processedCount: 0, page: { nextPageToken: '' }, sync },
+    });
+    app.mail.queue.scope = 'pending';
+    await app.ui.loadContactMailList('queue');
+    app.mail.queue.reconcilePageToken = 'old-page';
+    await app.ui.reconcileContactMailPendingFromUi();
+    const originalId = app.mail.queue.reconcileRequestId;
+    assert.ok(originalId);
+    for (readback of ['failed', 'invalid']) {
+      await app.ui.loadContactMailList('queue');
+      assert.equal(app.mail.queue.reconcileRequestId, originalId);
+      assert.equal(app.mail.queue.reconcilePageToken, 'old-page');
+      assert.equal(writes, 1);
+    }
+    readback = 'valid';
+    await app.ui.loadContactMailList('queue');
+    assert.equal(writes, 1);
+    assert.equal(app.mail.queue.reconcileRequestId, code === 'MAIL_REQUEST_EXPIRED' ? '' : originalId);
+    assert.equal(app.mail.queue.reconcilePageToken, code === 'MAIL_REQUEST_EXPIRED' ? '' : 'old-page');
+    await app.ui.reconcileContactMailPendingFromUi();
+    const requests = app.calls.filter((call) => call.name === 'reconcileContactMailPending');
+    assert.equal(writes, 2);
+    assert.equal(requests[1].args[0].pageToken, code === 'MAIL_REQUEST_EXPIRED' ? '' : 'old-page');
+    if (code === 'MAIL_REQUEST_EXPIRED') assert.notEqual(requests[1].args[0].requestId, originalId);
+    else assert.equal(requests[1].args[0].requestId, originalId);
+  }
+});
+
 test('residual UI pages empty scans and identifies unindexed failures without leaking markup', async () => {
   const app = uiRuntime({ listContactMailIssues: (options) => ({ ok: true, kind: options.kind,
     targets: options.pageToken ? [{ type: 'message', messageId: 'before-index', message: null }] : [],

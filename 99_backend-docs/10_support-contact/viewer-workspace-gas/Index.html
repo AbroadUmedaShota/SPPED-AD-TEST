@@ -1515,7 +1515,7 @@
       ++current.serial;
       ++current.detailSerial;
       (current.urls || []).forEach((url) => URL.revokeObjectURL(url));
-      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'unobserved', error: '', writing: false, pendingWrite: null, noMail: null, pendingNoMail: null, noMailError: '', resolveCaseId: '', resolveReason: '', reconcilePageToken: '', reconcileRequestId: '', reconcileMessage: '', caseId: '', pageToken: '', page: null, attachmentSerial: (current.attachmentSerial || 0) + 1 });
+      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'unobserved', error: '', writing: false, pendingWrite: null, noMail: null, pendingNoMail: null, noMailError: '', resolveCaseId: '', resolveReason: '', reconcilePageToken: '', reconcileRequestId: '', reconcileExpired: false, reconcileMessage: '', caseId: '', pageToken: '', page: null, attachmentSerial: (current.attachmentSerial || 0) + 1 });
       const root = contactMailRoot(view);
       root.innerHTML = '';
       if (view === 'case') root.hidden = true;
@@ -1926,6 +1926,12 @@
         current.noMail = current.scope === 'case' ? result.noMail : null;
         if (current.noMail && (current.noMail.confirmation || current.pendingNoMail?.expired === true || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)))) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
         if (current.noMail && !current.pendingNoMail) current.noMailError = '';
+        if (current.scope === 'pending' && current.reconcileExpired) {
+          current.reconcileRequestId = '';
+          current.reconcilePageToken = '';
+          current.reconcileExpired = false;
+          current.reconcileMessage = '現在の照合待ちを読み直しました。必要なら先頭から再照合してください。';
+        }
         current.status = 'loaded';
         renderContactMailView(view);
         if (current.messages.length) await selectContactMail(view, options.selectLast ? current.messages.length - 1 : 0);
@@ -2066,6 +2072,7 @@
         if (observeContactMailResponse(result.sync, observationSerial)) return;
         current.reconcilePageToken = result.page.nextPageToken;
         current.reconcileRequestId = '';
+        current.reconcileExpired = false;
         current.reconcileMessage = `${result.processedCount}件を再照合しました。${current.reconcilePageToken ? '続行ボタンで次へ進めます。' : 'この回の再照合は完了です。'}`;
         current.writing = false;
         await loadContactMailList('queue');
@@ -2073,6 +2080,7 @@
       } catch (error) {
         if (serial !== current.serial) return;
         current.writing = false;
+        if (error.message === 'MAIL_REQUEST_EXPIRED') current.reconcileExpired = true;
         current.reconcileMessage = contactMailErrorText(error.message);
         renderContactMailView('queue');
       }
