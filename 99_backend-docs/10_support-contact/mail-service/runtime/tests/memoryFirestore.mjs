@@ -11,16 +11,18 @@ export function memoryFirestore(seed = {}) {
       collection: (name) => collection(`${path}/${name}`),
       listCollections: async () => [...new Set([...records.keys()].filter((key) => key.startsWith(`${path}/`)).map((key) => key.slice(path.length + 1).split('/')[0]))].map((name) => collection(`${path}/${name}`)) };
   }
-  function collection(path, filters = [], maximum = Infinity, orders = []) {
+  function collection(path, filters = [], maximum = Infinity, orders = [], after = null) {
     const query = { path, id: path.split('/').at(-1), doc: (id) => document(`${path}/${id || 'generated'}`),
       listDocuments: async () => [...new Set([...records.keys()].filter((key) => key.startsWith(`${path}/`)).map((key) => `${path}/${key.slice(path.length + 1).split('/')[0]}`))].map(document),
-      where: (field, operator, expected) => collection(path, [...filters, { field, operator, expected }], maximum, orders),
-      limit: (value) => collection(path, filters, value, orders),
-      orderBy: (field, direction = 'asc') => collection(path, filters, maximum, [...orders, { field, direction }]),
+      where: (field, operator, expected) => collection(path, [...filters, { field, operator, expected }], maximum, orders, after),
+      limit: (value) => collection(path, filters, value, orders, after),
+      orderBy: (field, direction = 'asc') => collection(path, filters, maximum, [...orders, { field, direction }], after),
+      startAfter: (value) => collection(path, filters, maximum, orders, value),
       get: async () => {
         let found = [...records].filter(([key]) => key.startsWith(`${path}/`) && key.split('/').length === path.split('/').length + 1)
-          .filter(([, value]) => filters.every(({ field, operator, expected }) => operator === '==' ? value[field] === expected : operator === 'in' ? expected.includes(value[field]) : true));
-        found.sort(([, a], [, b]) => orders.reduce((result, { field, direction }) => result || String(a[field]).localeCompare(String(b[field])) * (direction === 'desc' ? -1 : 1), 0));
+          .filter(([key, value]) => (!after || key.split('/').at(-1) > after) && filters.every(({ field, operator, expected }) => operator === '==' ? value[field] === expected : operator === 'in' ? expected.includes(value[field]) : true));
+        found.sort(([aKey, a], [bKey, b]) => orders.reduce((result, { field, direction }) => result ||
+          String(field === '__name__' ? aKey : a[field]).localeCompare(String(field === '__name__' ? bKey : b[field])) * (direction === 'desc' ? -1 : 1), 0));
         const docs = found.slice(0, maximum).map(([key]) => snapshot(document(key)));
         return { docs, size: docs.length };
       } };

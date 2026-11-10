@@ -54,4 +54,24 @@ node tools/purgeMailMetadata.mjs --project '<approved-project>' --confirm-projec
 
 ## 本番受入に残る確認
 
-実Firestoreでdry-run無変更、途中失敗後の再開、全関連collection、削除後の同期と別利用者の遅延応答を確認します。完全な同期列挙から原本が対象外になったと証明して最小マーカーを整理する運用が必要です。新しい無人削除スケジュールは作成しません。
+実Firestoreでdry-run無変更、途中失敗後の再開、全関連collection、削除後の同期と別利用者の遅延応答を確認します。新しい無人削除スケジュールは作成しません。
+
+## Gmail原本がなくなったメールIDマーカーの整理
+
+`tools/cleanupMailMarkers.mjs` は管理者の明示操作で、`suppressedMessages` の最小hashだけを整理します。一般利用者のRPCには公開しません。実行には承認済みFirestoreの管理用ADCと、窓口Gmailの読取専用Secretの特定versionが必要です。案件hashと旧要求hashの整理はこの処理に含めません。
+
+現在の期間に見つからないだけでは、将来の期間拡大で再取込する恐れがあります。この実装は期間・ラベルで絞らず、下書き・Spam・Trashを含むGmail全体のIDを全ページ列挙し、原本が不在のときだけ候補にします。**「原本が同期対象にある間」より保守的に、Gmailに原本がある間は最小hashを保持する条件です。この保持範囲の本人判断は未確定で、実データ実行前に確定します。** 原本の本文・件名・アドレスは取得しません。[Gmail一覧API](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list)
+
+計画は最大250マーカーを文書ID順に読み、同期完了状態と期間・保存世代を固定します。出力は件数・計画hash・次のhash cursorだけです。
+
+```powershell
+node tools/cleanupMailMarkers.mjs --project '<approved-project>' --confirm-project '<same-project>' --database '(default)' --request-reference '<verified-operation>' --operation plan
+```
+
+返された計画hashを確認後、同じ指定に `--operation advance --plan-hash '<returned-hash>' --secret-version '<approved-canonical-numeric-version>'` を指定します。1回につきGmail IDを50件まで読み、IDは直ちにhash比較して破棄します。元IDは一時計画にも保存しません。`enumerating` の間は同じ操作を明示して進めます。全ページ完了まで削除候補を確定せず、Gmail profileの履歴IDが開始時と一致した場合だけ `ready` と `deletionHash` を返します。最大5,000ページで止まり、結果件数の推定値は完全性の証拠にしません。
+
+`ready` の件数を確認後、`--operation apply --plan-hash '<same-plan-hash>' --deletion-hash '<returned-deletion-hash>' --secret-version '<same-version>'` を指定します。1回25マーカーまで、現在のGmail履歴ID・同期状態・保存世代・計画を再照合して削除します。`deleting` は同じ操作で再開し、`complete` で一時計画を消して保守を解除します。次のhash cursorがある場合は、別の依頼番号で `--after-marker '<nextMarker>'` を付けたplanから次の250個を処理します。advanceの初回にも同じcursorを付けます。
+
+処理中は既存の保守gateでメール閲覧・確認・同期・別の削除を止め、古い世代の要求を無効にします。API失敗・ページ不正・履歴ID変更・同期状態変更では未削除マーカーを保持して停止します。`--operation status --plan-hash '<same-plan-hash>'` はGmailを取得せず進捗を読みます。処理を取りやめる場合は `--operation cancel --plan-hash '<same-plan-hash>'` で残りを保持して保守を解除し、新しいdry-runから再列挙します。最終応答不明でstatusがidleでも完了の証明にはせず、記録と新しいdry-runを照合します。自動再送・自動scheduleはありません。
+
+合成試験は完全列挙、不安定な履歴、途中失敗、重複ページ、同時進行、25件境界の再開、250個を超えるcursor到達を扱います。実Gmail/Firestoreの全ページ・権限・保守解除・削除後の同期と、この保守的な保持条件は実データ受入前に別途確認します。

@@ -62,6 +62,11 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
 
   return {
     getProfile: profile,
+    async listAllMessageIds({ pageToken } = {}) {
+      const result = await read('messages', { maxResults: 50, includeSpamTrash: true, pageToken });
+      assertMail(result.messages === undefined || Array.isArray(result.messages), 'MAIL_INVALID_UPSTREAM', 502);
+      return { messageIds: (result.messages || []).map((item) => item.id), nextPageToken: result.nextPageToken ?? null };
+    },
     async getMessage(id) { return read(`messages/${encodeURIComponent(id)}`, { format: 'full' }); },
     async getAttachment(id, attachmentId, { cache = true } = {}) {
       if (!cache) return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`);
