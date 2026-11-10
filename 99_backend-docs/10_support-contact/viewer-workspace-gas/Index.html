@@ -355,6 +355,7 @@
   <main class="denied" id="deniedView" hidden>
     <h2>アクセスできません</h2>
     <p class="error" id="deniedMessage"></p>
+    <? if (loginStartUrl) { ?><a href="<?= loginStartUrl ?>" target="_top" rel="noreferrer">専用Googleログイン</a><? } ?>
   </main>
 
   <main class="app" id="appView" hidden>
@@ -621,11 +622,23 @@
     const attachmentModalClose = document.getElementById('attachmentModalClose');
     const attachmentModalLoading = document.getElementById('attachmentModalLoading');
 
+    function readAuthProof() {
+      try {
+        const proof = window.sessionStorage.getItem('speed-ad-contact-oauth-tab-proof-v2') || '';
+        return /^[a-f0-9]{64}$/.test(proof) ? proof : '';
+      } catch (_error) {
+        return '';
+      }
+    }
+
     function callServer(name, ...args) {
       return new Promise((resolve, reject) => {
         google.script.run
           .withSuccessHandler(resolve)
-          .withFailureHandler(reject)[name](...args);
+          .withFailureHandler((error) => {
+            if (String(error.message || error).includes('権限')) showDenied('専用Googleログインから認証し直してください。');
+            reject(error);
+          })[name](...args, readAuthProof());
       });
     }
 
@@ -1097,7 +1110,16 @@
     let viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
 
     function showDenied(message) {
-      viewerEmail.textContent = viewerContext.email || '';
+      state.submissions = [];
+      state.detail = null;
+      state.dirty = false;
+      submissionRows.innerHTML = '';
+      detailView.innerHTML = '';
+      resetAttachmentModalState();
+      viewerContext = {};
+      viewerEmail.textContent = '';
+      attachmentModalImage.removeAttribute('src');
+      attachmentModalCaption.textContent = '';
       deniedMessage.textContent = message;
       deniedView.hidden = false;
       appView.hidden = true;
@@ -1120,13 +1142,13 @@
       try {
         viewerContext = await callServer('getViewerContext');
         if (!viewerContext || !viewerContext.allowed) {
-          showDenied('abroad-o.com または customer@speed-ad.com のアカウントで開いてください。');
+          showDenied('社員は社内Googleアカウント、それ以外は通常URLの専用Googleログインから開いてください。');
           return;
         }
         applyViewerLocationState(await getAppsScriptLocation());
         showApp();
       } catch (_error) {
-        showDenied('アクセスを確認できません。abroad-o.com または customer@speed-ad.com のアカウントで開き直してください。');
+        showDenied('アクセスを確認できません。許可されたGoogleアカウントで通常URLから開き直してください。');
       }
     }
 

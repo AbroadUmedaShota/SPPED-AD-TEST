@@ -30,21 +30,33 @@ var CONTACT_HEADERS = [
 ];
 
 function doGet(e) {
-  var context = requireViewer_();
+  var params = (e && e.parameter) || {};
+  if ('code' in params || 'state' in params || 'error' in params || 'id_token' in params || 'access_token' in params) {
+    var callback = {};
+    var invalid = 'id_token' in params || 'access_token' in params;
+    ['code', 'state', 'error'].forEach(function (key) {
+      if (e.parameters && e.parameters[key] && e.parameters[key].length !== 1) invalid = true;
+      if (typeof params[key] === 'string') callback[key] = params[key].slice(0, 4096);
+    });
+    // Callback GET never consumes state, exchanges code, issues grant, or reads contact data.
+    return renderLogin_('', invalid ? { invalid: true } : callback);
+  }
+  if (params.login === 'google') return renderLogin_(String(params.id || '').slice(0, 256), null);
+  var email = getActiveUserEmail_();
   var template = HtmlService.createTemplateFromFile('Index');
-  template.initialSubmissionId = String((e && e.parameter && e.parameter.id) || '');
-  template.viewerContext = context;
-  return template
-    .evaluate()
-    .setTitle('SPEED AD お問い合わせ確認（社内）');
+  template.initialSubmissionId = String(params.id || '');
+  // External GET is only a data-free shell. Its first RPC must prove the tab secret.
+  template.viewerContext = /^[^\s@]+@abroad-o\.com$/.test(email) ? getViewerContext_() : {};
+  template.loginStartUrl = customerLoginStartUrl_(params.id);
+  return template.evaluate().setTitle('SPEED AD お問い合わせ確認（社内）');
 }
 
-function getViewerContext() {
-  return requireViewer_();
+function getViewerContext(authProof) {
+  return requireViewer_(authProof);
 }
 
-function listContactSubmissions(options) {
-  var context = requireViewer_();
+function listContactSubmissions(options, authProof) {
+  var context = requireViewer_(authProof);
   options = options || {};
   var statusFilter = String(options.status || '').trim();
   var query = String(options.query || '').toLowerCase().trim();
@@ -100,8 +112,8 @@ function listContactSubmissions(options) {
   };
 }
 
-function getContactSubmission(submissionId) {
-  requireViewer_();
+function getContactSubmission(submissionId, authProof) {
+  requireViewer_(authProof);
   var match = findSubmission_(submissionId);
   if (!match) {
     throw new Error('問い合わせが見つかりません。');
@@ -115,8 +127,8 @@ function getContactSubmission(submissionId) {
   };
 }
 
-function getAttachmentPreview(submissionId, fileId) {
-  requireViewer_();
+function getAttachmentPreview(submissionId, fileId, authProof) {
+  requireViewer_(authProof);
   var match = findSubmission_(submissionId);
   if (!match) {
     throw new Error('問い合わせが見つかりません。');
@@ -145,8 +157,8 @@ function getAttachmentPreview(submissionId, fileId) {
   };
 }
 
-function updateContactSubmissionStatus(submissionId, status, note) {
-  var context = requireViewer_();
+function updateContactSubmissionStatus(submissionId, status, note, authProof) {
+  var context = requireViewer_(authProof);
   var normalizedStatus = String(status || '').trim();
   if (VIEWER_STATUSES.indexOf(normalizedStatus) === -1) {
     throw new Error('対応ステータスが不正です。');
@@ -172,22 +184,24 @@ function updateContactSubmissionStatus(submissionId, status, note) {
     }
   });
 
-  return getContactSubmission(submissionId);
+  return getContactSubmission(submissionId, authProof);
 }
 
-function getViewerContext_() {
+function getViewerContext_(authProof) {
   var email = getActiveUserEmail_();
+  var customer = (!email || email === OAUTH_CUSTOMER_EMAIL) ? getCustomerOAuthSession_(authProof) : null;
+  if (customer) return customer;
   return {
     email: email,
-    allowed: /^[^\s@]+@abroad-o\.com$/.test(email) || email === 'customer@speed-ad.com',
+    allowed: /^[^\s@]+@abroad-o\.com$/.test(email),
     authMode: 'domain'
   };
 }
 
-function requireViewer_() {
-  var context = getViewerContext_();
+function requireViewer_(authProof) {
+  var context = getViewerContext_(authProof);
   if (!context.allowed) {
-    throw new Error('このお問い合わせ確認アプリを利用する権限がありません。abroad-o.com または customer@speed-ad.com のアカウントで開いてください。');
+    throw new Error('このお問い合わせ確認アプリを利用する権限がありません。社員は abroad-o.com のアカウント、customer は通常URLの専用Googleログインで開いてください。');
   }
   return context;
 }

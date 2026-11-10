@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <base target="_top">
+  <style>
+    body { margin: 40px auto; padding: 0 20px; max-width: 640px; font: 16px/1.7 system-ui, sans-serif; color: #17202a; }
+    a { display: inline-block; margin: 12px 0; padding: 10px 16px; border: 1px solid #0f62fe; border-radius: 6px; color: #0f62fe; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>SPEED AD ログイン</h1>
+  <p id="loginMessage">許可されたGoogleアカウントでログインしてください。</p>
+  <a id="loginLink" target="_top" rel="noreferrer" hidden>Googleでログイン</a>
+  <script>
+    const callback = <?!= JSON.stringify(callback).replace(/</g, '\\u003c') ?>;
+    const initialId = <?!= JSON.stringify(submissionId).replace(/</g, '\\u003c') ?>;
+    const proofStorageKey = 'speed-ad-contact-oauth-tab-proof-v2';
+    const message = document.getElementById('loginMessage');
+    const link = document.getElementById('loginLink');
+
+    function loginRpc(name, ...args) {
+      return new Promise((resolve, reject) => {
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args);
+      });
+    }
+
+    async function prepareLogin() {
+      try {
+        // No proof is ever recovered from URL, postMessage, or server context.
+        let proof = '';
+        if (callback) {
+          proof = window.sessionStorage.getItem(proofStorageKey) || '';
+          if (!/^[a-f0-9]{64}$/.test(proof)) throw new Error('Missing original tab proof');
+        } else {
+          // A new authorization attempt must never revive a previously stolen proof.
+          const bytes = new Uint8Array(32);
+          window.crypto.getRandomValues(bytes);
+          proof = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+          window.sessionStorage.setItem(proofStorageKey, proof);
+          if (window.sessionStorage.getItem(proofStorageKey) !== proof) throw new Error('Storage unavailable');
+        }
+        let result;
+        if (callback) {
+          result = await loginRpc('completeCustomerOAuthLogin', callback, proof);
+          message.textContent = 'ログインを確認しました。通常の確認画面を開いてください。';
+          link.textContent = '確認画面を開く';
+          link.href = result.returnUrl;
+        } else {
+          const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(proof));
+          const proofHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+          result = await loginRpc('beginCustomerOAuthLogin', proofHash, initialId);
+          link.href = result.authorizationUrl;
+        }
+        link.hidden = false;
+      } catch (_error) {
+        message.textContent = 'ログインを確認できません。同じタブで通常URLからやり直してください。';
+        link.hidden = true;
+      }
+    }
+    prepareLogin();
+  </script>
+</body>
+</html>

@@ -1,17 +1,35 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import vm from 'node:vm';
+import { createHash, createHmac, randomUUID, webcrypto } from 'node:crypto';
 import test from 'node:test';
 
 const root = new URL('../99_backend-docs/10_support-contact/viewer-workspace-gas/', import.meta.url);
 const source = readFileSync(new URL('Code.gs', root), 'utf8');
+const oauthSource = existsSync(new URL('OAuth.gs', root)) ? readFileSync(new URL('OAuth.gs', root), 'utf8') : '';
 const html = readFileSync(new URL('Index.html', root), 'utf8');
-const publicNames = ['doGet', 'getViewerContext', 'listContactSubmissions', 'getContactSubmission', 'getAttachmentPreview', 'updateContactSubmissionStatus'];
+const publicNames = ['doGet', 'getViewerContext', 'listContactSubmissions', 'getContactSubmission', 'getAttachmentPreview', 'updateContactSubmissionStatus', 'beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'];
 
-function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp' } = {}) {
+function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp', oauth = false } = {}) {
   const accesses = [];
   const writes = [];
   const templates = [];
+  const cacheEntries = new Map();
+  const network = [];
+  const cacheReads = [];
+  let now = Date.now();
+  let temporaryKey = oauth ? 'script-user-a' : '';
+  let locked = false;
+  let response = () => { throw new Error('No mocked token response'); };
+  const cache = {
+    get(key) {
+      cacheReads.push(key);
+      const entry = cacheEntries.get(key);
+      return entry && entry.until > now ? entry.value : null;
+    },
+    put(key, value, ttl) { cacheEntries.set(key, { value, until: now + ttl * 1000, ttl }); },
+    remove(key) { assert.equal(locked, true, 'one-time state consumed under lock'); cacheEntries.delete(key); },
+  };
   const headers = ['submission_id', 'submitted_at', 'contact_type', 'name', 'email', 'subject', 'message', 'attachment_count', 'attachment_refs', 'source_url', 'user_agent', 'storage_status', 'mail_status', 'handled_status', 'handled_by', 'handled_at', 'internal_note'].filter((key) => key !== missingHeader);
   const records = [
     { submission_id: 'case-a', submitted_at: '2026-11-10T00:00:00Z', subject: '<img src=x onerror=alert(1)>', message: '</div><script>bad()</script>', email: 'customer@example.com', attachment_count: '3', attachment_refs: 'file-a:https://drive.google.com/file/d/file-a/view,file-out:javascript:bad(),file-swapped:javascript:bad()', handled_status: '未対応' },
@@ -33,9 +51,27 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
     },
   };
   const properties = { SPREADSHEET_ID: 'configured-sheet', DRIVE_FOLDER_ID: 'configured-folder', CONTACT_SHEET_NAME: 'contact_submissions', CONTACT_VIEWER_ACCESS_TOKEN: 'old-token', CONTACT_VIEWER_EMAILS: 'outsider@example.com' };
+  if (oauth) Object.assign(properties, {
+    OAUTH_CLIENT_ID: 'test-client.apps.googleusercontent.com',
+    OAUTH_CLIENT_SECRET: 'test-secret-never-in-output',
+    OAUTH_REDIRECT_URI: 'https://script.google.com/macros/s/test-deployment/exec',
+  });
   delete properties[missingProperty];
   const sandbox = {
+    Date: class extends Date { static now() { return now; } },
+    CacheService: { getScriptCache: () => cache },
+    LockService: { getScriptLock: () => ({
+      waitLock() { assert.equal(locked, false); locked = true; },
+      releaseLock() { assert.equal(locked, true); locked = false; },
+    }) },
+    UrlFetchApp: { fetch(url, options) {
+      assert.equal(locked, false, 'network must run after consume lock is released');
+      assert.equal([...cacheEntries.keys()].some((key) => key.startsWith('oauth-state-v2:')), false, 'state consumed before network');
+      network.push({ url, options });
+      return response(url, options);
+    } },
     Session: {
+      getTemporaryActiveUserKey: () => temporaryKey,
       getActiveUser() {
         if (sessionThrows) throw new Error('Identity unavailable');
         return { getEmail: () => email };
@@ -65,17 +101,34 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
         getBlob() { accesses.push(`blob:${id}`); return { getContentType: () => mimeType, getBytes: () => [1, 2, 3] }; },
       };
     } },
-    Utilities: { base64Encode: (bytes) => Buffer.from(bytes).toString('base64') },
+    Utilities: {
+      Charset: { UTF_8: 'UTF-8' }, DigestAlgorithm: { SHA_256: 'SHA-256' },
+      getUuid: () => randomUUID(),
+      base64Encode: (bytes) => Buffer.from(bytes).toString('base64'),
+      base64EncodeWebSafe: (bytes) => Buffer.from(bytes).toString('base64url'),
+      base64DecodeWebSafe: (value) => [...Buffer.from(value, 'base64url')],
+      newBlob: (bytes) => ({ getDataAsString: () => Buffer.from(bytes).toString('utf8') }),
+      computeDigest: (_algorithm, value) => [...createHash('sha256').update(value).digest()],
+      computeHmacSha256Signature: (value, secret) => [...createHmac('sha256', secret).update(value).digest()],
+    },
     HtmlService: { XFrameOptionsMode: { ALLOWALL: 'ALLOWALL' }, createTemplateFromFile(name) {
-      assert.equal(name, 'Index');
-      const template = { evaluate() { return { setTitle() { return this; }, setXFrameOptionsMode() { return this; } }; } };
+      assert.ok(['Index', 'Login'].includes(name));
+      const template = { name, evaluate() { return { setTitle() { return this; }, setXFrameOptionsMode() { return this; } }; } };
       templates.push(template);
       return template;
     } },
   };
   vm.createContext(sandbox);
   vm.runInContext(source, sandbox, { filename: 'Code.gs' });
-  return { api: sandbox, accesses, writes, templates, rows, headers, setEmail(value) { email = value; } };
+  vm.runInContext(oauthSource, sandbox, { filename: 'OAuth.gs' });
+  return { api: sandbox, accesses, writes, templates, rows, headers, setEmail(value) { email = value; },
+    proof: 'a'.repeat(64),
+    cacheEntries, cacheReads, network, properties,
+    setTempKey(value) { temporaryKey = value; },
+    advance(seconds) { now += seconds * 1000; },
+    nowSeconds: () => Math.floor(now / 1000),
+    respond(handler) { response = handler; },
+  };
 }
 
 const deniedCalls = [
@@ -87,25 +140,32 @@ const deniedCalls = [
   ['updateContactSubmissionStatus', ['case-a', '対応中', 'memo', { email: 'reader@abroad-o.com', token: 'old-token' }]],
 ];
 
-for (const email of ['', null, 'outsider@example.com', 'other@speed-ad.com', 'customer+alias@speed-ad.com', 'customer@sub.speed-ad.com', 'customer@speed-ad.com.evil', 'reader@sub.abroad-o.com', 'reader@abroad-o.com.evil', 'reader@evilabroad-o.com', 'reader@@abroad-o.com', '@abroad-o.com']) {
+for (const email of ['', null, 'outsider@example.com', 'customer@speed-ad.com', '  CuStOmEr@SPEED-AD.COM  ', 'other@speed-ad.com', 'customer+alias@speed-ad.com', 'customer@sub.speed-ad.com', 'customer@speed-ad.com.evil', 'reader@sub.abroad-o.com', 'reader@abroad-o.com.evil', 'reader@evilabroad-o.com', 'reader@@abroad-o.com', '@abroad-o.com']) {
   test(`all public entry points deny ${JSON.stringify(email)} before datastore access`, () => {
     const env = runtime(email);
     for (const [name, args] of deniedCalls) {
-      assert.throws(() => env.api[name](...args), /権限/);
+      if (name === 'doGet') {
+        env.api[name](...args);
+        assert.equal(env.templates.at(-1).name, 'Index');
+        assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0);
+      } else assert.throws(() => env.api[name](...args), /権限/);
     }
-    assert.deepEqual(env.accesses, []);
+    assert.ok(!env.accesses.some((entry) => /^(sheet:|file:|blob:)/.test(entry)));
     assert.deepEqual(env.writes, []);
-    assert.deepEqual(env.templates, []);
+    assert.ok(env.templates.every((template) => !template.viewerContext || Object.keys(template.viewerContext).length === 0));
   });
 }
 
 test('unavailable Session identity fails closed for every public entry point', () => {
   const env = runtime('reader@abroad-o.com', { sessionThrows: true });
-  for (const [name, args] of deniedCalls) assert.throws(() => env.api[name](...args), /権限/);
-  assert.deepEqual(env.accesses, []);
+  for (const [name, args] of deniedCalls) {
+    if (name === 'doGet') { env.api[name](...args); assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0); }
+    else assert.throws(() => env.api[name](...args), /権限/);
+  }
+  assert.ok(!env.accesses.some((entry) => /^(sheet:|file:|blob:)/.test(entry)));
 });
 
-for (const email of ['reader@abroad-o.com', '  AnOther.User@ABROAD-O.COM  ', 'customer@speed-ad.com', '  CuStOmEr@SPEED-AD.COM  ']) {
+for (const email of ['reader@abroad-o.com', '  AnOther.User@ABROAD-O.COM  ']) {
   test(`allowed identity ${email} reads and updates with actual normalized actor`, () => {
     const { api, accesses, rows, headers, templates } = runtime(email);
     const normalized = email.trim().toLowerCase();
@@ -179,7 +239,7 @@ test('missing configured resource IDs never fall back to another datastore', () 
 
 test('only the approved RPC surface is public; no cleanup, setup or property writers', () => {
   const { api } = runtime();
-  const actual = Object.keys(api).filter((name) => typeof api[name] === 'function' && !name.endsWith('_')).sort();
+  const actual = Object.keys(api).filter((name) => typeof api[name] === 'function' && !name.endsWith('_') && name !== 'Date').sort();
   assert.deepEqual(actual, publicNames.slice().sort());
   assert.doesNotMatch(source, /getEffectiveUser|setTrashed|deleteRow|setProperty|setProperties|CONTACT_VIEWER_ACCESS_TOKEN|CONTACT_VIEWER_EMAILS|UrlFetchApp/);
   assert.equal(existsSync(new URL('.clasp.json', root)), false);
@@ -192,11 +252,12 @@ test('manifest requires Google sign-in, deployer execution and minimum used serv
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive.readonly',
     'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/script.external_request',
   ].sort());
 });
 
-test('UI has no token storage and safely serializes template values', () => {
-  assert.doesNotMatch(html, /accessToken|AccessToken|ACCESS_TOKEN|sessionStorage|validateViewerAccessToken/);
+test('UI has no legacy email-token storage and safely serializes template values', () => {
+  assert.doesNotMatch(html, /accessToken|AccessToken|ACCESS_TOKEN|validateViewerAccessToken/);
   assert.match(html, /JSON\.stringify\(initialSubmissionId\)\.replace\(/);
   assert.match(html, /JSON\.stringify\(viewerContext\)\.replace\(/);
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
@@ -208,8 +269,11 @@ test('each RPC rechecks active identity after a previously authorized request', 
   const env = runtime();
   assert.equal(env.api.getViewerContext().allowed, true);
   env.setEmail('outsider@example.com');
-  for (const [name, args] of deniedCalls) assert.throws(() => env.api[name](...args), /権限/);
-  assert.deepEqual(env.accesses, []);
+  for (const [name, args] of deniedCalls) {
+    if (name === 'doGet') { env.api[name](...args); assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0); }
+    else assert.throws(() => env.api[name](...args), /権限/);
+  }
+  assert.ok(!env.accesses.some((entry) => /^(sheet:|file:|blob:)/.test(entry)));
   env.setEmail('second@abroad-o.com');
   assert.equal(env.api.updateContactSubmissionStatus('case-a', '対応済み', '').submission.handled_by, 'second@abroad-o.com');
 });
@@ -222,7 +286,7 @@ test('trashed and non-image files cannot be previewed', () => {
   assert.throws(() => nonImage.api.getAttachmentPreview('case-a', 'file-a'), /画像/);
 });
 
-function uiRuntime(env = runtime(), initialId = '') {
+function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
   const elements = new Map();
   const calls = [];
   const element = (id) => {
@@ -258,7 +322,7 @@ function uiRuntime(env = runtime(), initialId = '') {
     },
   };
   const context = {
-    window: { CONTACT_VIEWER_INITIAL_ID: initialId, CONTACT_VIEWER_CONTEXT: { allowed: true, email: 'spoof@abroad-o.com' } },
+    window: { CONTACT_VIEWER_INITIAL_ID: initialId, CONTACT_VIEWER_CONTEXT: { allowed: true, email: 'spoof@abroad-o.com' }, sessionStorage: { getItem: (key) => storage.get(key) || null } },
     document: {
       getElementById: element,
       querySelectorAll: (selector) => selector === '.quick-status' ? ['対応中', '対応済み', '保留'].map((status) => {
@@ -361,4 +425,519 @@ test('template JSON cannot close its script tag through initial id', () => {
   const rendered = expressions.map((expression) => vm.runInNewContext(expression, { initialSubmissionId, viewerContext }));
   assert.doesNotMatch(rendered.join(''), /<\/script>/i);
   assert.equal(JSON.parse(rendered[0]), initialSubmissionId);
+});
+
+function beginOAuth(env, id = 'case-b') {
+  env.api.doGet({ parameter: { login: 'google', id } });
+  assert.equal(env.templates.at(-1).name, 'Login');
+  const proofHash = createHash('sha256').update(env.proof).digest('hex');
+  const result = env.api.beginCustomerOAuthLogin(proofHash, id);
+  assert.ok(result.authorizationUrl);
+  return new URL(result.authorizationUrl);
+}
+
+function tokenResponse(env, authorization, changes = {}, headerChanges = {}) {
+  const claims = {
+    iss: 'https://accounts.google.com', aud: env.properties.OAUTH_CLIENT_ID,
+    azp: env.properties.OAUTH_CLIENT_ID, sub: 'google-customer-subject',
+    email: 'customer@speed-ad.com', email_verified: true, hd: 'speed-ad.com',
+    exp: env.nowSeconds() + 1800, iat: env.nowSeconds(), nonce: authorization.searchParams.get('nonce'),
+    ...changes,
+  };
+  const encode = (value) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const idToken = [encode({ alg: 'RS256', ...headerChanges }), encode(claims), 'trusted-endpoint-signature'].join('.');
+  return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ id_token: idToken, access_token: 'never-return-access-token', refresh_token: 'never-store-refresh-token' }) };
+}
+
+function finishOAuth(env, authorization, extra = {}) {
+  const params = { code: 'single-use-google-code', state: authorization.searchParams.get('state'), ...extra };
+  const requestsBefore = env.network.length;
+  env.api.doGet({ parameter: params });
+  assert.equal(env.network.length, requestsBefore, 'GET callback cannot exchange or issue grants');
+  const page = env.templates.at(-1);
+  assert.equal(page.name, 'Login');
+  try {
+    env.lastCompletion = env.api.completeCustomerOAuthLogin(page.callback, env.proof);
+  } catch (error) {
+    env.lastCompletion = { returnUrl: '', error: String(error) };
+  }
+  return env.lastCompletion;
+}
+
+function assertNoContactAccess(env) {
+  assert.ok(!env.accesses.some((entry) => /^(sheet:|file:|blob:)/.test(entry)));
+  assert.deepEqual(env.writes, []);
+  for (const page of env.templates) {
+    if (page.name === 'Index') assert.equal(Object.keys(page.viewerContext).length, 0);
+    else assert.equal(page.name, 'Login');
+    assert.doesNotMatch(String(page.message || '') + String(page.oauthUrl || ''), /customer@|test-secret|never-return|never-store/);
+    assert.equal(page.submissions, undefined);
+    assert.equal(page.detail, undefined);
+  }
+}
+
+test('OAuth initial login, authorization and callback are data-free; PKCE/state/nonce use HMAC', () => {
+  const env = runtime('', { oauth: true });
+  env.api.doGet({ parameter: { id: 'case-b' } });
+  assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0);
+  assert.equal(env.cacheEntries.size, 0, 'ordinary login page does not create a state');
+  assert.equal(env.templates.at(-1).loginStartUrl, env.properties.OAUTH_REDIRECT_URI + '?login=google&id=case-b');
+  const authorization = beginOAuth(env);
+  assert.equal(authorization.origin + authorization.pathname, 'https://accounts.google.com/o/oauth2/v2/auth');
+  assert.equal(authorization.searchParams.get('scope'), 'openid email');
+  assert.equal(authorization.searchParams.get('response_type'), 'code');
+  assert.equal(authorization.searchParams.get('redirect_uri'), env.properties.OAUTH_REDIRECT_URI);
+  assert.equal(authorization.searchParams.get('code_challenge_method'), 'S256');
+  assert.equal(authorization.searchParams.has('login_hint'), false);
+  assert.equal(authorization.searchParams.has('c'), false);
+  assert.equal(authorization.searchParams.has('sid'), false);
+  const [key, entry] = [...env.cacheEntries.entries()][0];
+  const pending = JSON.parse(entry.value);
+  assert.equal(key, 'oauth-state-v2:' + authorization.searchParams.get('state'));
+  assert.equal(entry.ttl, 600);
+  assert.equal(createHash('sha256').update(pending.verifier).digest('base64url'), authorization.searchParams.get('code_challenge'));
+  assert.equal(new Set([authorization.searchParams.get('state'), pending.nonce, pending.verifier]).size, 3);
+  for (const value of [authorization.searchParams.get('state'), pending.nonce, pending.verifier]) assert.match(value, /^[A-Za-z0-9_-]{43}$/);
+  assert.doesNotMatch(authorization.href, new RegExp(pending.verifier));
+  assert.doesNotMatch(entry.value, /script-user-a/);
+  assertNoContactAccess(env);
+  // A known UUID still produces keyed, purpose-separated values rather than bare UUID entropy.
+  env.api.Utilities.getUuid = () => 'predictable-test-uuid';
+  // Clock may have millisecond precision; independently calculate using the sandbox clock.
+  const exact = createHmac('sha256', env.properties.OAUTH_CLIENT_SECRET)
+    .update(JSON.stringify(['state', 'predictable-test-uuid:' + env.api.Date.now()])).digest('base64url');
+  assert.equal(beginOAuth(env).searchParams.get('state'), exact);
+});
+
+for (const email of ['customer@speed-ad.com', '  CuStOmEr@SPEED-AD.COM  ']) {
+  test(`OAuth verified ${email} reuses ordinary URL and records RPC actor`, () => {
+    const env = runtime('customer@speed-ad.com', { oauth: true });
+    const authorization = beginOAuth(env);
+    env.respond(() => tokenResponse(env, authorization, { email }));
+    const page = finishOAuth(env, authorization);
+    assert.equal(page.returnUrl, env.properties.OAUTH_REDIRECT_URI + '?id=case-b');
+    assertNoContactAccess(env);
+    const request = env.network[0];
+    assert.equal(request.url, 'https://oauth2.googleapis.com/token');
+    assert.equal(request.options.method, 'post');
+    assert.equal(request.options.contentType, 'application/x-www-form-urlencoded');
+    assert.equal(request.options.followRedirects, false);
+    assert.equal(request.options.validateHttpsCertificates, true);
+    assert.equal(request.options.payload.client_secret, env.properties.OAUTH_CLIENT_SECRET);
+    assert.equal(request.options.payload.redirect_uri, env.properties.OAUTH_REDIRECT_URI);
+    assert.equal(request.options.payload.grant_type, 'authorization_code');
+    assert.equal(createHash('sha256').update(request.options.payload.code_verifier).digest('base64url'), authorization.searchParams.get('code_challenge'));
+    const [sessionKey, sessionEntry] = [...env.cacheEntries.entries()][0];
+    assert.match(sessionKey, /^oauth-tab-session-v2:[A-Za-z0-9_-]{43}$/);
+    assert.ok(sessionEntry.ttl <= 1800);
+    assert.doesNotMatch(sessionEntry.value, /id_token|access_token|refresh_token|secret|verifier|nonce/);
+    assert.equal(JSON.parse(sessionEntry.value).sub, 'google-customer-subject');
+    const context = env.api.getViewerContext(env.proof);
+    assert.equal(context.authMode, 'google-oauth');
+    assert.deepEqual(Object.keys(context).sort(), ['allowed', 'authMode', 'email']);
+    env.api.doGet({ parameter: { id: 'case-b' } });
+    assert.equal(env.templates.at(-1).name, 'Index');
+    assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0);
+    assert.equal(env.api.listContactSubmissions({ status: 'all' }, env.proof).submissions.length, 2);
+    assert.equal(env.api.getContactSubmission('case-a', env.proof).submission.submission_id, 'case-a');
+    assert.equal(env.api.getAttachmentPreview('case-a', 'file-a', env.proof).fileId, 'file-a');
+    assert.equal(env.api.updateContactSubmissionStatus('case-a', '対応中', 'oauth memo', env.proof).submission.handled_by, 'customer@speed-ad.com');
+    assert.equal(env.network.length, 1);
+  });
+}
+
+test('OAuth state is single-use even during a second callback while first exchange runs', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.respond(() => {
+    finishOAuth(env, authorization);
+    assert.equal(env.lastCompletion.returnUrl, '');
+    return tokenResponse(env, authorization);
+  });
+  finishOAuth(env, authorization);
+  finishOAuth(env, authorization);
+  assert.equal(env.lastCompletion.returnUrl, '');
+  assert.equal(env.network.length, 1);
+  assertNoContactAccess(env);
+});
+
+for (const condition of ['expired', 'wrong-user-key', 'missing-user-key', 'evicted', 'future-state']) {
+  test(`OAuth rejects ${condition} state before exchange`, () => {
+    const env = runtime('', { oauth: true });
+    const authorization = beginOAuth(env);
+    if (condition === 'expired') env.advance(600);
+    if (condition === 'wrong-user-key') env.setTempKey('different-google-script-user');
+    if (condition === 'missing-user-key') env.setTempKey('');
+    if (condition === 'evicted') env.cacheEntries.clear();
+    if (condition === 'future-state') env.advance(-1);
+    const page = finishOAuth(env, authorization);
+    assert.equal(page.returnUrl, '');
+    assert.equal(env.network.length, 0);
+    assert.throws(() => env.api.listContactSubmissions({}, env.proof), /権限/);
+    assertNoContactAccess(env);
+  });
+}
+
+test('missing key/configuration and non-global redirect fail closed on initiation', () => {
+  for (const condition of ['key', 'client', 'secret', 'redirect']) {
+    const env = runtime('', { oauth: true });
+    if (condition === 'key') env.setTempKey('');
+    if (condition === 'client') delete env.properties.OAUTH_CLIENT_ID;
+    if (condition === 'secret') delete env.properties.OAUTH_CLIENT_SECRET;
+    if (condition === 'redirect') env.properties.OAUTH_REDIRECT_URI = 'https://evil.example/exec';
+    env.api.doGet({ parameter: { login: 'google' } });
+    assert.throws(() => env.api.beginCustomerOAuthLogin(createHash('sha256').update(env.proof).digest('hex'), ''), /ログイン/);
+    assert.equal(env.cacheEntries.size, 0);
+    assertNoContactAccess(env);
+  }
+});
+
+for (const condition of ['network', 'http-302', 'http-400', 'token-error', 'malformed-json', 'missing-id-token', 'malformed-token', 'provider-error', 'duplicate-state', 'client-id-token']) {
+  test(`OAuth ${condition} cannot create a grant`, () => {
+    const env = runtime('', { oauth: true });
+    const authorization = beginOAuth(env);
+    env.respond(() => {
+      if (condition === 'network') throw new Error('sensitive-network-details');
+      const body = condition === 'token-error' ? '{"error":"invalid_grant"}' : condition === 'malformed-json' ? '{' : condition === 'malformed-token' ? '{"id_token":"bad"}' : '{}';
+      return { getResponseCode: () => condition === 'http-302' ? 302 : condition === 'http-400' ? 400 : 200, getContentText: () => body };
+    });
+    if (condition === 'duplicate-state') {
+      env.api.doGet({ parameter: { state: authorization.searchParams.get('state'), code: 'code' }, parameters: { state: ['one', 'two'] } });
+      assert.throws(() => env.api.completeCustomerOAuthLogin(env.templates.at(-1).callback, env.proof), /ログイン/);
+      env.lastCompletion = { returnUrl: '' };
+    }
+    else finishOAuth(env, authorization, condition === 'provider-error' ? { error: 'access_denied' } : condition === 'client-id-token' ? { id_token: 'untrusted-client-token' } : {});
+    assert.equal(env.lastCompletion.returnUrl, '');
+    assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+    assert.ok(![...env.cacheEntries.keys()].some((key) => key.startsWith('oauth-tab-session-v2:')));
+    assertNoContactAccess(env);
+    assert.doesNotMatch(JSON.stringify(env.templates), /sensitive-network-details|invalid_grant|untrusted-client-token/);
+  });
+}
+
+const invalidClaims = [
+  ['issuer', { iss: 'https://evil.example' }], ['audience', { aud: 'wrong-client' }],
+  ['audience-array', { aud: ['test-client.apps.googleusercontent.com'] }], ['azp', { azp: 'wrong-client' }], ['azp-null', { azp: null }],
+  ['subject', { sub: '' }], ['subject-type', { sub: 123 }],
+  ['expired', { exp: 1 }], ['expiry-type', { exp: '9999999999' }], ['future-issued', { iat: 9999999999 }],
+  ['stale-issued', { iat: 1 }], ['issued-type', { iat: '1' }], ['nonce', { nonce: 'wrong' }],
+  ['unverified', { email_verified: false }], ['verification-string', { email_verified: 'true' }],
+  ['other-email', { email: 'other@speed-ad.com' }], ['employee-email', { email: 'employee@abroad-o.com' }],
+  ['missing-hd', { hd: undefined }], ['wrong-hd', { hd: 'abroad-o.com' }], ['hd-suffix', { hd: 'speed-ad.com.evil' }],
+];
+for (const [name, changes] of invalidClaims) {
+  test(`OAuth rejects ID token claim ${name}`, () => {
+    const env = runtime('', { oauth: true });
+    const authorization = beginOAuth(env);
+    env.respond(() => tokenResponse(env, authorization, changes));
+    finishOAuth(env, authorization);
+    assert.equal(env.lastCompletion.returnUrl, '');
+    assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+    assertNoContactAccess(env);
+  });
+}
+
+test('only RS256 headers from direct token response are accepted', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.respond(() => tokenResponse(env, authorization, {}, { alg: 'none' }));
+  finishOAuth(env, authorization);
+  assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+  assertNoContactAccess(env);
+});
+
+test('known noncustomer principal cannot initiate, finish or consult cached customer grant', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.setEmail('other@speed-ad.com');
+  finishOAuth(env, authorization);
+  assert.equal(env.network.length, 0);
+  env.api.doGet({ parameter: { login: 'google' } });
+  assert.throws(() => env.api.beginCustomerOAuthLogin(createHash('sha256').update(env.proof).digest('hex'), ''), /ログイン/);
+  assertNoContactAccess(env);
+  env.setEmail('customer@speed-ad.com');
+  const second = beginOAuth(env);
+  env.respond(() => tokenResponse(env, second));
+  finishOAuth(env, second);
+  const readsBefore = env.cacheReads.filter((key) => key.startsWith('oauth-tab-session-v2:')).length;
+  env.setEmail('other@speed-ad.com');
+  assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+  for (const [name, args] of deniedCalls) {
+    if (name === 'doGet') { env.api[name](...args); assert.equal(Object.keys(env.templates.at(-1).viewerContext).length, 0); }
+    else assert.throws(() => env.api[name](...args), /権限/);
+  }
+  assert.equal(env.cacheReads.filter((key) => key.startsWith('oauth-tab-session-v2:')).length, readsBefore);
+  env.setEmail('employee@abroad-o.com');
+  assert.equal(env.api.getViewerContext(env.proof).authMode, 'domain');
+  assert.equal(env.api.getViewerContext(env.proof).email, 'employee@abroad-o.com');
+});
+
+for (const condition of ['expiry', 'key-rotation', 'missing-key', 'eviction', 'secret-rotation', 'client-rotation', 'redirect-rotation']) {
+  test(`customer grant fails closed after ${condition}`, () => {
+    const env = runtime('customer@speed-ad.com', { oauth: true });
+    const authorization = beginOAuth(env);
+    env.respond(() => tokenResponse(env, authorization, { exp: env.nowSeconds() + 7200 }));
+    finishOAuth(env, authorization);
+    const session = [...env.cacheEntries.values()][0];
+    assert.equal(session.ttl, 3600);
+    if (condition === 'expiry') env.advance(3600);
+    if (condition === 'key-rotation') env.setTempKey('rotated-user-key');
+    if (condition === 'missing-key') env.setTempKey('');
+    if (condition === 'eviction') env.cacheEntries.clear();
+    if (condition === 'secret-rotation') env.properties.OAUTH_HMAC_SECRET = 'new-dedicated-key';
+    if (condition === 'client-rotation') env.properties.OAUTH_CLIENT_ID = 'another-client';
+    if (condition === 'redirect-rotation') env.properties.OAUTH_REDIRECT_URI = 'https://script.google.com/macros/s/other/exec';
+    assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+    assert.throws(() => env.api.listContactSubmissions({}, env.proof), /権限/);
+    assertNoContactAccess(env);
+  });
+}
+
+test('OAuth helper surface stays private and Login never exposes identity or provider tokens', () => {
+  const login = readFileSync(new URL('Login.html', root), 'utf8');
+  for (const match of oauthSource.matchAll(/^function ([^(]+)\(/gm)) assert.ok(match[1].endsWith('_') || ['beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'].includes(match[1]));
+  assert.doesNotMatch(oauthSource, /getEffectiveUser|Math\.random|console\.|Logger\.|login_hint|setProperty/);
+  assert.doesNotMatch(login, /customer@|speed-ad\.com|id_token|access_token/);
+  assert.match(login, /getRandomValues/);
+  assert.match(login, /sessionStorage/);
+  assert.match(login, /JSON\.stringify\(callback\)/);
+  assert.match(login, /JSON\.stringify\(submissionId\)/);
+  assert.match(login, /no-referrer/);
+});
+
+
+test('known principal and temporary key are rechecked immediately before grant issuance', () => {
+  for (const condition of ['known-mismatch', 'rotated-key']) {
+    const env = runtime('', { oauth: true });
+    const authorization = beginOAuth(env);
+    env.respond(() => {
+      if (condition === 'known-mismatch') env.setEmail('other@speed-ad.com');
+      else env.setTempKey('rotated-script-user');
+      return tokenResponse(env, authorization);
+    });
+    finishOAuth(env, authorization);
+    assert.equal(env.lastCompletion.returnUrl, '');
+    assert.ok(![...env.cacheEntries.keys()].some((key) => key.startsWith('oauth-tab-session-v2:')));
+    assertNoContactAccess(env);
+  }
+});
+
+test('grant expires at token expiry even when the cache retains an unexpired entry', () => {
+  const env = runtime('customer@speed-ad.com', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.respond(() => tokenResponse(env, authorization, { exp: env.nowSeconds() + 120 }));
+  finishOAuth(env, authorization);
+  const entry = [...env.cacheEntries.values()][0];
+  assert.equal(entry.ttl, 120);
+  entry.until += 3600000; // Model delayed cache expiry; the application must still deny.
+  env.advance(120);
+  assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+});
+
+test('dedicated HMAC key replaces client secret for state unpredictability', () => {
+  const env = runtime('', { oauth: true });
+  env.properties.OAUTH_HMAC_SECRET = 'separate-test-hmac-key';
+  env.api.Utilities.getUuid = () => 'test-uuid';
+  const state = beginOAuth(env).searchParams.get('state');
+  const expected = createHmac('sha256', env.properties.OAUTH_HMAC_SECRET)
+    .update(JSON.stringify(['state', 'test-uuid:' + env.api.Date.now()])).digest('base64url');
+  assert.equal(state, expected);
+});
+
+
+const tabProofKey = 'speed-ad-contact-oauth-tab-proof-v2';
+
+function loginClientRuntime(env, storage = new Map(), callback = null) {
+  const elements = new Map([['loginMessage', {}], ['loginLink', { hidden: true }]]);
+  const run = { withSuccessHandler(success) { return { withFailureHandler(failure) {
+    return new Proxy({}, { get(_target, method) { return (...args) => {
+      try { success(env.api[method](...args)); } catch (error) { failure(error); }
+    }; } });
+  } }; } };
+  const context = {
+    window: {
+      crypto: webcrypto,
+      sessionStorage: {
+        getItem: (key) => storage.get(key) || null,
+        setItem: (key, value) => storage.set(key, value),
+      },
+    },
+    document: { getElementById: (id) => elements.get(id) },
+    google: { script: { run } }, Uint8Array, TextEncoder,
+  };
+  vm.createContext(context);
+  const login = readFileSync(new URL('Login.html', root), 'utf8');
+  const script = login.match(/<script>([\s\S]*?)<\/script>/)[1]
+    .replace(/<\?!= ([\s\S]*?) \?>/g, (_match, expression) => vm.runInNewContext(expression, { callback, submissionId: 'case-b' }))
+    .replace('    prepareLogin();', '');
+  vm.runInContext(script, context);
+  return { ui: context, elements, storage };
+}
+
+test('same GAS principal cannot finish another tab state without its original secret', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  const callback = { code: 'single-use-google-code', state: authorization.searchParams.get('state') };
+  env.respond(() => tokenResponse(env, authorization));
+  env.api.doGet({ parameter: callback });
+  assert.equal(env.network.length, 0);
+  assertNoContactAccess(env);
+  const leakedHash = createHash('sha256').update(env.proof).digest('hex');
+  for (const proof of [undefined, '', 'b'.repeat(64), leakedHash]) {
+    assert.throws(() => env.api.completeCustomerOAuthLogin(callback, proof), /ログイン/);
+    assert.equal(env.network.length, 0);
+    assert.ok([...env.cacheEntries.keys()].some((key) => key.startsWith('oauth-state-v2:')), 'wrong proof cannot consume the real state');
+  }
+  env.api.completeCustomerOAuthLogin(callback, env.proof);
+  assert.equal(env.network.length, 1);
+  assert.throws(() => env.api.completeCustomerOAuthLogin(callback, env.proof), /ログイン/);
+});
+
+test('same blank-email GAS key in a different tab cannot reuse an issued customer grant', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.respond(() => tokenResponse(env, authorization));
+  finishOAuth(env, authorization);
+  assert.equal(env.api.getViewerContext(env.proof).email, 'customer@speed-ad.com');
+  const accessesBefore = env.accesses.filter((entry) => /^(sheet:|file:|blob:)/.test(entry)).length;
+  for (const proof of [undefined, '', 'b'.repeat(64), createHash('sha256').update(env.proof).digest('hex')]) {
+    assert.throws(() => env.api.getViewerContext(proof), /権限/);
+    assert.throws(() => env.api.listContactSubmissions({}, proof), /権限/);
+    assert.throws(() => env.api.getContactSubmission('case-a', proof), /権限/);
+    assert.throws(() => env.api.getAttachmentPreview('case-a', 'file-a', proof), /権限/);
+    assert.throws(() => env.api.updateContactSubmissionStatus('case-a', '対応中', 'attack', proof), /権限/);
+  }
+  assert.equal(env.accesses.filter((entry) => /^(sheet:|file:|blob:)/.test(entry)).length, accessesBefore);
+  assert.deepEqual(env.writes, []);
+});
+
+test('legacy GAS-key-only grants are never consumed by revised code', () => {
+  const env = runtime('', { oauth: true });
+  const config = env.api.oauthConfig_();
+  const legacyBinding = env.api.oauthHmac_(config, 'temporary-user', JSON.stringify(['script-user-a', config.clientId, config.redirectUri]));
+  env.cacheEntries.set('oauth-session:' + legacyBinding, {
+    value: JSON.stringify({ email: 'customer@speed-ad.com', sub: 'old', expiresAt: env.nowSeconds() + 3600 }), until: Date.now() + 3600000,
+  });
+  assert.throws(() => env.api.getViewerContext(), /権限/);
+  assert.throws(() => env.api.getViewerContext(env.proof), /権限/);
+  assert.ok(env.cacheReads.every((key) => !key.startsWith('oauth-session:')));
+  assertNoContactAccess(env);
+});
+
+test('Login WebCrypto client completes with same tab proof and app reload forwards proof to all RPCs', async () => {
+  const env = runtime('', { oauth: true });
+  const login = loginClientRuntime(env);
+  await login.ui.prepareLogin();
+  const proof = login.storage.get(tabProofKey);
+  assert.match(proof, /^[a-f0-9]{64}$/);
+  const authorization = new URL(login.elements.get('loginLink').href);
+  const pending = JSON.parse([...env.cacheEntries.values()][0].value);
+  assert.equal(pending.proofHash, createHash('sha256').update(proof).digest('hex'));
+  assert.doesNotMatch(authorization.href, new RegExp(proof));
+  assert.doesNotMatch([...env.cacheEntries.values()][0].value, new RegExp(proof));
+  env.respond(() => tokenResponse(env, authorization));
+  const callback = { code: 'single-use-google-code', state: authorization.searchParams.get('state') };
+  env.api.doGet({ parameter: callback });
+  assert.equal(env.network.length, 0);
+  const wrongTab = loginClientRuntime(env, new Map(), callback);
+  await wrongTab.ui.prepareLogin();
+  assert.equal(wrongTab.elements.get('loginLink').hidden, true);
+  assert.equal(wrongTab.storage.size, 0, 'callback must not generate a replacement proof');
+  assert.equal(env.network.length, 0);
+  const completion = loginClientRuntime(env, login.storage, callback);
+  await completion.ui.prepareLogin();
+  assert.equal(completion.elements.get('loginLink').href, env.properties.OAUTH_REDIRECT_URI + '?id=case-b');
+  assert.equal(env.network.length, 1);
+  for (let reload = 0; reload < 2; reload++) {
+    const app = uiRuntime(env, '', login.storage);
+    await app.ui.loadList();
+    assert.match(app.elements.get('detailView').innerHTML, /case-a/);
+    app.elements.get('statusSelect').value = '対応中';
+    app.elements.get('internalNote').value = 'tab proof update';
+    await app.ui.saveStatus();
+    const preview = await app.ui.ensureAttachmentPreviewLoaded(0);
+    assert.equal(preview.dataUrl, 'data:image/webp;base64,AQID');
+    assert.ok(app.calls.every((call) => call.at(-1) === proof));
+  }
+  assert.equal(env.api.getContactSubmission('case-a', proof).submission.handled_by, 'customer@speed-ad.com');
+  const isolatedTab = uiRuntime(env, '', new Map([[tabProofKey, 'b'.repeat(64)]]));
+  await isolatedTab.ui.bootstrapViewer();
+  assert.equal(isolatedTab.elements.get('appView').hidden, true);
+  assert.equal(isolatedTab.elements.get('submissionRows').innerHTML, '');
+  env.cacheEntries.clear();
+  const expiredApp = uiRuntime(env, '', login.storage);
+  await expiredApp.ui.bootstrapViewer();
+  assert.equal(expiredApp.elements.get('appView').hidden, true);
+});
+
+test('Login storage/WebCrypto unavailability fails closed without OAuth initiation', async () => {
+  const env = runtime('', { oauth: true });
+  const unavailable = loginClientRuntime(env);
+  unavailable.ui.window.sessionStorage.getItem = () => { throw new Error('blocked'); };
+  await unavailable.ui.prepareLogin();
+  assert.equal(unavailable.elements.get('loginLink').hidden, true);
+  assert.equal(env.cacheEntries.size, 0);
+  const noCrypto = loginClientRuntime(env);
+  noCrypto.ui.window.crypto = {};
+  await noCrypto.ui.prepareLogin();
+  assert.equal(noCrypto.elements.get('loginLink').hidden, true);
+  assert.equal(env.cacheEntries.size, 0);
+});
+
+
+test('every fresh Login start replaces stored proof using 32-byte WebCrypto randomness; callback never generates', async () => {
+  const env = runtime('', { oauth: true });
+  const storage = new Map([[tabProofKey, 'c'.repeat(64)]]);
+  const start = loginClientRuntime(env, storage);
+  let randomCalls = 0;
+  start.ui.window.crypto = {
+    subtle: webcrypto.subtle,
+    getRandomValues(bytes) {
+      randomCalls++;
+      assert.equal(bytes.length, 32);
+      return webcrypto.getRandomValues(bytes);
+    },
+  };
+  await start.ui.prepareLogin();
+  const proof = storage.get(tabProofKey);
+  assert.equal(randomCalls, 1);
+  assert.notEqual(proof, 'c'.repeat(64));
+  const authorization = new URL(start.elements.get('loginLink').href);
+  env.respond(() => tokenResponse(env, authorization));
+  const callback = loginClientRuntime(env, storage, { code: 'single-use-google-code', state: authorization.searchParams.get('state') });
+  callback.ui.window.crypto = { getRandomValues() { throw new Error('Callback must only read original proof'); } };
+  await callback.ui.prepareLogin();
+  assert.equal(callback.elements.get('loginLink').hidden, false);
+  assert.equal(storage.get(tabProofKey), proof);
+  assert.equal(env.api.getViewerContext(proof).email, 'customer@speed-ad.com');
+});
+
+test('two successive logins after grant A expiry never revive proof A under the same GAS key', async () => {
+  const env = runtime('', { oauth: true });
+  const storage = new Map();
+  const loginA = loginClientRuntime(env, storage);
+  await loginA.ui.prepareLogin();
+  const proofA = storage.get(tabProofKey);
+  const authorizationA = new URL(loginA.elements.get('loginLink').href);
+  env.respond(() => tokenResponse(env, authorizationA));
+  const callbackA = loginClientRuntime(env, storage, { code: 'code-a', state: authorizationA.searchParams.get('state') });
+  await callbackA.ui.prepareLogin();
+  assert.equal(callbackA.elements.get('loginLink').hidden, false);
+  assert.equal(env.api.getViewerContext(proofA).email, 'customer@speed-ad.com');
+  env.advance(1800);
+  assert.throws(() => env.api.getViewerContext(proofA), /権限/);
+  const loginB = loginClientRuntime(env, storage);
+  await loginB.ui.prepareLogin();
+  const proofB = storage.get(tabProofKey);
+  assert.notEqual(proofB, proofA);
+  const authorizationB = new URL(loginB.elements.get('loginLink').href);
+  env.respond(() => tokenResponse(env, authorizationB));
+  const callbackB = loginClientRuntime(env, storage, { code: 'code-b', state: authorizationB.searchParams.get('state') });
+  await callbackB.ui.prepareLogin();
+  assert.equal(callbackB.elements.get('loginLink').hidden, false);
+  assert.throws(() => env.api.getViewerContext(proofA), /権限/);
+  assert.throws(() => env.api.listContactSubmissions({}, proofA), /権限/);
+  assert.equal(env.api.getViewerContext(proofB).email, 'customer@speed-ad.com');
+  assert.equal(env.api.listContactSubmissions({}, proofB).submissions.length, 2);
+  assert.equal(env.network.length, 2);
 });
