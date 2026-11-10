@@ -128,7 +128,9 @@ function advanceContactMailSync(options, authProof) {
   var pageCount = Math.max(1, Math.ceil(ids.length / 200));
   var previous = options.catalog || {};
   var snapshotId = mailUuid_(previous.snapshotId);
-  if (options.prepareCatalog === true) return { ok: true, catalog: { snapshotId: snapshotId, digest: digest, nextPageIndex: 0, pageCount: pageCount, total: ids.length, complete: false, startAt: source.startAt } };
+  var catalogRequestId = previous.requestId || (options.prepareCatalog === true ? mailRequestId_() : '');
+  mailCatalogRequestId_(catalogRequestId, snapshotId, 0);
+  if (options.prepareCatalog === true) return { ok: true, catalog: { snapshotId: snapshotId, requestId: catalogRequestId, digest: digest, nextPageIndex: 0, pageCount: pageCount, total: ids.length, complete: false, startAt: source.startAt } };
   var pageIndex = previous.nextPageIndex;
   if (previous.digest !== digest || previous.pageCount !== pageCount || previous.total !== ids.length || previous.startAt !== source.startAt) return mailError_('CONFLICT');
   if (!Number.isInteger(pageIndex) || pageIndex < 0 || pageIndex >= pageCount) throw new Error('受付ID照合のページが不正です。');
@@ -138,10 +140,17 @@ function advanceContactMailSync(options, authProof) {
     lastResult = callMailService_('uploadCaseCatalog', {
       snapshotId: snapshotId, pageIndex: pageIndex, pageCount: pageCount, total: ids.length,
       digest: digest, cases: source.cases.slice(pageIndex * 200, (pageIndex + 1) * 200)
-    }, context);
+    }, context, mailCatalogRequestId_(catalogRequestId, snapshotId, pageIndex));
     if (!lastResult.ok) return lastResult;
   }
-  return { ok: true, catalog: { snapshotId: snapshotId, digest: digest, nextPageIndex: pageIndex, pageCount: pageCount, total: ids.length, complete: pageIndex === pageCount && !!(lastResult.catalog && lastResult.catalog.complete), startAt: source.startAt } };
+  return { ok: true, catalog: { snapshotId: snapshotId, requestId: catalogRequestId, digest: digest, nextPageIndex: pageIndex, pageCount: pageCount, total: ids.length, complete: pageIndex === pageCount && !!(lastResult.catalog && lastResult.catalog.complete), startAt: source.startAt } };
+}
+
+function mailCatalogRequestId_(requestId, snapshotId, pageIndex) {
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(String(requestId || ''))) throw new Error('受付ID照合の操作識別子が不正です。');
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, requestId + '\n' + snapshotId + '\n' + pageIndex, Utilities.Charset.UTF_8);
+  var hex = bytes.map(function (byte) { return ('0' + ((byte + 256) % 256).toString(16)).slice(-2); }).join('');
+  return requestId.slice(0, 14) + '7' + hex.slice(0, 3) + '-' + ((parseInt(hex.charAt(3), 16) & 3) | 8).toString(16) + hex.slice(4, 7) + '-' + hex.slice(7, 19);
 }
 
 function mailCatalogSource_() {

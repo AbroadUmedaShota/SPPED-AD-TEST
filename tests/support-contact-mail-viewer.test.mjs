@@ -6,6 +6,7 @@ import test from 'node:test';
 import { createMailService, MAX_MAIL_DETAIL_JSON_CHARS } from '../99_backend-docs/10_support-contact/mail-service/runtime/service.mjs';
 import { fakeStore } from '../99_backend-docs/10_support-contact/mail-service/runtime/tests/fakeStore.mjs';
 import * as mime from '../99_backend-docs/10_support-contact/mail-service/mime.mjs';
+import { createRequestId, requestExpiresAt } from '../99_backend-docs/10_support-contact/mail-service/runtime/requestIdentity.mjs';
 
 const root = new URL('../99_backend-docs/10_support-contact/viewer-workspace-gas/', import.meta.url);
 const bridge = readFileSync(new URL('MailBridge.gs', root), 'utf8');
@@ -1630,5 +1631,76 @@ test('closure before receipt fails closed while equal and later receipt times ar
     if (closedAt < submitted) assert.throws(operation, /MAIL_CATALOG_INVALID/);
     else assert.equal(operation().ok, true);
     assert.equal(app.calls.length, 0);
+  }
+});
+
+
+test('catalog page identities survive a lost response and cannot be renewed after the planned deadline', async () => {
+  const at = '2026-11-10T09:00:00.000Z';
+  const ids = Array.from({ length: 201 }, (_, index) => `${index.toString(16).padStart(8, '0')}-1111-4111-8111-111111111111`);
+  const app = bridgeRuntime({ ids });
+  app.respond(() => ({ ok: true, catalog: { complete: true } }));
+  const plan = app.api.advanceContactMailSync({ prepareCatalog: true,
+    catalog: { snapshotId: randomUUID(), requestId: createRequestId(new Date(at)) } }).catalog;
+  app.api.advanceContactMailSync({ catalog: plan });
+  const first = app.calls.map((call) => call.envelope);
+  app.api.advanceContactMailSync({ catalog: plan });
+  const retry = app.calls.slice(2).map((call) => call.envelope);
+  assert.equal(first.length, 2);
+  assert.notEqual(first[0].requestId, first[1].requestId);
+  assert.deepEqual(first.map((item) => item.requestId), retry.map((item) => item.requestId));
+  assert.equal(requestExpiresAt(first[0].requestId), '2026-11-17T09:00:00.000Z');
+  assert.equal(requestExpiresAt(first[1].requestId), '2026-11-17T09:00:00.000Z');
+  let clock = new Date(at);
+  const store = fakeStore();
+  const execute = createMailService({ store, gmail: {}, core: {}, now: () => clock });
+  for (const envelope of first) await execute({ ...envelope, issuedAt: clock.toISOString() });
+  const committed = await store.getCatalog();
+  clock = new Date('2026-11-17T08:59:59.999Z');
+  for (const envelope of retry) await execute({ ...envelope, issuedAt: clock.toISOString() });
+  assert.deepEqual(await store.getCatalog(), committed);
+  clock = new Date('2026-11-17T09:00:00.000Z');
+  await assert.rejects(execute({ ...retry[0], issuedAt: clock.toISOString() }), { code: 'MAIL_REQUEST_EXPIRED' });
+  assert.deepEqual(await store.getCatalog(), committed);
+  let attempts = 0;
+  const pending = uiRuntime({ advanceContactMailSync: (options) => options.prepareCatalog ? catalogResponse(options) :
+    { ok: false, error: { code: ++attempts === 1 ? 'MAIL_UPSTREAM_TIMEOUT' : 'MAIL_REQUEST_EXPIRED' } } });
+  await pending.ui.advanceContactMailSyncFromUi();
+  const lost = JSON.parse(JSON.stringify(pending.mail.syncProgress.catalog));
+  await pending.ui.advanceContactMailSyncFromUi();
+  assert.deepEqual(JSON.parse(JSON.stringify(pending.mail.syncProgress.catalog)), lost);
+  assert.equal(pending.mail.syncProgress.catalogPending, true);
+  assert.equal(pending.mail.syncProgress.executionId, undefined);
+  assert.equal(pending.calls.filter((call) => call.args[0].prepareCatalog).length, 1);
+  assert.match(pending.element('mailSyncSummary').textContent, /7日.*自動では再送しません/);
+});
+
+test('validated no-mail refresh resolves an expired operation before a new explicit confirmation', async () => {
+  for (const committed of [false, true]) {
+    let refreshed = false;
+    let writes = 0;
+    const app = uiRuntime({
+      listContactMail: () => ({ ...list([]), noMail: noMail(committed && refreshed ? { confirmation: noMailConfirmation } : { eligible: true }) }),
+      confirmContactCaseNoMail: () => ++writes === 1 ? { ok: false, error: { code: 'MAIL_REQUEST_EXPIRED' } } :
+        { ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync },
+    });
+    await app.ui.loadContactMailList('case', { caseId });
+    await app.ui.confirmContactCaseNoMailFromUi('case');
+    const expiredId = app.mail.case.pendingNoMail.requestId;
+    assert.equal(app.mail.case.pendingNoMail.expired, true);
+    refreshed = true;
+    await app.ui.loadContactMailList('case', { caseId });
+    assert.equal(writes, 1);
+    assert.equal(app.mail.case.pendingNoMail, null);
+    await app.ui.confirmContactCaseNoMailFromUi('case');
+    if (committed) {
+      assert.equal(writes, 1);
+      assert.equal(app.mail.case.noMail.confirmation.email, noMailConfirmation.email);
+    } else {
+      assert.equal(writes, 2);
+      const requests = app.calls.filter((call) => call.name === 'confirmContactCaseNoMail');
+      assert.notEqual(requests[1].args[0].requestId, expiredId);
+      assert.equal(app.mail.case.noMail.confirmation.email, noMailConfirmation.email);
+    }
   }
 });

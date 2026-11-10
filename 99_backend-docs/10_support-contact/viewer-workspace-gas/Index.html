@@ -1702,6 +1702,7 @@
 
     function validateContactMailCatalog(catalog, previous, prepared) {
       if (!catalog || catalog.snapshotId !== previous.snapshotId || !/^[a-f0-9]{64}$/.test(catalog.digest || '') ||
+          catalog.requestId !== previous.requestId || !/^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(catalog.requestId || '') ||
           !Number.isSafeInteger(catalog.total) || catalog.total < 0 || catalog.pageCount !== Math.max(1, Math.ceil(catalog.total / 200)) ||
           !Number.isSafeInteger(catalog.nextPageIndex) || catalog.nextPageIndex < 0 || catalog.nextPageIndex > catalog.pageCount ||
           typeof catalog.complete !== 'boolean' || (typeof catalog.startAt !== 'string' || !Number.isFinite(Date.parse(catalog.startAt))) ||
@@ -1725,7 +1726,7 @@
       try {
         if (!progress.executionId) {
           element.textContent = '正本の受付IDを照合中...';
-          progress.catalog = progress.catalog || { snapshotId: window.crypto.randomUUID(), nextPageIndex: 0 };
+          progress.catalog = progress.catalog || { snapshotId: window.crypto.randomUUID(), requestId: contactMailRequestId(), nextPageIndex: 0 };
           if (!progress.catalog.digest) {
             const prepared = contactMailResult(await callContactMailSync({ prepareCatalog: true, catalog: progress.catalog }));
             if (serial !== contactMailState.syncSerial) return;
@@ -1923,7 +1924,7 @@
         current.page = result.page;
         current.sync = newerObservation ? contactMailState.sync : result.sync;
         current.noMail = current.scope === 'case' ? result.noMail : null;
-        if (current.noMail && (current.noMail.confirmation || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)))) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
+        if (current.noMail && (current.noMail.confirmation || current.pendingNoMail?.expired === true || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)))) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
         if (current.noMail && !current.pendingNoMail) current.noMailError = '';
         current.status = 'loaded';
         renderContactMailView(view);
@@ -2098,7 +2099,8 @@
       current.noMailError = '';
       renderContactMailView(view);
       try {
-        const result = contactMailResult(await contactCaseNoMailCall({ ...current.pendingNoMail }));
+        const { caseId, contextToken, requestId } = current.pendingNoMail;
+        const result = contactMailResult(await contactCaseNoMailCall({ caseId, contextToken, requestId }));
         if (serial !== current.serial) return;
         validateContactMailSync(result.sync);
         const noMail = validateContactCaseNoMail(result.noMail, result.sync);
@@ -2121,6 +2123,7 @@
         if (serial !== current.serial) return;
         current.writing = false;
         if (['AUTH_REQUIRED', 'FORBIDDEN', 'MAIL_AUTH_REQUIRED', 'MAIL_FORBIDDEN'].includes(error.message)) { showDenied('認証を確認できません。専用Googleログインから認証し直してください。'); return; }
+        if (error.message === 'MAIL_REQUEST_EXPIRED' && current.pendingNoMail) current.pendingNoMail.expired = true;
         if (['MAIL_MAPPING_CHANGED', 'MAIL_CATALOG_CHANGED', 'MAIL_REQUEST_CONFLICT', 'MAIL_CASE_NOT_FOUND', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_INVALID_REQUEST'].includes(error.message)) {
           delete contactMailState.noMailRequests[current.caseId];
           current.pendingNoMail = null;
