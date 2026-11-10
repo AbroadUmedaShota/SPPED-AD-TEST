@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { createGoogleVerifier } from '../auth.mjs';
-import { createMailService, catalogDigest } from '../service.mjs';
+import { createMailService, catalogDigest, MAX_MAIL_DETAIL_JSON_CHARS } from '../service.mjs';
 import { MailError } from '../errors.mjs';
 import { createMailHttpServer } from '../http.mjs';
 import { createGmailAdapter } from '../googleAdapters.mjs';
@@ -186,6 +186,25 @@ test('mail body observation includes independent HTML beside plain text', async 
   const detail = await f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'mixed' }));
   assert.equal(detail.message.bodyText, 'plain introduction\nindependent inquiry');
   assert.equal(detail.message.bodyAvailability, 'verified');
+});
+
+test('sync and detail never verify a body whose complete JSON cannot pass the GAS detail ceiling', async () => {
+  for (const tooLarge of ['\t'.repeat(MAX_MAIL_DETAIL_JSON_CHARS / 2), 'あ'.repeat(11 * 1024 * 1024)]) {
+    const f = fixture([A]);
+    const guardedCore = { ...core, readMessageText: async () => tooLarge,
+      classifyMessage: () => ({ matchState: 'matched', caseId: A, reason: 'trusted_current_case_id', evidence: { bodyCaseIds: [A], currentCaseIds: [A], parentMessageIds: [] } }) };
+    const execute = createMailService({ store: f.store, gmail: f.gmail, core: guardedCore, now: () => new Date(NOW) });
+    f.messages.set('oversized', gmailMessage('oversized'));
+    await execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' }));
+    assert.equal((await f.store.getMessage('oversized')).bodyAvailability, 'unavailable');
+    f.store.seed(record('oversized', { bodyAvailability: 'verified' }));
+    const result = await execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'oversized' }));
+    assert.equal(result.message.bodyAvailability, 'unavailable');
+    assert.equal(result.message.bodyText, '');
+    assert.equal(result.message.reviewReady, false);
+    assert.equal((await f.store.getMessage('oversized')).bodyAvailability, 'unavailable');
+    assert.ok(JSON.stringify(result).length <= MAX_MAIL_DETAIL_JSON_CHARS);
+  }
 });
 
 test('forwarded attachment child content cannot be acknowledged as an empty transfer', async () => {

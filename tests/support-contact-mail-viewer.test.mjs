@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 import { createHash, randomUUID, webcrypto } from 'node:crypto';
 import vm from 'node:vm';
 import test from 'node:test';
+import { createMailService, MAX_MAIL_DETAIL_JSON_CHARS } from '../99_backend-docs/10_support-contact/mail-service/runtime/service.mjs';
+import { fakeStore } from '../99_backend-docs/10_support-contact/mail-service/runtime/tests/fakeStore.mjs';
+import * as mime from '../99_backend-docs/10_support-contact/mail-service/mime.mjs';
 
 const root = new URL('../99_backend-docs/10_support-contact/viewer-workspace-gas/', import.meta.url);
 const bridge = readFileSync(new URL('MailBridge.gs', root), 'utf8');
@@ -355,6 +358,49 @@ test('mail UI navigates individual messages across page boundaries and renders t
   assert.doesNotMatch(markup, /<script>|token=secret/);
   assert.match(markup, /本文未検証 1件/);
   assert.match(markup, /全件確認に必要な処理が残っています/);
+});
+
+test('maximum decoded bodies survive runtime JSON, GAS bridge and UI without truncation', async () => {
+  const tail = 'END-OF-COMPLETE-BODY';
+  for (const unit of ['a', '"\\\t\r\n']) {
+    const bodyText = unit.repeat(Math.ceil((2 * 1024 * 1024 - tail.length) / unit.length)).slice(0, 2 * 1024 * 1024 - tail.length) + tail;
+    const at = '2026-11-10T00:00:00.000Z';
+    const attachments = Array.from({ length: 498 }, (_, index) => ({ partId: `0.${index + 1}`,
+      name: '"'.repeat(255), mimeType: `application/x-${'m'.repeat(240)}`, size: 0,
+      availability: 'verified', transferVersion: 1 }));
+    const stored = { ...detail(), subject: '"'.repeat(4096), from: '"'.repeat(4096), to: '"'.repeat(4096),
+      bodyAvailability: 'unverified', attachmentCount: attachments.length, attachments };
+    delete stored.bodyText;
+    const store = fakeStore([caseId], { state: 'complete', startAt: '2026-11-01T00:00:00.000Z' });
+    store.seed(stored);
+    const message = { id: 'mail1', internalDate: String(Date.parse(at)), labelIds: [], payload: {
+      mimeType: 'multipart/mixed', parts: [{ mimeType: 'text/plain', body: { size: Buffer.byteLength(bodyText), data: Buffer.from(bodyText).toString('base64url') } },
+        ...attachments.map((item) => ({ mimeType: item.mimeType, filename: item.name, body: { size: 0, data: '' } }))]
+    } };
+    const service = createMailService({ store, gmail: {
+      getMessageMetadata: async () => ({ id: 'mail1', internalDate: message.internalDate, labelIds: [] }),
+      getMessage: async () => message, getAttachment: async () => { throw new Error('unexpected attachment'); }
+    }, core: mime, now: () => new Date(at) });
+    const result = await service({ contractVersion: 1, operation: 'getMail', requestId: randomUUID(), issuedAt: at,
+      actor: { email: 'reader@abroad-o.com', authMode: 'domain' }, payload: { scope: 'case', caseId, messageId: 'mail1' } });
+    assert.equal(result.message.bodyAvailability, 'verified');
+    assert.equal(result.message.bodyText, bodyText);
+    assert.ok(JSON.stringify(result).length > 2097152);
+    assert.ok(JSON.stringify(result).length < MAX_MAIL_DETAIL_JSON_CHARS);
+    const gas = bridgeRuntime();
+    assert.equal(gas.api.MAIL_DETAIL_RESPONSE_CHARS, MAX_MAIL_DETAIL_JSON_CHARS);
+    gas.respond(() => result);
+    const app = uiRuntime({ listContactMail: () => list([summary()]),
+      getContactMailMessage: (options) => JSON.parse(JSON.stringify(gas.api.getContactMailMessage(options))) });
+    await app.ui.loadContactMailList('case', { caseId });
+    assert.equal(app.mail.case.message.bodyText, bodyText);
+    assert.match(app.element('caseMailSection').innerHTML, /END-OF-COMPLETE-BODY<\/div>/);
+    assert.equal(app.mail.case.message.reviewReady, true);
+    gas.respond(() => ({ raw: ' '.repeat(MAX_MAIL_DETAIL_JSON_CHARS + 1) }));
+    assert.equal(gas.api.getContactMailMessage({ scope: 'case', caseId, messageId: 'mail1' }).error.code, 'MAIL_INVALID_RESPONSE');
+    gas.respond(() => ({ raw: ' '.repeat(2097153) }));
+    assert.equal(gas.api.getContactMailSyncStatus().error.code, 'MAIL_INVALID_RESPONSE');
+  }
 });
 
 test('unconfigured or malformed mail responses never render as zero results', async () => {

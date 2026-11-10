@@ -1,4 +1,7 @@
 /** Authenticated, fixed-operation bridge to the separately deployed mail service. */
+// A 2 MiB decoded body can grow when JSON escapes quotes, backslashes and controls.
+// Keep this getMail-only ceiling aligned with MAX_MAIL_DETAIL_JSON_CHARS in service.mjs.
+var MAIL_DETAIL_RESPONSE_CHARS = 16 * 1024 * 1024;
 var MAIL_SAFE_ERROR_CODES = [
   'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH', 'MAIL_SERVICE_UNAVAILABLE',
   'MAIL_INVALID_RESPONSE', 'INVALID_REQUEST', 'NOT_FOUND', 'CONFLICT',
@@ -268,7 +271,8 @@ function callMailService_(operation, payload, context, requestId) {
     });
     var status = response.getResponseCode();
     var body = response.getContentText();
-    if (body.length > 2097152) return mailError_('MAIL_INVALID_RESPONSE');
+    var responseLimit = operation === 'getMail' ? MAIL_DETAIL_RESPONSE_CHARS : 2097152;
+    if (body.length > responseLimit) return mailError_('MAIL_INVALID_RESPONSE');
     var result;
     try { result = JSON.parse(body); } catch (_parseError) { return mailError_(status === 401 || status === 403 ? 'MAIL_SERVICE_AUTH' : 'MAIL_SERVICE_UNAVAILABLE'); }
     if (!result || typeof result !== 'object' || typeof result.ok !== 'boolean') return mailError_('MAIL_INVALID_RESPONSE');

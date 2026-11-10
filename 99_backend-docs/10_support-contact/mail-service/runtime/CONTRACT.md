@@ -39,6 +39,10 @@ GASの`advanceSync`送信前に、正本検査での計画変更・読取り失�
 
 一覧は日時・messageId降順の50件。返却は`{ok:true,messages,page:{nextPageToken,previousPageToken,pageSize},sync}`。詳細は`message.bodyText`と添付descriptorを返す。MIME partIdはrootを`0`、子を`0.1`のように表す。本文は安全なテキストとし、HTML・remote画像を実行しない。同じ`multipart/alternative`内だけ、デコード・安全化後に空白以外の表示文字があるプレーンテキスト、その他の表現の順で1表現を選び、全表現が空なら空本文を維持する。選択のために取得した各表現の元バイト数も本文上限に合算する。独立した本文partは順に連結する。旧秘密付きURLを表示・ログ前に除去する。
 
+本文の元バイト上限は2MiBを維持し、切詰めない。`getMail` の応答JSON全体（本文・メタ情報・`ok`を含む）の上限を16Mi文字かつUTF-8で32MiBとし、GAS bridgeでも16Mi文字の上限を使う。他のRPCは従来の2Mi文字を維持する。JSONエスケープで本文より応答が増えても、2MiBのASCIIや引用符・バックスラッシュ・改行・タブを末尾まで運べる。同期時と詳細取得時の両方で完全なJSONのサイズを検査し、上限を超える場合は本文を`unavailable`にして確認可と扱わない。メタ情報だけでも上限を超える場合は固定エラーで停止する。これは転送可能なサイズの確認であり、利用者が読んだ証拠は明示確認操作で記録する。
+
+Apps Scriptの[URL Fetch上限](https://developers.google.com/apps-script/guides/services/quotas)は1応答50MBで、[HTML Service通信](https://developers.google.com/apps-script/guides/html/communication)にはこの詳細応答より低いサイズ上限の記載がない。ローカルでは実service→応答JSON→GAS bridge VM→画面コードの末尾まで確認する。実配備のChrome/HTML Service経由でも上限本文の末尾と確認記録を検証し、ローカルVMだけで本番の配信成功と扱わない。
+
 添付は元サイズ・配信サイズとも最大64MiBとし、各要求でmessage内の所有partを再検証して512KiB以下のbase64 chunkを返す。返却は`{attachment:{partId,name,mimeType,size,previewKind},offset,nextOffset,totalSize,dataBase64,done}`。画像・PDFはsignature確認、テキストは安全なUTF-8プレビュー、それ以外はoctet-stream取得。転送メール添付などで元のバイト列が取得できず子MIME partだけが存在する場合は、空ファイルに置き換えず取得不能とする。テキスト添付の表示用データも秘密URLを除去する。
 
 Gmail adapterは添付取得応答を固定窓口・message ID・attachment IDで識別し、Cloud Runのプロセスメモリに1添付分だけ保持する。64MiBのdecoded相当（base64では約85.4MiB）が上限で、アイドル120秒・取得開始から絶対5分の短い方で破棄する。同じキーの取得中要求は共有し、別添付の取得が進行中なら`MAIL_ATTACHMENT_BUSY`で明示再操作を求める。busyは取得不能や確認済みへ変更しない。各chunkの利用者・案件・最新messageとpartの確認はcacheにかかわらず行う。cache hitでも現在のOAuth scopeを検証し、本文・添付をFirestore・ファイル・ログへ保存しない。別instance、期限切れ、再起動、別添付への切替では再取得するため、取得1回は保証しない。デコード・安全化・digest計算はchunkごとに行うので、大容量添付の待ち時間・メモリ・API回数・費用は本番接続前に実測する。

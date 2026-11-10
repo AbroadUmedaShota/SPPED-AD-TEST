@@ -13,6 +13,24 @@ const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMa
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
 const CHUNK_SIZE = ATTACHMENT_CHUNK_SIZE;
+// GAS applies this ceiling only to getMail. Include the complete JSON envelope,
+// not just decoded body bytes, before treating the body as deliverable.
+export const MAX_MAIL_DETAIL_JSON_CHARS = 16 * 1024 * 1024;
+const MAX_MAIL_DETAIL_JSON_BYTES = 32 * 1024 * 1024;
+
+function mailDetail(record, bodyText, attachments = record.attachments || []) {
+  return { message: { ...summary(record), bodyText, bodyAvailability: record.bodyAvailability,
+    reviewReady: attachmentReviewReady(record), attachments: attachments.map((item) => ({
+      partId: item.partId, name: item.name, mimeType: item.mimeType, size: item.size,
+      ...(typeof item.inline === 'boolean' ? { inline: item.inline } : {}),
+      availability: record.attachments?.find((stored) => stored.partId === item.partId)?.availability || 'unverified'
+    })) } };
+}
+
+function detailFitsResponse(record, bodyText, attachments) {
+  const serialized = JSON.stringify({ ok: true, ...mailDetail(record, bodyText, attachments) });
+  return serialized.length <= MAX_MAIL_DETAIL_JSON_CHARS && Buffer.byteLength(serialized, 'utf8') <= MAX_MAIL_DETAIL_JSON_BYTES;
+}
 
 export function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -259,8 +277,12 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function getMail(payload) {
     const record = await requireRecord(payload, { allowUnavailable: true });
-    const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable', reviewReady: false,
-      attachments: (item.attachments || []).map(({ partId, name, mimeType, size, availability }) => ({ partId, name, mimeType, size, availability })) } });
+    const metadataOnly = (item) => {
+      const result = mailDetail({ ...item, bodyAvailability: 'unavailable' }, '');
+      result.message.reviewReady = false;
+      assertMail(detailFitsResponse(result.message, ''), 'MAIL_CONTENT_UNAVAILABLE', 410);
+      return result;
+    };
     if (record.unavailable) return metadataOnly(await requireRecord(payload, { allowUnavailable: true }));
     let message;
     try { message = await fetchMessage(record.messageId); } catch (error) {
@@ -271,16 +293,18 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     let bodyText;
     try {
       bodyText = await core.readMessageText(message, gmail.getAttachment.bind(gmail));
+      assertMail(detailFitsResponse({ ...record, bodyAvailability: 'verified' }, bodyText, parsed.attachments), 'MAIL_CONTENT_UNAVAILABLE', 410);
       await store.recordBodyObservation(record.messageId, 'verified', now().toISOString());
     } catch {
       await store.recordBodyObservation(record.messageId, 'unavailable', now().toISOString());
       bodyText = '';
     }
     const latest = await requireRecord(payload);
-    return { message: { ...summary(latest), bodyText, bodyAvailability: latest.bodyAvailability, reviewReady: attachmentReviewReady(latest), attachments: parsed.attachments.map((item) => ({
-      partId: item.partId, name: item.name, mimeType: item.mimeType, size: item.size, inline: item.inline,
-      availability: latest.attachments?.find((stored) => stored.partId === item.partId)?.availability || 'unverified'
-    })) } };
+    if (!detailFitsResponse(latest, bodyText, parsed.attachments)) {
+      await store.recordBodyObservation(record.messageId, 'unavailable', now().toISOString());
+      return metadataOnly(await requireRecord(payload));
+    }
+    return mailDetail(latest, bodyText, parsed.attachments);
   }
 
   async function listIssues(payload) {
@@ -508,7 +532,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const to = scrub(core.headerValue(headers, 'To'));
     const rawRfcMessageId = core.headerValue(headers, 'Message-ID').trim();
     const rfcMessageId = rawRfcMessageId.length <= 512 && /^<[^<>\s]+@[^<>\s]+>$/.test(rawRfcMessageId) ? rawRfcMessageId : '';
-    await store.upsertIndexedMessage({ messageId: id, sourceKind: 'mail', threadId: message.threadId || '', internalDate,
+    const indexedRecord = { messageId: id, sourceKind: 'mail', threadId: message.threadId || '', internalDate,
       subject: scrub(core.headerValue(headers, 'Subject')), from, to,
       direction: Array.isArray(message.labelIds) ? (message.labelIds.includes('SENT') ? 'sent' : 'received') : 'unknown',
       attachmentCount: parsed.attachments.length, rfcMessageId, unavailable: false,
@@ -517,7 +541,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       bodyAvailability, bodyCheckedAt: now().toISOString(),
       unverifiedAttachmentCount: parsed.attachments.length, unavailableAttachmentCount: 0,
       ...classification, version: 1, firstReview: null, indexedAt: now().toISOString(),
-      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) }, latestCatalog.digest, policy);
+      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) };
+    if (indexedRecord.bodyAvailability === 'verified' && !detailFitsResponse(indexedRecord, bodyText, parsed.attachments)) indexedRecord.bodyAvailability = 'unavailable';
+    await store.upsertIndexedMessage(indexedRecord, latestCatalog.digest, policy);
   }
 
   async function reconcilePending(payload, requestId, actor) {
