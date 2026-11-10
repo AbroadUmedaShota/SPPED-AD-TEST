@@ -1,4 +1,4 @@
----
+﻿---
 owner: shared-docs
 status: implementation-local-verified
 last_reviewed: 2026-11-10
@@ -8,17 +8,17 @@ last_reviewed: 2026-11-10
 
 ## 目的と配置
 
-`abroad-o.com` の利用者が通常のブックマークから問い合わせ一覧・詳細・添付画像を確認し、対応ステータスと内部メモを更新できるようにする。
+`abroad-o.com` の利用者および単一の外部例外 `customer@speed-ad.com` が同じ通常URLのブックマークから問い合わせ一覧・詳細・添付画像を確認し、対応ステータスと内部メモを更新できるようにする。
 
 実装は `99_backend-docs/10_support-contact/viewer-workspace-gas/`。旧 `viewer-gas` の `Code.gs` と `Index.html` を複製し、認証と添付境界を変更する。旧viewerと既存送信GASはこの実装の変更対象に含めない。
 
 ## 認証と権限
 
-- Web Appは会社アカウント `s-umeda@abroad-o.com` から別プロジェクトへ配備する。manifestは `executeAs: USER_DEPLOYING` / `access: DOMAIN`。
-- `doGet` と全公開RPCで `Session.getActiveUser().getEmail()` を取得し、前後空白を除去・小文字化する。ローカル部が空でなく、ドメインが厳密に `abroad-o.com` と一致する場合のみ許可する。
-- メール空欄、取得失敗、匿名、外部ドメイン、サブドメインはサーバーで拒否し、データアクセスに進まない。`getEffectiveUser`、引数やUIのメール、トークンを本人確認の代替にしない。
-- 全社内利用者に同じ閲覧・ステータス/メモ更新権限を与える。`handled_by` にはサーバーで取得した実利用者メール、`handled_at` には更新日時を記録する。
-- トークン認証、トークン検証API、トークンのsessionStorage保存は持たない。社内アカウントで通常URLを開き直せる。
+- Web Appは会社アカウント `s-umeda@abroad-o.com` から別プロジェクトへ配備する。manifestは `executeAs: USER_DEPLOYING` / `access: ANYONE`（Googleログイン必須）。`ANYONE_ANONYMOUS` は使用しない。
+- `doGet` と全公開RPCで `Session.getActiveUser().getEmail()` を取得し、前後空白を除去・小文字化する。ローカル部が空でなく、ドメインが厳密に `abroad-o.com` と一致するか、メール全体が `customer@speed-ad.com` と完全一致する場合のみ許可する。外部例外はこの1件だけとし、他の `speed-ad.com` 利用者やメール別名・サブドメインは許可しない。
+- メール空欄、取得失敗、匿名、上記1件以外の外部メール、サブドメインはサーバーで拒否し、データアクセスに進まない。`getEffectiveUser`、引数やUIのメール、トークンを本人確認の代替にしない。
+- 全社内利用者と例外アカウントに同じ閲覧・ステータス/メモ更新権限を与える。`handled_by` にはサーバーで取得した実利用者メール、`handled_at` には更新日時を記録する。
+- トークン認証、トークン検証API、トークンのsessionStorage保存は持たない。許可アカウントで同じ通常URLを開き直せる。
 
 ## 保存先とRPC
 
@@ -52,11 +52,12 @@ last_reviewed: 2026-11-10
 
 配備後に別途確認する事項（本変更では実施しない）:
 
-1. 配備者、実行者、組織内アクセス設定が上記と一致する。
+1. 配備者、実行者、Googleログイン必須のアクセス設定が上記と一致する。
 2. 異なる社内利用者2名で通常ブックマークから一覧/詳細/添付/更新を利用でき、`handled_by` が各本人になる。
 3. 初期一覧対象外の受付IDも `?id=` から開け、再読込でも利用できる。
-4. 空メール・外部利用者・匿名アクセスが拒否される。社内でもSessionメールが取得できない場合は拒否を維持して設定を確認する。
-5. 対象Sheet/Driveへの配備者の既存権限を確認し、新しい共有なしで操作できる。旧viewerの利用経路を維持する。
-6. Chrome / Firefox / Edgeで一覧・編集・保存・添付拡大・未保存確認と表示崩れ/consoleエラーを確認する。
+4. `customer@speed-ad.com` 本人のGoogleログインで、同じ通常URLから利用者メールを取得でき、一覧/詳細/添付/更新が利用でき、`handled_by` に本人メールが残ることを確認する。この外部アカウントのSessionメールが実際に提供されるかは未確認であり、ライブ確認前に利用可能とは判定しない。
+5. 空メール・他の `speed-ad.com` 利用者を含む非許可利用者・匿名アクセスが拒否される。社内/例外アカウントでもSessionメールが取得できない場合は拒否を維持し、配備者やUIのメールへ代替しない。
+6. 対象Sheet/Driveへの配備者の既存権限を確認し、新しい共有なしで操作できる。旧viewerの利用経路を維持する。
+7. Chrome / Firefox / Edgeで一覧・編集・保存・添付拡大・未保存確認と表示崩れ/consoleエラーを確認する。
 
 配備手順は [新viewer README](../../../99_backend-docs/10_support-contact/viewer-workspace-gas/README.md) を参照。ローカル検証の合格は実配備・実アカウントでの受入完了を意味しない。

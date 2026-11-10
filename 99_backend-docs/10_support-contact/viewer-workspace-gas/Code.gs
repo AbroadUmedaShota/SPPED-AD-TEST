@@ -179,7 +179,7 @@ function getViewerContext_() {
   var email = getActiveUserEmail_();
   return {
     email: email,
-    allowed: /^[^\s@]+@abroad-o\.com$/.test(email),
+    allowed: /^[^\s@]+@abroad-o\.com$/.test(email) || email === 'customer@speed-ad.com',
     authMode: 'domain'
   };
 }
@@ -187,7 +187,7 @@ function getViewerContext_() {
 function requireViewer_() {
   var context = getViewerContext_();
   if (!context.allowed) {
-    throw new Error('このお問い合わせ確認アプリを利用する権限がありません。abroad-o.com のアカウントで開いてください。');
+    throw new Error('このお問い合わせ確認アプリを利用する権限がありません。abroad-o.com または customer@speed-ad.com のアカウントで開いてください。');
   }
   return context;
 }

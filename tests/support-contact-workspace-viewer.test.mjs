@@ -80,14 +80,14 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
 
 const deniedCalls = [
   ['doGet', [{ parameter: { id: 'case-a', token: 'old-token', email: 'reader@abroad-o.com' } }]],
-  ['getViewerContext', ['old-token', { email: 'reader@abroad-o.com', allowed: true }]],
+  ['getViewerContext', ['old-token', { email: 'customer@speed-ad.com', allowed: true }]],
   ['listContactSubmissions', [{ status: 'all', token: 'old-token', email: 'reader@abroad-o.com' }]],
   ['getContactSubmission', ['case-a', 'old-token']],
   ['getAttachmentPreview', ['case-a', 'file-a', 'old-token']],
   ['updateContactSubmissionStatus', ['case-a', '対応中', 'memo', { email: 'reader@abroad-o.com', token: 'old-token' }]],
 ];
 
-for (const email of ['', null, 'outsider@example.com', 'customer@speed-ad.com', 'reader@sub.abroad-o.com', 'reader@abroad-o.com.evil', 'reader@evilabroad-o.com', 'reader@@abroad-o.com', '@abroad-o.com']) {
+for (const email of ['', null, 'outsider@example.com', 'other@speed-ad.com', 'customer+alias@speed-ad.com', 'customer@sub.speed-ad.com', 'customer@speed-ad.com.evil', 'reader@sub.abroad-o.com', 'reader@abroad-o.com.evil', 'reader@evilabroad-o.com', 'reader@@abroad-o.com', '@abroad-o.com']) {
   test(`all public entry points deny ${JSON.stringify(email)} before datastore access`, () => {
     const env = runtime(email);
     for (const [name, args] of deniedCalls) {
@@ -105,14 +105,15 @@ test('unavailable Session identity fails closed for every public entry point', (
   assert.deepEqual(env.accesses, []);
 });
 
-for (const email of ['reader@abroad-o.com', '  AnOther.User@ABROAD-O.COM  ']) {
-  test(`company identity ${email} reads and updates with actual normalized actor`, () => {
+for (const email of ['reader@abroad-o.com', '  AnOther.User@ABROAD-O.COM  ', 'customer@speed-ad.com', '  CuStOmEr@SPEED-AD.COM  ']) {
+  test(`allowed identity ${email} reads and updates with actual normalized actor`, () => {
     const { api, accesses, rows, headers, templates } = runtime(email);
     const normalized = email.trim().toLowerCase();
     api.doGet({ parameter: { id: 'case-b' } });
     assert.equal(templates[0].initialSubmissionId, 'case-b');
     assert.equal(templates[0].viewerContext.email, normalized);
     assert.equal(api.getViewerContext().allowed, true);
+    assert.equal(api.getAttachmentPreview('case-a', 'file-a').fileId, 'file-a');
     const list = api.listContactSubmissions({ status: 'all' });
     assert.equal(list.viewerEmail, normalized);
     assert.equal(list.counts.total, 2);
@@ -184,9 +185,9 @@ test('only the approved RPC surface is public; no cleanup, setup or property wri
   assert.equal(existsSync(new URL('.clasp.json', root)), false);
 });
 
-test('manifest restricts deployment to domain, deployer execution and minimum used services', () => {
+test('manifest requires Google sign-in, deployer execution and minimum used services', () => {
   const manifest = JSON.parse(readFileSync(new URL('appsscript.json', root), 'utf8'));
-  assert.deepEqual(manifest.webapp, { executeAs: 'USER_DEPLOYING', access: 'DOMAIN' });
+  assert.deepEqual(manifest.webapp, { executeAs: 'USER_DEPLOYING', access: 'ANYONE' });
   assert.deepEqual(manifest.oauthScopes.slice().sort(), [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive.readonly',
@@ -226,12 +227,19 @@ function uiRuntime(env = runtime(), initialId = '') {
   const calls = [];
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, {
-      value: id === 'statusFilter' ? 'active' : '',
+      _value: id === 'statusFilter' ? 'active' : '',
+      get value() { return this._value; },
+      set value(value) {
+        const text = String(value);
+        this._value = id === 'statusSelect' && !['未対応', '対応中', '対応済み', '保留'].includes(text) ? '' : text;
+      },
       hidden: true,
       innerHTML: '',
       classList: { add() {}, remove() {} },
       options: [{ value: 'active', textContent: '対応が必要' }],
-      addEventListener() {}, removeAttribute() {}, setAttribute() {},
+      listeners: new Map(),
+      addEventListener(type, listener) { this.listeners.set(type, listener); },
+      removeAttribute() {}, setAttribute() {},
       querySelectorAll: () => [],
     });
     return elements.get(id);
@@ -251,7 +259,15 @@ function uiRuntime(env = runtime(), initialId = '') {
   };
   const context = {
     window: { CONTACT_VIEWER_INITIAL_ID: initialId, CONTACT_VIEWER_CONTEXT: { allowed: true, email: 'spoof@abroad-o.com' } },
-    document: { getElementById: element, querySelectorAll: () => [], addEventListener() {} },
+    document: {
+      getElementById: element,
+      querySelectorAll: (selector) => selector === '.quick-status' ? ['対応中', '対応済み', '保留'].map((status) => {
+        const button = element(`quick-${status}`);
+        button.dataset = { status };
+        return button;
+      }) : [],
+      addEventListener() {},
+    },
     google: { script: { run } },
     URL, URLSearchParams,
   };
@@ -293,6 +309,40 @@ test('ordinary bookmark loads without token and UI saves through real authentica
   const preview = await ui.ensureAttachmentPreviewLoaded(0);
   assert.equal(preview.dataUrl, 'data:image/webp;base64,AQID');
   assert.ok(calls.some(([name, id, fileId]) => name === 'getAttachmentPreview' && id === 'case-a' && fileId === 'file-a'));
+});
+
+test('recorded Save click listener preserves selected status when passed a MouseEvent', async () => {
+  const { ui, elements, calls, env } = uiRuntime();
+  await ui.loadList();
+  const button = elements.get('saveStatusButton');
+  elements.get('statusSelect').value = '対応中';
+  elements.get('internalNote').value = 'saved by button click';
+  const event = {
+    type: 'click', target: button, currentTarget: button, button: 0, bubbles: true,
+    isTrusted: true, preventDefault() {},
+    [Symbol.toStringTag]: 'MouseEvent',
+  };
+  button.listeners.get('click')(event);
+  await new Promise(setImmediate);
+  const update = calls.find(([name]) => name === 'updateContactSubmissionStatus');
+  assert.equal(update[2], '対応中');
+  const saved = env.api.getContactSubmission('case-a').submission;
+  assert.equal(saved.handled_status, '対応中');
+  assert.equal(saved.internal_note, 'saved by button click');
+  assert.equal(saved.handled_by, 'reader@abroad-o.com');
+  assert.equal(elements.get('statusSaveMessage').textContent, '保存しました。');
+});
+
+test('recorded quick-status click listeners still save each explicit status', async () => {
+  for (const status of ['対応中', '対応済み', '保留']) {
+    const { ui, calls, env } = uiRuntime();
+    await ui.loadList();
+    const button = ui.document.querySelectorAll('.quick-status').find((item) => item.dataset.status === status);
+    button.listeners.get('click')({ type: 'click', target: button, currentTarget: button, button: 0 });
+    await new Promise(setImmediate);
+    assert.equal(calls.find(([name]) => name === 'updateContactSubmissionStatus')[2], status);
+    assert.equal(env.api.getContactSubmission('case-a').submission.handled_status, status);
+  }
 });
 
 test('spoofed frontend context cannot authorize bootstrap', async () => {
