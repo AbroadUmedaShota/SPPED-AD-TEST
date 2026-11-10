@@ -176,3 +176,39 @@ test('revoked or inconsistent stored absence is hidden and a fresh action record
     assert.equal(db.records.get(`${root}/events/generated`).actor, actor.email);
   }
 });
+
+test('acceptance residual lists match fixed-cutoff counts while ordinary queues retain later mail', async () => {
+  const f = fixture(); const after = '2026-11-10T00:00:00.001Z';
+  for (const [suffix, internalDate] of [['exact', END], ['later', after]]) {
+    for (const matchState of ['pending', 'matched']) f.store.seed({ messageId: `${matchState}-${suffix}`, internalDate,
+      matchState, caseId: matchState === 'matched' ? A : null, firstReview: null, unavailable: true,
+      bodyAvailability: matchState === 'pending' ? 'unverified' : 'unavailable', unverifiedAttachmentCount: 1, unavailableAttachmentCount: 1 });
+  }
+  const status = (await f.execute(f.envelope('getSyncStatus'))).sync;
+  for (const [kind, countField] of [['pending', 'pendingCount'], ['unreviewed', 'unreviewedCount'],
+    ['unavailable', 'unavailableCount'], ['bodyUnverified', 'bodyUnverifiedCount'], ['bodyUnavailable', 'bodyUnavailableCount'],
+    ['attachmentUnverified', 'attachmentUnverifiedCount'], ['attachmentUnavailable', 'attachmentUnavailableCount']]) {
+    const result = await f.execute(f.envelope('listMailIssues', { kind }));
+    assert.equal(result.targets.length, status[countField], kind);
+    assert.ok(result.targets.every((item) => item.message.internalDate === END), kind);
+  }
+  assert.deepEqual((await f.execute(f.envelope('listPendingMail'))).messages.map((item) => item.messageId), ['pending-later', 'pending-exact']);
+  assert.deepEqual((await f.execute(f.envelope('listUnreviewedMail'))).messages.map((item) => item.messageId), ['matched-later', 'matched-exact']);
+});
+
+test('acceptance residual cursors and snapshots cannot survive a changed cutoff', async () => {
+  const ids = Array.from({ length: 55 }, (_, index) => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`);
+  const f = fixture(ids);
+  for (let index = 0; index < 55; index++) f.store.seed({ messageId: `pending-${String(index).padStart(3, '0')}`,
+    internalDate: END, matchState: 'pending', caseId: null, firstReview: null });
+  const tokens = new Map();
+  for (const kind of ['pending', 'coverage']) tokens.set(kind, (await f.execute(f.envelope('listMailIssues', { kind }))).page.nextPageToken);
+  assert.ok([...tokens.values()].every(Boolean));
+  const lease = await f.store.acquireSyncLease('cutoff-change');
+  await f.store.setSyncState({ ...f.state, cutoffAt: '2026-11-10T00:00:00.001Z' }, lease); await f.store.releaseSyncLease(lease);
+  for (const [kind, pageToken] of tokens) await assert.rejects(f.execute(f.envelope('listMailIssues', { kind, pageToken })), { code: 'MAIL_INVALID_REQUEST' });
+  const unknown = await f.store.acquireSyncLease('missing-cutoff');
+  await f.store.setSyncState({ ...f.state, cutoffAt: null }, unknown); await f.store.releaseSyncLease(unknown);
+  await assert.rejects(f.execute(f.envelope('listMailIssues', { kind: 'pending' })), { code: 'MAIL_PERIOD_REQUIRED' });
+  assert.equal((await f.execute(f.envelope('listPendingMail'))).messages.length, 50);
+});

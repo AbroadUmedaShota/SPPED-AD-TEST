@@ -284,14 +284,16 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function listIssues(payload) {
-    const startAt = await activeStartAt();
+    const state = await store.getSyncState();
+    const startAt = periodStart(state?.startAt); const cutoffAt = periodStart(state?.cutoffAt);
+    assertMail(startAt && cutoffAt && startAt <= cutoffAt, 'MAIL_PERIOD_REQUIRED', 409);
     const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted', 'unknownClosure', 'expiredRetention'];
     const kind = payload.kind;
     assertMail(kinds.includes(kind));
     const currentCatalog = await store.getCatalog();
     assertMail(currentCatalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
     const policy = retentionPolicy(currentCatalog, now());
-    const scopeKey = `issues:${kind}:${startAt}`;
+    const scopeKey = `issues:${kind}:${startAt}:${cutoffAt}`;
     let cursor = null;
     if (payload.pageToken) {
       assertMail(typeof payload.pageToken === 'string' && /^[A-Za-z0-9_-]{1,2048}$/.test(payload.pageToken));
@@ -310,29 +312,27 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).detectedAt });
       scannedCount = pageRows.length;
     } else if (['coverage', 'failed', 'unknownClosure', 'expiredRetention'].includes(kind)) {
-      const state = await store.getSyncState();
       let ids;
       if (kind !== 'failed') {
         const catalog = await store.getCatalog();
         assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-        const cutoffAt = periodStart(state?.cutoffAt);
         const covered = new Set(await store.getCoveredCaseIds({ startAt, cutoffAt }));
         const retention = catalogRetention(catalog, now());
         const confirmed = new Set(await confirmedNoMailIds(catalog, state, await store.countMessages({ startAt, cutoffAt }), await store.countUnobservedDeletions()));
         ids = kind === 'unknownClosure' ? retention.unknownClosureCaseIds : kind === 'expiredRetention' ? retention.expiredCaseIds : catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id)).sort();
       } else ids = [...new Set(state?.failedMessageIds || [])].sort();
-      const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });
+      const snapshot = digest({ ids, startAt, cutoffAt, executionId: kind === 'failed' ? state?.executionId || '' : '' });
       const offset = cursor?.offset || 0;
       assertMail(Number.isSafeInteger(offset) && offset >= 0 && (!cursor || cursor.snapshot === snapshot), 'MAIL_MAPPING_CHANGED', 409);
       const pageIds = ids.slice(offset, offset + PAGE_SIZE);
       targets = await Promise.all(pageIds.map(async (id) => kind !== 'failed' ? { type: 'case', caseId: id } :
-        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && ['matched', 'pending'].includes(item.matchState) && isRetainedRecord(item, policy) ? summary(item) : null) }));
+        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && item.internalDate <= cutoffAt && ['matched', 'pending'].includes(item.matchState) && isRetainedRecord(item, policy) ? summary(item) : null) }));
       if (kind === 'failed' && !ids.length && state?.state === 'failed') targets = [{ type: 'sync', errorCode: state.errorCode || 'MAIL_SYNC_FAILED' }];
       if (offset + PAGE_SIZE < ids.length) nextPageToken = token({ offset: offset + PAGE_SIZE, snapshot });
       scannedCount = pageIds.length;
     } else {
       if (cursor) assertMail(ID.test(cursor.id) && Number.isFinite(Date.parse(cursor.at)));
-      const rows = await store.listIndexedScope({ startAt, cutoffAt: '9999-12-31T23:59:59.999Z', cursor, limit: PAGE_SIZE + 1 });
+      const rows = await store.listIndexedScope({ startAt, cutoffAt, cursor, limit: PAGE_SIZE + 1 });
       const pageRows = rows.slice(0, PAGE_SIZE);
       const filters = {
         pending: (item) => item.matchState === 'pending', unreviewed: (item) => item.matchState === 'matched' && !item.firstReview,
@@ -346,7 +346,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       scannedCount = pageRows.length;
     }
     const sync = await syncStatus();
-    assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
+    assertMail(periodStart(sync.startAt) === startAt && periodStart(sync.cutoffAt) === cutoffAt, 'MAIL_MAPPING_CHANGED', 409);
     assertMail((await store.getCatalog()).digest === currentCatalog.digest, 'MAIL_CATALOG_CHANGED', 409);
     return { kind, targets, scannedCount, page: { nextPageToken, pageSize: PAGE_SIZE }, sync };
   }

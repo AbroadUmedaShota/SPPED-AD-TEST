@@ -63,6 +63,12 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   return { store, messages, calls, metadataCalls, gmail, execute, envelope };
 }
 
+async function setIssuePeriod(f) {
+  const lease = await f.store.acquireSyncLease('issue-period');
+  await f.store.setSyncState({ ...await f.store.getSyncState(), cutoffAt: NOW }, lease);
+  await f.store.releaseSyncLease(lease);
+}
+
 test('suppressed original Gmail IDs are never fetched or restored by full or history sync', async () => {
   const f = fixture([A]);
   f.store.isMessageSuppressed = async (id) => id === 'purged-original';
@@ -1029,7 +1035,7 @@ test('residual list pages identify unindexed failures, unavailable attachments a
   }));
   const failedIds = Array.from({ length: 121 }, (_, i) => `unindexed-${i}`);
   const lease = await f.store.acquireSyncLease('test');
-  await f.store.setSyncState({ state: 'failed', startAt: START, executionId: 'run', failedMessageIds: failedIds, failedCount: failedIds.length }, lease);
+  await f.store.setSyncState({ state: 'failed', startAt: START, cutoffAt: NOW, executionId: 'run', failedMessageIds: failedIds, failedCount: failedIds.length }, lease);
   await f.store.releaseSyncLease(lease);
   for (const [kind, expected] of [['pending', 123], ['unavailable', 62], ['bodyUnavailable', 123], ['attachmentUnavailable', 123], ['failed', 121], ['coverage', 121]]) {
     const targets = []; let pageToken = ''; let pages = 0;
@@ -1049,6 +1055,7 @@ test('residual list pages identify unindexed failures, unavailable attachments a
 
 test('residual deletion diagnostics are reachable beyond the first 50 IDs', async () => {
   const f = fixture();
+  await setIssuePeriod(f);
   const rows = Array.from({ length: 111 }, (_, i) => ({ messageId: `deleted-${String(i).padStart(3, '0')}`, detectedAt: NOW })).reverse();
   f.store.listUnobservedDeletions = async ({ cursor, limit }) => rows.filter((row) => !cursor || row.messageId < cursor.id).slice(0, limit);
   let pageToken = ''; const ids = [];
@@ -1155,6 +1162,7 @@ test('temporary attachment busy does not record unavailable or allow review', as
 
 test('closure metadata changes the immutable catalog and unknown or expired cases remain residuals', async () => {
   const f = fixture([A, B]);
+  await setIssuePeriod(f);
   const cases = [{ caseId: A, handledStatus: '対応済み', closedAt: null }, { caseId: B, handledStatus: '対応済み', closedAt: '2023-11-10T09:00:00.000Z' }];
   assert.notEqual(catalogDigest(cases), catalogDigest(caseEntries([A, B])));
   const snapshotId = randomUUID();
@@ -1278,6 +1286,7 @@ test('Firestore final merged manual record cannot restore an expired or removed 
 
 test('expired metadata is hidden in cross-case and failed lists while empty pages retain navigation', async () => {
   const f = fixture([A, B]);
+  await setIssuePeriod(f);
   const cases = [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }, ...caseEntries([B])];
   f.store.setCatalog({ complete: true, cases, caseIds: [A, B], digest: catalogDigest(cases) });
   for (let index = 0; index < 50; index++) f.store.seed(record(`expired-${String(index).padStart(3, '0')}`));
