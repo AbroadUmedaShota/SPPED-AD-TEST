@@ -39,14 +39,15 @@ export function fakeStore(caseIds = [], initialSync = null) {
     async getMappingRevision() { return mappingRevision; },
     async getPurgeGeneration() { return 0; },
     async hasActiveSyncLease() { return Boolean(lease); },
-    async getCaseNoMailConfirmation(id) { return clone(noMail.get(id) || null); },
+    async getCaseNoMailConfirmation(id, context, at) { const value = noMail.get(id); return value?.caseId === id && value.at <= at && validNoMailConfirmation(value, context) ? clone(value) : null; },
+    async hasCaseNoMailConfirmation(id) { return noMail.has(id); },
     async getConfirmedNoMailCaseIds(context, at) { return [...noMail].filter(([, value]) => value.at <= at && validNoMailConfirmation(value, context)).map(([id]) => id); },
     async confirmCaseNoMail({ caseId, contextToken, email, at, requestId, fingerprint }) {
       return serial(async () => {
         const context = noMailContext(catalog, sync, mappingRevision);
         assertMail(context && noMailContextToken(context) === contextToken, 'MAIL_MAPPING_CHANGED', 409);
         assertMail(!lease, 'MAIL_SYNC_BUSY', 409);
-        assertMail(!deletionDiagnostics.size && ![...records.values()].some((item) => item.internalDate >= context.startAt &&
+        assertMail(!deletionDiagnostics.size && ![...records.values()].some((item) => item.internalDate >= context.startAt && item.internalDate <= context.cutoffAt &&
           (item.matchState === 'pending' || item.matchState === 'matched' && item.caseId === caseId)), 'MAIL_MAPPING_CHANGED', 409);
         const receipt = await store.getReceipt(requestId, fingerprint);
         if (receipt) return receipt;
@@ -61,7 +62,7 @@ export function fakeStore(caseIds = [], initialSync = null) {
     },
     setCatalog(value) { catalog = value; },
     async getCatalog() { return clone(catalog); },
-    async getCoveredCaseIds({ startAt } = {}) { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched' && (!startAt || item.internalDate >= startAt)).map((item) => item.caseId))]; },
+    async getCoveredCaseIds({ startAt, cutoffAt } = {}) { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched' && (!startAt || item.internalDate >= startAt) && (!cutoffAt || item.internalDate <= cutoffAt)).map((item) => item.caseId))]; },
     async uploadCatalogPage(page, digest) {
       const snapshot = pages.get(page.snapshotId) || { ...page, pages: new Map() };
       assertMail(snapshot.digest === page.digest && snapshot.total === page.total && snapshot.pageCount === page.pageCount, 'MAIL_REQUEST_CONFLICT', 409);
@@ -109,8 +110,8 @@ export function fakeStore(caseIds = [], initialSync = null) {
         reason: next.reason, previous: { matchState: old.matchState, caseId: old.caseId }, next: { matchState: 'pending', caseId: null } });
       deletionDiagnostics.delete(id);
     },
-    async listMessages({ mode, caseId, startAt, cursor, limit }) {
-      let items = [...records.values()].filter((item) => !startAt || item.internalDate >= startAt).filter((item) => mode === 'case' ? item.caseId === caseId && item.matchState === 'matched' :
+    async listMessages({ mode, caseId, startAt, cutoffAt, cursor, limit }) {
+      let items = [...records.values()].filter((item) => (!startAt || item.internalDate >= startAt) && (!cutoffAt || item.internalDate <= cutoffAt)).filter((item) => mode === 'case' ? item.caseId === caseId && item.matchState === 'matched' :
         mode === 'pending' ? item.matchState === 'pending' : item.matchState === 'matched' && !item.firstReview).sort(order);
       if (cursor) {
         const anchor = { internalDate: cursor.at, messageId: cursor.id };
@@ -124,8 +125,8 @@ export function fakeStore(caseIds = [], initialSync = null) {
       if (cursor) items = items.filter((item) => order(item, { internalDate: cursor.at, messageId: cursor.id }) > 0);
       return clone(items.slice(0, limit));
     },
-    async countMessages({ startAt } = {}) {
-      const all = [...records.values()].filter((item) => !startAt || item.internalDate >= startAt);
+    async countMessages({ startAt, cutoffAt } = {}) {
+      const all = [...records.values()].filter((item) => (!startAt || item.internalDate >= startAt) && (!cutoffAt || item.internalDate <= cutoffAt));
       const active = all.filter((item) => item.matchState !== 'excluded');
       return {
         pending: active.filter((item) => item.matchState === 'pending').length,

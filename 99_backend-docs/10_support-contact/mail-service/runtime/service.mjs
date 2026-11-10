@@ -99,13 +99,15 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function caseNoMail(id) {
     const state = await store.getSyncState();
-    const [catalog, stored, counts, deleted] = await Promise.all([store.getCatalog(),
-      store.getCaseNoMailConfirmation?.(id) ?? null, store.countMessages({ startAt: periodStart(state?.startAt) }), store.countUnobservedDeletions()]);
+    const [catalog, counts, deleted] = await Promise.all([store.getCatalog(),
+      store.countMessages({ startAt: periodStart(state?.startAt), cutoffAt: periodStart(state?.cutoffAt) }), store.countUnobservedDeletions()]);
     const context = await availableConfirmationContext(catalog, state, counts, deleted);
-    const linked = context ? await store.listMessages({ mode: 'case', caseId: id, startAt: context.startAt, limit: 1 }) : [];
+    const [stored, prior] = await Promise.all([store.getCaseNoMailConfirmation?.(id, context, now().toISOString()) ?? null,
+      store.hasCaseNoMailConfirmation?.(id) ?? false]);
+    const linked = context ? await store.listMessages({ mode: 'case', caseId: id, startAt: context.startAt, cutoffAt: context.cutoffAt, limit: 1 }) : [];
     const eligible = Boolean(context && catalog.caseIds.includes(id) && !linked.length);
     const valid = eligible && stored?.caseId === id && stored.at <= now().toISOString() && validNoMailConfirmation(stored, context);
-    return { eligible, contextToken: noMailContextToken(context), confirmation: noMailConfirmationSummary(valid ? stored : null), stale: Boolean(stored && !valid) };
+    return { eligible, contextToken: noMailContextToken(context), confirmation: noMailConfirmationSummary(valid ? stored : null), stale: Boolean(prior && !valid) };
   }
 
   async function confirmCaseNoMail(payload, actor, requestId) {
@@ -126,18 +128,19 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
     const startAt = periodStart(state?.startAt);
-    const counts = startAt ? await store.countMessages({ startAt }) : {
+    const cutoffAt = periodStart(state?.cutoffAt);
+    const counts = startAt ? await store.countMessages({ startAt, cutoffAt }) : {
       pending: null, unreviewed: null, unavailable: null, bodyUnverified: null, bodyUnavailable: null,
       attachmentUnverified: null, attachmentUnavailable: null
     };
     const unobservedDeletedCount = startAt ? await store.countUnobservedDeletions() : null;
     const catalog = await store.getCatalog();
     const retention = catalog.complete ? catalogRetention(catalog, now()) : null;
-    const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt }) : []);
+    const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt, cutoffAt }) : []);
     const confirmationScope = startAt ? await availableConfirmationContext(catalog, state, counts, unobservedDeletedCount) : null;
     const confirmed = new Set(confirmationScope && store.getConfirmedNoMailCaseIds ? await store.getConfirmedNoMailCaseIds(confirmationScope, now().toISOString()) : []);
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id));
-    const enumerationComplete = Boolean(startAt) && state?.state === 'complete';
+    const enumerationComplete = Boolean(startAt && cutoffAt && startAt <= cutoffAt) && state?.state === 'complete';
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
       counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
     if (confirmationScope) {
@@ -312,9 +315,10 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (kind !== 'failed') {
         const catalog = await store.getCatalog();
         assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-        const covered = new Set(await store.getCoveredCaseIds({ startAt }));
+        const cutoffAt = periodStart(state?.cutoffAt);
+        const covered = new Set(await store.getCoveredCaseIds({ startAt, cutoffAt }));
         const retention = catalogRetention(catalog, now());
-        const confirmed = new Set(await confirmedNoMailIds(catalog, state, await store.countMessages({ startAt }), await store.countUnobservedDeletions()));
+        const confirmed = new Set(await confirmedNoMailIds(catalog, state, await store.countMessages({ startAt, cutoffAt }), await store.countUnobservedDeletions()));
         ids = kind === 'unknownClosure' ? retention.unknownClosureCaseIds : kind === 'expiredRetention' ? retention.expiredCaseIds : catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id)).sort();
       } else ids = [...new Set(state?.failedMessageIds || [])].sort();
       const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });

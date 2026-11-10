@@ -112,3 +112,67 @@ test('stored map field order cannot invalidate a current record and purge genera
   assert.equal(validNoMailConfirmation(record, context), true);
   assert.equal(validNoMailConfirmation(record, { ...context, purgeGeneration: 1 }), false);
 });
+
+test('fixed-cutoff absence ignores later history arrivals without hiding them from mail queues', async () => {
+  const f = fixture(); const after = '2026-11-10T00:00:00.001Z';
+  f.store.seed({ messageId: 'later-match', internalDate: after, matchState: 'matched', caseId: A, firstReview: null });
+  f.store.seed({ messageId: 'later-pending', internalDate: after, matchState: 'pending', caseId: null, firstReview: null });
+  const listed = await f.execute(f.envelope('listCaseMail', { caseId: A }));
+  assert.deepEqual(listed.messages.map((item) => item.messageId), ['later-match']);
+  assert.equal(listed.noMail.eligible, true); assert.equal(listed.sync.pendingCount, 0);
+  assert.equal(listed.sync.coverageUnverifiedCaseCount, 1);
+  const issues = await f.execute(f.envelope('listMailIssues', { kind: 'coverage' }));
+  assert.deepEqual(issues.targets.map((item) => item.caseId), [A]);
+  const confirmed = await f.execute(f.envelope('confirmCaseNoMail', { caseId: A, contextToken: listed.noMail.contextToken }));
+  assert.equal(confirmed.sync.acceptanceReady, true);
+  assert.equal((await f.execute(f.envelope('listPendingMail'))).messages[0].messageId, 'later-pending');
+  assert.equal((await f.execute(f.envelope('listCaseMail', { caseId: A }))).messages[0].messageId, 'later-match');
+  f.store.seed({ messageId: 'at-cutoff', internalDate: END, matchState: 'pending', caseId: null, firstReview: null });
+  const blocked = await f.execute(f.envelope('listCaseMail', { caseId: A }));
+  assert.equal(blocked.noMail.eligible, false); assert.equal(blocked.sync.pendingCount, 1);
+  assert.equal(blocked.noMail.confirmation, null);
+});
+
+test('Firestore confirmation queries include cutoff exactly and exclude its immediate successor', async () => {
+  const root = 'contactMailboxes/customer-speed-ad'; const entries = cases([A]); const digest = catalogDigest(entries); const state = fixture().state;
+  const db = memoryFirestore({ [`${root}/meta/activeCatalog`]: { snapshotId: 'catalog-1', total: 1, digest },
+    [`${root}/catalogSnapshots/catalog-1/pages/0000`]: { pageIndex: 0, cases: entries }, [`${root}/meta/sync`]: state,
+    [`${root}/messages/later-match`]: { caseId: A, matchState: 'matched', internalDate: '2026-11-10T00:00:00.001Z' },
+    [`${root}/messages/later-pending`]: { caseId: null, matchState: 'pending', internalDate: '2026-11-10T00:00:00.001Z' } });
+  const store = createFirestoreStore(db); const context = noMailContext({ complete: true, snapshotId: 'catalog-1', digest }, state);
+  const input = { caseId: A, caseEntry: entries[0], contextToken: noMailContextToken(context), email: actor.email, at: NOW,
+    requestId: '00000000-0000-4000-8000-000000000001', fingerprint: 'cutoff' };
+  assert.equal((await store.confirmCaseNoMail(input)).confirmation.email, actor.email);
+  assert.deepEqual(await store.getCoveredCaseIds({ startAt: START, cutoffAt: END }), []);
+  for (const matchState of ['matched', 'pending']) {
+    db.records.set(`${root}/messages/exact`, { caseId: matchState === 'matched' ? A : null, matchState, internalDate: END });
+    await assert.rejects(store.confirmCaseNoMail({ ...input, requestId: randomUUID(), fingerprint: matchState }), { code: 'MAIL_MAPPING_CHANGED' });
+  }
+});
+
+test('revoked or inconsistent stored absence is hidden and a fresh action records the new actor', async () => {
+  for (const invalid of ['flag', 'case', 'time', 'context']) {
+    const root = 'contactMailboxes/customer-speed-ad'; const entries = cases([A]); const digest = catalogDigest(entries); const state = fixture().state;
+    const context = noMailContext({ complete: true, snapshotId: 'catalog-1', digest }, state);
+    const old = { caseId: A, email: 'old@abroad-o.com', at: END, requestId: randomUUID(), context };
+    const value = { noMailConfirmed: true, noMailConfirmation: old };
+    if (invalid === 'flag') value.noMailConfirmed = false;
+    if (invalid === 'case') old.caseId = '22222222-2222-4222-8222-222222222222';
+    if (invalid === 'time') old.at = '2026-11-12T00:00:00.000Z';
+    if (invalid === 'context') old.context = { ...context, executionId: 'old-sync' };
+    const db = memoryFirestore({ [`${root}/meta/activeCatalog`]: { snapshotId: 'catalog-1', total: 1, digest },
+      [`${root}/catalogSnapshots/catalog-1/pages/0000`]: { pageIndex: 0, cases: entries }, [`${root}/meta/sync`]: state,
+      [`${root}/caseCoverage/${A}`]: value });
+    const store = createFirestoreStore(db);
+    store.countMessages = async () => ({ pending: 0, unreviewed: 0, unavailable: 0, bodyUnverified: 0, bodyUnavailable: 0, attachmentUnverified: 0, attachmentUnavailable: 0 });
+    store.countUnobservedDeletions = async () => 0;
+    const execute = createMailService({ store, gmail: {}, core: {}, now: () => new Date(NOW) });
+    const envelope = (operation, payload) => ({ contractVersion: 1, operation, payload, actor, issuedAt: NOW, requestId: randomUUID() });
+    const before = await execute(envelope('listCaseMail', { caseId: A }));
+    assert.equal(before.noMail.confirmation, null, invalid);
+    const result = await execute(envelope('confirmCaseNoMail', { caseId: A, contextToken: before.noMail.contextToken }));
+    assert.equal(result.noMail.confirmation.email, actor.email, invalid);
+    assert.equal(db.records.get(`${root}/caseCoverage/${A}`).noMailConfirmed, true);
+    assert.equal(db.records.get(`${root}/events/generated`).actor, actor.email);
+  }
+});

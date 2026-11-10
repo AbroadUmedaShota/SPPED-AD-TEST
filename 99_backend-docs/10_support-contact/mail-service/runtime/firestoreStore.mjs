@@ -66,7 +66,11 @@ export function createFirestoreStore(db) {
     async getMappingRevision() { return mappingRevisionToken(data(await mappingRef.get())); },
     async getPurgeGeneration() { return data(await controlRef.get())?.generation ?? 0; },
     async hasActiveSyncLease(at) { const lease = data(await leaseRef.get()); return Boolean(lease && !expiredLease(lease, at)); },
-    async getCaseNoMailConfirmation(id) { return data(await coverage.doc(id).get())?.noMailConfirmation || null; },
+    async getCaseNoMailConfirmation(id, context, at) {
+      const value = data(await coverage.doc(id).get()); const record = value?.noMailConfirmation;
+      return value?.noMailConfirmed === true && record?.caseId === id && record.at <= at && validNoMailConfirmation(record, context) ? record : null;
+    },
+    async hasCaseNoMailConfirmation(id) { const value = data(await coverage.doc(id).get()); return Boolean(value?.noMailConfirmed === true && value.noMailConfirmation); },
     async getConfirmedNoMailCaseIds(context, at) {
       const found = await coverage.where('noMailConfirmed', '==', true).get();
       return found.docs.filter((item) => item.data().noMailConfirmation?.caseId === item.id && item.data().noMailConfirmation.at <= at && validNoMailConfirmation(item.data().noMailConfirmation, context)).map((item) => item.id);
@@ -89,15 +93,16 @@ export function createFirestoreStore(db) {
         const lease = data(leaseDoc);
         assertMail(!lease || expiredLease(lease, at), 'MAIL_SYNC_BUSY', 409);
         const [matched, pending, deleted] = await Promise.all([
-          transaction.get(messages.where('caseId', '==', caseId).where('matchState', '==', 'matched').where('internalDate', '>=', context.startAt).limit(1)),
-          transaction.get(messages.where('matchState', '==', 'pending').where('internalDate', '>=', context.startAt).limit(1)),
+          transaction.get(messages.where('caseId', '==', caseId).where('matchState', '==', 'matched').where('internalDate', '>=', context.startAt).where('internalDate', '<=', context.cutoffAt).limit(1)),
+          transaction.get(messages.where('matchState', '==', 'pending').where('internalDate', '>=', context.startAt).where('internalDate', '<=', context.cutoffAt).limit(1)),
           transaction.get(deletionDiagnostics.limit(1))
         ]);
         assertMail(!matched.docs.length && !pending.docs.length && !deleted.docs.length, 'MAIL_MAPPING_CHANGED', 409);
         const receipt = data(receiptDoc);
         if (receipt) { assertMail(receipt.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409); return receipt.result; }
-        const existing = data(coverageDoc)?.noMailConfirmation;
-        const confirmation = validNoMailConfirmation(existing, context) && existing.at <= at ? existing : { caseId, email, at, requestId, context };
+        const coverageValue = data(coverageDoc); const existing = coverageValue?.noMailConfirmation;
+        const confirmation = coverageValue?.noMailConfirmed === true && existing?.caseId === caseId &&
+          validNoMailConfirmation(existing, context) && existing.at <= at ? existing : { caseId, email, at, requestId, context };
         assertMail(validNoMailConfirmation(confirmation, context), 'MAIL_INVALID_REQUEST');
         transaction.set(coverage.doc(caseId), { noMailConfirmed: true, noMailConfirmation: confirmation }, { merge: true });
         if (confirmation !== existing) transaction.set(mailbox.collection('events').doc(), {
@@ -109,9 +114,11 @@ export function createFirestoreStore(db) {
       });
     },
     async isMessageSuppressed(id) { return (await suppressedMessages.doc(suppressionKey('message', id)).get()).exists; },
-    async getCoveredCaseIds({ startAt } = {}) {
+    async getCoveredCaseIds({ startAt, cutoffAt } = {}) {
       if (!startAt) return (await coverage.where('count', '>', 0).get()).docs.map((item) => item.id);
-      const found = await messages.where('matchState', '==', 'matched').where('internalDate', '>=', startAt).select('caseId').get();
+      let query = messages.where('matchState', '==', 'matched').where('internalDate', '>=', startAt);
+      if (cutoffAt) query = query.where('internalDate', '<=', cutoffAt);
+      const found = await query.select('caseId').get();
       return [...new Set(found.docs.map((item) => item.data().caseId))];
     },
     async uploadCatalogPage(page, makeDigest) {
@@ -187,9 +194,10 @@ export function createFirestoreStore(db) {
         });
       });
     },
-    async listMessages({ mode, caseId, startAt, cursor, limit }) {
+    async listMessages({ mode, caseId, startAt, cutoffAt, cursor, limit }) {
       let query = messages;
       if (startAt) query = query.where('internalDate', '>=', startAt);
+      if (cutoffAt) query = query.where('internalDate', '<=', cutoffAt);
       if (mode === 'case') query = query.where('caseId', '==', caseId).where('matchState', '==', 'matched');
       if (mode === 'pending') query = query.where('matchState', '==', 'pending');
       if (mode === 'unreviewed') query = query.where('matchState', '==', 'matched').where('firstReview', '==', null);
@@ -198,8 +206,9 @@ export function createFirestoreStore(db) {
       if (cursor) query = query.startAfter(cursor.at, cursor.id);
       return (await query.limit(limit).get()).docs.map((item) => item.data());
     },
-    async countMessages({ startAt } = {}) {
-      const scoped = startAt ? messages.where('internalDate', '>=', startAt) : messages;
+    async countMessages({ startAt, cutoffAt } = {}) {
+      let scoped = startAt ? messages.where('internalDate', '>=', startAt) : messages;
+      if (cutoffAt) scoped = scoped.where('internalDate', '<=', cutoffAt);
       const active = scoped.where('matchState', 'in', ['matched', 'pending']);
       const [pending, unavailable, unreviewed, bodyUnverified, bodyUnavailable, attachments] = await Promise.all([
         scoped.where('matchState', '==', 'pending').count().get(),

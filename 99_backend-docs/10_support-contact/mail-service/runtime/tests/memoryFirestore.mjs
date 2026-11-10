@@ -15,12 +15,16 @@ export function memoryFirestore(seed = {}) {
     const query = { path, id: path.split('/').at(-1), doc: (id) => document(`${path}/${id || 'generated'}`),
       listDocuments: async () => [...new Set([...records.keys()].filter((key) => key.startsWith(`${path}/`)).map((key) => `${path}/${key.slice(path.length + 1).split('/')[0]}`))].map(document),
       where: (field, operator, expected) => collection(path, [...filters, { field, operator, expected }], maximum, orders, after),
+      select: () => collection(path, filters, maximum, orders, after),
       limit: (value) => collection(path, filters, value, orders, after),
       orderBy: (field, direction = 'asc') => collection(path, filters, maximum, [...orders, { field, direction }], after),
       startAfter: (value) => collection(path, filters, maximum, orders, value),
       get: async () => {
         let found = [...records].filter(([key]) => key.startsWith(`${path}/`) && key.split('/').length === path.split('/').length + 1)
-          .filter(([key, value]) => (!after || key.split('/').at(-1) > after) && filters.every(({ field, operator, expected }) => operator === '==' ? value[field] === expected : operator === 'in' ? expected.includes(value[field]) : true));
+          .filter(([key, value]) => (!after || key.split('/').at(-1) > after) && filters.every(({ field, operator, expected }) =>
+            operator === '==' ? value[field] === expected : operator === 'in' ? expected.includes(value[field]) :
+              operator === '>=' ? value[field] >= expected : operator === '<=' ? value[field] <= expected :
+                operator === '>' ? value[field] > expected : operator === '<' ? value[field] < expected : false));
         found.sort(([aKey, a], [bKey, b]) => orders.reduce((result, { field, direction }) => result ||
           String(field === '__name__' ? aKey : a[field]).localeCompare(String(field === '__name__' ? bKey : b[field])) * (direction === 'desc' ? -1 : 1), 0));
         const docs = found.slice(0, maximum).map(([key]) => snapshot(document(key)));
