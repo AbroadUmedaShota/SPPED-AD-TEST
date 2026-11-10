@@ -2,6 +2,7 @@ import { assertMail, MailError } from './errors.mjs';
 
 const MAILBOX = 'customer@speed-ad.com';
 const GMAIL = 'https://gmail.googleapis.com/gmail/v1/users/me/';
+const READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 
 export async function createGmailAdapter({ secretManager, secretVersion, createOAuthClient, fetchImpl = fetch }) {
   assertMail(/^projects\/[^/]+\/secrets\/[^/]+\/versions\/[^/]+$/.test(secretVersion || ''), 'MAIL_NOT_CONFIGURED', 503);
@@ -12,10 +13,19 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
   const oauth = createOAuthClient(credentials.clientId, credentials.clientSecret);
   oauth.setCredentials({ refresh_token: credentials.refreshToken });
   let verified = false;
+  let scopeVerifiedToken = null;
 
   async function request(path, query = {}, kind = 'message') {
-    const token = await oauth.getAccessToken();
+    let token;
+    try { token = await oauth.getAccessToken(); } catch { throw new MailError('MAIL_AUTH_REQUIRED', 401); }
     assertMail(token?.token, 'MAIL_AUTH_REQUIRED', 401);
+    if (token.token !== scopeVerifiedToken) {
+      let info;
+      try { info = await oauth.getTokenInfo(token.token); } catch { throw new MailError('MAIL_AUTH_REQUIRED', 401); }
+      assertMail(Array.isArray(info?.scopes) && info.scopes.length === 1 && info.scopes[0] === READONLY_SCOPE,
+        'MAIL_SCOPE_MISMATCH', 403);
+      scopeVerifiedToken = token.token;
+    }
     const url = new URL(path, GMAIL);
     assertMail(url.origin === 'https://gmail.googleapis.com' && url.pathname.startsWith('/gmail/v1/users/me/'));
     for (const [key, value] of Object.entries(query)) if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, String(value));

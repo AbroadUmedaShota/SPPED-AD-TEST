@@ -258,7 +258,8 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
   const calls = [];
   const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
     secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
-    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; } }),
+    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
+      async getTokenInfo() { return { scopes: ['https://www.googleapis.com/auth/gmail.readonly'] }; } }),
     fetchImpl: async (url, options) => { calls.push({ url: String(url), options }); return { ok: true, async json() {
       return String(url).endsWith('/profile') ? { emailAddress: 'customer@speed-ad.com', historyId: '3' } : { messages: [{ id: 'a' }], nextPageToken: 'next' };
     } }; }
@@ -267,6 +268,40 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
   assert.deepEqual(result.messageIds, ['a']); assert.equal(result.nextPageToken, 'next');
   assert.equal(calls.length, 2); assert.ok(calls[1].url.includes('includeSpamTrash=true'));
   assert.ok(calls[1].url.includes('pageToken=page2')); assert.equal(calls[1].options.redirect, 'error');
+});
+
+test('Gmail adapter rejects any scope other than exactly readonly before Gmail GET', async () => {
+  const readonly = 'https://www.googleapis.com/auth/gmail.readonly';
+  for (const scopes of [undefined, [], [readonly, 'https://www.googleapis.com/auth/gmail.modify'], ['https://mail.google.com/'], `${readonly}`]) {
+    let gets = 0;
+    const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
+      secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
+      createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
+        async getTokenInfo() { return { scopes }; } }),
+      fetchImpl: async () => { gets++; throw new Error('must not call Gmail'); }
+    });
+    await assert.rejects(() => adapter.getMessage('m1'), { code: 'MAIL_SCOPE_MISMATCH' });
+    assert.equal(gets, 0);
+  }
+});
+
+test('Gmail adapter rechecks a refreshed token and fails closed when tokenInfo fails', async () => {
+  const readonly = 'https://www.googleapis.com/auth/gmail.readonly';
+  let token = 'first'; let gets = 0; let checks = 0;
+  const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
+    secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
+    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token }; },
+      async getTokenInfo(value) { checks++; if (value === 'broken') throw new Error('private tokenInfo response'); return { scopes: value === 'first' ? [readonly] : [readonly, 'openid'] }; } }),
+    fetchImpl: async () => { gets++; return { ok: true, async json() { return { emailAddress: 'customer@speed-ad.com', historyId: '100' }; } }; }
+  });
+  await adapter.getProfile(); await adapter.getProfile();
+  assert.equal(checks, 1); assert.equal(gets, 2);
+  token = 'broader';
+  await assert.rejects(() => adapter.getMessage('m1'), { code: 'MAIL_SCOPE_MISMATCH' });
+  assert.equal(checks, 2); assert.equal(gets, 2);
+  token = 'broken';
+  await assert.rejects(() => adapter.getMessage('m1'), { code: 'MAIL_AUTH_REQUIRED', message: 'MAIL_AUTH_REQUIRED' });
+  assert.equal(gets, 2);
 });
 
 test('HTTP authenticates before dispatch and never echoes arbitrary failures', async (t) => {

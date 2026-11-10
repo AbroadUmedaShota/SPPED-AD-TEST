@@ -6,7 +6,7 @@ Node.js 24、Cloud Run、Firestore、Secret Managerを使う。既存GASのSheet
 
 Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audienceに登録する。呼出し権限は配備者に限定し、`allUsers`を追加しない。GASで`requireViewer_()`が実利用者を確認してから、サーバー内の`ScriptApp.getIdentityToken()`を使ってPOSTする。backendでも署名検証済みtokenのaudience、issuer、azp、配備者subject/email、verified emailを確認する。ID tokenの配備者をメール確認者として記録しない。
 
-環境変数は`MAIL_SCRIPT_AUDIENCE`、`MAIL_DEPLOYER_EMAIL`、`MAIL_DEPLOYER_SUBJECT`、`MAILBOX_OAUTH_SECRET_VERSION`、任意の`FIRESTORE_DATABASE_ID`、`PORT`。Secret ManagerのJSONは`{clientId,clientSecret,refreshToken}`。固定窓口`customer@speed-ad.com`のprofile確認後だけGmailのGETを実行する。Google tokenやsecretは応答・ログに出さない。
+環境変数は`MAIL_SCRIPT_AUDIENCE`、`MAIL_DEPLOYER_EMAIL`、`MAIL_DEPLOYER_SUBJECT`、`MAILBOX_OAUTH_SECRET_VERSION`、任意の`FIRESTORE_DATABASE_ID`、`PORT`。Secret ManagerのJSONは`{clientId,clientSecret,refreshToken}`。初回およびアクセストークン更新時にGoogle tokenInfoでscopeが正確に`gmail.readonly`だけであることを確認し、不一致は`MAIL_SCOPE_MISMATCH`、確認失敗は`MAIL_AUTH_REQUIRED`としてGmail GET前に停止する。固定窓口`customer@speed-ad.com`のprofile確認後だけメールを取得する。Google tokenやsecretは応答・ログに出さない。
 
 ## POST /rpc
 
