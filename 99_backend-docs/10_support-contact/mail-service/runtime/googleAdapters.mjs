@@ -71,10 +71,12 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
       const ids = new Set();
       const deleted = new Set();
       const drafts = new Set();
+      const sent = new Set();
       const observe = (message, target) => {
         if (!message?.id) return;
         target.add(message.id);
         if (message.labelIds?.includes('DRAFT')) drafts.add(message.id);
+        if (message.labelIds?.includes('SENT')) sent.add(message.id);
       };
       for (const history of result.history || []) {
         for (const item of history.messages || []) observe(item, ids);
@@ -84,10 +86,12 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
           for (const item of history[key] || []) {
             observe(item.message, ids);
             if (item.labelIds?.includes('DRAFT')) drafts.add(item.message?.id);
+            if (item.labelIds?.includes('SENT')) sent.add(item.message?.id);
           }
         }
       }
       drafts.delete(undefined);
+      for (const id of sent) drafts.delete(id);
       return { messageIds: [...ids].filter((id) => !deleted.has(id)),
         deletedIds: [...deleted].filter((id) => !drafts.has(id)), draftIds: [...drafts],
         nextPageToken: result.nextPageToken || null, historyId: result.historyId };

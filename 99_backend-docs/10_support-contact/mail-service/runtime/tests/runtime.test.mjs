@@ -325,6 +325,19 @@ test('historical draft evidence never erases a current sent message classificati
   assert.deepEqual(saved.firstReview, firstReview); assert.equal(saved.direction, 'sent');
 });
 
+test('unavailable sent mail with older draft evidence remains a mail residual', async () => {
+  const f = fixture([A]);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  f.store.seed(record('sent-deleted', { sourceKind: 'mail', direction: 'sent', version: 3 }));
+  f.gmail.getMessage = async () => { throw new MailError('MAIL_CONTENT_UNAVAILABLE', 410); };
+  f.gmail.listHistory = async () => ({ messageIds: ['sent-deleted'], draftIds: ['sent-deleted'], historyId: '201' });
+  await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  const saved = await f.store.getMessage('sent-deleted');
+  assert.equal(saved.sourceKind, 'mail'); assert.equal(saved.matchState, 'matched');
+  assert.equal(saved.unavailable, true); assert.equal((await f.store.countMessages()).unavailable, 1);
+});
+
 test('unknown deleted history IDs remain diagnostics without phantom received mail rows', async () => {
   const f = fixture([A]);
   const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
@@ -353,13 +366,15 @@ test('Gmail history observes draft evidence and label-only sent updates', async 
       return { historyId: '200', history: [
         { messagesAdded: [{ message: { id: 'draft-old', labelIds: ['DRAFT'] } }], messagesDeleted: [{ message: { id: 'draft-old' } }] },
         { messagesDeleted: [{ message: { id: 'unknown' } }] },
-        { labelsAdded: [{ message: { id: 'sent' }, labelIds: ['SENT'] }], labelsRemoved: [{ message: { id: 'sent' }, labelIds: ['DRAFT'] }] }
+        { labelsAdded: [{ message: { id: 'sent' }, labelIds: ['SENT'] }], labelsRemoved: [{ message: { id: 'sent' }, labelIds: ['DRAFT'] }] },
+        { labelsAdded: [{ message: { id: 'sent-deleted' }, labelIds: ['SENT'] }], labelsRemoved: [{ message: { id: 'sent-deleted' }, labelIds: ['DRAFT'] }],
+          messagesDeleted: [{ message: { id: 'sent-deleted' } }] }
       ] };
     } })
   });
   const page = await adapter.listHistory({ startHistoryId: '100' });
-  assert.deepEqual(page.messageIds, ['sent']); assert.deepEqual(page.deletedIds, ['unknown']);
-  assert.deepEqual(page.draftIds, ['draft-old', 'sent']);
+  assert.deepEqual(page.messageIds, ['sent']); assert.deepEqual(page.deletedIds, ['unknown', 'sent-deleted']);
+  assert.deepEqual(page.draftIds, ['draft-old']);
 });
 
 test('Gmail adapter rejects any scope other than exactly readonly before Gmail GET', async () => {

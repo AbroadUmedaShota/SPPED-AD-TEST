@@ -246,8 +246,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     let message;
     try { message = await fetchMessage(id, true); } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') {
-        if (scope.draftEvidence) await store.excludeDraft(id, now().toISOString());
-        else if (!await store.getMessage(id)) await store.recordUnobservedDeletion(id, now().toISOString());
+        const existing = await store.getMessage(id);
+        if (scope.draftEvidence && existing?.sourceKind !== 'mail') await store.excludeDraft(id, now().toISOString());
+        else if (!existing) await store.recordUnobservedDeletion(id, now().toISOString());
         return;
       }
       throw error;
