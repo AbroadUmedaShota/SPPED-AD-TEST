@@ -21,7 +21,7 @@ OAuth clientの所属projectとSecret保存先のprojectは別に照合します
 
 推奨構成は既存の窓口OAuth専用projectを維持し、`customer@speed-ad.com` がGmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認する形です。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。現在、窓口のGmail同意・refresh token・Secret version・実メール読取は未実施です。
 
-アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しません。[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)に沿って、アプリ専用のホーム・プライバシー案内、利用規約の掲載要否、制限付きscope審査、サーバー処理に対する年次CASA評価の適用または除外根拠を本番接続前に確認します。既存の公開 `/privacy/` はGmail取得・利用者への共有・保存期間の説明が不足しています。改訂案を作成し、公開条件を照合してから反映します。審査申請・公開と評価費用はそれぞれ別に判断します。
+アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しません。[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)に沿って、アプリ専用の公開ホーム・プライバシー案内、制限付きscope審査、サーバー処理に対する年次CASA評価の適用または除外根拠を本番接続前に確認します。[OAuthの本番ポリシー](https://developers.google.com/identity/protocols/oauth2/policies)はホームから利用規約とプライバシー方針へのリンクと、本番・試験用projectの分離を求めます。既存の公開 `/privacy/` はGmail取得・利用者への共有・保存期間の説明が不足しています。改訂案を作成し、公開条件を照合してから反映します。審査申請・公開と評価費用はそれぞれ別に判断します。
 
 ## 1. 接続前に確定すること
 
