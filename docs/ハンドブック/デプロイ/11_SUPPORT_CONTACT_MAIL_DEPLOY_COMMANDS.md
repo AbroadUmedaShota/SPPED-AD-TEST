@@ -154,12 +154,12 @@ $SecretVersion = '<observed-canonical-secret-version>'
 $versionPattern = '^' + [regex]::Escape($CanonicalSecretName) + '/versions/([1-9][0-9]*)$'
 if ($SecretVersion -notmatch $versionPattern) { throw 'Canonical numeric Secret version required.' }
 $VersionNumber = $Matches[1]
-$versionMetadata = gcloud secrets versions describe $VersionNumber --secret=$CanonicalSecretName --project=$ProjectId --format=json | ConvertFrom-Json
+$versionMetadata = gcloud secrets versions describe $VersionNumber --secret=$SecretId --project=$ProjectId --format=json | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or $versionMetadata.name -cne $SecretVersion -or
     $versionMetadata.state -cne 'ENABLED') { throw 'Secret version readback mismatch.' }
 ```
 
-この同じ`$SecretVersion`をCloud Runまで保持します。`versions access`は使いません。
+version読戻しのCLIには短い`SecretId`と明示`ProjectId`を渡します。正規名全体を`--secret`へ入れてパスを二重化しません。応答の`name`は上で観測した正規version名と完全一致させ、この同じ`$SecretVersion`をCloud Runまで保持します。`versions access`は使いません。
 
 ## 4. imageビルドとdigest固定
 
