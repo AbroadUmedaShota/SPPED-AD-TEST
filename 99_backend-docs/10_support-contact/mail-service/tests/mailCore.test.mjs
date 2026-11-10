@@ -95,6 +95,22 @@ test('HTML is rendered as inert text and secret links are removed', async () => 
   assert.equal(scrubSecretUrls('https://example.com/?id=123'), 'https://example.com/?id=123');
 });
 
+test('encoded secret URLs are scrubbed without changing surrounding text or safe URL spelling', () => {
+  const raw = 'https://example.com/view#token=TEST_SECRET';
+  const variants = [raw, encodeURIComponent(raw), encodeURIComponent(encodeURIComponent(raw)),
+    'https&#58;&#47;&#47;example.com/view&#35;token&#61;TEST_SECRET',
+    'https&colon;&sol;&sol;example.com/view&num;token&equals;TEST_SECRET',
+    'https&amp;colon;&amp;sol;&amp;sol;example.com/view&amp;num;token&amp;equals;TEST_SECRET'];
+  for (const url of variants) assert.equal(scrubSecretUrls(`前 ${url} 後`), '前 [リンクを非表示] 後');
+  const safe = encodeURIComponent('https://example.com/?id=123&label=日本語');
+  assert.equal(scrubSecretUrls(`前 ${safe} 後`), `前 ${safe} 後`);
+  const percent = 'https://example.com/?label=100%25';
+  assert.equal(scrubSecretUrls(`前 ${percent} 後`), `前 ${percent} 後`);
+  const deep = encodeURIComponent(encodeURIComponent(encodeURIComponent(encodeURIComponent(raw))));
+  assert.equal(scrubSecretUrls(`前 ${deep} 後`), '前 [リンクを非表示] 後');
+  assert.equal(scrubSecretUrls('https の説明と 100% の文章'), 'https の説明と 100% の文章');
+});
+
 test('inline CID image and zero byte text attachment are preserved', async () => {
   const mail = message({ mimeType: 'multipart/mixed', parts: [{ mimeType: 'image/png', headers: [{ name: 'Content-ID', value: '<img1>' }], body: { data: '', size: 0 } }, part('', 'text/plain', { filename: 'empty.txt' })] });
   const attachments = inspectMime(mail).attachments;

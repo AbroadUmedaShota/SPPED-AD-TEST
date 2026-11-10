@@ -106,6 +106,31 @@ test('mail and attachment enforce mapping and scrub notification secrets', async
   await assert.rejects(() => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'm1', partId: '0.8', offset: 0 })), { code: 'MAIL_ATTACHMENT_NOT_FOUND' });
 });
 
+test('encoded secret links never reach stored metadata, body RPC or text attachment bytes', async () => {
+  const raw = 'https://script.google.com/macros/s/test/exec#token=TEST_ENCODED_SECRET';
+  const variants = [encodeURIComponent(raw), encodeURIComponent(encodeURIComponent(raw)),
+    'https&#58;&#47;&#47;script.google.com/macros/s/test/exec&#35;token&#61;TEST_ENCODED_SECRET'];
+  for (const [index, url] of variants.entries()) {
+    const f = fixture([A]);
+    const id = `encoded-${index}`;
+    const bytes = Buffer.from(`添付 ${url} 終わり`);
+    f.messages.set(id, gmailMessage(id, `受付ID: ${A}\n本文 ${url} 終わり`, [
+      { name: 'Subject', value: `件名 ${url}` }, { name: 'From', value: `sender@example.test ${url}` },
+      { name: 'To', value: `customer@speed-ad.com ${url}` }
+    ], { bytes, name: `memo-${url}.txt` }));
+    await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' }));
+    const stored = await f.store.getMessage(id);
+    assert.ok(!JSON.stringify(stored).includes('TEST_ENCODED_SECRET'));
+    assert.match(stored.subject, /\[リンクを非表示\]/);
+    const detail = await f.execute(f.envelope('getMail', { scope: 'pending', messageId: id }));
+    assert.ok(!JSON.stringify(detail).includes('TEST_ENCODED_SECRET'));
+    assert.match(detail.message.bodyText, /本文 \[リンクを非表示\] 終わり/);
+    const chunk = await f.execute(f.envelope('getAttachmentChunk', { scope: 'pending', messageId: id, partId: '0.1', offset: 0 }));
+    assert.ok(!JSON.stringify(chunk).includes('TEST_ENCODED_SECRET'));
+    assert.equal(Buffer.from(chunk.dataBase64, 'base64').toString(), '添付 [リンクを非表示] 終わり');
+  }
+});
+
 test('first reviewer is transactional, write-once, idempotent and never changes case status', async () => {
   const f = fixture([A]); f.store.seed(record('m1'));
   const sheetStatus = { [A]: '対応済み' };

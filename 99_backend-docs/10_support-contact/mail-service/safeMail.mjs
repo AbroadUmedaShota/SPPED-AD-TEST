@@ -1,18 +1,33 @@
-const secretParameter = /(?:^|[?#&])(?:token|access_token|id_token|refresh_token|code|state)=/i;
+const secretParameter = /(?:^|[?#&])(?:token|access_token|id_token|refresh_token|secret|code|state)=/i;
+const urlColon = '(?::|%(?:25)*3a|&(?:amp;)*(?:colon|#0*58|#x0*3a);)';
+const urlSlash = '(?:/|%(?:25)*2f|&(?:amp;)*(?:sol|#0*47|#x0*2f);)';
+const urlCandidate = new RegExp(`https?${urlColon}${urlSlash}${urlSlash}[^\\s<>"']*`, 'gi');
+const urlEntities = { amp: '&', colon: ':', sol: '/', quest: '?', num: '#', equals: '=' };
+
+function decodeUrlEntities(value) {
+  return value.replace(/&(amp|colon|sol|quest|num|equals|#x[0-9a-f]+|#\d+);/gi, (_entity, name) => {
+    if (name[0] !== '#') return urlEntities[name.toLowerCase()];
+    const code = name[1].toLowerCase() === 'x' ? parseInt(name.slice(2), 16) : Number(name.slice(1));
+    return code > 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : '';
+  });
+}
 
 export function scrubSecretUrls(value) {
-  return String(value ?? '').replace(/https?:\/\/[^\s<>"']+/gi, (raw) => {
+  return String(value ?? '').replace(urlCandidate, (raw) => {
     let decoded = raw;
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
-        const next = decodeURIComponent(decoded.replace(/&amp;/gi, '&'));
+        const entitiesDecoded = decodeUrlEntities(decoded);
+        const next = /%[0-9a-f]{2}/i.test(entitiesDecoded) ? decodeURIComponent(entitiesDecoded) : entitiesDecoded;
         if (next === decoded) break;
         decoded = next;
       } catch {
         return '[リンクを非表示]';
       }
     }
-    return secretParameter.test(decoded) ? '[リンクを非表示]' : raw;
+    // Deep or malformed URL encoding is hidden rather than passed to an API with an undecided secret value.
+    const undecoded = !/^https?:\/\//i.test(decoded) || /%[0-9a-f]{2}|&(?:amp|colon|sol|quest|num|equals|#x[0-9a-f]+|#\d+);/i.test(decoded);
+    return undecoded || secretParameter.test(decoded) ? '[リンクを非表示]' : raw;
   });
 }
 
