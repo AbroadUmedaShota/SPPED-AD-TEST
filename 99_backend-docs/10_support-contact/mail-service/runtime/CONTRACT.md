@@ -2,6 +2,8 @@
 
 Node.js 24、Cloud Run、Firestore、Secret Managerを使う。既存GASのSheet/Drive更新APIから独立し、メール取得・照合・確認記録の操作はSheetの対応ステータスを書き換えない。
 
+手動削除は[管理者用手順](../../../../docs/ハンドブック/運用/10_SUPPORT_CONTACT_MAIL_PURGE.md)を使う。削除中は`meta/purgeControl`で全メール操作を停止し、要求開始時の保存世代と応答直前・書込みtransaction内の世代を照合する。途中失敗は同じ計画で再開する。最小hashマーカーで原メールの再取込・削除済み案件への紐付け・旧receipt再生を拒否する。新規返信は新しい照合待ちとして残り得る。手動除外は`excludedAt`をサーバー時刻で記録する。
+
 ## 認証
 
 Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audienceに登録する。呼出し権限は配備者に限定し、`allUsers`を追加しない。GASで`requireViewer_()`が実利用者を確認してから、サーバー内の`ScriptApp.getIdentityToken()`を使ってPOSTする。backendでも署名検証済みtokenのaudience、issuer、azp、配備者subject/email、verified emailを確認する。ID tokenの配備者をメール確認者として記録しない。
@@ -22,12 +24,12 @@ Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audie
 | resolvePending | messageId、action:match/exclude、match時caseId、expectedVersion、理由reason（1〜1000文字） |
 | getSyncStatus | 空object |
 | getSyncRequestResult | requestId、元のadvanceSync requestPayload。読取り専用で同じactor・内容の保存済みレシートと現在の同期状態を返す |
-| listMailIssues | kind:pending/unreviewed/unavailable/bodyUnverified/bodyUnavailable/attachmentUnverified/attachmentUnavailable/failed/coverage/deleted、任意pageToken |
-| uploadCaseCatalog | snapshotId、pageIndex、pageCount、total、digest、caseIds（200件以下） |
+| listMailIssues | kind:pending/unreviewed/unavailable/bodyUnverified/bodyUnavailable/attachmentUnverified/attachmentUnavailable/failed/coverage/deleted/unknownClosure/expiredRetention、任意pageToken |
+| uploadCaseCatalog | snapshotId、pageIndex、pageCount、total、digest、cases（200件以下、各要素はcaseId/handledStatus/closedAt） |
 | advanceSync | executionId、開始時mode:full/historyと必須startAt、catalogSnapshotId/catalogDigest。失敗した同じ実行の明示再開だけresume:true |
 | reconcilePending | 任意pageToken |
 
-catalog・同期・再照合は社員操作だけに限定する。catalog digestは、重複のない小文字UUIDを昇順に並べ、改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用する。
+catalog・同期・再照合は社員操作だけに限定する。catalog digestは、小文字UUID順のJSON tuple `[caseId, handledStatus, closedAt]` を改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用し、処理中に有効catalogが変われば書込みを拒否する。
 
 同期要求が応答不明になった場合、GASは元の受付ID計画と開始日を保持し、正本Sheetの現在値で要求を作り直さず`getSyncRequestResult`で確認する。この操作もdomain認証必須で、`advanceSync`・元payload（実行IDを含む）・実利用者actorのfingerprintが一致するレシートだけを返す。レシート内の同期メタ情報と現在の同期状態以外は返さず、同期・Gmail取得・状態更新は実行しない。未作成レシートは`found:false`とし、自動再送しない。別利用者が同じ実行を進めた場合、古いレシートは元要求の成立確認に使い、画面の新しい進捗を戻さない。
 
@@ -77,10 +79,12 @@ Gmail adapterは添付取得応答を固定窓口・message ID・attachment ID�
 
 ## Case closure catalog and retention residuals
 
-`uploadCaseCatalog` requires `cases` (up to 200) instead of an ID-only `caseIds` payload. Each entry has exactly `{caseId, handledStatus, closedAt}`: a lower-case UUID, one of 未対応/対応中/対応済み/保留, and canonical UTC ISO or null. Non-completed entries cannot have a closure timestamp; future or malformed dates fail closed. The digest covers sorted JSON tuples `[caseId, handledStatus, closedAt]` joined by newline. Firestore verifies the complete snapshot count/digest on read and returns both full `cases` and derived `caseIds`. Legacy ID-only pages must be re-uploaded; no dates are inferred.
+`uploadCaseCatalog` requires `cases` (up to 200) instead of an ID-only `caseIds` payload. Each entry has exactly `{caseId, handledStatus, closedAt}`: a lower-case UUID, one of 未対応/対応中/対応済み/保留, and canonical UTC ISO or null. Non-completed entries cannot have a closure timestamp; future or malformed dates fail closed. GAS also requires receipt time ≤ closure time ≤ current time before uploading. The digest covers sorted JSON tuples `[caseId, handledStatus, closedAt]` joined by newline. Firestore verifies the complete snapshot count/digest on read and returns both full `cases` and derived `caseIds`. Legacy ID-only pages must be re-uploaded; no dates are inferred.
 
 `caseRetention.mjs` exports `normalizeCatalogCases`, `retentionExpiresAt`, and `catalogRetention`. Expiry is the UTC calendar anniversary plus three years, clamping Feb 29 to Feb 28. `catalogRetention` accepts optional `suppressedCaseIds` as attestation from the separate purge store: snapshot metadata stays intact, but these cases are excluded from outstanding retention residuals.
 
-Sync status includes `unknownClosureCaseCount` and `expiredCaseCount` (null only when no complete catalog exists). Both must be zero for `acceptanceReady`. `listMailIssues` adds `unknownClosure` and `expiredRetention`, returning paged case targets. Expired case list/body/attachment/review/manual match operations return `MAIL_RETENTION_EXPIRED`. Indexing checks the pinned and latest catalogs before storing a new matching message and fails without storing its metadata if expired-case evidence is present. Existing data is not erased by this module; purge attestation and cleanup require separate integration/acceptance.
+Sync status includes `unknownClosureCaseCount` and `expiredCaseCount` (null only when no complete catalog exists). Both must be zero for `acceptanceReady`. `listMailIssues` adds `unknownClosure` and `expiredRetention`, returning paged case targets. Expired case list/body/attachment/review/manual match operations return `MAIL_RETENTION_EXPIRED`. Indexing checks the pinned and latest catalogs before storing a new matching message and fails without storing its metadata if expired-case evidence is present. The manual purge supports an expiry-only case plan bound to the current closure catalog. Completed purge hashes suppress coverage/retention residuals while immutable Sheet-derived catalog tuples remain intact. Expired/removed case metadata is withheld from cross-case and failure lists; navigation uses scanned row boundaries even when a page has no visible rows.
 
 Record mutation and index writes carry `expectedCatalogDigest`; Firestore reads activeCatalog inside the same transaction and rejects a changed digest before replaying a receipt or writing metadata. This prevents a closure-only catalog change between service preflight and commit from applying a stale decision.
+
+Final merged manual index records are checked against the catalog-bound retention policy inside the transaction before any message, event, diagnostic or coverage write. Removed cases return `MAIL_CASE_NOT_FOUND`; purged cases return `MAIL_RECORDS_DELETED`.

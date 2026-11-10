@@ -3,7 +3,7 @@ import { assertMail, MailError } from './errors.mjs';
 import { validateActor } from './auth.mjs';
 import { mixedThreadDemotions } from './mixedThread.mjs';
 import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObservation.mjs';
-import { normalizeCatalogCases, catalogRetention } from './caseRetention.mjs';
+import { normalizeCatalogCases, catalogRetention, retentionPolicy, isRetainedRecord, assertRetainedRecord } from './caseRetention.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
@@ -80,7 +80,7 @@ function withinPeriod(record, startAt) {
 }
 
 export function createMailService({ store, gmail, core, now = () => new Date(), trustedAnchor = () => false }) {
-  assertMail(store && gmail && core, 'MAIL_NOT_CONFIGURED', 503);
+  assertMail(store && typeof store.withAccess === 'function' && gmail && core, 'MAIL_NOT_CONFIGURED', 503);
 
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
@@ -119,7 +119,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   async function assertCaseRetention(id) {
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-    assertMail(!catalogRetention(catalog, now()).expiredCaseIds.includes(id), 'MAIL_RETENTION_EXPIRED', 410);
+    assertRetainedRecord({ caseId: id }, retentionPolicy(catalog, now()));
   }
 
   async function activeStartAt() {
@@ -160,24 +160,28 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     if (targetCaseId) {
       const catalog = await store.getCatalog();
       assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-      assertMail(catalog.caseIds.includes(targetCaseId), 'MAIL_CASE_NOT_FOUND', 404);
-      await assertCaseRetention(targetCaseId);
+      assertRetainedRecord({ caseId: targetCaseId }, retentionPolicy(catalog, now()));
     }
     const scopeKey = `${mode}:${targetCaseId || ''}:${startAt}`;
     const cursor = parseCursor(payload.pageToken, scopeKey);
+    const catalog = await store.getCatalog();
+    assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    const policy = retentionPolicy(catalog, now());
     const result = await store.listMessages({ mode, caseId: targetCaseId, startAt, cursor, limit: PAGE_SIZE + 1 });
     const more = result.length > PAGE_SIZE;
-    let records = result.slice(0, PAGE_SIZE);
-    if (cursor?.direction === 'previous') records = records.reverse();
+    let scanned = result.slice(0, PAGE_SIZE);
+    if (cursor?.direction === 'previous') scanned = scanned.reverse();
+    const records = scanned.filter((item) => isRetainedRecord(item, policy));
     const hasPrevious = cursor?.direction === 'previous' ? more : Boolean(cursor);
     const hasNext = cursor?.direction === 'previous' ? Boolean(cursor) : more;
     const sync = await syncStatus();
     assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
+    assertMail((await store.getCatalog()).digest === catalog.digest, 'MAIL_CATALOG_CHANGED', 409);
     return {
       messages: records.map(summary),
       page: {
-        nextPageToken: hasNext && records.length ? cursorToken(records.at(-1), 'next', scopeKey) : '',
-        previousPageToken: hasPrevious && records.length ? cursorToken(records[0], 'previous', scopeKey) : '',
+        nextPageToken: hasNext && scanned.length ? cursorToken(scanned.at(-1), 'next', scopeKey) : '',
+        previousPageToken: hasPrevious && scanned.length ? cursorToken(scanned[0], 'previous', scopeKey) : '',
         pageSize: PAGE_SIZE
       },
       sync
@@ -188,7 +192,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const record = await requireRecord(payload, { allowUnavailable: true });
     const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable', reviewReady: false,
       attachments: (item.attachments || []).map(({ partId, name, mimeType, size, availability }) => ({ partId, name, mimeType, size, availability })) } });
-    if (record.unavailable) return metadataOnly(record);
+    if (record.unavailable) return metadataOnly(await requireRecord(payload, { allowUnavailable: true }));
     let message;
     try { message = await fetchMessage(record.messageId); } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') return metadataOnly(await requireRecord(payload, { allowUnavailable: true }));
@@ -215,6 +219,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted', 'unknownClosure', 'expiredRetention'];
     const kind = payload.kind;
     assertMail(kinds.includes(kind));
+    const currentCatalog = await store.getCatalog();
+    assertMail(currentCatalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    const policy = retentionPolicy(currentCatalog, now());
     const scopeKey = `issues:${kind}:${startAt}`;
     let cursor = null;
     if (payload.pageToken) {
@@ -248,7 +255,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       assertMail(Number.isSafeInteger(offset) && offset >= 0 && (!cursor || cursor.snapshot === snapshot), 'MAIL_MAPPING_CHANGED', 409);
       const pageIds = ids.slice(offset, offset + PAGE_SIZE);
       targets = await Promise.all(pageIds.map(async (id) => kind !== 'failed' ? { type: 'case', caseId: id } :
-        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && ['matched', 'pending'].includes(item.matchState) ? summary(item) : null) }));
+        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && ['matched', 'pending'].includes(item.matchState) && isRetainedRecord(item, policy) ? summary(item) : null) }));
       if (kind === 'failed' && !ids.length && state?.state === 'failed') targets = [{ type: 'sync', errorCode: state.errorCode || 'MAIL_SYNC_FAILED' }];
       if (offset + PAGE_SIZE < ids.length) nextPageToken = token({ offset: offset + PAGE_SIZE, snapshot });
       scannedCount = pageIds.length;
@@ -262,13 +269,14 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         bodyUnavailable: (item) => item.bodyAvailability === 'unavailable',
         attachmentUnverified: (item) => item.unverifiedAttachmentCount > 0, attachmentUnavailable: (item) => item.unavailableAttachmentCount > 0
       };
-      targets = pageRows.filter((item) => ['matched', 'pending'].includes(item.matchState) && filters[kind](item))
+      targets = pageRows.filter((item) => ['matched', 'pending'].includes(item.matchState) && isRetainedRecord(item, policy) && filters[kind](item))
         .map((item) => ({ type: 'message', messageId: item.messageId, message: summary(item) }));
       if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).internalDate });
       scannedCount = pageRows.length;
     }
     const sync = await syncStatus();
     assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
+    assertMail((await store.getCatalog()).digest === currentCatalog.digest, 'MAIL_CATALOG_CHANGED', 409);
     return { kind, targets, scannedCount, page: { nextPageToken, pageSize: PAGE_SIZE }, sync };
   }
 
@@ -309,12 +317,12 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const fingerprint = digest({ operation, payload, actor, startAt });
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-    const expiredCaseIds = catalogRetention(catalog, now()).expiredCaseIds;
-    if (current?.caseId) assertMail(!expiredCaseIds.includes(current.caseId), 'MAIL_RETENTION_EXPIRED', 410);
+    const policy = retentionPolicy(catalog, now());
+    if (current?.caseId) assertRetainedRecord(current, policy);
     return store.mutate(requestId, fingerprint, async (transaction) => {
       const record = await transaction.getMessage(id);
       assertMail(record, 'MAIL_NOT_FOUND', 404);
-      if (record.caseId) assertMail(!expiredCaseIds.includes(record.caseId), 'MAIL_RETENTION_EXPIRED', 410);
+      assertRetainedRecord(record, policy);
       assertMail(withinPeriod(record, periodStart((await transaction.getSyncState())?.startAt)), 'MAIL_NOT_FOUND', 404);
       let transition;
       if (operation === 'markReviewed') {
@@ -333,14 +341,14 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         if (targetCase) {
           assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
           assertMail(catalog.caseIds.includes(targetCase), 'MAIL_CASE_NOT_FOUND', 404);
-          await assertCaseRetention(targetCase);
+          assertRetainedRecord({ caseId: targetCase }, policy);
         }
         transition = core.classifyManually(record, {
           matchState: payload.action === 'match' ? 'matched' : 'excluded', caseId: targetCase,
           expectedVersion: payload.expectedVersion, reason: payload.reason
         }, { email: actor.email, verified: true }, now().toISOString(), catalog.caseIds);
       }
-      const threadRecords = transition.record.threadId ? await transaction.getThreadMessages(transition.record.threadId) : [];
+      const threadRecords = transition.record.threadId ? (await transaction.getThreadMessages(transition.record.threadId)).filter((item) => isRetainedRecord(item, policy)) : [];
       const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== id), transition.record], now().toISOString());
       transaction.setMessage(transition.record);
       if (transition.event) transaction.addEvent({ ...transition.event, requestId });
@@ -363,6 +371,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function indexMessage(id, catalog, scope = {}) {
+    if (await store.isMessageSuppressed?.(id)) return;
     let message;
     try { message = await fetchMessage(id, true); } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') {
@@ -392,7 +401,11 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       { matchState: 'pending', caseId: null, reason: bodyAvailability === 'verified' ? 'evidence_limit' : 'body_unavailable', evidence: { bodyCaseIds: [], currentCaseIds: [], parentMessageIds: [] } };
     const latestCatalog = await store.getCatalog();
     assertMail(latestCatalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-    const expiredIds = [...new Set([...catalogRetention(catalog, now()).expiredCaseIds, ...catalogRetention(latestCatalog, now()).expiredCaseIds])];
+    assertMail(latestCatalog.digest === catalog.digest, 'MAIL_CATALOG_CHANGED', 409);
+    const policy = retentionPolicy(latestCatalog, now());
+    const existing = await store.getMessage(id);
+    if (existing) assertRetainedRecord(existing, policy);
+    const expiredIds = policy.expiredCaseIds;
     assertMail(!expiredIds.includes(classification.caseId) && !classification.evidence.currentCaseIds.some((id) => expiredIds.includes(id)), 'MAIL_RETENTION_EXPIRED', 410);
     for (const key of ['bodyCaseIds', 'currentCaseIds', 'parentMessageIds']) {
       if (classification.evidence[key].length > 100) {
@@ -415,7 +428,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       bodyAvailability, bodyCheckedAt: now().toISOString(),
       unverifiedAttachmentCount: parsed.attachments.length, unavailableAttachmentCount: 0,
       ...classification, version: 1, firstReview: null, indexedAt: now().toISOString(),
-      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) }, latestCatalog.digest);
+      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) }, latestCatalog.digest, policy);
   }
 
   async function reconcilePending(payload, requestId, actor) {
@@ -568,7 +581,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     }
   }
 
-  return async function execute(envelope) {
+  async function execute(envelope) {
     assertMail(envelope && envelope.contractVersion === 1 && OPERATIONS.has(envelope.operation) &&
       ID.test(envelope.requestId || '') && typeof envelope.issuedAt === 'string' &&
       Math.abs(now().getTime() - Date.parse(envelope.issuedAt)) <= 120000 && envelope.payload &&
@@ -576,23 +589,26 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const actor = validateActor(envelope.actor);
     const { operation, payload, requestId } = envelope;
     if (['uploadCaseCatalog', 'advanceSync', 'getSyncRequestResult', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
-    let result;
-    if (operation === 'listMailIssues') result = await listIssues(payload);
-    else if (operation.startsWith('list')) result = await list(operation, payload);
-    else if (operation === 'getMail') result = await getMail(payload);
-    else if (operation === 'getAttachmentChunk') result = await attachment(payload);
-    else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);
-    else if (operation === 'getSyncStatus') result = { sync: await syncStatus() };
-    else if (operation === 'getSyncRequestResult') {
-      const original = payload.requestPayload;
-      assertMail(ID.test(payload.requestId || '') && original && typeof original === 'object' && !Array.isArray(original) &&
-        ID.test(original.executionId || '') && Object.keys(original).every((key) => ['executionId', 'mode', 'catalogSnapshotId', 'catalogDigest', 'startAt', 'resume'].includes(key)));
-      const receipt = await store.getReceipt(payload.requestId, digest({ operation: 'advanceSync', payload: original, actor }));
-      result = { found: Boolean(receipt), receipt: receipt ? { sync: receipt.sync } : null, sync: await syncStatus() };
-    }
-    else if (operation === 'uploadCaseCatalog') result = await uploadCatalog(payload);
-    else if (operation === 'advanceSync') result = await advanceSync(payload, requestId, actor);
-    else if (operation === 'reconcilePending') result = await reconcilePending(payload, requestId, actor);
-    return { ok: true, ...result };
-  };
+    return store.withAccess(async () => {
+      let result;
+      if (operation === 'listMailIssues') result = await listIssues(payload);
+      else if (operation.startsWith('list')) result = await list(operation, payload);
+      else if (operation === 'getMail') result = await getMail(payload);
+      else if (operation === 'getAttachmentChunk') result = await attachment(payload);
+      else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);
+      else if (operation === 'getSyncStatus') result = { sync: await syncStatus() };
+      else if (operation === 'getSyncRequestResult') {
+        const original = payload.requestPayload;
+        assertMail(ID.test(payload.requestId || '') && original && typeof original === 'object' && !Array.isArray(original) &&
+          ID.test(original.executionId || '') && Object.keys(original).every((key) => ['executionId', 'mode', 'catalogSnapshotId', 'catalogDigest', 'startAt', 'resume'].includes(key)));
+        const receipt = await store.getReceipt(payload.requestId, digest({ operation: 'advanceSync', payload: original, actor }));
+        result = { found: Boolean(receipt), receipt: receipt ? { sync: receipt.sync } : null, sync: await syncStatus() };
+      }
+      else if (operation === 'uploadCaseCatalog') result = await uploadCatalog(payload);
+      else if (operation === 'advanceSync') result = await advanceSync(payload, requestId, actor);
+      else if (operation === 'reconcilePending') result = await reconcilePending(payload, requestId, actor);
+      return { ok: true, ...result };
+    });
+  }
+  return execute;
 }

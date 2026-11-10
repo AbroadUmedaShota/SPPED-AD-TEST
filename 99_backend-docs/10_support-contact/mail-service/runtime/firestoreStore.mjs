@@ -4,7 +4,8 @@ import { assertMail } from './errors.mjs';
 import { canonicalJson, catalogDigest } from './service.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from './mixedThread.mjs';
 import { observeAttachment } from './attachmentObservation.mjs';
-import { normalizeCatalogCases } from './caseRetention.mjs';
+import { normalizeCatalogCases, assertRetainedRecord, isRetainedRecord } from './caseRetention.mjs';
+import { createPurgeGate, suppressionKey } from './purgeGate.mjs';
 
 export function createFirestoreStore(db) {
   const mailbox = db.collection('contactMailboxes').doc('customer-speed-ad');
@@ -17,6 +18,20 @@ export function createFirestoreStore(db) {
   const activeRef = meta.doc('activeCatalog');
   const deletionDiagnostics = mailbox.collection('deletionDiagnostics');
   const data = (snapshot) => snapshot.exists ? snapshot.data() : null;
+  const controlRef = meta.doc('purgeControl');
+  const suppressedMessages = mailbox.collection('suppressedMessages');
+  const suppressedCases = mailbox.collection('suppressedCases');
+  const suppressedRequests = mailbox.collection('suppressedRequests');
+  const gate = createPurgeGate(async () => data(await controlRef.get()));
+  async function runTransaction(operation) {
+    return db.runTransaction(async (transaction) => {
+      gate.check(data(await transaction.get(controlRef)));
+      return operation(transaction);
+    });
+  }
+  async function requestAllowed(transaction, id) {
+    assertMail(!(await transaction.get(suppressedRequests.doc(suppressionKey('request', id)))).exists, 'MAIL_REQUEST_CONFLICT', 409);
+  }
   function updateCoverage(transaction, before, after) {
     const previous = before?.matchState === 'matched' ? before.caseId : null;
     const next = after?.matchState === 'matched' ? after.caseId : null;
@@ -32,11 +47,16 @@ export function createFirestoreStore(db) {
     const pages = await snapshots.doc(active.snapshotId).collection('pages').orderBy('pageIndex').get();
     const cases = normalizeCatalogCases(pages.docs.flatMap((page) => { assertMail(Array.isArray(page.data().cases), 'MAIL_CATALOG_INVALID', 409); return page.data().cases; }));
     assertMail(cases.length === active.total && catalogDigest(cases) === active.digest, 'MAIL_CATALOG_INVALID', 409);
-    return { complete: true, snapshotId: active.snapshotId, digest: active.digest, cases, caseIds: cases.map((item) => item.caseId) };
+    const blocked = new Set((await suppressedCases.get()).docs.map((item) => item.id));
+    const suppressedCaseIds = cases.map((item) => item.caseId).filter((id) => blocked.has(suppressionKey('case', id)));
+    return { complete: true, snapshotId: active.snapshotId, digest: active.digest, cases,
+      caseIds: cases.map((item) => item.caseId).filter((id) => !suppressedCaseIds.includes(id)), suppressedCaseIds };
   }
 
   return {
     getCatalog,
+    withAccess: gate.withAccess,
+    async isMessageSuppressed(id) { return (await suppressedMessages.doc(suppressionKey('message', id)).get()).exists; },
     async getCoveredCaseIds({ startAt } = {}) {
       if (!startAt) return (await coverage.where('count', '>', 0).get()).docs.map((item) => item.id);
       const found = await messages.where('matchState', '==', 'matched').where('internalDate', '>=', startAt).select('caseId').get();
@@ -45,7 +65,7 @@ export function createFirestoreStore(db) {
     async uploadCatalogPage(page, makeDigest) {
       const ref = snapshots.doc(page.snapshotId);
       const pageRef = ref.collection('pages').doc(String(page.pageIndex).padStart(4, '0'));
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
         const existing = data(await transaction.get(ref));
         const existingPage = data(await transaction.get(pageRef));
         if (existing) assertMail(existing.pageCount === page.pageCount && existing.total === page.total && existing.digest === page.digest, 'MAIL_REQUEST_CONFLICT', 409);
@@ -57,7 +77,7 @@ export function createFirestoreStore(db) {
       if (pages.size !== page.pageCount) return { complete: false, snapshotId: page.snapshotId, receivedPages: pages.size };
       const cases = normalizeCatalogCases(pages.docs.flatMap((item) => item.data().cases));
       assertMail(cases.length === page.total && makeDigest(cases) === page.digest, 'MAIL_CATALOG_INVALID', 409);
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
         const snapshot = data(await transaction.get(ref));
         const active = data(await transaction.get(activeRef));
         if (!active || active.createdAt <= snapshot.createdAt) transaction.set(activeRef, { snapshotId: page.snapshotId, createdAt: snapshot.createdAt, total: cases.length, digest: page.digest });
@@ -65,12 +85,15 @@ export function createFirestoreStore(db) {
       });
       return { complete: true, snapshotId: page.snapshotId, total: cases.length };
     },
-    async getMessage(id) { return data(await messages.doc(id).get()); },
+    async getMessage(id) {
+      if ((await suppressedMessages.doc(suppressionKey('message', id)).get()).exists) return null;
+      return data(await messages.doc(id).get());
+    },
     async recordUnobservedDeletion(id, at) {
       const ref = deletionDiagnostics.doc(id);
-      await db.runTransaction(async (transaction) => {
-        const [message, diagnostic] = await Promise.all([transaction.get(messages.doc(id)), transaction.get(ref)]);
-        if (!message.exists && !diagnostic.exists) transaction.set(ref, { messageId: id, detectedAt: at });
+      await runTransaction(async (transaction) => {
+        const [message, diagnostic, blocked] = await Promise.all([transaction.get(messages.doc(id)), transaction.get(ref), transaction.get(suppressedMessages.doc(suppressionKey('message', id)))]);
+        if (!blocked.exists && !message.exists && !diagnostic.exists) transaction.set(ref, { messageId: id, detectedAt: at });
       });
     },
     async countUnobservedDeletions() { return (await deletionDiagnostics.count().get()).data().count; },
@@ -81,7 +104,8 @@ export function createFirestoreStore(db) {
     },
     async excludeDraft(id, at) {
       const ref = messages.doc(id);
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
+        if ((await transaction.get(suppressedMessages.doc(suppressionKey('message', id)))).exists) return;
         const existing = data(await transaction.get(ref));
         const record = { ...(existing || { messageId: id, threadId: '', internalDate: at,
           subject: '', from: '', to: '', direction: 'unknown', attachmentCount: 0, firstReview: null,
@@ -134,7 +158,8 @@ export function createFirestoreStore(db) {
     },
     async mutate(requestId, fingerprint, operation, expectedStartAt, expectedCatalogDigest) {
       const receiptRef = mailbox.collection('receipts').doc(requestId);
-      return db.runTransaction(async (transaction) => {
+      return runTransaction(async (transaction) => {
+        await requestAllowed(transaction, requestId);
         const state = data(await transaction.get(syncRef));
         const catalog = data(await transaction.get(activeRef));
         if (expectedCatalogDigest) assertMail(catalog?.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
@@ -163,6 +188,7 @@ export function createFirestoreStore(db) {
       });
     },
     async getReceipt(requestId, fingerprint) {
+      assertMail(!(await suppressedRequests.doc(suppressionKey('request', requestId)).get()).exists, 'MAIL_REQUEST_CONFLICT', 409);
       const receipt = data(await mailbox.collection('receipts').doc(requestId).get());
       if (!receipt) return null;
       assertMail(receipt.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409);
@@ -170,7 +196,8 @@ export function createFirestoreStore(db) {
     },
     async saveReceipt(requestId, fingerprint, result) {
       const ref = mailbox.collection('receipts').doc(requestId);
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
+        await requestAllowed(transaction, requestId);
         const existing = data(await transaction.get(ref));
         if (existing) assertMail(existing.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409);
         else transaction.set(ref, { fingerprint, result, committedAt: new Date().toISOString() });
@@ -183,16 +210,22 @@ export function createFirestoreStore(db) {
       if (cursor) query = query.startAfter(cursor.at, cursor.id);
       return (await query.limit(limit).get()).docs.map((item) => item.data());
     },
-    async upsertIndexedMessage(incoming, expectedCatalogDigest) {
+    async upsertIndexedMessage(incoming, expectedCatalogDigest, retentionPolicy) {
       const ref = messages.doc(incoming.messageId);
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
         const catalog = data(await transaction.get(activeRef));
         if (expectedCatalogDigest) assertMail(catalog?.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
+        if ((await transaction.get(suppressedMessages.doc(suppressionKey('message', incoming.messageId)))).exists) return;
+        if (incoming.caseId && (await transaction.get(suppressedCases.doc(suppressionKey('case', incoming.caseId)))).exists) {
+          incoming = { ...incoming, matchState: 'pending', caseId: null, reason: 'suppressed_case' };
+        }
         const existing = data(await transaction.get(ref));
         const threadRecords = incoming.threadId ? (await transaction.get(messages.where('threadId', '==', incoming.threadId))).docs.map((item) => item.data()) : [];
+        if (retentionPolicy && existing) assertRetainedRecord(existing, retentionPolicy);
         const merged = mergeIndexedMessage(existing, incoming);
-        const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== incoming.messageId), merged], incoming.indexedAt);
+        const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== incoming.messageId && (!retentionPolicy || isRetainedRecord(item, retentionPolicy))), merged], incoming.indexedAt);
         const final = demotions.find((item) => item.record.messageId === incoming.messageId)?.record || merged;
+        if (retentionPolicy) assertRetainedRecord(final, retentionPolicy);
         transaction.set(ref, final);
         transaction.delete(deletionDiagnostics.doc(incoming.messageId));
         updateCoverage(transaction, existing, final);
@@ -210,17 +243,22 @@ export function createFirestoreStore(db) {
     },
     async markUnavailable(id, at) {
       const ref = messages.doc(id);
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
         const existing = data(await transaction.get(ref));
         if (existing && existing.sourceKind !== 'draft') transaction.update(ref, { unavailable: true });
       });
     },
     async recordBodyObservation(id, availability, at) {
-      await messages.doc(id).update({ bodyAvailability: availability, bodyCheckedAt: at });
+      await runTransaction(async (transaction) => {
+        const ref = messages.doc(id);
+        const [record, blocked] = await Promise.all([transaction.get(ref), transaction.get(suppressedMessages.doc(suppressionKey('message', id)))]);
+        assertMail(record.exists && !blocked.exists, 'MAIL_NOT_FOUND', 404);
+        transaction.update(ref, { bodyAvailability: availability, bodyCheckedAt: at });
+      });
     },
     async recordAttachmentObservation(id, partId, availability, at, transfer) {
       const ref = messages.doc(id);
-      return db.runTransaction(async (transaction) => {
+      return runTransaction(async (transaction) => {
         const record = data(await transaction.get(ref));
         assertMail(record && record.attachments?.some((item) => item.partId === partId), 'MAIL_ATTACHMENT_NOT_FOUND', 404);
         const attachments = record.attachments.map((item) => item.partId === partId ? observeAttachment(item, availability, at, transfer) : item);
@@ -232,7 +270,7 @@ export function createFirestoreStore(db) {
     },
     async getSyncState() { return data(await syncRef.get()); },
     async acquireSyncLease(requestId, at) {
-      return db.runTransaction(async (transaction) => {
+      return runTransaction(async (transaction) => {
         const existing = data(await transaction.get(leaseRef));
         if (existing && Date.parse(existing.expiresAt) > Date.parse(at)) return null;
         const lease = { token: randomUUID(), requestId, expiresAt: new Date(Date.parse(at) + 600000).toISOString() };
@@ -241,7 +279,8 @@ export function createFirestoreStore(db) {
       });
     },
     async setSyncState(state, lease, receipt) {
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
+        if (receipt) await requestAllowed(transaction, receipt.requestId);
         const existing = data(await transaction.get(leaseRef));
         const previousReceipt = receipt ? data(await transaction.get(mailbox.collection('receipts').doc(receipt.requestId))) : null;
         assertMail(existing?.token === lease, 'MAIL_SYNC_BUSY', 409);
@@ -253,7 +292,7 @@ export function createFirestoreStore(db) {
       });
     },
     async releaseSyncLease(lease) {
-      await db.runTransaction(async (transaction) => {
+      await runTransaction(async (transaction) => {
         const existing = data(await transaction.get(leaseRef));
         if (existing?.token === lease) transaction.delete(leaseRef);
       });

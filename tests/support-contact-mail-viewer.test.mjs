@@ -1270,7 +1270,7 @@ test('authoritative closure metadata is paged and changing only closure invalida
   const plan = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
   app.api.advanceContactMailSync({ catalog: plan });
   assert.deepEqual(JSON.parse(JSON.stringify(app.calls[0].envelope.payload.cases)), [{ caseId, handledStatus: '対応済み', closedAt: null }]);
-  closedDates[0] = '2023-11-10T00:00:00.000Z';
+  closedDates[0] = '2026-11-10T00:00:00.000Z';
   assert.equal(app.api.advanceContactMailSync({ catalog: plan }).error.code, 'CONFLICT');
   const revised = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
   assert.notEqual(revised.digest, plan.digest);
@@ -1285,4 +1285,16 @@ test('retention residual counts are visible and can never accompany technical re
   assert.match(app.ui.renderContactMailSync(value), /終了日未確認 2件・保存期限到来 3件/);
   assert.throws(() => app.ui.validateContactMailSync({ ...value, acceptanceReady: true }), /MAIL_INVALID_RESPONSE/);
   assert.throws(() => app.ui.validateContactMailSync({ ...sync, unknownClosureCaseCount: undefined }), /MAIL_INVALID_RESPONSE/);
+});
+
+
+test('closure before receipt fails closed while equal and later receipt times are allowed', () => {
+  const submitted = '2026-01-01T00:00:00.000Z';
+  for (const closedAt of ['2025-12-31T23:59:59.999Z', submitted, '2026-01-01T00:00:00.001Z']) {
+    const app = bridgeRuntime({ dates: [submitted], statuses: ['対応済み'], closedDates: [closedAt] });
+    const operation = () => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } });
+    if (closedAt < submitted) assert.throws(operation, /MAIL_CATALOG_INVALID/);
+    else assert.equal(operation().ok, true);
+    assert.equal(app.calls.length, 0);
+  }
 });

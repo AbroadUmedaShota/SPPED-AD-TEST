@@ -1,5 +1,6 @@
 import { assertMail } from '../errors.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
+import { assertRetainedRecord, isRetainedRecord } from '../caseRetention.mjs';
 import { observeAttachment } from '../attachmentObservation.mjs';
 
 const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
@@ -19,6 +20,7 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const serial = (fn) => { const task = queue.then(fn); queue = task.catch(() => {}); return task; };
   const store = {
     records, receipts, events,
+    withAccess: (operation) => operation(),
     seed(record) { records.set(record.messageId, clone(record)); },
     setCatalog(value) { catalog = value; },
     async getCatalog() { return clone(catalog); },
@@ -111,13 +113,15 @@ export function fakeStore(caseIds = [], initialSync = null) {
         return clone(result);
       });
     },
-    async upsertIndexedMessage(incoming, expectedCatalogDigest) {
+    async upsertIndexedMessage(incoming, expectedCatalogDigest, policy) {
       if (expectedCatalogDigest) assertMail(catalog.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
-      deletionDiagnostics.delete(incoming.messageId);
       const before = records.get(incoming.messageId);
+      if (policy && before) assertRetainedRecord(before, policy);
       const merged = mergeIndexedMessage(before, incoming);
       const threadRecords = [...records.values()].filter((record) => record.threadId === incoming.threadId && record.messageId !== incoming.messageId);
-      const demotions = mixedThreadDemotions([...threadRecords, merged], incoming.indexedAt);
+      const demotions = mixedThreadDemotions([...threadRecords.filter((item) => !policy || isRetainedRecord(item, policy)), merged], incoming.indexedAt);
+      if (policy) assertRetainedRecord(merged, policy);
+      deletionDiagnostics.delete(incoming.messageId);
       store.seed(merged);
       const event = indexedClassificationEvent(before, merged, incoming.indexedAt);
       if (event) events.push(clone(event));

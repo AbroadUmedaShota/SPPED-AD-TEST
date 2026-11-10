@@ -10,6 +10,8 @@ import { createMailHttpServer } from '../http.mjs';
 import { createGmailAdapter } from '../googleAdapters.mjs';
 import { createFirestoreStore } from '../firestoreStore.mjs';
 import { fakeStore } from './fakeStore.mjs';
+import { memoryFirestore } from './memoryFirestore.mjs';
+import { retentionPolicy } from '../caseRetention.mjs';
 
 const coreRoot = process.env.MAIL_CORE_DIR ? pathToFileURL(`${resolve(process.env.MAIL_CORE_DIR)}/`) : new URL('../../', import.meta.url);
 const modules = await Promise.all(['classification', 'mime', 'review', 'safeMail'].map((name) => import(new URL(`${name}.mjs`, coreRoot))));
@@ -52,6 +54,28 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
     payload: operation === 'advanceSync' && payload.mode ? { startAt: START, ...payload } : payload, ...changes });
   return { store, messages, calls, gmail, execute, envelope };
 }
+
+test('suppressed original Gmail IDs are never fetched or restored by full or history sync', async () => {
+  const f = fixture([A]);
+  f.store.isMessageSuppressed = async (id) => id === 'purged-original';
+  f.messages.set('purged-original', gmailMessage('purged-original'));
+  const executionId = randomUUID();
+  let result = await f.execute(f.envelope('advanceSync', { executionId, mode: 'full' }));
+  while (result.sync.state === 'running') result = await f.execute(f.envelope('advanceSync', { executionId }));
+  assert(!f.calls.includes('purged-original'));
+  assert.equal(await f.store.getMessage('purged-original'), null);
+  f.gmail.listHistory = async () => ({ messageIds: ['purged-original'], historyId: '200' });
+  result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert(!f.calls.includes('purged-original'));
+  assert.equal(await f.store.getMessage('purged-original'), null);
+});
+
+test('manual exclusion anchors retention at the verified server time', async () => {
+  const f = fixture([A]);
+  f.store.seed(record('excluded', { matchState: 'pending', caseId: null }));
+  await f.execute(f.envelope('resolvePending', { messageId: 'excluded', action: 'exclude', expectedVersion: 1, reason: 'unrelated' }));
+  assert.equal((await f.store.getMessage('excluded')).excludedAt, NOW);
+});
 
 test('OIDC verifies exact script audience and deployer, including azp', async () => {
   const claims = { iss: 'https://accounts.google.com', aud: 'script-client', sub: 'deployer-sub', email: 'owner@abroad-o.com', email_verified: true };
@@ -957,7 +981,7 @@ test('Firestore catalog read requires complete closure metadata and verifies its
   const metadata = { snapshotId: 'snapshot', total: 2, digest: catalogDigest(cases) };
   const node = (path = '') => ({
     collection(name) { return node(`${path}/${name}`); }, doc(name) { return node(`${path}/${name}`); }, orderBy() { return this; },
-    async get() { return path.endsWith('/pages') ? { docs: [{ data: () => page }] } : { exists: true, data: () => metadata }; }
+    async get() { return path.endsWith('/suppressedCases') ? { docs: [] } : path.endsWith('/pages') ? { docs: [{ data: () => page }] } : { exists: true, data: () => metadata }; }
   });
   const store = createFirestoreStore(node());
   assert.deepEqual((await store.getCatalog()).cases, cases);
@@ -987,7 +1011,7 @@ test('Firestore transactions reject stale catalog digest before any record write
   const node = (path = '') => ({ path, collection(name) { return node(`${path}/${name}`); }, doc(name) { return node(`${path}/${name}`); } });
   let writes = 0;
   const db = { ...node(), async runTransaction(fn) { return fn({
-    async get(ref) { return { exists: true, data: () => ref.path.endsWith('/activeCatalog') ? { digest: 'new' } : { startAt: START } }; },
+    async get(ref) { return { exists: !ref.path.includes('/suppressed'), data: () => ref.path.endsWith('/activeCatalog') ? { digest: 'new' } : { startAt: START } }; },
     set() { writes++; }, update() { writes++; }, delete() { writes++; }
   }); } };
   const store = createFirestoreStore(db);
@@ -1004,4 +1028,64 @@ test('review rechecks expiry in the exact catalog pinned for its transaction', a
     cases: [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }] };
   await assert.rejects(() => f.execute(f.envelope('markReviewed', { messageId: 'review', scope: 'case', caseId: A, expectedVersion: 1 })), { code: 'MAIL_RETENTION_EXPIRED' });
   assert.equal(f.store.records.get('review').firstReview, null); assert.equal(f.store.receipts.size, 0);
+});
+
+
+test('a catalog removed during sync cannot authorize an old match or expose its existing mail', async () => {
+  const f = fixture([A]);
+  const first = { complete: true, cases: caseEntries([A]), caseIds: [A], digest: catalogDigest(caseEntries([A])) };
+  const second = { complete: true, cases: caseEntries([B]), caseIds: [B], digest: catalogDigest(caseEntries([B])) };
+  f.store.setCatalog(first);
+  f.messages.set('removed', gmailMessage('removed'));
+  const getMessage = f.gmail.getMessage;
+  f.gmail.getMessage = async (id) => { const mail = await getMessage(id); f.store.setCatalog(second); return mail; };
+  const execute = createMailService({ store: f.store, gmail: f.gmail, core, now: () => new Date(NOW), trustedAnchor: () => true });
+  await assert.rejects(execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' })), { code: 'MAIL_CATALOG_CHANGED' });
+  assert.equal(f.store.records.has('removed'), false);
+  f.store.seed(record('old-removed'));
+  for (const operation of ['getMail', 'markReviewed']) await assert.rejects(execute(f.envelope(operation,
+    { scope: 'case', caseId: A, messageId: 'old-removed', expectedVersion: 1 })), { code: 'MAIL_CASE_NOT_FOUND' });
+});
+
+test('Firestore final merged manual record cannot restore an expired or removed case', async () => {
+  const root = 'contactMailboxes/customer-speed-ad';
+  for (const removed of [false, true]) {
+    const cases = removed ? caseEntries([B]) : [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }];
+    const catalog = { complete: true, cases, caseIds: cases.map((item) => item.caseId), digest: catalogDigest(cases) };
+    const original = record('manual-old', { manualClassification: true, reason: 'manual', firstReview: { email: 'reviewer@abroad-o.com', at: NOW } });
+    const db = memoryFirestore({ [`${root}/meta/activeCatalog`]: { digest: catalog.digest }, [`${root}/messages/manual-old`]: original });
+    const before = JSON.stringify([...db.records]);
+    await assert.rejects(createFirestoreStore(db).upsertIndexedMessage(record('manual-old', { matchState: 'pending', caseId: null }), catalog.digest,
+      retentionPolicy(catalog, new Date(NOW))), { code: removed ? 'MAIL_CASE_NOT_FOUND' : 'MAIL_RETENTION_EXPIRED' });
+    assert.equal(JSON.stringify([...db.records]), before);
+  }
+});
+
+test('expired metadata is hidden in cross-case and failed lists while empty pages retain navigation', async () => {
+  const f = fixture([A, B]);
+  const cases = [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }, ...caseEntries([B])];
+  f.store.setCatalog({ complete: true, cases, caseIds: [A, B], digest: catalogDigest(cases) });
+  for (let index = 0; index < 50; index++) f.store.seed(record(`expired-${String(index).padStart(3, '0')}`));
+  f.store.seed(record('visible', { caseId: B, internalDate: '2026-11-09T00:00:00.000Z' }));
+  const page = await f.execute(f.envelope('listUnreviewedMail'));
+  assert.deepEqual(page.messages, []); assert(page.page.nextPageToken);
+  assert.deepEqual((await f.execute(f.envelope('listUnreviewedMail', { pageToken: page.page.nextPageToken }))).messages.map((item) => item.messageId), ['visible']);
+  const issues = await f.execute(f.envelope('listMailIssues', { kind: 'unreviewed' }));
+  assert.deepEqual(issues.targets, []); assert(issues.page.nextPageToken);
+  assert.equal((await f.execute(f.envelope('listMailIssues', { kind: 'unreviewed', pageToken: issues.page.nextPageToken }))).targets[0].messageId, 'visible');
+  const state = await f.store.getSyncState();
+  const lease = await f.store.acquireSyncLease('test');
+  await f.store.setSyncState({ ...state, state: 'failed', failedMessageIds: ['expired-000'] }, lease);
+  const failed = await f.execute(f.envelope('listMailIssues', { kind: 'failed' }));
+  assert.equal(failed.targets[0].message, null);
+});
+
+
+test('purged cases show a deletion result and no longer remain coverage or retention residuals', async () => {
+  const f = fixture([A]);
+  f.store.setCatalog({ complete: true, caseIds: [], suppressedCaseIds: [A],
+    cases: [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }] });
+  const status = (await f.execute(f.envelope('getSyncStatus'))).sync;
+  assert.equal(status.expiredCaseCount, 0); assert.equal(status.coverageUnverifiedCaseCount, 0);
+  await assert.rejects(f.execute(f.envelope('listCaseMail', { caseId: A })), { code: 'MAIL_RECORDS_DELETED' });
 });

@@ -41,7 +41,8 @@ export function classifyManually(record, change, actor, now, knownCaseIds) {
   const known = new Set([...knownCaseIds].map(normalizeCaseId).filter(Boolean));
   if (change.matchState === 'matched' && (!caseId || !known.has(caseId))) throw new Error('CASE_NOT_FOUND');
   const at = timestamp(now);
-  const next = { ...record, matchState: change.matchState, caseId, reason: 'manual', manualClassification: true, version: record.version + 1 };
+  const next = { ...record, matchState: change.matchState, caseId, reason: 'manual', manualClassification: true, version: record.version + 1,
+    excludedAt: change.matchState === 'excluded' ? at : null };
   const event = { type: 'mail.classified', messageId: record.messageId, actor: email, at, version: next.version, reason, previous: { matchState: record.matchState, caseId: record.caseId || null }, next: { matchState: next.matchState, caseId } };
   return { record: next, event };
 }

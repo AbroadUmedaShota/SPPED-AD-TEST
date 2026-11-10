@@ -9,7 +9,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
   'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
-  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_RETENTION_EXPIRED'
+  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_MAINTENANCE'
 ];
 
 function listContactMail(options, authProof) {
@@ -154,11 +154,12 @@ function mailCatalogSource_() {
     ids.push(id);
     var status = String(row[statusColumn] || '').trim() || '未対応';
     if (['未対応', '対応中', '対応済み', '保留'].indexOf(status) === -1) throw new Error('MAIL_CATALOG_INVALID');
+    var submittedMillis = dateColumn < 0 ? NaN : mailSubmittedAtMillis_(row[dateColumn]);
     var rawClosed = row[closedColumn];
     var closedAt = null;
     if (rawClosed !== '' && rawClosed != null) {
       var closedMillis = mailSubmittedAtMillis_(rawClosed);
-      if (status !== '対応済み' || !isFinite(closedMillis) || closedMillis > Date.now()) throw new Error('MAIL_CATALOG_INVALID');
+      if (status !== '対応済み' || !isFinite(closedMillis) || !isFinite(submittedMillis) || closedMillis < submittedMillis || closedMillis > Date.now()) throw new Error('MAIL_CATALOG_INVALID');
       closedAt = new Date(closedMillis).toISOString();
     }
     cases.push({ caseId: id, handledStatus: status, closedAt: closedAt });

@@ -35,3 +35,20 @@ export function catalogRetention(catalog, now) {
   const expiredCaseIds = retained.filter((item) => item.closedAt && Date.parse(retentionExpiresAt(item.closedAt)) <= now.getTime()).map((item) => item.caseId);
   return { cases, unknownClosureCaseIds, expiredCaseIds };
 }
+
+export function retentionPolicy(catalog, now) {
+  const retention = catalogRetention(catalog, now);
+  return { caseIds: catalog.caseIds, expiredCaseIds: retention.expiredCaseIds,
+    suppressedCaseIds: catalog.suppressedCaseIds || [] };
+}
+
+export function isRetainedRecord(record, policy) {
+  return !record.caseId || (policy.caseIds.includes(record.caseId) && !policy.expiredCaseIds.includes(record.caseId));
+}
+
+export function assertRetainedRecord(record, policy) {
+  if (!record.caseId) return;
+  assertMail(!policy.suppressedCaseIds.includes(record.caseId), 'MAIL_RECORDS_DELETED', 410);
+  assertMail(policy.caseIds.includes(record.caseId), 'MAIL_CASE_NOT_FOUND', 404);
+  assertMail(!policy.expiredCaseIds.includes(record.caseId), 'MAIL_RETENTION_EXPIRED', 410);
+}
