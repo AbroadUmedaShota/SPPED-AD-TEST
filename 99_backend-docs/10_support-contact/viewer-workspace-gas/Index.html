@@ -1336,9 +1336,11 @@
     const contactMailState = {
       case: { scope: 'case', serial: 0, detailSerial: 0, attachmentSerial: 0, urls: [] },
       queue: { scope: 'unreviewed', serial: 0, detailSerial: 0, attachmentSerial: 0, urls: [] },
-      issues: { serial: 0, kind: 'pending', pageToken: '', history: [], result: null },
+      issues: { serial: 0, kind: 'pending', pageToken: '', history: [], result: null, active: false },
       syncSerial: 0,
       sync: null,
+      periodObserved: false,
+      periodStartAt: null,
       syncProgress: null,
       syncBusy: false,
       syncStopRequested: false,
@@ -1467,6 +1469,35 @@
       if (view === 'case') root.hidden = true;
     }
 
+    function observeContactMailSync(sync) {
+      if (!sync || typeof sync.state !== 'string') throw new Error('MAIL_INVALID_RESPONSE');
+      const startAt = typeof sync.startAt === 'string' && Number.isFinite(Date.parse(sync.startAt)) ? new Date(sync.startAt).toISOString() : null;
+      const changed = contactMailState.periodObserved && contactMailState.periodStartAt !== startAt;
+      contactMailState.periodObserved = true;
+      contactMailState.periodStartAt = startAt;
+      contactMailState.sync = sync;
+      if (!changed) return false;
+      const notice = 'メールの同期対象期間が変わりました。更新して現在の期間を確認してください。';
+      const previous = Object.fromEntries(['case', 'queue'].map((view) => [view, {
+        caseId: contactMailState[view].caseId,
+        scope: contactMailState[view].scope,
+        issuesActive: view === 'queue' && contactMailState.issues.active,
+        visible: Boolean((contactMailState[view].status && contactMailState[view].status !== 'unobserved') || (view === 'queue' && contactMailState.issues.active))
+      }]));
+      clearContactMailView('case');
+      clearContactMailView('queue');
+      Object.assign(contactMailState.issues, { pageToken: '', history: [], result: null });
+      for (const view of ['case', 'queue']) {
+        if (!previous[view].visible) continue;
+        if (previous[view].issuesActive || previous[view].scope === 'issues') renderContactMailIssues(notice);
+        else {
+          Object.assign(contactMailState[view], { caseId: previous[view].caseId, status: 'failed', error: notice });
+          renderContactMailView(view);
+        }
+      }
+      return true;
+    }
+
     function contactMailOptions(current, extra = {}) {
       return { scope: current.scope, ...(current.scope === 'case' ? { caseId: current.caseId } : {}), ...extra };
     }
@@ -1497,7 +1528,7 @@
         const result = contactMailResult(await callServer('getContactMailSyncStatus'));
         if (serial !== contactMailState.syncSerial) return;
         validateContactMailSync(result.sync);
-        contactMailState.sync = result.sync;
+        observeContactMailSync(result.sync);
         const progress = contactMailState.syncProgress;
         if (progress && result.sync && result.sync.executionId === progress.executionId) {
           if (result.sync.state === 'failed') {
@@ -1655,7 +1686,7 @@
             if (typeof result.found !== 'boolean' || (result.found ? !result.receipt : result.receipt !== null)) throw new Error('MAIL_INVALID_RESPONSE');
             validateContactMailSync(result.sync);
             if (!result.found) {
-              contactMailState.sync = result.sync;
+              observeContactMailSync(result.sync);
               element.textContent = `${renderContactMailSync(result.sync)} この要求の保存結果はまだ確認できません。自動では再送せず、要求IDを保持しています。同期状態を確認してください。`;
               break;
             }
@@ -1665,7 +1696,7 @@
           progress.requestId = '';
           progress.requestPayload = null;
           progress.requestPending = false;
-          contactMailState.sync = result.sync;
+          observeContactMailSync(result.sync);
           element.textContent = `${progress.periodText || ''} ${renderContactMailSync(result.sync)} この操作: ${batch}/20回。`;
           renderContactMailSyncButton();
           if (result.sync.executionId !== progress.executionId) { contactMailState.syncProgress = null; element.textContent += ' 元の要求の成立を確認しました。現在は別の同期実行があるため、続行を停止しました。'; break; }
@@ -1706,12 +1737,14 @@
 
     async function loadContactMailIssues() {
       const current = contactMailState.issues;
+      current.active = true;
       const serial = ++current.serial;
       current.result = null;
       renderContactMailIssues('対象を確認中...');
       try {
         const result = contactMailResult(await callServer('listContactMailIssues', { kind: current.kind, pageToken: current.pageToken }));
         if (serial !== current.serial) return;
+        if (observeContactMailSync(result.sync)) return;
         current.result = validateContactMailIssues(result, current.kind);
         renderContactMailIssues();
       } catch (error) {
@@ -1753,6 +1786,7 @@
     function openContactMailQueue(scope) {
       contactMailState.returnFocus = document.activeElement;
       clearContactMailView('queue');
+      contactMailState.issues.active = false;
       contactMailState.queue.scope = scope;
       document.getElementById('mailQueueTitle').textContent = scope === 'pending' ? '照合待ちメール' : '未確認メール（全ステータス）';
       document.getElementById('mailQueueModal').hidden = false;
@@ -1762,6 +1796,7 @@
     }
 
     function closeContactMailQueue() {
+      contactMailState.issues.active = false;
       clearContactMailView('queue');
       document.getElementById('mailQueueModal').hidden = true;
       appView.inert = false;
@@ -1781,6 +1816,7 @@
         const result = contactMailResult(await callServer('listContactMail', contactMailOptions(current, { pageToken: current.pageToken })));
         if (serial !== current.serial) return;
         validateContactMailList(result, current.scope, current.caseId);
+        if (observeContactMailSync(result.sync)) return;
         current.messages = result.messages;
         current.page = result.page;
         current.sync = result.sync;
@@ -1901,11 +1937,11 @@
         const result = contactMailResult(await callServer('reconcileContactMailPending', { pageToken: current.reconcilePageToken || '', requestId: current.reconcileRequestId }));
         if (serial !== current.serial) return;
         if (!Number.isInteger(result.processedCount) || !result.page || typeof result.page.nextPageToken !== 'string') throw new Error('MAIL_INVALID_RESPONSE');
+        if (observeContactMailSync(result.sync)) return;
         current.reconcilePageToken = result.page.nextPageToken;
         current.reconcileRequestId = '';
         current.reconcileMessage = `${result.processedCount}件を再照合しました。${current.reconcilePageToken ? '続行ボタンで次へ進めます。' : 'この回の再照合は完了です。'}`;
         current.writing = false;
-        if (result.sync) contactMailState.sync = result.sync;
         await loadContactMailList('queue');
         loadContactMailSyncStatus();
       } catch (error) {
@@ -2021,6 +2057,8 @@
     function showDenied(message) {
       ++contactMailState.syncSerial;
       contactMailState.sync = null;
+      contactMailState.periodObserved = false;
+      contactMailState.periodStartAt = null;
       contactMailState.syncProgress = null;
       contactMailState.syncBusy = false;
       contactMailState.syncStopRequested = false;

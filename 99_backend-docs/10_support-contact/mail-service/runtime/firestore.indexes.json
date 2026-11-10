@@ -14,6 +14,8 @@
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "unavailable", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "bodyAvailability", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }, { "fieldPath": "caseId", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "firstReview", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }, { "fieldPath": "unverifiedAttachmentCount", "order": "ASCENDING" }, { "fieldPath": "unavailableAttachmentCount", "order": "ASCENDING" }] }
   ],
   "fieldOverrides": []

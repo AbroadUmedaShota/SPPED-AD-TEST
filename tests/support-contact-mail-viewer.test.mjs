@@ -360,6 +360,73 @@ test('newer mail list and auth loss invalidate late protected responses', async 
   assert.equal(app.element('mailQueueModal').hidden, true);
 });
 
+test('observed period shrink clears open mail, revokes previews and discards a pending attachment response', async () => {
+  const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z' };
+  const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z' };
+  let resolveAttachment;
+  const chunk = (partId) => ({ ok: true, attachment: { partId, name: 'note.txt', mimeType: 'text/plain', previewKind: 'text', availability: 'verified' }, reviewReady: false, offset: 0, nextOffset: 3, totalSize: 3, dataBase64: 'YWJj', done: true });
+  const app = uiRuntime({
+    listContactMail: () => ({ ...list([summary()]), sync: broad }),
+    getContactMailMessage: () => ({ ok: true, message: detail('mail1', { bodyText: 'old protected body', attachments: ['0.1', '0.2'].map((partId) => ({ partId, name: 'note.txt', mimeType: 'text/plain', size: 3 })) }) }),
+    getContactMailSyncStatus: () => ({ ok: true, sync: narrow }),
+    getContactMailAttachmentChunk: (options) => options.partId === '0.1' ? chunk('0.1') : new Promise((resolve) => { resolveAttachment = resolve; }),
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  await app.ui.loadContactMailList('queue');
+  assert.match(app.element('caseMailSection').innerHTML, /old protected body/);
+  const previewParent = app.element('preview-parent');
+  const previewButton = app.element('preview-button'); previewButton.parentElement = previewParent;
+  await app.ui.loadContactMailAttachment('case', '0.1', previewButton);
+  const previewUrl = app.mail.case.urls[0];
+  assert.ok(previewUrl);
+  const pendingParent = app.element('pending-parent');
+  const pendingButton = app.element('pending-button'); pendingButton.parentElement = pendingParent;
+  const pending = app.ui.loadContactMailAttachment('case', '0.2', pendingButton);
+  await Promise.resolve();
+  app.mail.issues.history.push('old-page');
+  await app.ui.loadContactMailSyncStatus();
+  assert.equal(app.mail.case.message, null); assert.equal(app.mail.queue.message, null);
+  assert.equal(app.mail.case.messages.length, 0); assert.equal(app.mail.queue.messages.length, 0);
+  assert.equal(app.mail.case.caseId, caseId);
+  assert.equal(app.mail.issues.history.length, 0);
+  assert.ok(app.revoked.includes(previewUrl));
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /old protected body/);
+  assert.doesNotMatch(app.element('mailQueueContent').innerHTML, /old protected body/);
+  assert.match(app.element('caseMailSection').innerHTML, /同期対象期間が変わりました/);
+  resolveAttachment(chunk('0.2'));
+  await pending;
+  assert.equal(app.mail.case.urls.length, 0);
+  assert.equal(pendingParent.querySelector('[data-mail-attachment-preview]').children.length, 0);
+  assert.equal(app.mail.periodStartAt, narrow.startAt);
+});
+
+test('sync advance with a new period invalidates old list and detail responses before they can restore content', async () => {
+  const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z' };
+  const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z' };
+  let resolveList;
+  let resolveDetail;
+  let detailCalls = 0;
+  const app = uiRuntime({
+    listContactMail: (options) => options.scope === 'pending' ? new Promise((resolve) => { resolveList = resolve; }) : { ...list([summary()]), sync: broad },
+    getContactMailMessage: () => ++detailCalls === 1 ? { ok: true, message: detail('mail1', { bodyText: 'old open body' }) } : new Promise((resolve) => { resolveDetail = resolve; }),
+    advanceContactMailSync: (options) => !options.executionId ? { ok: true, catalog: { complete: true, nextPageIndex: 1, pageCount: 1, digest: 'digest', snapshotId: randomUUID(), startAt: narrow.startAt } } : { ok: true, sync: narrow },
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  const oldDetail = app.ui.selectContactMail('case', 0);
+  app.mail.queue.scope = 'pending';
+  const oldList = app.ui.loadContactMailList('queue');
+  await Promise.resolve();
+  await app.ui.advanceContactMailSyncFromUi();
+  resolveDetail({ ok: true, message: detail('mail1', { bodyText: 'late old body' }) });
+  resolveList({ ...list([summary('old-pending', { caseId: null, matchState: 'pending' })]), sync: broad });
+  await Promise.all([oldDetail, oldList]);
+  assert.equal(app.mail.periodStartAt, narrow.startAt);
+  assert.equal(app.mail.case.message, null); assert.equal(app.mail.queue.messages.length, 0);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /old open body|late old body/);
+  assert.doesNotMatch(app.element('mailQueueContent').innerHTML, /old-pending/);
+  assert.match(app.element('mailQueueContent').innerHTML, /同期対象期間が変わりました/);
+});
+
 test('explicit review retries preserve request ID and never mutate case status', async () => {
   let attempts = 0;
   const app = uiRuntime({
