@@ -2,6 +2,8 @@
 
 受付データのGAS viewerを維持し、公式窓口メールの読取・照合・確認記録だけを別のCloud Runサービスで扱う。画面とサーバーの詳細な受入条件は[仕様24](../../../docs/画面設計/仕様/24_support_contact_workspace_viewer_requirements.md)を参照する。現行のCloudflare/D1試用と公開フォームの保存経路は変更しない。
 
+本番配備の順序、手動同期、失敗時の復旧、全件照合と巻戻しは[運用手順](OPERATIONS.md)を参照する。手順の準備と実行・受入の完了は別に記録する。
+
 ## 構成
 
 - GASは既存の利用者認証を通した後、サーバー側で取得したApps ScriptのID tokenを使ってIAM非公開のCloud Run `/rpc` を呼ぶ。画面から確認者メールや任意のサービスURLを指定できない。
