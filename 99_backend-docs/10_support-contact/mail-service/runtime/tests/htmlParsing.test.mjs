@@ -8,7 +8,10 @@ import * as safeMail from '../../safeMail.mjs';
 import { createMailService } from '../service.mjs';
 import { fakeStore } from './fakeStore.mjs';
 
-test('HTML beyond the tree budget stays a visible unavailable residual and cannot be reviewed', async () => {
+for (const [kind, html] of [
+  ['source tag count', '<br>'.repeat(20001)],
+  ['parser-generated formatting clones', '<p>start' + Array.from({ length: 256 }, (_, index) => `<b id=b${index}>`).join('') + '<p>x</p>'.repeat(256)]
+]) test(`HTML beyond ${kind} budget stays a visible unavailable residual and cannot be reviewed`, async () => {
   const caseId = '11111111-1111-4111-8111-111111111111';
   const at = '2026-11-10T09:00:00.000Z';
   const store = fakeStore([caseId], { state: 'complete', startAt: '2026-01-01T00:00:00.000Z', cutoffAt: at });
@@ -16,7 +19,6 @@ test('HTML beyond the tree budget stays a visible unavailable residual and canno
     internalDate: at, subject: 'test', from: 'a', to: 'b', direction: 'received', firstReview: null,
     unavailable: false, bodyAvailability: 'unverified', attachmentCount: 0, attachments: [],
     unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0 });
-  const html = '<br>'.repeat(20001);
   assert.throws(() => safeMail.htmlToPlainText(html), /MAIL_HTML_STRUCTURE_LIMIT/);
   const bytes = Buffer.from(html);
   const gmail = { async getAttachment() { throw new Error('unexpected attachment fetch'); },

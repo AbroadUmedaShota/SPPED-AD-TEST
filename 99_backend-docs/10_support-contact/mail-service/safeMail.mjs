@@ -1,4 +1,4 @@
-import { parseFragment } from 'parse5';
+import { defaultTreeAdapter, parseFragment } from 'parse5';
 
 const secretParameter = /(?:^|[?#&])(?:token|access_token|id_token|refresh_token|secret|code|state)=/i;
 const urlColon = '(?::|%(?:25)*3a|&(?:amp;)*(?:colon|#0*58|#x0*3a);)';
@@ -40,6 +40,7 @@ export function safeMailText(value) {
 const activeHtmlTags = new Set(['script', 'style', 'iframe', 'object', 'svg']);
 const lineEndHtmlTags = new Set(['p', 'div', 'li', 'tr', 'blockquote']);
 const maxHtmlMarkupCandidates = 20000;
+const maxHtmlTreeNodes = 20000;
 
 function assertHtmlComplexity(value) {
   let candidates = 0;
@@ -53,11 +54,42 @@ function assertHtmlComplexity(value) {
   }
 }
 
+function boundedHtmlTreeAdapter() {
+  let createdNodes = 0;
+  const reserveNode = () => {
+    if (createdNodes >= maxHtmlTreeNodes) throw new Error('MAIL_HTML_STRUCTURE_LIMIT');
+    createdNodes += 1;
+  };
+  const adapter = { ...defaultTreeAdapter };
+  for (const method of ['createDocument', 'createDocumentFragment', 'createElement', 'createCommentNode', 'createTextNode']) {
+    adapter[method] = (...args) => {
+      reserveNode();
+      return defaultTreeAdapter[method](...args);
+    };
+  }
+  // These default methods construct nodes internally through the original adapter.
+  adapter.insertText = (parent, text) => {
+    if (parent.childNodes.at(-1)?.nodeName !== '#text') reserveNode();
+    defaultTreeAdapter.insertText(parent, text);
+  };
+  adapter.insertTextBefore = (parent, text, reference) => {
+    const children = parent.childNodes;
+    const index = children.at(-1) === reference ? children.length - 1 : children.indexOf(reference);
+    if (children[index - 1]?.nodeName !== '#text') reserveNode();
+    defaultTreeAdapter.insertTextBefore(parent, text, reference);
+  };
+  adapter.setDocumentType = (document, ...args) => {
+    if (!document.childNodes.some((node) => node.nodeName === '#documentType')) reserveNode();
+    defaultTreeAdapter.setDocumentType(document, ...args);
+  };
+  return adapter;
+}
+
 export function htmlToPlainText(value) {
   const html = String(value ?? '');
   // Bound potential tree allocation before invoking the standards parser. This does not interpret markup.
   assertHtmlComplexity(html);
-  const fragment = parseFragment(html);
+  const fragment = parseFragment(html, { treeAdapter: boundedHtmlTreeAdapter() });
   const output = [];
   const pending = [fragment];
   while (pending.length) {

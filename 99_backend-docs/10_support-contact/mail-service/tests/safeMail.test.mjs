@@ -54,6 +54,30 @@ test('commented closing tags cannot leak hidden SVG or object case IDs into clas
   }
 });
 
+test('actual tree budget counts formatting clones and internally created text nodes', () => {
+  const amplified = '<p>start' + Array.from({ length: 256 }, (_, index) => `<b id=b${index}>`).join('') + '<p>x</p>'.repeat(256);
+  for (const html of [amplified, '<span>x</span>'.repeat(10000), '<table>x</table>'.repeat(10000)]) {
+    assert.throws(() => htmlToPlainText(html), /^Error: MAIL_HTML_STRUCTURE_LIMIT$/);
+  }
+  assert.equal(htmlToPlainText('<b id=normal>'.repeat(8) + '<p>visible</p>'.repeat(8)), 'visible\n'.repeat(8));
+});
+
+test('formatting reconstruction is stopped within a bounded child process', { timeout: 15000 }, (t) => {
+  const moduleUrl = new URL('../safeMail.mjs', import.meta.url).href;
+  const script = `import assert from 'node:assert/strict';
+    import { htmlToPlainText } from ${JSON.stringify(moduleUrl)};
+    const started = performance.now();
+    for (const count of [256, 512]) {
+      const html = '<p>start' + Array.from({ length: count }, (_, index) => '<b id=b' + index + '>').join('') + '<p>x</p>'.repeat(count);
+      assert.throws(() => htmlToPlainText(html), /^Error: MAIL_HTML_STRUCTURE_LIMIT$/);
+    }
+    process.stdout.write(JSON.stringify({ elapsedMs: performance.now() - started, maxRssKiB: process.resourceUsage().maxRSS }));`;
+  const result = JSON.parse(execFileSync(process.execPath, ['--max-old-space-size=128', '--input-type=module', '--eval', script],
+    { encoding: 'utf8', timeout: 10000 }));
+  assert(result.maxRssKiB > 0 && result.maxRssKiB <= 192 * 1024, `HTML reconstruction peak RSS ${result.maxRssKiB} KiB`);
+  t.diagnostic(`HTML reconstruction stress: ${Math.round(result.elapsedMs)} ms, peak RSS ${result.maxRssKiB} KiB`);
+});
+
 test('maximum-size malformed HTML finishes within a generous process budget', { timeout: 15000 }, (t) => {
   const moduleUrl = new URL('../safeMail.mjs', import.meta.url).href;
   const script = `import assert from 'node:assert/strict';
@@ -72,8 +96,8 @@ test('maximum-size malformed HTML finishes within a generous process budget', { 
     for (const tag of ['<br>', '<div>']) {
       assert.throws(() => htmlToPlainText(tag.repeat(Math.floor(size / tag.length))), /MAIL_HTML_STRUCTURE_LIMIT/);
     }
-    const text = 'x'.repeat(size - 20000 * 5);
-    assert.ok(htmlToPlainText('<div>'.repeat(20000) + text) === text + '\\n'.repeat(20000));
+    const text = 'x'.repeat(size - 19000 * 5);
+    assert.ok(htmlToPlainText('<div>'.repeat(19000) + text) === text + '\\n'.repeat(19000));
     let attrs = []; let length = 6;
     for (let index = 0; length < size - 30; index += 1) {
       const attr = 'a' + index + '=x '; attrs.push(attr); length += attr.length;
