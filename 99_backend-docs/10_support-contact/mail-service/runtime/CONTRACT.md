@@ -70,3 +70,5 @@ Gmail adapterは添付取得応答を固定窓口・message ID・attachment ID�
 合成adapterの試験は、GAS token→Cloud Run IAM、Firestoreの実transaction/index、公式窓口の送受信保持、実メール/添付の到達、別利用者での確認記録読戻しを証明しない。Gmailの同意・審査、Cloud請求/予算、IAM/secret/index設定、実配備は別の判断を要する。
 
 開始日が未確定の`not_started`または旧状態からの`needs_full_sync`では、対象期間依存の残件数は`null`として返す。画面は不明と表示し、0件や達成済みには変換しない。開始日のないrunning/complete応答は採用しない。
+
+画面は一覧・残件・再照合を含む全入口で同期状態の完全な形式と残件/達成条件を検証してから採用する。同期実行・レシート照会の待機中に別応答から新しい状態を観測した場合、遅い応答は表示へ戻さず、元の不変要求を保持して明示的な再確認を待つ。

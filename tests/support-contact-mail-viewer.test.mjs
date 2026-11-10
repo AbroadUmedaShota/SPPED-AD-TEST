@@ -1117,3 +1117,73 @@ test('catalog source failure before dispatch requires an explicit rebuild withou
   assert.equal(bridgeApp.calls.some((call) => call.envelope.operation === 'getSyncRequestResult'), false);
   assert.equal(app.mail.syncProgress, null);
 });
+
+
+test('late advance and receipt responses preserve a newer observed period and the immutable pending request', async () => {
+  for (const receipt of [false, true]) for (const changedPeriod of [false, true]) {
+    const oldStartAt = '2026-01-01T00:00:00.000Z';
+    const broad = { ...sync, startAt: oldStartAt, pendingCount: 99 };
+    const narrow = { ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', startAt: changedPeriod ? sync.startAt : oldStartAt, pendingCount: 2 };
+    let useNarrow = false;
+    let resolveSync;
+    let advanceCount = 0;
+    const app = uiRuntime({
+      listContactMail: () => ({ ...list([]), sync: useNarrow ? narrow : broad }),
+      advanceContactMailSync: (options) => {
+        if (!options.executionId) return { ...catalogResponse(options), catalog: { ...catalogResponse(options).catalog, startAt: oldStartAt } };
+        advanceCount++;
+        if (receipt && advanceCount === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
+        return new Promise((resolve) => { resolveSync = () => resolve(syncCallResponse(options, 'complete', { startAt: oldStartAt, pendingCount: 99 })); });
+      },
+    });
+    await app.ui.loadContactMailList('case', { caseId });
+    if (receipt) await app.ui.advanceContactMailSyncFromUi();
+    const waiting = app.ui.advanceContactMailSyncFromUi();
+    for (let turn = 0; !resolveSync && turn < 20; turn++) await Promise.resolve();
+    assert.ok(resolveSync);
+    const requestId = app.mail.syncProgress.requestId;
+    const requestPayload = JSON.parse(JSON.stringify(app.mail.syncProgress.requestPayload));
+    useNarrow = true;
+    await app.ui.loadContactMailList('case', { caseId });
+    resolveSync();
+    await waiting;
+    assert.equal(app.mail.sync, narrow);
+    assert.equal(app.mail.periodStartAt, narrow.startAt);
+    assert.equal(app.mail.syncProgress.requestId, requestId);
+    assert.deepEqual(JSON.parse(JSON.stringify(app.mail.syncProgress.requestPayload)), requestPayload);
+    assert.equal(app.mail.syncProgress.requestPending, true);
+    assert.equal(advanceCount, receipt ? 2 : 1);
+    assert.match(app.element('mailSyncSummary').textContent, /照合待ち 2件/);
+    assert.doesNotMatch(app.element('mailSyncSummary').textContent, /照合待ち 99件/);
+    assert.match(app.element('mailSyncSummary').textContent, /元の要求IDと内容を保持/);
+    assert.equal(app.mail.syncBusy, false);
+  }
+});
+
+test('list, issue and reconcile reject partial or inconsistent sync state before adoption', async () => {
+  const malformed = [
+    { state: 'complete', startAt: sync.startAt, pendingCount: 8, acceptanceReady: true },
+    { ...sync, pendingCount: 8, bodyUnverifiedCount: 0, acceptanceReady: true },
+  ];
+  for (const operation of ['list', 'issues', 'reconcile']) for (const invalid of malformed) {
+    let invalidResponse = false;
+    const app = uiRuntime({
+      listContactMail: () => ({ ...list([]), sync: invalidResponse ? invalid : sync }),
+      listContactMailIssues: (options) => ({ ok: true, kind: options.kind, targets: [], scannedCount: 0, page: { pageSize: 50, nextPageToken: '' }, sync: invalid }),
+      reconcileContactMailPending: () => ({ ok: true, processedCount: 0, page: { nextPageToken: '' }, sync: invalid }),
+    });
+    app.mail.queue.scope = 'pending';
+    await app.ui.loadContactMailList('queue');
+    const observationSerial = app.mail.syncObservationSerial;
+    invalidResponse = true;
+    if (operation === 'list') await app.ui.loadContactMailList('queue');
+    else if (operation === 'issues') await app.ui.loadContactMailIssues();
+    else await app.ui.reconcileContactMailPendingFromUi();
+    assert.equal(app.mail.sync, sync);
+    assert.equal(app.mail.syncObservationSerial, observationSerial);
+    assert.equal(app.mail.sync.acceptanceReady, false);
+    assert.doesNotMatch(app.element('mailSyncSummary').textContent, /技術残件は0件/);
+    assert.match(app.element('mailQueueContent').innerHTML, /メールの応答を確認できません/);
+    if (operation === 'reconcile') assert.ok(app.mail.queue.reconcileRequestId);
+  }
+});

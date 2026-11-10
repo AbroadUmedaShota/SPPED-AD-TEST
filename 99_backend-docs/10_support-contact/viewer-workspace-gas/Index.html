@@ -1472,7 +1472,7 @@
     }
 
     function observeContactMailSync(sync) {
-      if (!sync || typeof sync.state !== 'string') throw new Error('MAIL_INVALID_RESPONSE');
+      validateContactMailSync(sync);
       const startAt = typeof sync.startAt === 'string' && Number.isFinite(Date.parse(sync.startAt)) ? new Date(sync.startAt).toISOString() : null;
       const changed = contactMailState.periodObserved && contactMailState.periodStartAt !== startAt;
       contactMailState.periodObserved = true;
@@ -1635,6 +1635,8 @@
       const serial = ++contactMailState.syncSerial;
       const element = document.getElementById('mailSyncSummary');
       const sync = contactMailState.sync || {};
+      let observationSerial = contactMailState.syncObservationSerial;
+      const newerObservationText = () => `${renderContactMailSync(contactMailState.sync)} 新しい同期状態を観測したため続行を停止しました。元の要求IDと内容を保持しています。続行ボタンから結果を再確認してください。`;
       const progress = contactMailState.syncProgress || (['running', 'failed'].includes(sync.state) && sync.executionId ? { executionId: sync.executionId, started: true } : {});
       contactMailState.syncProgress = progress;
       contactMailState.syncBusy = true;
@@ -1676,10 +1678,12 @@
           };
           const confirming = progress.requestPending === true;
           progress.requestPending = true;
+          observationSerial = contactMailState.syncObservationSerial;
           const response = await callContactMailSync({
             ...progress.requestPayload, requestId: progress.requestId, ...(confirming ? { confirmOnly: true } : {}),
           });
           if (serial !== contactMailState.syncSerial) return;
+          if (observationSerial !== contactMailState.syncObservationSerial) { element.textContent = newerObservationText(); break; }
           if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && ['MAIL_CATALOG_CHANGED', 'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH', 'MAIL_PERIOD_REQUIRED', 'MAIL_CATALOG_INVALID'].includes(response.error.cause) &&
               response.dispatch && response.dispatch.sent === false && response.dispatch.operation === 'advanceSync' && response.dispatch.requestId === progress.requestId && response.dispatch.executionId === progress.executionId) {
             progress.requestPending = false;
@@ -1718,6 +1722,7 @@
         }
       } catch (error) {
         if (serial !== contactMailState.syncSerial) return;
+        if (observationSerial !== contactMailState.syncObservationSerial) { element.textContent = newerObservationText(); return; }
         if (!progress.requestPending && !progress.catalogPending && ['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
         element.textContent = `${contactMailErrorText(error.message)} 自動では再試行しません。送信済みの処理が終了したとは限りません。同期状態を更新するか、続行ボタンから明示的に再確認できます。`;
         if (progress.catalogPending && !progress.executionId) element.textContent += ' 元の受付ID計画を保持しています。現在のSheetで作り直す場合は「受付IDの計画を破棄して作り直す」を選んでください。';
