@@ -144,3 +144,5 @@ last_reviewed: 2026-11-11
 `exportContactMailSheetAcceptance(options, authProof)` は既存domain認証を通した読取り専用の受入用関数とする。全データ行を2回読み、受付ID・受付日時・状態・終了日時の一致を確認して、共通の実行キーでhash化した受付IDと受付日時・状態・終了日時を返す。空、非空行のID欠落、不正・重複ID、不正日時、基準日時より後の受付、読取り中の変更を完了扱いにしない。本文・連絡先・メモ・添付情報やhashキーは返さない。Sheet-before→Gmail→App→Sheet-afterの順で採取し、最後にも正本の一致を確認する。[取得手順](../../ハンドブック/デプロイ/12_SUPPORT_CONTACT_MAIL_SHEET_ACCEPTANCE.md)に従い、原子的なシステム横断snapshotとは扱わない。
 
 取得用画面は通常URLの `?operator=sheet-acceptance` から開き、server renderと取得RPCを既存domain認証に限る。通常の案件画面へ操作を追加せず、新しい管理者役割は設けない。実行ID・開始/基準日時・一時キーをフォームで受け、Sheet前/後の固定名でmanifestとreceiptだけを端末へ保存する。入力をURL・browser storage・console・ログへ保存せず、キーは成功/失敗後に消去する。不正な入力・応答・認証では保存を行わず、固定の失敗案内だけを表示する。
+
+App側の受入採取CLIも、Gmail採取と同じ32byte一時キーファイルと、事前にアクセスを制限したフォルダを使う。所有者・ACL/mode・既存出力を検査し、新規出力を排他的に確保してからFirestoreを読み取る。共有先・フォルダ外・既存ファイルの指定で読取りへ進めず、成功・失敗後に使用したkey Bufferを消去する。引数だけの計画実行はFirestoreやADCへ接続しない。[App取得手順](../../../99_backend-docs/10_support-contact/mail-service/tools/APP_ACCEPTANCE_CAPTURE.md)に従い、実本番の保存先ACLとFirestore採取は別途受入する。

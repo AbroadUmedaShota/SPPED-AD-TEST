@@ -1,6 +1,8 @@
 import { createHash, createHmac } from 'node:crypto';
-import { readFile, stat, writeFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
+import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { prepareCaptureFiles } from './privateCaptureFiles.mjs';
 
 const ROOT = 'contactMailboxes/customer-speed-ad';
 const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -152,12 +154,10 @@ export async function captureAppAcceptance({ db, runId, key, startAt, cutoffAt, 
   return manifest;
 }
 
-async function main(args) {
-  if (args.length === 1 && args[0] === '--help') {
-    process.stdout.write('Read-only app acceptance capture. Plan by default; --execute requires --project --database --run-id --start-at --cutoff-at --out and MAIL_ACCEPTANCE_HASH_KEY (base64, at least 32 bytes). Optional --no-mail-confirmations accepts a private hashed evidence manifest for the same run. Existing ADC must already have read permission. No overwrite; keep output in a restricted private directory.\n');
-    return;
-  }
-  const options = {}; const required = ['--project', '--database', '--run-id', '--start-at', '--cutoff-at', '--out'];
+export function parseAppCaptureArguments(args, now = new Date()) {
+  if (args.length === 0) return { execute: false, configured: false };
+  if (args.length === 1 && args[0] === '--help') return { help: true };
+  const options = {}; const required = ['--project', '--database', '--run-id', '--start-at', '--cutoff-at', '--private-dir', '--key-file', '--out'];
   const allowed = new Set([...required, '--no-mail-confirmations']);
   let execute = false;
   for (let index = 0; index < args.length; index++) {
@@ -165,31 +165,56 @@ async function main(args) {
     if (!allowed.has(args[index]) || options[args[index]] !== undefined || !args[index + 1] || args[index + 1].startsWith('--')) invalid();
     options[args[index]] = args[++index];
   }
-  if (!execute) { process.stdout.write('{"execute":false,"operation":"readOnlyAppAcceptanceCapture"}\n'); return; }
   if (required.some((name) => !options[name]) || !/^[a-z][a-z0-9-]{4,61}[a-z0-9]$/.test(options['--project']) ||
-      !/^\(default\)$|^[a-z][a-z0-9-]{2,61}$/.test(options['--database'])) invalid();
-  const encoded = process.env.MAIL_ACCEPTANCE_HASH_KEY || '';
-  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) invalid();
-  const key = Buffer.from(encoded, 'base64');
-  if (key.toString('base64') !== encoded || key.length < 32) invalid();
-  let noMailConfirmations = [];
-  if (options['--no-mail-confirmations']) {
-    if ((await stat(options['--no-mail-confirmations'])).size > 10 * 1024 * 1024) invalid();
-    noMailConfirmations = noMailEvidenceRows(JSON.parse(await readFile(options['--no-mail-confirmations'], 'utf8')),
-      { runId: options['--run-id'], hashKeyId: hash(key), startAt: options['--start-at'], cutoffAt: options['--cutoff-at'] });
-  }
+      !/^\(default\)$|^[a-z][a-z0-9-]{2,61}$/.test(options['--database']) ||
+      !/^[A-Za-z0-9._-]{1,80}$/.test(options['--run-id']) || !date(options['--start-at']) || !date(options['--cutoff-at']) ||
+      options['--start-at'] > options['--cutoff-at'] || options['--cutoff-at'] > now.toISOString() ||
+      !['--private-dir', '--key-file', '--out'].every((name) => isAbsolute(options[name])) ||
+      !/\.json$/i.test(options['--out']) || (options['--no-mail-confirmations'] && !isAbsolute(options['--no-mail-confirmations']))) invalid();
+  return { execute, configured: true, projectId: options['--project'], databaseId: options['--database'],
+    runId: options['--run-id'], startAt: options['--start-at'], cutoffAt: options['--cutoff-at'],
+    privateDir: resolve(options['--private-dir']), keyFile: resolve(options['--key-file']), outputFile: resolve(options['--out']),
+    noMailFile: options['--no-mail-confirmations'] ? resolve(options['--no-mail-confirmations']) : null };
+}
+
+export async function runAppCaptureCli(args, { prepare = prepareCaptureFiles, createDb = async (options) => {
   const { Firestore } = await import('@google-cloud/firestore');
-  const db = new Firestore({ projectId: options['--project'], databaseId: options['--database'] });
+  return new Firestore({ projectId: options.projectId, databaseId: options.databaseId });
+}, readEvidence = async (path) => {
+  if ((await stat(path)).size > 10 * 1024 * 1024) invalid();
+  return JSON.parse(await readFile(path, 'utf8'));
+}, now = () => new Date(), write = (value) => process.stdout.write(`${JSON.stringify(value)}\n`) } = {}) {
+  const options = parseAppCaptureArguments(args, now());
+  if (options.help) {
+    write({ operation: 'readOnlyAppAcceptanceCapture', executeByDefault: false,
+      required: ['--project', '--database', '--run-id', '--start-at', '--cutoff-at', '--private-dir', '--key-file', '--out'],
+      optional: ['--no-mail-confirmations'], executionFlag: '--execute',
+      prerequisites: 'Existing read-only ADC, restricted private directory, shared temporary 32-byte run key file' });
+    return { execute: false };
+  }
+  if (!options.configured) { write({ execute: false, operation: 'readOnlyAppAcceptanceCapture' }); return { execute: false }; }
+  const files = await prepare(options);
+  let db;
   try {
-    const manifest = await captureAppAcceptance({ db, runId: options['--run-id'], key,
-      startAt: options['--start-at'], cutoffAt: options['--cutoff-at'], noMailConfirmations });
-    await writeFile(options['--out'], `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
-    process.stdout.write(`${JSON.stringify({ sourceComplete: manifest.sourceComplete, errors: manifest.errors,
-      caseCount: manifest.catalog.length, messageCount: manifest.rows.length })}\n`);
-    if (!manifest.sourceComplete) process.exitCode = 1;
-  } finally { key.fill(0); await db.terminate(); }
+    if (!options.execute) { write({ execute: false, operation: 'readOnlyAppAcceptanceCapture' }); return { execute: false }; }
+    const noMailConfirmations = options.noMailFile ? noMailEvidenceRows(await readEvidence(options.noMailFile),
+      { runId: options.runId, hashKeyId: hash(files.key), startAt: options.startAt, cutoffAt: options.cutoffAt }) : [];
+    db = await createDb(options);
+    const manifest = await captureAppAcceptance({ db, runId: options.runId, key: files.key,
+      startAt: options.startAt, cutoffAt: options.cutoffAt, noMailConfirmations, now });
+    await files.write(manifest);
+    const result = { execute: true, sourceComplete: manifest.sourceComplete, errors: manifest.errors,
+      caseCount: manifest.catalog.length, messageCount: manifest.rows.length };
+    write(result);
+    return result;
+  } finally {
+    try { if (db) await db.terminate(); } finally { await files.close(); }
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch(() => { process.stderr.write('MAIL_ACCEPTANCE_CAPTURE_FAILED\n'); process.exitCode = 1; });
+  runAppCaptureCli(process.argv.slice(2)).then((result) => { process.exitCode = result.execute && !result.sourceComplete ? 1 : 0; }).catch((error) => {
+    const code = ['MAIL_ACCEPTANCE_INPUT_INVALID', 'MAIL_ACCEPTANCE_PRIVATE_PATH_REQUIRED'].includes(error?.message) ? error.message : 'MAIL_ACCEPTANCE_CAPTURE_FAILED';
+    process.stderr.write(`${code}\n`); process.exitCode = 2;
+  });
 }

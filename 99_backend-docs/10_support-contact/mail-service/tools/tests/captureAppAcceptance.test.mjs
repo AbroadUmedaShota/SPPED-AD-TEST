@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createHash, createHmac } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { captureAppAcceptance, noMailEvidenceRows } from '../captureAppAcceptance.mjs';
+import { mkdtemp, writeFile, readFile, rm, rmdir } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { captureAppAcceptance, noMailEvidenceRows, parseAppCaptureArguments, runAppCaptureCli } from '../captureAppAcceptance.mjs';
+import { prepareCaptureFiles } from '../privateCaptureFiles.mjs';
 
 const ROOT = 'contactMailboxes/customer-speed-ad';
 const CASE = '00000000-0000-0000-0000-000000000001';
@@ -159,4 +163,110 @@ test('completion timestamp follows the snapshot read and retention unknowns rema
 test('CLI plan does not require ADC or make a capture', () => {
   const result = spawnSync(process.execPath, ['tools/captureAppAcceptance.mjs'], { encoding: 'utf8', cwd: new URL('../..', import.meta.url) });
   assert.equal(result.status, 0); assert.deepEqual(JSON.parse(result.stdout), { execute: false, operation: 'readOnlyAppAcceptanceCapture' });
+});
+
+const cliArgs = (folder = resolve('private-capture')) => ['--project', 'test-project', '--database', '(default)',
+  '--run-id', 'acceptance-1', '--start-at', START, '--cutoff-at', END,
+  '--private-dir', folder, '--key-file', join(folder, 'run.key'), '--out', join(folder, 'app.json')];
+
+test('App CLI requires complete context and absolute private paths before preparing output', () => {
+  assert.equal(parseAppCaptureArguments(cliArgs(), new Date(NOW)).execute, false);
+  for (const [name, value] of [['--run-id', '../bad'], ['--cutoff-at', '2026-11-12T00:00:00.000Z'],
+    ['--private-dir', 'relative'], ['--key-file', 'relative.key'], ['--out', 'relative.json']]) {
+    const values = cliArgs(); values[values.indexOf(name) + 1] = value;
+    assert.throws(() => parseAppCaptureArguments(values, new Date(NOW)), /MAIL_ACCEPTANCE_INPUT_INVALID/);
+  }
+  for (const values of [['--execute'], [...cliArgs(), '--execute', '--execute'], [...cliArgs(), '--unknown', 'private']]) {
+    assert.throws(() => parseAppCaptureArguments(values, new Date(NOW)), /MAIL_ACCEPTANCE_INPUT_INVALID/);
+  }
+});
+
+test('App CLI dry-run checks local boundaries without constructing Firestore or reading evidence', async () => {
+  let prepared = 0; let closed = 0;
+  const io = { now: () => new Date(NOW), prepare: async () => { prepared++; return { close: async () => { closed++; } }; },
+    createDb: async () => { throw new Error('must not construct Firestore'); },
+    readEvidence: async () => { throw new Error('must not read evidence'); }, write: () => {} };
+  await runAppCaptureCli([], io); assert.equal(prepared, 0);
+  await runAppCaptureCli(cliArgs(), io); assert.equal(prepared, 1); assert.equal(closed, 1);
+});
+
+test('App CLI rejects broad, existing and outside output boundaries before Firestore access', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'app-private-boundary-'));
+  const keyFile = join(folder, 'run.key'); const outputFile = join(folder, 'app.json');
+  let cloudCalls = 0;
+  try {
+    await writeFile(keyFile, Buffer.alloc(32, 7), { mode: 0o600 });
+    await writeFile(outputFile, 'existing private output', { mode: 0o600 });
+    const io = { now: () => new Date(NOW), createDb: async () => { cloudCalls++; }, write: () => {},
+      prepare: (options) => prepareCaptureFiles({ ...options, ...(process.platform === 'win32' ? { inspectWindows: async () => {} } : {}) }) };
+    await assert.rejects(runAppCaptureCli([...cliArgs(folder), '--execute'], io));
+    assert.equal(await readFile(outputFile, 'utf8'), 'existing private output');
+    const outside = cliArgs(folder); outside[outside.indexOf('--out') + 1] = join(tmpdir(), 'outside-app.json');
+    await assert.rejects(runAppCaptureCli([...outside, '--execute'], io), /MAIL_ACCEPTANCE_PRIVATE_PATH_REQUIRED/);
+    await assert.rejects(runAppCaptureCli([...cliArgs(folder), '--execute'], { ...io,
+      prepare: (options) => prepareCaptureFiles({ ...options, platform: 'win32', inspectWindows: async () => { throw new Error('MAIL_ACCEPTANCE_PRIVATE_PATH_REQUIRED'); } })
+    }), /MAIL_ACCEPTANCE_PRIVATE_PATH_REQUIRED/);
+    assert.equal(cloudCalls, 0);
+  } finally { await Promise.all([keyFile, outputFile].map((path) => rm(path, { force: true }))); await rmdir(folder); }
+});
+
+test('App CLI reserves private output before Firestore and zeroes key on completion and construction failure', async () => {
+  for (const fail of [false, true]) {
+    const folder = await mkdtemp(join(tmpdir(), 'app-private-capture-'));
+    const keyFile = join(folder, 'run.key'); const outputFile = join(folder, 'app.json');
+    let key; let terminated = 0; const logs = [];
+    try {
+      await writeFile(keyFile, Buffer.alloc(32, 7), { mode: 0o600 });
+      const f = fixture(); f.db.terminate = async () => { terminated++; };
+      const invocation = runAppCaptureCli([...cliArgs(folder), '--execute'], { now: () => new Date(NOW),
+        prepare: async (options) => {
+          const files = await prepareCaptureFiles({ ...options, ...(process.platform === 'win32' ? { inspectWindows: async () => {} } : {}) });
+          key = files.key; return files;
+        }, createDb: async () => {
+          assert.equal(await readFile(outputFile, 'utf8'), '');
+          if (fail) throw new Error('PRIVATE ADC FAILURE');
+          return f.db;
+        }, write: (value) => logs.push(value) });
+      if (fail) await assert.rejects(invocation, /PRIVATE ADC FAILURE/);
+      else {
+        const result = await invocation;
+        assert.equal(result.sourceComplete, true); assert.equal(f.transactions(), 1); assert.equal(terminated, 1);
+        const manifest = JSON.parse(await readFile(outputFile, 'utf8'));
+        assert.equal(manifest.catalog[0].caseHash, hmac('case', CASE));
+        assert.equal(JSON.stringify(logs).includes(CASE), false);
+      }
+      assert.equal(key.every((value) => value === 0), true);
+    } finally { await Promise.all([keyFile, outputFile].map((path) => rm(path, { force: true }))); await rmdir(folder); }
+  }
+});
+
+test('App CLI real argument failures emit only a fixed code without paths or environment key', () => {
+  const result = spawnSync(process.execPath, ['tools/captureAppAcceptance.mjs', '--out', 'private-sensitive.json', '--execute'], {
+    encoding: 'utf8', cwd: new URL('../..', import.meta.url), env: { ...process.env, MAIL_ACCEPTANCE_HASH_KEY: 'private-sensitive-key' }
+  });
+  assert.equal(result.status, 2); assert.equal(result.stdout, ''); assert.equal(result.stderr, 'MAIL_ACCEPTANCE_INPUT_INVALID\n');
+});
+
+test('App CLI closes files and erases key after evidence, output and database cleanup failures', async () => {
+  for (const stage of ['evidence', 'output', 'terminate']) {
+    const folder = await mkdtemp(join(tmpdir(), 'app-private-failure-'));
+    const keyFile = join(folder, 'run.key'); const outputFile = join(folder, 'app.json');
+    let key; let constructed = 0;
+    try {
+      await writeFile(keyFile, Buffer.alloc(32, 7), { mode: 0o600 });
+      const args = [...cliArgs(folder), '--execute'];
+      if (stage === 'evidence') args.push('--no-mail-confirmations', join(folder, 'evidence.json'));
+      const f = fixture(); f.db.terminate = async () => { if (stage === 'terminate') throw new Error('private cleanup failure'); };
+      await assert.rejects(runAppCaptureCli(args, { now: () => new Date(NOW), write: () => {},
+        prepare: async (options) => {
+          const files = await prepareCaptureFiles({ ...options, ...(process.platform === 'win32' ? { inspectWindows: async () => {} } : {}) });
+          key = files.key;
+          return { ...files, write: stage === 'output' ? async () => { throw new Error('private output failure'); } : files.write };
+        }, readEvidence: async () => { throw new Error('private evidence failure'); },
+        createDb: async () => { constructed++; return f.db; }
+      }), /private (?:evidence|output|cleanup) failure/);
+      assert.equal(constructed, stage === 'evidence' ? 0 : 1);
+      assert.equal(key.every((value) => value === 0), true);
+    } finally { await Promise.all([keyFile, outputFile].map((path) => rm(path, { force: true }))); await rmdir(folder); }
+  }
 });

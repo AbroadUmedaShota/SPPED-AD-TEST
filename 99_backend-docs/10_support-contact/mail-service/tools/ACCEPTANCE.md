@@ -43,7 +43,7 @@ app固有キーは `catalog`、`syncComplete`、`residualCount`、`noMailConfirm
 node tools/captureGmailAcceptanceCli.mjs --project APPROVED_PROJECT --confirm-project APPROVED_PROJECT --secret-version projects/APPROVED_PROJECT/secrets/EXISTING_SECRET/versions/NUMBER --confirm-mailbox customer@speed-ad.com --run-id ACCEPTANCE_RUN --start-at START_ISO --cutoff-at CUTOFF_ISO --private-dir C:\PRIVATE\ACCEPTANCE_RUN --key-file C:\PRIVATE\ACCEPTANCE_RUN\run.key --out C:\PRIVATE\ACCEPTANCE_RUN\gmail.json
 ```
 
-対象projectはSecret versionのproject表記と完全一致、versionは正の数値を指定する。Secretのproject ID/number表記を混在させず、既存記録から同じ正本名へ揃える。日時はミリ秒付きUTC ISOで、cutoffは未来にしない。保存先は事前に管理者がアクセスを制限した既存の絶対パスのディレクトリとし、32byteの一時keyファイルと新規JSON出力をその直下へ置く。全sourceで同じkey bytesを使う（app採取の `MAIL_ACCEPTANCE_HASH_KEY` は同じbytesのbase64）。keyをコマンド引数・ログ・共有repoへ渡さない。
+対象projectはSecret versionのproject表記と完全一致、versionは正の数値を指定する。Secretのproject ID/number表記を混在させず、既存記録から同じ正本名へ揃える。日時はミリ秒付きUTC ISOで、cutoffは未来にしない。保存先は事前に管理者がアクセスを制限した既存の絶対パスのディレクトリとし、32byteの一時keyファイルと新規JSON出力をその直下へ置く。全sourceで同じkey bytesを使う。app採取も同じ `--private-dir` / `--key-file` 方式とし、Sheetには同じbytesのbase64を渡す。keyをコマンド引数・ログ・共有repoへ渡さない。
 
 実行前にGoogle審査・評価要件と社員全員の人による閲覧条件を解決し、現行の受入照合目的を含む説明version `2026-11-11.6` へ本人が明示同意したSecret versionを用意する。CLIは既存の `createRuntimeGmailAdapter` で同意記録を検証してからOAuth clientを作る。全メールmetadataを1通ずつ読むため、profile件数、Gmail quotaと月額3,000円の予算通知を確認して実行規模を判断する。予算通知は支出停止の上限ではない。上限100,000件、10,000ページを超える場合や途中変更・失敗は未完了とし、黙って省略・自動retryしない。
 
