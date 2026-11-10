@@ -31,14 +31,15 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 | 順序 | 操作 | 読戻し・停止条件 |
 | --- | --- | --- |
 | 1 | 現行GASの配備version、コード、manifest、Script Propertiesの設定名、Sheet/Drive参照先を保全する。 | 現行第1段階の利用経路と復旧先を特定する。secretの値を出力しない。 |
-| 2 | 承認済み請求先と費用管理を設定し、Run、Firestore、Secret Manager、Gmail、Artifact Registry、必要なビルドAPIを有効化する。 | projectとAPI一覧、請求状態を再取得する。使わないビルドAPIは追加しない。 |
-| 3 | Cloud Run専用実行サービスアカウント、Firestore database、Secret、image保存先を作成する。 | 実行アカウントにはFirestore操作と対象Secretの読取りに必要な権限だけを付ける。ブラウザや一般利用者へFirestore/Secretを直接共有しない。 |
-| 4 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
-| 5 | 窓口本人の同意で、scopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)を使い、code/tokenを端末ファイル・ログへ出さない。登録先Secretとversionを確認する。 |
-| 6 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
-| 7 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、GASの実ID tokenのaudienceをcustom audienceへ登録する。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
-| 8 | GASへメール連携コードと`openid` scopeを反映し、固定`MAIL_SERVICE_URL`を設定して必要な再認可を行う。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
-| 9 | 社員と窓口の利用経路、IAM拒否、メール読取、実Firestore更新とindexを実環境で確認する。 | 確認者が配備者へ置き換わらず、実利用者として記録される。認証失敗時は業務データが消える。 |
+| 2 | 窓口Gmail読取用のOAuth project/clientを作成するか既存設定を確認し、Audience・公開状態・宣言scope・審査/評価または適用除外を本番用に確定する。認可補助ツールを使う場合はDesktop clientを用意する。 | clientの所属projectと用途、`gmail.readonly`だけの要求、本番で継続可能な公開・審査状態または文書化した適用除外を確認する。未確定またはExternal/Testingのままなら窓口同意へ進まない。 |
+| 3 | 承認済み請求先と費用管理を設定し、Run、Firestore、Secret Manager、Gmail、Artifact Registry、必要なビルドAPIを有効化する。 | projectとAPI一覧、請求状態を再取得する。使わないビルドAPIは追加しない。 |
+| 4 | Cloud Run専用実行サービスアカウント、Firestore database、Secret、image保存先を作成する。 | 実行アカウントにはFirestore操作と対象Secretの読取りに必要な権限だけを付ける。ブラウザや一般利用者へFirestore/Secretを直接共有しない。 |
+| 5 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
+| 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)を使い、code/tokenを端末ファイル・ログへ出さない。登録先Secretとversionを確認する。 |
+| 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
+| 8 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、GASの実ID tokenのaudienceをcustom audienceへ登録する。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
+| 9 | GASへメール連携コードと`openid` scopeを反映し、固定`MAIL_SERVICE_URL`を設定して必要な再認可を行う。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
+| 10 | 社員と窓口の利用経路、IAM拒否、メール読取、実Firestore更新とindexを実環境で確認する。 | 確認者が配備者へ置き換わらず、実利用者として記録される。認証失敗時は業務データが消える。 |
 
 Cloud Runの設定は次の対応で照合します。値はrepoへ保存せず、実tokenをログへ出して取得しないでください。
 
@@ -49,13 +50,15 @@ Cloud Runの設定は次の対応で照合します。値はrepoへ保存せず�
 | `MAILBOX_OAUTH_SECRET_VERSION` | 窓口資格情報を持つSecretの特定version。 |
 | `FIRESTORE_DATABASE_ID` | default以外を使う場合のdatabase ID。 |
 
-ビルドは採用するGit SHAの`99_backend-docs/10_support-contact/mail-service/`を作業ディレクトリにして行います。`IMAGE_REFERENCE`は承認済み保存先とSHAに対応するタグへ置き換えます。
+2026-11-10の確認時点で作業PCにはDockerがなく、imageビルドは未実施です。Dockerが利用できる環境では、採用するGit SHAの`99_backend-docs/10_support-contact/mail-service/`を作業ディレクトリにして下記を実行します。`IMAGE_REFERENCE`は承認済み保存先とSHAに対応するタグへ置き換えます。
 
 ```powershell
 npm ci --ignore-scripts
 npm test
 docker build -f runtime/Dockerfile -t IMAGE_REFERENCE .
 ```
+
+remote buildは代替手段ですが、請求先・費用・実行権限・利用するビルドサービスを承認した後に選びます。Docker不在だけを理由にremote buildを開始しません。いずれの方法でもimage digestとビルド結果の読戻しが必要です。
 
 リポジトリ直下ではGAS側の対象試験を実行します。
 
