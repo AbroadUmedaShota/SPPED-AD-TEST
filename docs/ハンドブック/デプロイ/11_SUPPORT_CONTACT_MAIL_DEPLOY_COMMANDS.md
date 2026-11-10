@@ -251,13 +251,30 @@ if (@($ClaspUser, $ClaspProjectFile, $GasScriptId, $GasDeploymentId).Where({
 }
 $claspTarget = Get-Content -Raw -LiteralPath $ClaspProjectFile | ConvertFrom-Json
 if ($claspTarget.scriptId -cne $GasScriptId) { throw 'GAS script target mismatch.' }
+$GasSourceRoot = Join-Path (git rev-parse --show-toplevel) '99_backend-docs/10_support-contact/viewer-workspace-gas'
+$ExpectedGasFiles = @(
+  'Code.gs', 'OAuth.gs', 'MailBridge.gs', 'SheetAcceptance.gs',
+  'Index.html', 'Login.html', 'SheetAcceptance.html', 'appsscript.json'
+)
+$ActualGasFiles = @(Get-ChildItem -LiteralPath $GasSourceRoot -File | Where-Object {
+  $_.Extension -in @('.gs', '.html') -or $_.Name -eq 'appsscript.json'
+} | Select-Object -ExpandProperty Name)
+if ($ActualGasFiles.Count -ne $ExpectedGasFiles.Count -or
+    @(Compare-Object ($ExpectedGasFiles | Sort-Object) ($ActualGasFiles | Sort-Object)).Count) {
+  throw 'GAS source file set mismatch.'
+}
 clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
 clasp -u $ClaspUser -P $ClaspProjectFile show-file-status
+```
+
+private clasp設定の`rootDir`が上の`$GasSourceRoot`を指し、`show-file-status`の送信対象に8ファイルすべてが含まれることを確認します。`SheetAcceptance.gs`または`SheetAcceptance.html`が無い、無視対象になっている、別のsource rootならpushへ進みません。
+
+```powershell
 Invoke-ApprovedChange clasp @('-u', $ClaspUser, '-P', $ClaspProjectFile, 'push')
 clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
 ```
 
-対象は`Code.gs`・`OAuth.gs`・`MailBridge.gs`・`Index.html`・`Login.html`・`appsscript.json`です。manifestの`openid`と既存scopeを照合します。push後も公開配備ID/versionが保全値のままであることを確認します。
+対象は上記8ファイルです。manifestの`openid`と既存scopeを照合します。push後はGAS editorでも両SheetAcceptanceファイルの存在と採用sourceを確認し、公開配備ID/versionが保全値のままであることを確認します。受入用の専用画面は、採用versionへ配備後に通常の`/exec` URLへ`?operator=sheet-acceptance`を付けて開きます。[取得手順](12_SUPPORT_CONTACT_MAIL_SHEET_ACCEPTANCE.md)のdomain認証・JSON取得を確認します。
 
 配備者本人がGAS editorで新scopeを再認可し、次の一時関数を開発版で実行します。`expectedEmail`を承認済み配備者へ置き換えます。出力は必要なclaimsだけです。token全体・payload全体・例外詳細を表示しません。
 

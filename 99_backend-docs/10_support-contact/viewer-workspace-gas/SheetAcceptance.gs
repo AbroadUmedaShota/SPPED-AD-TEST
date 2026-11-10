@@ -1,4 +1,10 @@
 /** Read-only, authenticated Sheet projection for an independent acceptance run. */
+function renderSheetAcceptance_() {
+  var context = requireViewer_('');
+  if (context.authMode !== 'domain') throw new Error('FORBIDDEN');
+  return HtmlService.createHtmlOutputFromFile('SheetAcceptance').setTitle('SPEED AD 受入用Sheet取得');
+}
+
 function exportContactMailSheetAcceptance(options, authProof) {
   var context = requireViewer_(authProof);
   if (context.authMode !== 'domain') throw new Error('FORBIDDEN');

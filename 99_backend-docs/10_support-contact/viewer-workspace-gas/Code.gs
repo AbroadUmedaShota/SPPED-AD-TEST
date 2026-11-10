@@ -42,6 +42,11 @@ function doGet(e) {
     // Callback GET never consumes state, exchanges code, issues grant, or reads contact data.
     return renderLogin_('', invalid ? { invalid: true } : callback, params.authuser);
   }
+  if (params.operator === 'sheet-acceptance') {
+    if (Object.keys(params).some(function (key) { return ['operator', 'authuser'].indexOf(key) === -1; }) ||
+        (e.parameters && e.parameters.operator && e.parameters.operator.length !== 1)) throw new Error('MAIL_ACCEPTANCE_INPUT_INVALID');
+    return renderSheetAcceptance_();
+  }
   if (params.login === 'google') return renderLogin_(String(params.id || '').slice(0, 256), null, params.authuser);
   var email = getActiveUserEmail_();
   var template = HtmlService.createTemplateFromFile('Index');
