@@ -391,6 +391,7 @@
         <button type="button" id="pendingMailButton">照合待ち</button>
         <button type="button" id="syncMailButton" hidden>メール同期</button>
         <button type="button" id="stopMailSyncButton" hidden>同期の続行を止める</button>
+        <button type="button" id="restartMailCatalogButton" hidden>受付IDの計画を破棄して作り直す</button>
         <button type="button" id="mailSyncStatusButton">同期状態を更新</button>
         <button type="button" id="mailIssuesButton">全件確認の残件</button>
         <p class="mail-sync" id="mailSyncSummary" aria-live="polite">メール連携の状態は未取得です。</p>
@@ -1523,6 +1524,8 @@
       stopButton.hidden = button.hidden || !contactMailState.syncBusy;
       stopButton.disabled = contactMailState.syncStopRequested;
       document.getElementById('mailSyncStatusButton').disabled = contactMailState.syncBusy;
+      const restartButton = document.getElementById('restartMailCatalogButton');
+      restartButton.hidden = button.hidden || contactMailState.syncBusy || !contactMailState.syncProgress || !contactMailState.syncProgress.catalog || Boolean(contactMailState.syncProgress.executionId);
       if (sync && Number.isInteger(sync.pendingCount)) document.getElementById('pendingMailButton').textContent = `照合待ち ${sync.pendingCount}件`;
       if (sync && Number.isInteger(sync.unreviewedCount)) document.getElementById('unreviewedMailButton').textContent = `未確認メール ${sync.unreviewedCount}件`;
     }
@@ -1531,6 +1534,16 @@
       if (!contactMailState.syncBusy) return;
       contactMailState.syncStopRequested = true;
       document.getElementById('mailSyncSummary').textContent = '同期の続行を止めます。送信済みの処理は中止せず、応答を待っています。';
+      renderContactMailSyncButton();
+    }
+
+    function discardContactMailCatalogFromUi() {
+      const progress = contactMailState.syncProgress;
+      if (contactMailState.syncBusy || !viewerContext.allowed || viewerContext.authMode !== 'domain' || !progress || !progress.catalog || progress.executionId) return;
+      if (!window.confirm('保持している受付IDの計画を破棄しますか？送信済みの登録処理は中止しません。次のメール同期操作で現在のSheetから計画を作り直します。')) return;
+      ++contactMailState.syncSerial;
+      contactMailState.syncProgress = null;
+      document.getElementById('mailSyncSummary').textContent = '受付IDの計画を破棄しました。メール同期ボタンで現在のSheetから作り直せます。送信済みの登録処理を中止した意味ではありません。';
       renderContactMailSyncButton();
     }
 
@@ -1598,10 +1611,12 @@
             progress.catalog = prepared.catalog;
             if (contactMailState.syncStopRequested) { element.textContent = '受付ID登録の続行を止めました。続行ボタンから再開できます。'; return; }
           }
+          progress.catalogPending = true;
           const catalogResult = contactMailResult(await callContactMailSync({ catalog: progress.catalog }));
           if (serial !== contactMailState.syncSerial) return;
           const catalog = catalogResult.catalog;
           validateContactMailCatalog(catalog, progress.catalog, false);
+          progress.catalogPending = false;
           progress.catalog = catalog;
           progress.periodText = catalog.startAt ? `同期対象: ${formatDate(catalog.startAt)}以降` : '受付日時に欠落・不正または受付なしのため、同期対象は公式窓口の全保存メールです。';
           if (!catalog.complete) { element.textContent = `受付IDを照合中: ${catalog.nextPageIndex} / ${catalog.pageCount}ページ。続行ボタンで次へ進めます。`; return; }
@@ -1621,10 +1636,18 @@
           };
           const confirming = progress.requestPending === true;
           progress.requestPending = true;
-          const result = contactMailResult(await callContactMailSync({
+          const response = await callContactMailSync({
             ...progress.requestPayload, requestId: progress.requestId, ...(confirming ? { confirmOnly: true } : {}),
-          }));
+          });
           if (serial !== contactMailState.syncSerial) return;
+          if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && response.error.cause === 'MAIL_CATALOG_CHANGED' &&
+              response.dispatch && response.dispatch.sent === false && response.dispatch.operation === 'advanceSync' && response.dispatch.requestId === progress.requestId && response.dispatch.executionId === progress.executionId) {
+            progress.requestPending = false;
+            contactMailState.syncProgress = null;
+            element.textContent = '受付データが変わったため、GASの事前確認で停止しました。この同期要求はCloudへ送信していません。メール同期ボタンで現在のSheetから計画を作り直してください。';
+            break;
+          }
+          const result = contactMailResult(response);
           if (confirming) {
             if (typeof result.found !== 'boolean' || (result.found ? !result.receipt : result.receipt !== null)) throw new Error('MAIL_INVALID_RESPONSE');
             validateContactMailSync(result.sync);
@@ -1653,8 +1676,9 @@
         }
       } catch (error) {
         if (serial !== contactMailState.syncSerial) return;
-        if (!progress.requestPending && ['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
+        if (!progress.requestPending && !progress.catalogPending && ['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
         element.textContent = `${contactMailErrorText(error.message)} 自動では再試行しません。送信済みの処理が終了したとは限りません。同期状態を更新するか、続行ボタンから明示的に再確認できます。`;
+        if (progress.catalogPending && !progress.executionId) element.textContent += ' 元の受付ID計画を保持しています。現在のSheetで作り直す場合は「受付IDの計画を破棄して作り直す」を選んでください。';
       } finally {
         if (serial === contactMailState.syncSerial) { contactMailState.syncBusy = false; renderContactMailSyncButton(); }
       }
@@ -2003,6 +2027,7 @@
       document.getElementById('mailSyncSummary').textContent = '';
       document.getElementById('syncMailButton').hidden = true;
       document.getElementById('stopMailSyncButton').hidden = true;
+      document.getElementById('restartMailCatalogButton').hidden = true;
       document.getElementById('mailSyncStatusButton').disabled = false;
       ++state.listRequestSerial;
       ++state.detailRequestSerial;
@@ -2050,6 +2075,7 @@
       renderContactMailSyncButton();
       document.getElementById('syncMailButton').addEventListener('click', advanceContactMailSyncFromUi);
       document.getElementById('stopMailSyncButton').addEventListener('click', stopContactMailSyncFromUi);
+      document.getElementById('restartMailCatalogButton').addEventListener('click', discardContactMailCatalogFromUi);
       document.getElementById('mailSyncStatusButton').addEventListener('click', loadContactMailSyncStatus);
       document.getElementById('unreviewedMailButton').addEventListener('click', () => openContactMailQueue('unreviewed'));
       document.getElementById('pendingMailButton').addEventListener('click', () => openContactMailQueue('pending'));

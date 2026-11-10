@@ -31,6 +31,8 @@ catalog・同期・再照合は社員操作だけに限定する。catalog diges
 
 同期要求が応答不明になった場合、GASは元の受付ID計画と開始日を保持し、正本Sheetの現在値で要求を作り直さず`getSyncRequestResult`で確認する。この操作もdomain認証必須で、`advanceSync`・元payload（実行IDを含む）・実利用者actorのfingerprintが一致するレシートだけを返す。レシート内の同期メタ情報と現在の同期状態以外は返さず、同期・Gmail取得・状態更新は実行しない。未作成レシートは`found:false`とし、自動再送しない。別利用者が同じ実行を進めた場合、古いレシートは元要求の成立確認に使い、画面の新しい進捗を戻さない。
 
+GASの初回`advanceSync`送信前の正本検査で計画変更を検出した場合だけ、`MAIL_SYNC_NOT_DISPATCHED`と一致する要求ID・実行ID、`sent:false`を直接返す。これはCloud Runのエラーallowlistへ含めず、upstream応答から同じ未送信結果を再構成しない。通信失敗は未送信の証拠にはしない。
+
 残件一覧は種類を選び、保存済みメールを日時・messageId降順に50件ずつ走査する。該当0件のページにも次ページが残る場合がある。同期失敗で未登録のメールID、案件別の関連メール有無が未確認の受付ID、取得前削除で種類未確認のIDも50件ずつ列挙する。受付ID一覧・失敗ID一覧の対象集合が変化したcursorは拒否し、更新して先頭から確認する。取得不能のメールは保存済みメタ情報と添付descriptorを表示し、本文取得不能でも添付確認経路を維持する。
 
 一覧は日時・messageId降順の50件。返却は`{ok:true,messages,page:{nextPageToken,previousPageToken,pageSize},sync}`。詳細は`message.bodyText`と添付descriptorを返す。MIME partIdはrootを`0`、子を`0.1`のように表す。本文は安全なテキストとし、HTML・remote画像を実行しない。同じ`multipart/alternative`内だけ、デコード・安全化後に空白以外の表示文字があるプレーンテキスト、その他の表現の順で1表現を選び、全表現が空なら空本文を維持する。選択のために取得した各表現の元バイト数も本文上限に合算する。独立した本文partは順に連結する。旧秘密付きURLを表示・ログ前に除去する。
