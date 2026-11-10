@@ -27,6 +27,14 @@ SPEED AD お問い合わせ確認アプリは `customer@speed-ad.com` に `https
 
 両方がない場合、または窓口がメールアドレスでない場合、ツールは認可を開始しません。対話端末で説明全文を表示し、所有者が「同意します」と入力した直後にGoogleの同意画面を開きます。`--execute`やパイプ入力だけでは同意になりません。Google画面でもアカウントと要求権限を確認してください。
 
+WindowsのPowerShell 7では、`mail-service` ディレクトリから次の補助スクリプトを実行できます。実際の既存Secret名、承認済みの保存期間説明、削除申請先を指定してください。前提はNode.js 24以降、依存パッケージの導入、Secret Managerへの認可済みADCです。
+
+```powershell
+pwsh -NoProfile -File ./tools/authorizeMailbox.ps1 -SecretName 'projects/PROJECT_NUMBER/secrets/EXISTING_SECRET' -RetentionNotice '承認済みの保存期間・削除方法の説明' -DeletionContact '承認済みの削除申請先メール'
+```
+
+DesktopクライアントのIDとsecretは続けて非表示入力します。コマンド行、入力履歴、設定ファイルへ貼り付けず、Google画面の同意は窓口本人が行います。補助は子Nodeプロセスの環境だけへ認可情報を渡し、終了・起動失敗時に環境の参照と一時変数を片付けます。資格情報を端末ファイルへ保存しませんが、処理中のメモリには必要です。入力したsecretをチャットや実行ログへ転記しないでください。
+
 ## アクセスを止める
 
 窓口の所有者は[Googleアカウントの接続管理](https://myaccount.google.com/connections)で、実際に認可したアプリ名を確認してアクセスを取り消せます。Workspace管理者によるアクセス制限も利用できます。取消し後は新しいGmail読取りができなくなりますが、Firestoreの保存済みデータと利用者が保存したファイルは自動で消えません。
