@@ -8,14 +8,22 @@ const options = { execute: true, desktopClient: true, confirmMailbox: MAILBOX,
   secretName: 'projects/test-project/secrets/existing-mailbox',
   clientId: '1-test.apps.googleusercontent.com', clientSecret: 'synthetic-client-secret',
   retentionNotice: '合成試験の保存期間', deletionContact: 'synthetic-operator@example.com' };
+const canonicalSecretName = 'projects/1234567890/secrets/existing-mailbox';
 
 function fixture(overrides = {}) {
-  const calls = { writes: [], token: [], opened: [], auth: [] };
+  const calls = { writes: [], metadata: [], token: [], opened: [], auth: [] };
   const oauth = {
     generateAuthUrl(value) { calls.auth.push(value); return 'https://accounts.google.com/o/oauth2/v2/auth?synthetic=true'; },
     async getToken(value) { calls.token.push(value); return { tokens: { access_token: 'synthetic-access', refresh_token: 'synthetic-refresh' } }; },
     async getTokenInfo() { return { scopes: [GMAIL_READONLY_SCOPE] }; },
     ...overrides.oauth
+  };
+  const secretManager = {
+    async getSecret(request) { calls.metadata.push(request); return [{ name: canonicalSecretName }]; },
+    async addSecretVersion(request, callOptions) {
+      calls.writes.push({ parent: request.parent, payload: JSON.parse(request.payload.data.toString('utf8')), callOptions });
+      return [{ name: `${canonicalSecretName}/versions/2` }];
+    }
   };
   const adapters = {
     createOAuthClient: () => oauth,
@@ -29,12 +37,10 @@ function fixture(overrides = {}) {
       calls.profile = { url, request };
       return { ok: true, async json() { return { emailAddress: MAILBOX }; } };
     },
-    secretManager: { async addSecretVersion(request, callOptions) {
-      calls.writes.push({ parent: request.parent, payload: JSON.parse(request.payload.data.toString('utf8')), callOptions });
-      return [{ name: `${options.secretName}/versions/2` }];
-    } },
+    secretManager,
     ...overrides.adapters
   };
+  adapters.secretManager = { ...secretManager, ...overrides.adapters?.secretManager };
   return { calls, adapters };
 }
 
@@ -51,7 +57,8 @@ test('explicit execution, desktop type, mailbox and existing secret target are r
 test('PKCE offline consent verifies the exact mailbox and writes only the runtime credential schema', async () => {
   const { adapters, calls } = fixture();
   const result = await authorizeMailbox(options, adapters);
-  assert.equal(result.secretVersion, `${options.secretName}/versions/2`);
+  assert.equal(result.secretVersion, `${canonicalSecretName}/versions/2`);
+  assert.deepEqual(calls.metadata, [{ name: options.secretName }]);
   const auth = calls.auth[0];
   assert.deepEqual(auth.scope, [GMAIL_READONLY_SCOPE]);
   assert.equal(auth.access_type, 'offline');
@@ -65,7 +72,7 @@ test('PKCE offline consent verifies the exact mailbox and writes only the runtim
   assert.notEqual(calls.token[0].codeVerifier, auth.code_challenge);
   assert.equal(calls.profile.url, 'https://gmail.googleapis.com/gmail/v1/users/me/profile');
   assert.equal(calls.profile.request.redirect, 'error');
-  assert.deepEqual(calls.writes, [{ parent: options.secretName,
+  assert.deepEqual(calls.writes, [{ parent: canonicalSecretName,
     payload: { clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: 'synthetic-refresh' }, callOptions: { retry: null } }]);
   assert.equal(calls.closed, true);
   assert.match(calls.disclosure, /SPEED AD お問い合わせ確認アプリ/);
@@ -92,9 +99,43 @@ test('disclosure requires affirmative acknowledgement immediately before browser
     assert.deepEqual(declined.calls.opened, []);
     assert.deepEqual(declined.calls.token, []);
     assert.deepEqual(declined.calls.writes, []);
+    assert.deepEqual(declined.calls.metadata, []);
     assert.equal(declined.calls.profile, undefined);
     assert.equal(declined.calls.state, undefined);
   }
+});
+
+test('Secret metadata resolves project IDs before consent and pins the exact version parent', async () => {
+  for (const name of [`${canonicalSecretName}/versions/4`, 'projects/9999999999/secrets/existing-mailbox/versions/4',
+    'projects/1234567890/secrets/other-mailbox/versions/4', `${canonicalSecretName}/versions/1/versions/4`]) {
+    const { adapters, calls } = fixture({ adapters: { secretManager: { async addSecretVersion(request) {
+      calls.writes.push(request);
+      return [{ name }];
+    } } } });
+    if (name === `${canonicalSecretName}/versions/4`) {
+      assert.equal((await authorizeMailbox(options, adapters)).secretVersion, name);
+    } else await assert.rejects(authorizeMailbox(options, adapters), /SECRET_WRITE_UNCONFIRMED/);
+    assert.equal(calls.writes.length, 1);
+    assert.equal(calls.writes[0].parent, canonicalSecretName);
+  }
+  const numeric = fixture();
+  assert.equal((await authorizeMailbox({ ...options, secretName: canonicalSecretName }, numeric.adapters)).secretVersion, `${canonicalSecretName}/versions/2`);
+  assert.deepEqual(numeric.calls.metadata, [{ name: canonicalSecretName }]);
+  for (const [requestedName, metadata] of [
+    [options.secretName, 'projects/other-project/secrets/existing-mailbox'],
+    [options.secretName, 'projects/1234567890/secrets/other-mailbox'],
+    [canonicalSecretName, 'projects/9999999999/secrets/existing-mailbox']
+  ]) {
+    const { adapters, calls } = fixture({ adapters: { secretManager: { async getSecret() { return [{ name: metadata }]; } } } });
+    await assert.rejects(authorizeMailbox({ ...options, secretName: requestedName }, adapters), /SECRET_TARGET_UNCONFIRMED/);
+    assert.deepEqual(calls.opened, []);
+    assert.deepEqual(calls.token, []);
+    assert.deepEqual(calls.writes, []);
+  }
+  const failed = fixture({ adapters: { secretManager: { async getSecret() { throw new Error('sensitive-details'); } } } });
+  await assert.rejects(authorizeMailbox(options, failed.adapters), (error) => error.message === 'SECRET_TARGET_UNCONFIRMED');
+  assert.deepEqual(failed.calls.opened, []);
+  assert.deepEqual(failed.calls.writes, []);
 });
 
 test('interactive disclosure rejects pipes and accepts only the explicit answer', async () => {

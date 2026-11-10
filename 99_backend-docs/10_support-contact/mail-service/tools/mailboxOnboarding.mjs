@@ -47,6 +47,19 @@ export function createProof(random = randomBytes) {
   return { verifier, state, challenge: createHash('sha256').update(verifier).digest('base64url') };
 }
 
+async function resolveSecretName(secretManager, requestedName) {
+  let secret;
+  try { [secret] = await secretManager.getSecret({ name: requestedName }, { timeout: 30000, retry: null }); }
+  catch { throw new OnboardingError('SECRET_TARGET_UNCONFIRMED'); }
+  const requested = /^projects\/([^/]+)\/secrets\/([^/]+)$/.exec(requestedName);
+  const resolved = /^projects\/([^/]+)\/secrets\/([^/]+)$/.exec(secret?.name || '');
+  // The authenticated metadata lookup resolves a project ID to its canonical number.
+  // Numeric inputs and the secret ID must remain exact; a later write cannot select another parent.
+  requireValue(resolved && resolved[2] === requested[2] &&
+    (resolved[1] === requested[1] || (!/^\d+$/.test(requested[1]) && /^[1-9]\d*$/.test(resolved[1]))), 'SECRET_TARGET_UNCONFIRMED');
+  return secret.name;
+}
+
 function sameState(actual, expected) {
   if (typeof actual !== 'string' || actual.length !== expected.length) return false;
   return timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
@@ -120,6 +133,7 @@ export async function authorizeMailbox(options, { createOAuthClient, secretManag
   validateOnboardingOptions(options);
   requireValue(typeof confirmDisclosure === 'function', 'DISCLOSURE_CONFIRMATION_REQUIRED');
   requireValue(await confirmDisclosure(mailboxDisclosure(options)) === true, 'DISCLOSURE_DECLINED');
+  const secretName = await resolveSecretName(secretManager, options.secretName);
   const proof = createProof(random);
   const listener = await listen(proof.state);
   try {
@@ -151,9 +165,10 @@ export async function authorizeMailbox(options, { createOAuthClient, secretManag
     let version;
     try {
       // addVersion is not idempotent. A failed/unknown result must be investigated, never retried automatically.
-      [version] = await secretManager.addSecretVersion({ parent: options.secretName, payload: { data: payload } }, { retry: null });
+      [version] = await secretManager.addSecretVersion({ parent: secretName, payload: { data: payload } }, { retry: null });
     } catch { throw new OnboardingError('SECRET_WRITE_UNCONFIRMED'); }
-    requireValue(typeof version?.name === 'string' && version.name.startsWith(`${options.secretName}/versions/`) && /^\d+$/.test(version.name.split('/').at(-1)), 'SECRET_WRITE_UNCONFIRMED');
+    const versionPrefix = `${secretName}/versions/`;
+    requireValue(typeof version?.name === 'string' && version.name.startsWith(versionPrefix) && /^[1-9]\d*$/.test(version.name.slice(versionPrefix.length)), 'SECRET_WRITE_UNCONFIRMED');
     return { secretVersion: version.name, mailbox: MAILBOX };
   } finally {
     listener.close();

@@ -33,3 +33,5 @@ GASの第1段階version 7は単独で受入済み。第2段階が未配備また
 [データ管理・削除の案内](../../../docs/ハンドブック/運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に、読取り・共有・保存先、Google側のアクセス取消し、アプリ側データの削除申請と現状の制約を記載する。
 
 認可補助ツールは「Gmail由来の照合・確認記録を案件終了後3年間保存する」方針を表示する。その実施説明 `MAIL_DATA_RETENTION_NOTICE` と削除申請先メール `MAIL_DATA_DELETION_CONTACT` が必須で、既定値は設けない。現実装には不変の案件終了日時と自動期限削除がないため、起算日と実行手段を先に用意する。対話端末で説明を読み「同意します」と入力した直後にだけGoogle同意画面を開く。非対話実行やフラグだけで同意を代行しない。
+
+補助ツールのCloud実行者には対象Secretだけの `secretmanager.secrets.get` と `secretmanager.versions.add` が必要。Secret値（資格情報）は読み取らず、指定したSecretのメタデータからproject IDを正式なproject number名へ解決し、その同じ親名へ保存する。返されたversionが別project・別Secretなら成功扱いにしない。保存応答不明時に自動再登録しない。

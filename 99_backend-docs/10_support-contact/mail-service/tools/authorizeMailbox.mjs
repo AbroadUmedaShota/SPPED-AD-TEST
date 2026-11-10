@@ -51,7 +51,7 @@ export async function main(args = process.argv.slice(2), env = process.env) {
   const options = parseArguments(args);
   if (options.help) {
     process.stdout.write(`node tools/authorizeMailbox.mjs --execute --desktop-client --confirm-mailbox ${MAILBOX} --secret projects/PROJECT/secrets/EXISTING_SECRET\n`);
-    process.stdout.write('Requires MAIL_OAUTH_CLIENT_ID and MAIL_OAUTH_CLIENT_SECRET in the process environment, an approved Desktop OAuth client, owner consent, and Secret Manager ADC permission.\n');
+    process.stdout.write('Requires MAIL_OAUTH_CLIENT_ID and MAIL_OAUTH_CLIENT_SECRET in the process environment, an approved Desktop OAuth client, owner consent, and Secret Manager ADC permissions secretmanager.secrets.get and secretmanager.versions.add.\n');
     process.stdout.write('Also requires MAIL_DATA_RETENTION_NOTICE and MAIL_DATA_DELETION_CONTACT (an actionable email address), followed by interactive disclosure acceptance. See README: データの管理・削除.\n');
     return;
   }
