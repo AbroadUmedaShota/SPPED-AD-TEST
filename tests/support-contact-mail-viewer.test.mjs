@@ -11,7 +11,7 @@ const caseId = '11111111-1111-4111-8111-111111111111';
 
 test('mail service exposes only the authenticated business RPC surface', () => {
   const actual = [...bridge.matchAll(/^function ([a-zA-Z0-9_]+)\(/gm)].map((match) => match[1]).filter((name) => !name.endsWith('_')).sort();
-  assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
+  assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'confirmContactCaseNoMail', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
 function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, statuses, closedDates, url = 'https://contact-mail-example.a.run.app' } = {}) {
@@ -45,6 +45,7 @@ test('every mail RPC authorizes before Sheet or service access', () => {
     ['listContactMail', [{ scope: 'case', caseId }]], ['getContactMailMessage', [{ scope: 'case', caseId, messageId: 'mail1' }]],
     ['getContactMailAttachmentChunk', [{ scope: 'case', caseId, messageId: 'mail1', partId: '0.1', offset: 0 }]],
     ['markContactMailReviewed', [{ scope: 'case', caseId, messageId: 'mail1', expectedVersion: 1 }]],
+    ['confirmContactCaseNoMail', [{ caseId, contextToken: 'a'.repeat(64), requestId: randomUUID() }]],
     ['resolveContactMailPending', [{ messageId: 'mail1', action: 'match', caseId, expectedVersion: 1, reason: '受付IDを確認' }]],
     ['getContactMailSyncStatus', []], ['advanceContactMailSync', [{}]], ['reconcileContactMailPending', [{}]], ['listContactMailIssues', [{ kind: 'failed' }]],
   ]) assert.throws(() => app.api[name](...args), /権限/);
@@ -88,6 +89,25 @@ test('case/message/part/version validation stops invalid service operations', ()
   assert.throws(() => app.api.markContactMailReviewed({ scope: 'case', caseId, messageId: 'mail1', expectedVersion: 0 }), /版/);
   assert.throws(() => app.api.resolveContactMailPending({ messageId: 'mail1', action: 'exclude', expectedVersion: 1, reason: '' }), /入力/);
   assert.equal(app.calls.length, 0);
+});
+
+test('no-mail bridge validates case, fixed context and explicit request identity before dispatch', () => {
+  const app = bridgeRuntime();
+  const requestId = randomUUID();
+  app.api.confirmContactCaseNoMail({ caseId, contextToken: 'a'.repeat(64), requestId, actor: { email: 'spoof@example.com' } });
+  const envelope = app.calls[0].envelope;
+  assert.equal(envelope.operation, 'confirmCaseNoMail');
+  assert.equal(envelope.requestId, requestId);
+  assert.deepEqual(envelope.payload, { caseId, contextToken: 'a'.repeat(64) });
+  assert.deepEqual(envelope.actor, { email: 'reader@abroad-o.com', authMode: 'domain' });
+  for (const options of [{ caseId, contextToken: 'A'.repeat(64), requestId }, { caseId, contextToken: 'a'.repeat(64) },
+    { caseId: 'missing', contextToken: 'a'.repeat(64), requestId }, { caseId, contextToken: 'a'.repeat(64), requestId: '../unsafe' }]) {
+    assert.throws(() => app.api.confirmContactCaseNoMail(options));
+  }
+  assert.equal(app.calls.length, 1);
+  app.setActor({ email: 'customer@speed-ad.com', authMode: 'google-oauth' });
+  app.api.confirmContactCaseNoMail({ caseId, contextToken: 'b'.repeat(64), requestId: randomUUID() });
+  assert.equal(app.calls.at(-1).envelope.actor.authMode, 'customer-oauth');
 });
 
 test('review and classification retain request identity and never accept caller actor', () => {
@@ -278,7 +298,9 @@ const catalogResponse = (options, total = 1) => {
   catalog.complete = !options.prepareCatalog && catalog.nextPageIndex === catalog.pageCount;
   return { ok: true, catalog };
 };
-const list = (messages, page = {}) => ({ ok: true, messages, page: { nextPageToken: '', previousPageToken: '', pageSize: 50, ...page }, sync });
+const noMail = (extra = {}) => ({ eligible: false, contextToken: null, confirmation: null, stale: false, ...extra });
+const noMailConfirmation = { email: 'reader@abroad-o.com', at: '2026-11-10T01:00:00.000Z', startAt: '2026-11-01T00:00:00.000Z', cutoffAt: '2026-11-10T00:00:00.000Z' };
+const list = (messages, page = {}) => ({ ok: true, messages, page: { nextPageToken: '', previousPageToken: '', pageSize: 50, ...page }, sync, noMail: noMail() });
 
 function uiRuntime(handlers = {}) {
   const elements = new Map();
@@ -558,6 +580,107 @@ test('empty case mail is an observed mapping result with incomplete-work guidanc
   assert.equal(app.mail.case.status, 'loaded');
   assert.match(app.element('caseMailSection').innerHTML, /現在紐付いているメールは0件/);
   assert.match(app.element('caseMailSection').innerHTML, /同期・照合の未完了/);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /data-mail-no-mail-confirm/);
+});
+
+test('case no-mail confirmation is explicit and reads back the server actor and fixed period', async () => {
+  const eligible = noMail({ eligible: true, contextToken: 'a'.repeat(64) });
+  const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: eligible }),
+    confirmContactCaseNoMail: () => ({ ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync }) });
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.match(app.element('caseMailSection').innerHTML, /この対象期間に関連メールなしと確認/);
+  const receiptDetail = { submission_id: caseId, handled_status: '未対応', internal_note: '保持するメモ' };
+  app.state.detail = receiptDetail;
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.equal(app.mail.case.caseId, caseId);
+  assert.equal(app.mail.case.pendingNoMail, null);
+  assert.equal(app.mail.case.noMail.confirmation.email, 'reader@abroad-o.com');
+  assert.match(app.element('caseMailSection').innerHTML, /関連メールなし確認済み.*確認者: reader@abroad-o\.com/s);
+  assert.match(app.element('caseMailSection').innerHTML, /確認日時:.*対象期間:/s);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /data-mail-no-mail-confirm/);
+  assert.equal(app.state.detail, receiptDetail);
+  assert.deepEqual(app.calls.filter((call) => call.name !== 'listContactMail').map((call) => call.name), ['confirmContactCaseNoMail']);
+  const readback = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ confirmation: { ...noMailConfirmation, email: 'first@abroad-o.com' } }) }) });
+  await readback.ui.loadContactMailList('case', { caseId });
+  assert.match(readback.element('caseMailSection').innerHTML, /確認者: first@abroad-o\.com/);
+  const cancelled = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: eligible }) });
+  await cancelled.ui.loadContactMailList('case', { caseId });
+  cancelled.ui.window.confirm = () => false;
+  await cancelled.ui.confirmContactCaseNoMailFromUi('case');
+  assert.equal(cancelled.calls.filter((call) => call.name === 'confirmContactCaseNoMail').length, 0);
+  assert.equal(Object.keys(cancelled.mail.noMailRequests).length, 0);
+});
+
+test('no-mail UI rejects malformed eligibility and shows stale confirmation as requiring review', async () => {
+  const stale = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ stale: true, eligible: true, contextToken: 'b'.repeat(64) }) }) });
+  await stale.ui.loadContactMailList('case', { caseId });
+  assert.match(stale.element('caseMailSection').innerHTML, /失効しています。再確認が必要/);
+  for (const value of [undefined, noMail({ eligible: true }), noMail({ confirmation: { ...noMailConfirmation, email: 'other@example.com' } }),
+    noMail({ confirmation: { ...noMailConfirmation, cutoffAt: '2026-11-09T00:00:00.000Z' } }), noMail({ unexpected: true })]) {
+    const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: value }) });
+    await app.ui.loadContactMailList('case', { caseId });
+    assert.equal(app.mail.case.status, 'failed');
+    assert.doesNotMatch(app.element('caseMailSection').innerHTML, /data-mail-no-mail-confirm/);
+  }
+  const nonempty = uiRuntime({ listContactMail: () => ({ ...list([summary()]), noMail: noMail({ eligible: true, contextToken: 'a'.repeat(64) }) }) });
+  await nonempty.ui.loadContactMailList('case', { caseId });
+  assert.equal(nonempty.mail.case.status, 'failed');
+});
+
+test('unknown no-mail result retains the same operation through timeout, late reply and explicit reload', async () => {
+  let completeFirst; let attempts = 0;
+  const eligible = noMail({ eligible: true, contextToken: 'a'.repeat(64) });
+  const success = { ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync };
+  const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: eligible }),
+    confirmContactCaseNoMail: () => ++attempts === 1 ? new Promise((resolve) => { completeFirst = resolve; }) : success });
+  await app.ui.loadContactMailList('case', { caseId });
+  const first = app.ui.confirmContactCaseNoMailFromUi('case');
+  await new Promise((resolve) => setImmediate(resolve));
+  app.expireSyncCall(); await first;
+  const pendingId = app.mail.case.pendingNoMail.requestId;
+  assert.equal(attempts, 1); assert.equal(app.mail.case.writing, false);
+  assert.match(app.element('caseMailSection').innerHTML, /確認結果は未確認/);
+  completeFirst(success); await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(app.mail.case.noMail.confirmation, null);
+  app.ui.clearContactMailView('case');
+  await app.ui.loadContactMailList('case', { caseId: '22222222-2222-4222-8222-222222222222' });
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.equal(app.mail.case.pendingNoMail.requestId, pendingId);
+  await app.ui.loadContactMailList('case');
+  assert.equal(app.mail.case.pendingNoMail.requestId, pendingId);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  const writes = app.calls.filter((call) => call.name === 'confirmContactCaseNoMail');
+  assert.equal(writes.length, 2);
+  assert.deepEqual(writes[0].args[0], writes[1].args[0]);
+  assert.equal(app.mail.case.pendingNoMail, null);
+});
+
+test('definite stale-context rejection requires readback before a new no-mail action', async () => {
+  const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ eligible: true, contextToken: 'a'.repeat(64) }) }),
+    confirmContactCaseNoMail: () => ({ ok: false, error: { code: 'MAIL_MAPPING_CHANGED' } }) });
+  await app.ui.loadContactMailList('case', { caseId });
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.equal(app.mail.case.pendingNoMail, null);
+  assert.equal(app.mail.case.noMail.eligible, false);
+  assert.match(app.element('caseMailSection').innerHTML, /更新して現在の確認状態/);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.equal(app.calls.filter((call) => call.name === 'confirmContactCaseNoMail').length, 1);
+});
+
+test('new sync observation and auth loss prevent a late no-mail confirmation from restoring old data', async () => {
+  for (const authLoss of [false, true]) {
+    let complete;
+    const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ eligible: true, contextToken: 'a'.repeat(64) }) }),
+      confirmContactCaseNoMail: () => new Promise((resolve) => { complete = resolve; }) });
+    await app.ui.loadContactMailList('case', { caseId });
+    const operation = app.ui.confirmContactCaseNoMailFromUi('case');
+    await new Promise((resolve) => setImmediate(resolve));
+    if (authLoss) app.ui.showDenied('認証失効');
+    else app.ui.observeContactMailSync({ ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' });
+    complete({ ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync }); await operation;
+    if (authLoss) { assert.equal(app.element('caseMailSection').innerHTML, ''); assert.equal(app.mail.case.pendingNoMail, null); assert.equal(Object.keys(app.mail.noMailRequests).length, 0); }
+    else { assert.equal(app.mail.case.noMail.confirmation, null); assert.ok(app.mail.case.pendingNoMail); assert.match(app.element('caseMailSection').innerHTML, /同期の状態が変わりました/); }
+  }
 });
 
 test('foreground sync continues successful batches and retains unknown-result request ID for manual retry', async () => {

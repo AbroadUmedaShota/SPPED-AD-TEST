@@ -47,6 +47,15 @@ function markContactMailReviewed(options, authProof) {
   return callMailService_('markReviewed', payload, context, mailRequestId_(options && options.requestId));
 }
 
+function confirmContactCaseNoMail(options, authProof) {
+  var context = requireViewer_(authProof);
+  var caseId = mailCaseId_(options && options.caseId);
+  var contextToken = options && options.contextToken;
+  if (typeof contextToken !== 'string' || !/^[a-f0-9]{64}$/.test(contextToken)) throw new Error('関連メールなし確認の対象条件が不正です。');
+  if (!options || typeof options.requestId !== 'string' || !options.requestId) throw new Error('メール操作の識別子が必要です。');
+  return callMailService_('confirmCaseNoMail', { caseId: caseId, contextToken: contextToken }, context, mailRequestId_(options.requestId));
+}
+
 function resolveContactMailPending(options, authProof) {
   var context = requireViewer_(authProof);
   var action = String(options && options.action || '');
