@@ -1242,7 +1242,7 @@ test('Firestore catalog read requires complete closure metadata and verifies its
   const metadata = { snapshotId: 'snapshot', total: 2, digest: catalogDigest(cases) };
   const node = (path = '') => ({
     collection(name) { return node(`${path}/${name}`); }, doc(name) { return node(`${path}/${name}`); }, orderBy() { return this; },
-    async get() { return path.endsWith('/suppressedCases') ? { docs: [] } : path.endsWith('/pages') ? { docs: [{ data: () => page }] } : { exists: true, data: () => metadata }; }
+    async get() { return path.includes('/retiredCatalogs/') ? { exists: false } : path.endsWith('/suppressedCases') ? { docs: [] } : path.endsWith('/pages') ? { docs: [{ data: () => page }] } : { exists: true, data: () => metadata }; }
   });
   const store = createFirestoreStore(node());
   assert.deepEqual((await store.getCatalog()).cases, cases);

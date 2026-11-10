@@ -8,7 +8,7 @@ import { requestExpiresAt } from '../runtime/requestIdentity.mjs';
 const MAILBOX = 'contactMailboxes/customer-speed-ad';
 const CASE_ID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const KNOWN = new Set(['messages', 'events', 'receipts', 'caseCoverage', 'deletionDiagnostics', 'meta',
-  'catalogSnapshots', 'suppressedMessages', 'suppressedCases', 'suppressedRequests']);
+  'catalogSnapshots', 'retiredCatalogs', 'suppressedMessages', 'suppressedCases', 'suppressedRequests']);
 const SCANNED = ['messages', 'events', 'receipts', 'caseCoverage', 'deletionDiagnostics'];
 const MAX_SCAN = 10000;
 const MAX_TARGETS = 2000;

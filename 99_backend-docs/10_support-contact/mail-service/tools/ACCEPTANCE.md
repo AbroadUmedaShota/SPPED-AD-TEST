@@ -1,5 +1,7 @@
 # 全件受入の独立照合
 
+App採取は現行一覧IDの再利用防止hashも読み、`retiredCatalogs` に記録された一覧を現行として復元した状態は `APP_CATALOG_RETIRED` で不合格にする。過去一覧の整理後も、この生成済み一覧ID由来hashはアプリが存在する間保持する。hashに受付IDや案件内容は含めない。
+
 `verifyMailAcceptance.mjs` は、正本Sheet・同期と独立したGmail列挙・Firestoreの3sourceを照合する。Sheetは専用画面が前後に出力した `{manifest,receipt}` のJSONファイルをそのまま渡す。CLIはreceiptの件数・二重読取り・前後catalogDigest一致を検査し、manifestだけの入力を拒否する。本文・件名・宛先・添付名・添付本体を入力しない。IDは実行ごとの32byte以上の乱数keyを使い、`hashAcceptanceId(kind, value, key)` のHMAC-SHA256へ変換する。keyはmanifestやログへ書かず、全sourceに同じkeyを使う。`hashKeyId` はkey bytesのSHA-256。hashも匿名情報とは扱わず、アクセス制限された一時フォルダで扱い、照合後に削除する。
 
 ## 実行と判定

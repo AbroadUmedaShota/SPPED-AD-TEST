@@ -3,7 +3,7 @@ import test from 'node:test';
 import { createCatalogRetirement, createCatalogDocumentPager } from '../catalogRetirement.mjs';
 import { parseCatalogRetirementArguments, runCatalogRetirementCli } from '../retireMailCatalogs.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
-import { createPurgeGate } from '../../runtime/purgeGate.mjs';
+import { createPurgeGate, suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createFirestoreStore } from '../../runtime/firestoreStore.mjs';
 import { catalogDigest } from '../../runtime/service.mjs';
 import { captureAppAcceptance } from '../captureAppAcceptance.mjs';
@@ -99,6 +99,62 @@ test('independent app capture remains complete after inactive snapshot retiremen
   assert.equal(after.sourceComplete, true);
   assert.deepEqual(after.catalog, before.catalog);
   assert.deepEqual(after.rows, before.rows);
+});
+
+test('retired snapshot IDs cannot be recreated or promoted by a delayed final page or lost-response retry', async () => {
+  const { db, cleanup } = fixture();
+  const plan = await nextPlan(cleanup);
+  await cleanup.apply('reference', plan.planHash, plan.pageToken);
+  const marker = `${ROOT}/retiredCatalogs/${suppressionKey('catalog', 'old')}`;
+  assert.deepEqual(db.records.get(marker), { version: 1 });
+  assert.equal(JSON.stringify(db.records.get(marker)).includes(row.caseId), false);
+  const store = createFirestoreStore(db);
+  const page = { snapshotId: 'old', pageIndex: 0, pageCount: 1, total: 1, digest: catalogDigest([row]), cases: [row] };
+  for (let retry = 0; retry < 2; retry++) await assert.rejects(store.uploadCatalogPage(page, catalogDigest), { code: 'MAIL_REQUEST_CONFLICT' });
+  assert(!db.records.has(path('old')));
+  assert(!db.records.has(`${path('old')}/pages/0000`));
+  assert.equal(db.records.get(`${ROOT}/meta/activeCatalog`).snapshotId, 'zzactive');
+});
+
+test('partial cancel leaves a retirement hash that blocks resuming an incomplete newer upload', async () => {
+  const pages = Object.fromEntries(Array.from({ length: 7 }, (_, index) => [`${path('old')}/pages/${String(index).padStart(4, '0')}`, { pageIndex: index, cases: [row] }]));
+  const { db, cleanup } = fixture({ ...pages, [path('old')]: { complete: false, pageCount: 8, total: 8, digest: 'a'.repeat(64), createdAt: '2999-01-01T00:00:00.000Z' } });
+  const plan = await nextPlan(cleanup);
+  await cleanup.apply('reference', plan.planHash, plan.pageToken);
+  await cleanup.cancel('reference', plan.planHash);
+  assert.deepEqual(db.records.get(`${ROOT}/retiredCatalogs/${suppressionKey('catalog', 'old')}`), { version: 1 });
+  await assert.rejects(createFirestoreStore(db).uploadCatalogPage({ snapshotId: 'old', pageIndex: 7, pageCount: 8, total: 8, digest: 'a'.repeat(64), cases: [row] }, catalogDigest), { code: 'MAIL_REQUEST_CONFLICT' });
+  assert(!db.records.has(`${path('old')}/pages/0000`));
+  assert(!db.records.has(`${path('old')}/pages/0007`));
+  assert.equal(db.records.get(`${ROOT}/meta/activeCatalog`).snapshotId, 'zzactive');
+});
+
+test('retirement between page storage and final promotion prevents stale active recreation', async () => {
+  const { db } = fixture();
+  const original = db.runTransaction;
+  let calls = 0;
+  db.runTransaction = (operation) => {
+    if (++calls === 2) {
+      db.records.set(`${ROOT}/retiredCatalogs/${suppressionKey('catalog', 'delayed')}`, { version: 1 });
+      db.records.delete(path('delayed'));
+      db.records.delete(`${path('delayed')}/pages/0000`);
+    }
+    return original(operation);
+  };
+  await assert.rejects(createFirestoreStore(db).uploadCatalogPage({ snapshotId: 'delayed', pageIndex: 0, pageCount: 1, total: 1, digest: catalogDigest([row]), cases: [row] }, catalogDigest), { code: 'MAIL_REQUEST_CONFLICT' });
+  assert.equal(db.records.get(`${ROOT}/meta/activeCatalog`).snapshotId, 'zzactive');
+  assert(!db.records.has(path('delayed')));
+});
+
+test('a manually restored active retired ID fails runtime reads, cleanup planning and independent capture', async () => {
+  const startAt = '2026-11-10T00:00:00.000Z';
+  const cutoffAt = '2026-11-10T12:00:00.000Z';
+  const { db, cleanup } = fixture({ [`${ROOT}/retiredCatalogs/${suppressionKey('catalog', 'zzactive')}`]: { version: 1 } });
+  await assert.rejects(createFirestoreStore(db).getCatalog(), { code: 'MAIL_CATALOG_INVALID' });
+  await assert.rejects(cleanup.plan('reference'), { code: 'MAIL_CATALOG_RETIRE_PROTECTED_INVALID' });
+  const capture = await captureAppAcceptance({ db, runId: 'synthetic', key: Buffer.alloc(32, 7), startAt, cutoffAt, now: () => new Date(NOW) });
+  assert.equal(capture.sourceComplete, false);
+  assert(capture.errors.includes('APP_CATALOG_RETIRED'));
 });
 
 test('partial deletion keeps the gate closed and resumes from the same pinned plan', async () => {

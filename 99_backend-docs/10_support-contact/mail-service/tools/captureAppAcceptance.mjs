@@ -62,10 +62,12 @@ export async function captureAppAcceptance({ db, runId, key, startAt, cutoffAt, 
         errors.add('APP_CATALOG_INVALID'); return;
       }
       if (sync?.catalogSnapshotId !== active.snapshotId) errors.add('APP_CATALOG_CHANGED');
-      const [snapshotDoc, pageDocs] = await Promise.all([
+      const [snapshotDoc, pageDocs, retiredDoc] = await Promise.all([
         transaction.get(doc(`catalogSnapshots/${active.snapshotId}`)),
-        transaction.get(collection(`catalogSnapshots/${active.snapshotId}/pages`).select('pageIndex', 'cases'))
+        transaction.get(collection(`catalogSnapshots/${active.snapshotId}/pages`).select('pageIndex', 'cases')),
+        transaction.get(doc(`retiredCatalogs/${marker('catalog', active.snapshotId)}`))
       ]);
+      if (retiredDoc.exists) errors.add('APP_CATALOG_RETIRED');
       const snapshot = data(snapshotDoc);
       if (!snapshot?.complete || snapshot.digest !== active.digest || snapshot.total !== active.total ||
           !Number.isSafeInteger(snapshot.pageCount) || snapshot.pageCount < 1 || snapshot.pageCount > MAX_ROWS ||

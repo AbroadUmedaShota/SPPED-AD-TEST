@@ -36,6 +36,7 @@ export function createCatalogRetirement({ db, listCatalogPage, projectId, databa
   assertMail(typeof listCatalogPage === 'function', 'MAIL_CATALOG_RETIRE_TARGET_INVALID');
   const mailbox = db.doc(ROOT);
   const catalogs = mailbox.collection('catalogSnapshots');
+  const retiredCatalogs = mailbox.collection('retiredCatalogs');
   const meta = mailbox.collection('meta');
   const controlRef = meta.doc('purgeControl');
   const jobRef = meta.doc('catalogRetirementJob');
@@ -61,9 +62,11 @@ export function createCatalogRetirement({ db, listCatalogPage, projectId, databa
     for (const id of protectedIds) {
       const ref = catalogs.doc(id);
       const pageQuery = ref.collection('pages').limit(501);
-      const [parentDoc, pageDocs] = await Promise.all(transaction ? [transaction.get(ref), transaction.get(pageQuery)] : [ref.get(), pageQuery.get()]);
+      const marker = retiredCatalogs.doc(suppressionKey('catalog', id));
+      const [parentDoc, pageDocs, retired] = await Promise.all(transaction ? [transaction.get(ref), transaction.get(pageQuery), transaction.get(marker)] :
+        [ref.get(), pageQuery.get(), marker.get()]);
       const parent = data(parentDoc);
-      assertMail(parent?.complete === true && Number.isInteger(parent.pageCount) && parent.pageCount >= 1 && parent.pageCount <= 500 &&
+      assertMail(!retired.exists && parent?.complete === true && Number.isInteger(parent.pageCount) && parent.pageCount >= 1 && parent.pageCount <= 500 &&
         Number.isInteger(parent.total) && parent.total >= 0 && parent.total <= 100000 && HASH.test(parent.digest || '') &&
         pageDocs.docs.length === parent.pageCount, 'MAIL_CATALOG_RETIRE_PROTECTED_INVALID', 409);
       const pages = [...pageDocs.docs].sort((a, b) => a.id.localeCompare(b.id));
@@ -197,6 +200,10 @@ export function createCatalogRetirement({ db, listCatalogPage, projectId, databa
         const pages = await transaction.get(db.doc(item.path).collection('pages'));
         assertMail(pages.docs.every((page) => group.some((target) => target.path === page.ref.path)), 'MAIL_CATALOG_RETIRE_PLAN_CHANGED', 409);
       }
+      const retiredRefs = [...new Set(group.map((item) => item.path.split('/')[3]))].map((id) => retiredCatalogs.doc(suppressionKey('catalog', id)));
+      const retired = await Promise.all(retiredRefs.map((ref) => transaction.get(ref)));
+      assertMail(retired.every((item) => !item.exists || item.data()?.version === 1 && Object.keys(item.data()).length === 1), 'MAIL_CATALOG_RETIRE_UNSUPPORTED_DATA', 409);
+      retiredRefs.forEach((ref) => transaction.set(ref, { version: 1 }));
       group.forEach((item) => transaction.delete(db.doc(item.path)));
       const updated = { ...current, offset: current.offset + group.length };
       if (updated.offset === updated.targets.length) {

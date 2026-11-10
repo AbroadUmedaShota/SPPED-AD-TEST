@@ -29,7 +29,8 @@ function fixture(extra = {}) {
 }
 
 test('case purge is dry-run first, deletes all linked records and persists only minimal hashes', async () => {
-  const { db, purge } = fixture();
+  const retiredPath = `${root}/retiredCatalogs/${suppressionKey('catalog', 'old-random-snapshot')}`;
+  const { db, purge } = fixture({ [retiredPath]: { version: 1 } });
   const before = JSON.stringify([...db.records]);
   const plan = await purge.plan(target, 'deletion-123');
   assert.equal(plan.messageCount, 1);
@@ -47,6 +48,7 @@ test('case purge is dry-run first, deletes all linked records and persists only 
   const catalog = await createFirestoreStore(db).getCatalog();
   assert.deepEqual(catalog.caseIds, [other]);
   assert.deepEqual(catalog.suppressedCaseIds, [target]);
+  assert.deepEqual(db.records.get(retiredPath), { version: 1 });
 });
 
 test('purged recent request IDs keep only their fixed expiry while expired IDs need no tombstone', async () => {

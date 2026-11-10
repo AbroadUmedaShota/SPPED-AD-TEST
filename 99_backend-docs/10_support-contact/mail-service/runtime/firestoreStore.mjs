@@ -27,6 +27,7 @@ export function createFirestoreStore(db) {
   const suppressedMessages = mailbox.collection('suppressedMessages');
   const suppressedCases = mailbox.collection('suppressedCases');
   const suppressedRequests = mailbox.collection('suppressedRequests');
+  const retiredCatalogs = mailbox.collection('retiredCatalogs');
   const gate = createPurgeGate(async () => data(await controlRef.get()));
   async function runTransaction(operation) {
     return db.runTransaction(async (transaction) => {
@@ -51,6 +52,7 @@ export function createFirestoreStore(db) {
     const active = snapshotId ? { ...data(await snapshots.doc(snapshotId).get()), snapshotId } : data(await activeRef.get());
     if (!active) return { complete: false, caseIds: [], cases: [] };
     if (snapshotId && !active.complete) return { complete: false, caseIds: [], cases: [] };
+    assertMail(!(await retiredCatalogs.doc(suppressionKey('catalog', active.snapshotId)).get()).exists, 'MAIL_CATALOG_INVALID', 409);
     const pages = await snapshots.doc(active.snapshotId).collection('pages').orderBy('pageIndex').get();
     const cases = normalizeCatalogCases(pages.docs.flatMap((page) => { assertMail(Array.isArray(page.data().cases), 'MAIL_CATALOG_INVALID', 409); return page.data().cases; }));
     assertMail(cases.length === active.total && catalogDigest(cases) === active.digest, 'MAIL_CATALOG_INVALID', 409);
@@ -125,6 +127,7 @@ export function createFirestoreStore(db) {
       const ref = snapshots.doc(page.snapshotId);
       const pageRef = ref.collection('pages').doc(String(page.pageIndex).padStart(4, '0'));
       await runTransaction(async (transaction) => {
+        assertMail(!(await transaction.get(retiredCatalogs.doc(suppressionKey('catalog', page.snapshotId)))).exists, 'MAIL_REQUEST_CONFLICT', 409);
         const existing = data(await transaction.get(ref));
         const existingPage = data(await transaction.get(pageRef));
         if (existing) assertMail(existing.pageCount === page.pageCount && existing.total === page.total && existing.digest === page.digest, 'MAIL_REQUEST_CONFLICT', 409);
@@ -137,6 +140,7 @@ export function createFirestoreStore(db) {
       const cases = normalizeCatalogCases(pages.docs.flatMap((item) => item.data().cases));
       assertMail(cases.length === page.total && makeDigest(cases) === page.digest, 'MAIL_CATALOG_INVALID', 409);
       await runTransaction(async (transaction) => {
+        assertMail(!(await transaction.get(retiredCatalogs.doc(suppressionKey('catalog', page.snapshotId)))).exists, 'MAIL_REQUEST_CONFLICT', 409);
         const snapshot = data(await transaction.get(ref));
         const active = data(await transaction.get(activeRef));
         if (!active || active.createdAt <= snapshot.createdAt) transaction.set(activeRef, { snapshotId: page.snapshotId, createdAt: snapshot.createdAt, total: cases.length, digest: page.digest });
