@@ -51,7 +51,7 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 | 4 | Cloud Run専用実行サービスアカウント、Firestore database、Secret、image保存先を作成する。 | 実行アカウントにはFirestore操作と対象Secretの読取りに必要な権限だけを付ける。ブラウザや一般利用者へFirestore/Secretを直接共有しない。 |
 | 5 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
 | 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [データ管理・削除の案内](../運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に従い、案件終了後3年間の保存方針を実施する手段と削除申請先を先に確認する。[認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)へ実施説明と申請先メールを渡し、本人が説明へ対話的に同意する。code/tokenを端末ファイル・ログへ出さず、登録先Secretとversionを確認する。 |
-| 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
+| 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | [配備コマンドの送信元確認](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md#4-imageビルドとdigest固定)で採用SHAの`mail-service`だけを列挙し、送信ファイル24件の完全一致を確認する。Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
 | 8 | GAS開発版へメール連携コードと`openid` scopeをpushし、配備者本人が再認可してID tokenの必要claimsだけを確認する。 | 公開配備ID・versionは保全値のまま。tokenを表示せず、実GASのaudience・配備者subject/emailを取得する。窓口ログイン用clientから推定しない。 |
 | 9 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、手順8で確認したaudienceをcustom audienceへ登録する。特定の正規Secret versionとbuild/Registryで一致したimage digestを使う。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
 | 10 | GASの固定`MAIL_SERVICE_URL`を設定し、一時claims関数を除いた採用コードから最終versionを作成して公開配備する。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
@@ -59,7 +59,9 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 
 Cloud Runの設定は次の対応で照合します。値はrepoへ保存せず、実tokenをログへ出して取得しないでください。
 
-GASの第2段階反映前に、正本Sheetとヘッダー・全行を保全し、先頭17列の名前・順序・各値の意味が公開フォームの `gas/Code.gs` の `CONTACT_HEADERS` と一致することを照合します。不一致なら公開フォームの自動ヘッダー修復に任せず、データの対応を確認して移行計画を直します。一致後にだけ18列目へ `closed_at` を追加し、既存行は空のままにします。先頭18列の読戻しと、合成受付の追加後も既存の内部メモ・終了日時が保持されることを確認します。viewerは列の欠落・順序不一致で停止し、自動作成しません。
+GASの第2段階反映前に、正本Sheetとヘッダー・全行を保全し、先頭17列の名前・順序・各値の意味が公開フォームの `gas/Code.gs` の `CONTACT_HEADERS` と一致することを照合します。18列目の `closed_at` は2026-11-11時点で追加済みで、既存の対応済み3件にも本人指定の終了日時が入力されています。配備時はこの列の位置と全行の値を読戻し、既存値を機械的に空欄へ戻したり再入力したりしません。列の欠落・順序不一致や予期しない値があれば公開フォームの自動ヘッダー修復に任せず、データの対応と切替記録を確認して停止します。合成受付の追加後も既存の内部メモ・終了日時が保持されることを確認します。viewerは列の欠落・順序不一致で停止し、自動作成しません。
+
+現行の第1段階配備版は `closed_at` を更新しません。終了日時を入力した時点から第2段階への切替まで、3件それぞれの再開・再完了をSheet版履歴と運用記録で追跡し、現在の終了日時が実際の終了日と一致することを確認します。状態が一度でも再開された行は、再完了の根拠日時へ訂正するか、日時を確定できなければ空欄にして読戻します。履歴を追跡できない行も終了日を個別に再確認し、確定できなければ空欄にします。対象を特定できなければ既存3件すべてを終了日未確認として扱い、確認・必要な訂正が済むまで期限削除を開始しません。`handled_at` はメモ保存でも変わるため、日時の大小だけで再完了と判定しません。
 
 | 設定 | 内容 |
 | --- | --- |

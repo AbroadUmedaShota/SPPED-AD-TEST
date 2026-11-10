@@ -49,6 +49,26 @@ if ($ProjectId -cne $ApprovedProjectId -or $GitSha -notmatch '^[a-f0-9]{40}$') {
 $RuntimeEmail = "$RuntimeAccountId@$ProjectId.iam.gserviceaccount.com"
 $BuildEmail = "$BuildAccountId@$ProjectId.iam.gserviceaccount.com"
 $ImageTag = "$Region-docker.pkg.dev/$ProjectId/$Repository/contact-mail:$GitSha"
+$RepositoryRoot = (git rev-parse --show-toplevel).Trim()
+if ($LASTEXITCODE -ne 0) { throw 'Git worktree root could not be read.' }
+$MailServiceDirectory = (Resolve-Path -LiteralPath (
+  Join-Path $RepositoryRoot '99_backend-docs/10_support-contact/mail-service')).Path
+Set-Location -LiteralPath $MailServiceDirectory
+
+function Assert-MailServiceSource {
+  if ([IO.Path]::GetFullPath((Get-Location).Path) -ine
+      [IO.Path]::GetFullPath($MailServiceDirectory)) {
+    throw 'Run this step from the adopted mail-service directory.'
+  }
+  $currentSha = (git rev-parse HEAD).Trim()
+  if ($LASTEXITCODE -ne 0 -or $currentSha -cne $GitSha) {
+    throw 'Mail-service source SHA differs from the adopted SHA.'
+  }
+  $changes = @(git status --porcelain)
+  if ($LASTEXITCODE -ne 0 -or $changes.Count -ne 0) {
+    throw 'Build source worktree is not clean.'
+  }
+}
 
 function Invoke-ApprovedChange {
   param([ValidateSet('gcloud', 'clasp')][string]$Tool, [string[]]$Arguments)
@@ -118,6 +138,7 @@ Compute Engine既定SA（`PROJECT_NUMBER-compute@developer.gserviceaccount.com`�
 採用SHAの`mail-service`ディレクトリから、**その版のindex定義全体**を使います。既存indexをlistし、fieldsの順序・queryScope・databaseまで一致するものは作成しません。次のloopは新規databaseの初回用です。既存databaseでは不足分だけを選び、不要indexを削除しません。
 
 ```powershell
+Assert-MailServiceSource
 $indexes = (Get-Content -Raw -LiteralPath 'runtime/firestore.indexes.json' | ConvertFrom-Json).indexes
 foreach ($index in $indexes) {
   $indexArguments = @('firestore', 'indexes', 'composite', 'create', '--project', $ProjectId,
@@ -163,10 +184,27 @@ version読戻しのCLIには短い`SecretId`と明示`ProjectId`を渡します�
 
 ## 4. imageビルドとdigest固定
 
-採用SHAの`mail-service`で既存の`npm ci --ignore-scripts`と`npm test`を通します。`gcloud meta list-files-for-upload`で送信対象を先に確認します。[`.gcloudignore`](../../../99_backend-docs/10_support-contact/mail-service/.gcloudignore)はruntimeコードとlockfile等だけを許可し、認可補助ツール・合成データ・node_modules・ローカル資格情報を送信しません。想定外ファイルが1件でもあれば停止します。
+採用SHAの`mail-service`で既存の`npm ci --ignore-scripts`と`npm test`を通します。`Assert-MailServiceSource`は作業場所・SHA・cleanなworktreeを照合し、`gcloud meta list-files-for-upload`の結果が下記24ファイルと完全一致した場合だけビルドへ進みます。[`.gcloudignore`](../../../99_backend-docs/10_support-contact/mail-service/.gcloudignore)はruntimeコードとlockfile等だけを許可し、認可補助ツール・合成データ・node_modules・ローカル資格情報を送信しません。採用版でファイル構成を変えた場合は、その変更をレビューして期待リストも更新します。
 
 ```powershell
-gcloud meta list-files-for-upload
+Assert-MailServiceSource
+$expectedUploadFiles = @(
+  'attachmentLimits.mjs', 'classification.mjs', 'mime.mjs',
+  'package-lock.json', 'package.json', 'review.mjs', 'safeMail.mjs', 'sync.mjs',
+  'runtime/attachmentCache.mjs', 'runtime/attachmentObservation.mjs',
+  'runtime/auth.mjs', 'runtime/caseRetention.mjs', 'runtime/cloudbuild.yaml',
+  'runtime/Dockerfile', 'runtime/errors.mjs', 'runtime/firestoreStore.mjs',
+  'runtime/googleAdapters.mjs', 'runtime/http.mjs', 'runtime/mailboxConsent.mjs',
+  'runtime/mailboxDisclosure.mjs', 'runtime/main.mjs', 'runtime/mixedThread.mjs',
+  'runtime/purgeGate.mjs', 'runtime/service.mjs'
+)
+$uploadFiles = @(gcloud meta list-files-for-upload | ForEach-Object {
+  $_.Trim().Replace('\', '/')
+} | Where-Object { $_ })
+if ($LASTEXITCODE -ne 0 -or $uploadFiles.Count -ne $expectedUploadFiles.Count -or
+    @(Compare-Object $expectedUploadFiles $uploadFiles -CaseSensitive).Count -ne 0) {
+  throw 'Cloud Build upload files differ from the reviewed manifest.'
+}
 Invoke-ApprovedChange gcloud @('builds', 'submit', '.', '--project', $ProjectId,
   '--region', $Region, '--config', 'runtime/cloudbuild.yaml',
   '--service-account', "projects/$ProjectId/serviceAccounts/$BuildEmail",
