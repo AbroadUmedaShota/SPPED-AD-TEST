@@ -3,6 +3,7 @@ import { AggregateField, FieldValue } from '@google-cloud/firestore';
 import { assertMail } from './errors.mjs';
 import { canonicalJson } from './service.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from './mixedThread.mjs';
+import { observeAttachment } from './attachmentObservation.mjs';
 
 export function createFirestoreStore(db) {
   const mailbox = db.collection('contactMailboxes').doc('customer-speed-ad');
@@ -201,15 +202,16 @@ export function createFirestoreStore(db) {
     async recordBodyObservation(id, availability, at) {
       await messages.doc(id).update({ bodyAvailability: availability, bodyCheckedAt: at });
     },
-    async recordAttachmentObservation(id, partId, availability, at) {
+    async recordAttachmentObservation(id, partId, availability, at, transfer) {
       const ref = messages.doc(id);
-      await db.runTransaction(async (transaction) => {
+      return db.runTransaction(async (transaction) => {
         const record = data(await transaction.get(ref));
         assertMail(record && record.attachments?.some((item) => item.partId === partId), 'MAIL_ATTACHMENT_NOT_FOUND', 404);
-        const attachments = record.attachments.map((item) => item.partId === partId ? { ...item, availability, checkedAt: at } : item);
+        const attachments = record.attachments.map((item) => item.partId === partId ? observeAttachment(item, availability, at, transfer) : item);
         transaction.update(ref, { attachments,
           unverifiedAttachmentCount: attachments.filter((item) => item.availability === 'unverified').length,
           unavailableAttachmentCount: attachments.filter((item) => item.availability === 'unavailable').length });
+        return attachments.find((item) => item.partId === partId);
       });
     },
     async getSyncState() { return data(await syncRef.get()); },

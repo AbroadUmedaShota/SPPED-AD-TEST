@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { assertMail, MailError } from './errors.mjs';
 import { validateActor } from './auth.mjs';
 import { mixedThreadDemotions } from './mixedThread.mjs';
+import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObservation.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
@@ -9,7 +10,7 @@ const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMa
   'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
-const CHUNK_SIZE = 512 * 1024;
+const CHUNK_SIZE = ATTACHMENT_CHUNK_SIZE;
 
 export function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -153,7 +154,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const record = await store.getMessage(messageId(payload.messageId));
     assertMail(record, 'MAIL_NOT_FOUND', 404);
     assertScope(record, payload);
-    const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable',
+    const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable', reviewReady: false,
       attachments: (item.attachments || []).map(({ partId, name, mimeType, size, availability }) => ({ partId, name, mimeType, size, availability })) } });
     if (record.unavailable) return metadataOnly(record);
     let message;
@@ -171,7 +172,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       bodyText = '';
     }
     const latest = await requireRecord(payload);
-    return { message: { ...summary(latest), bodyText, bodyAvailability: latest.bodyAvailability, attachments: parsed.attachments.map((item) => ({
+    return { message: { ...summary(latest), bodyText, bodyAvailability: latest.bodyAvailability, reviewReady: attachmentReviewReady(latest), attachments: parsed.attachments.map((item) => ({
       partId: item.partId, name: item.name, mimeType: item.mimeType, size: item.size, inline: item.inline,
       availability: latest.attachments?.find((stored) => stored.partId === item.partId)?.availability || 'unverified'
     })) } };
@@ -239,22 +240,24 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const record = await requireRecord(payload);
     assertMail(typeof payload.partId === 'string' && payload.partId.length <= 64 && /^0(?:\.\d+)*$/.test(payload.partId));
     const offset = payload.offset ?? 0;
-    assertMail(Number.isSafeInteger(offset) && offset >= 0);
+    assertMail(Number.isSafeInteger(offset) && offset >= 0 && offset % CHUNK_SIZE === 0);
     const message = await fetchMessage(record.messageId);
     let result;
     try {
       result = await core.readMailAttachment(message, payload.partId, gmail.getAttachment.bind(gmail));
-      await store.recordAttachmentObservation(record.messageId, payload.partId, 'verified', now().toISOString());
     } catch {
       await store.recordAttachmentObservation(record.messageId, payload.partId, 'unavailable', now().toISOString());
       throw new MailError('MAIL_ATTACHMENT_UNAVAILABLE', 410);
     }
     const bytes = result.previewKind === 'text' ? Buffer.from(result.text, 'utf8') : Buffer.from(result.bytes);
-    assertMail(offset <= bytes.length);
+    assertMail(offset < bytes.length || (offset === 0 && bytes.length === 0));
     await requireRecord(payload);
     const chunk = bytes.subarray(offset, Math.min(offset + CHUNK_SIZE, bytes.length));
-    return { attachment: { partId: payload.partId, name: result.name,
-      mimeType: result.mimeType, size: bytes.length, previewKind: result.previewKind },
+    const observed = await store.recordAttachmentObservation(record.messageId, payload.partId, 'served', now().toISOString(),
+      { offset, totalSize: bytes.length, contentDigest: createHash('sha256').update(bytes).digest('hex') });
+    const latest = await requireRecord(payload);
+    return { reviewReady: attachmentReviewReady(latest), attachment: { partId: payload.partId, name: result.name,
+      mimeType: result.mimeType, size: bytes.length, previewKind: result.previewKind, availability: observed.availability },
     offset, nextOffset: offset + chunk.length, totalSize: bytes.length,
     dataBase64: chunk.toString('base64'), done: offset + chunk.length === bytes.length };
   }
@@ -272,6 +275,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         assertScope(record, payload);
         assertMail(record.matchState === 'matched' && !record.unavailable, 'MAIL_MAPPING_CHANGED', 409);
         if (record.firstReview) return { message: summary(record) };
+        assertMail(attachmentReviewReady(record), 'MAIL_CONTENT_UNAVAILABLE', 410);
         assertMail(record.version === payload.expectedVersion, 'MAIL_MAPPING_CHANGED', 409);
         transition = core.recordFirstReview(record, { email: actor.email, verified: true }, now().toISOString());
       } else {

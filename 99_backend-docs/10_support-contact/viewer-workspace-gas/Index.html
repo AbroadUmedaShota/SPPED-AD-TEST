@@ -1434,6 +1434,7 @@
     function validateContactMailChunk(result, offset, partId) {
       if (!result || result.ok !== true || !result.attachment || result.attachment.partId !== partId ||
         typeof result.attachment.name !== 'string' || typeof result.attachment.mimeType !== 'string' ||
+        !['verified', 'unverified'].includes(result.attachment.availability) || typeof result.reviewReady !== 'boolean' ||
         !['image', 'pdf', 'text', 'download'].includes(result.attachment.previewKind) ||
         result.offset !== offset || !Number.isInteger(result.nextOffset) || !Number.isInteger(result.totalSize) ||
         result.totalSize < 0 || result.totalSize > 52428800 || result.nextOffset < offset || result.nextOffset > result.totalSize ||
@@ -1700,6 +1701,10 @@
       }
     }
 
+    function contactMailReviewHtml(message, writing) {
+      return `<span>${message.firstReview ? `最初の確認: ${escapeHtml(message.firstReview.email)} / ${escapeHtml(formatDate(message.firstReview.at))}` : '未確認'}</span>${message.matchState === 'matched' && !message.firstReview ? message.reviewReady === true && !message.unavailable ? `<button type="button" data-mail-review ${writing ? 'disabled' : ''}>このメールを確認済みにする</button>` : '<span>本文とすべての添付を取得してから確認済みにできます。</span>' : ''}`;
+    }
+
     function renderContactMailView(view) {
       const current = contactMailState[view];
       const root = contactMailRoot(view);
@@ -1728,11 +1733,11 @@
         ${!current.messages.length ? `<p class="muted">${current.scope === 'case' ? '現在紐付いているメールは0件です。同期・照合の未完了を確認し、関連メールの有無を受入時に照合してください。' : '現在の条件で表示できるメールは0件です。同期・照合の未完了も確認してください。'}</p>` : current.detailError ? `<p class="error" role="status">${escapeHtml(current.detailError)}</p>` : !message ? '<p class="muted" role="status">メール本文を読み込み中...</p>' : `
           <h3>${escapeHtml(contactMailText(message.subject || '（件名なし）'))}</h3>
           <div class="grid"><div class="label">日時</div><div>${escapeHtml(formatDate(message.internalDate))}</div><div class="label">送受信</div><div>${message.direction === 'sent' ? '送信' : message.direction === 'received' ? '受信' : '送受信不明'}</div><div class="label">差出人</div><div>${escapeHtml(contactMailText(message.from))}</div><div class="label">宛先</div><div>${escapeHtml(contactMailText(message.to))}</div><div class="label">案件</div><div>${escapeHtml(message.caseId || '照合待ち')}</div>${message.reason ? `<div class="label">照合の状態</div><div>${escapeHtml(contactMailMatchReason(message.reason))}</div>` : ''}${message.matchState === 'pending' && message.evidence && Array.isArray(message.evidence.bodyCaseIds) && message.evidence.bodyCaseIds.length ? `<div class="label">本文の受付ID</div><div>${escapeHtml(message.evidence.bodyCaseIds.join(' / '))}</div>` : ''}</div>
-          <div class="mail-review"><span>${message.firstReview ? `最初の確認: ${escapeHtml(message.firstReview.email)} / ${escapeHtml(formatDate(message.firstReview.at))}` : '未確認'}</span>${message.matchState === 'matched' && !message.firstReview && !message.unavailable ? `<button type="button" data-mail-review ${current.writing ? 'disabled' : ''}>このメールを確認済みにする</button>` : ''}</div>
+          <div class="mail-review">${contactMailReviewHtml(message, current.writing)}</div>
           ${message.matchState === 'pending' ? `<div class="mail-resolve"><input data-mail-case-id aria-label="紐付ける受付ID" placeholder="紐付ける受付ID" value="${escapeHtml(current.resolveCaseId || '')}" ${current.writing ? 'disabled' : ''}><input data-mail-reason aria-label="照合の理由" placeholder="照合・対象外の理由（必須）" maxlength="1000" value="${escapeHtml(current.resolveReason || '')}" ${current.writing ? 'disabled' : ''}><button type="button" data-mail-match ${current.writing ? 'disabled' : ''}>紐付けを確定</button><button type="button" data-mail-exclude ${current.writing ? 'disabled' : ''}>対象外にする</button></div>` : ''}
           <p class="error" data-mail-write-error role="status">${escapeHtml(current.writeError || '')}</p>
           ${message.unavailable || message.bodyAvailability === 'unavailable' ? '<p class="error">このメールの本文は取得不能です。全件確認の達成対象には含められません。</p>' : `<div class="mail-body">${escapeHtml(contactMailText(message.bodyText || '（本文なし）'))}</div>`}
-          ${message.attachments.map((attachment) => `<div class="mail-attachment" data-mail-part="${escapeHtml(attachment.partId)}"><strong>${escapeHtml(contactMailText(attachment.name || '添付ファイル'))}</strong> <span class="muted">${escapeHtml(attachment.mimeType)} / ${attachment.size} bytes / part ${escapeHtml(attachment.partId)} / ${{ verified: '取得確認済み', unavailable: '取得不能', unverified: '未検証' }[attachment.availability] || '未検証'}</span><br><button type="button" data-mail-attachment="${escapeHtml(attachment.partId)}" ${message.unavailable ? 'disabled' : ''}>添付を確認・取得</button><div data-mail-attachment-preview></div></div>`).join('')}`}`;
+          ${message.attachments.map((attachment) => `<div class="mail-attachment" data-mail-part="${escapeHtml(attachment.partId)}"><strong>${escapeHtml(contactMailText(attachment.name || '添付ファイル'))}</strong> <span class="muted">${escapeHtml(attachment.mimeType)} / ${attachment.size} bytes / part ${escapeHtml(attachment.partId)} / <span data-mail-availability>${{ verified: '取得確認済み', unavailable: '取得不能', unverified: '未検証' }[attachment.availability] || '未検証'}</span></span><br><button type="button" data-mail-attachment="${escapeHtml(attachment.partId)}" ${message.unavailable ? 'disabled' : ''}>添付を確認・取得</button><div data-mail-attachment-preview></div></div>`).join('')}`}`;
       const issuesBack = root.querySelector('[data-mail-issues-back]');
       if (issuesBack) issuesBack.addEventListener('click', () => openContactMailIssues(false));
       root.querySelector('[data-mail-prev]').addEventListener('click', () => moveContactMail(view, -1));
@@ -1781,6 +1786,7 @@
       const current = contactMailState[view];
       if (current.writing || !current.message) return;
       const message = current.message;
+      if (action === 'review' && message.reviewReady !== true) return;
       const serial = current.detailSerial;
       const caseId = action === 'match' ? contactMailRoot(view).querySelector('[data-mail-case-id]').value.trim() : '';
       const reason = action !== 'review' ? contactMailRoot(view).querySelector('[data-mail-reason]').value.trim() : '';
@@ -1831,6 +1837,7 @@
       const chunks = [];
       let offset = 0;
       let metadata;
+      let reviewReady = false;
       try {
         while (true) {
           const result = contactMailResult(await callServer('getContactMailAttachmentChunk', contactMailOptions(current, { messageId: message.messageId, partId, offset })));
@@ -1838,11 +1845,21 @@
           const bytes = validateContactMailChunk(result, offset, partId);
           if (metadata && (metadata.size !== result.totalSize || metadata.mimeType !== result.attachment.mimeType)) throw new Error('MAIL_INVALID_RESPONSE');
           metadata = { ...result.attachment, size: result.totalSize };
+          reviewReady = result.reviewReady === true;
           chunks.push(bytes);
           offset = result.nextOffset;
           panel.textContent = `添付を読み込み中... ${offset} / ${result.totalSize} bytes`;
           if (result.done) break;
         }
+        if (metadata.availability !== 'verified') throw new Error('MAIL_INVALID_RESPONSE');
+        const stored = message.attachments.find((item) => item.partId === partId);
+        stored.availability = metadata.availability;
+        message.reviewReady = reviewReady;
+        button.parentElement.querySelector('[data-mail-availability]').textContent = '取得確認済み';
+        const reviewRoot = contactMailRoot(view).querySelector('.mail-review');
+        reviewRoot.innerHTML = contactMailReviewHtml(message, current.writing);
+        const reviewButton = reviewRoot.querySelector('[data-mail-review]');
+        if (message.reviewReady && reviewButton) reviewButton.addEventListener('click', () => writeContactMail(view, 'review'));
         const blob = new Blob(chunks, { type: metadata.mimeType });
         const url = URL.createObjectURL(blob);
         current.urls.push(url);

@@ -178,7 +178,7 @@ test('full sync period comes from earliest authoritative date with whole-mailbox
 });
 
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
-const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', attachments: [], ...extra });
+const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
 const sync = { state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false };
 const list = (messages, page = {}) => ({ ok: true, messages, page: { nextPageToken: '', previousPageToken: '', pageSize: 50, ...page }, sync });
 
@@ -297,7 +297,7 @@ test('pending classification sends explicit reason, case and expected version', 
 });
 
 test('attachment chunks validate ownership/offset and assemble safe text preview', async () => {
-  const app = uiRuntime({ getContactMailAttachmentChunk: (options) => ({ ok: true, attachment: { partId: '0.1', name: 'note.txt', mimeType: 'text/plain', previewKind: 'text' }, offset: options.offset, nextOffset: 3, totalSize: 3, dataBase64: 'YWJj', done: true }) });
+  const app = uiRuntime({ getContactMailAttachmentChunk: (options) => ({ ok: true, attachment: { partId: '0.1', name: 'note.txt', mimeType: 'text/plain', previewKind: 'text', availability: 'verified' }, reviewReady: true, offset: options.offset, nextOffset: 3, totalSize: 3, dataBase64: 'YWJj', done: true }) });
   app.mail.case.caseId = caseId;
   app.mail.case.message = detail('mail1', { attachments: [{ partId: '0.1', name: 'note.txt', mimeType: 'text/plain', size: 3 }] });
   const parent = app.element('attachment-parent');
@@ -307,6 +307,8 @@ test('attachment chunks validate ownership/offset and assemble safe text preview
   assert.match(panel.innerHTML, /download="note.txt"/);
   assert.equal(panel.children.at(-1).textContent, 'abc');
   assert.equal(app.mail.case.urls.length, 1);
+  assert.equal(app.mail.case.message.attachments[0].availability, 'verified');
+  assert.equal(app.mail.case.message.reviewReady, true);
   assert.throws(() => app.ui.validateContactMailChunk({ ok: true, attachment: { partId: '0.2' }, offset: 0 }, 0, '0.1'), /MAIL_INVALID_RESPONSE/);
   app.ui.clearContactMailView('case');
   assert.equal(app.revoked.length, 1);
@@ -389,7 +391,7 @@ test('residual detail identifies unavailable attachment parts and auth loss inva
   }) }) });
   Object.assign(app.mail.queue, { scope: 'issues', messages: [summary('missing')], page: { previousPageToken: '', nextPageToken: '' }, status: 'loaded' });
   await app.ui.selectContactMail('queue', 0);
-  assert.match(app.element('mailQueueContent').innerHTML, /part 0.2 \/ 取得不能/);
+  assert.match(app.element('mailQueueContent').innerHTML, /part 0.2 \/ <span data-mail-availability>取得不能/);
   assert.match(app.element('mailQueueContent').innerHTML, /&lt;bad&gt;.pdf/);
   assert.match(app.element('mailQueueContent').innerHTML, /残件一覧に戻る/);
   assert.match(app.element('mailQueueContent').innerHTML, /data-mail-attachment="0.2" disabled/);
@@ -400,4 +402,16 @@ test('residual detail identifies unavailable attachment parts and auth loss inva
   release({ ok: true, kind: 'pending', targets: [{ type: 'message', messageId: 'private', message: summary('private') }], scannedCount: 1, page: { pageSize: 50, nextPageToken: '' }, sync });
   await waiting;
   assert.equal(late.element('mailQueueContent').innerHTML, '');
+});
+
+
+test('review action stays unavailable until server confirms body and complete attachments', async () => {
+  const app = uiRuntime({ getContactMailMessage: () => ({ ok: true, message: detail('partial', { reviewReady: false, bodyAvailability: 'unavailable',
+    attachments: [{ partId: '0.1', name: 'part.bin', mimeType: 'application/octet-stream', size: 600000, availability: 'unverified' }] }) }) });
+  Object.assign(app.mail.case, { caseId, messages: [summary('partial')], page: { previousPageToken: '', nextPageToken: '' }, status: 'loaded' });
+  await app.ui.selectContactMail('case', 0);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /data-mail-review /);
+  assert.match(app.element('caseMailSection').innerHTML, /本文とすべての添付を取得/);
+  await app.ui.writeContactMail('case', 'review');
+  assert.equal(app.calls.filter((item) => item.name === 'markContactMailReviewed').length, 0);
 });

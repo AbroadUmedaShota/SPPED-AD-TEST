@@ -531,3 +531,38 @@ test('unavailable mail retains safe metadata and attachment targets in issue det
   const detail = await f.execute(f.envelope('getMail', { scope: 'issues', messageId: 'broken' }));
   assert.equal(detail.message.bodyAvailability, 'unavailable'); assert.equal(detail.message.bodyText, '');
 });
+
+
+test('attachment coverage survives retries, out-of-order chunks and reindex before review', async () => {
+  const f = fixture([A]);
+  const bytes = Buffer.alloc(1024 * 1024 + 1, 7);
+  f.messages.set('large', gmailMessage('large', 'body', [], { bytes, mimeType: 'application/octet-stream', name: 'large.bin' }));
+  const attachment = { partId: '0.1', name: 'large.bin', mimeType: 'application/octet-stream', size: bytes.length, availability: 'unverified' };
+  f.store.seed(record('large', { attachments: [attachment], attachmentCount: 1, unverifiedAttachmentCount: 1, reason: 'manual' }));
+  const read = (offset) => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'large', partId: '0.1', offset }));
+  const review = () => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'large', expectedVersion: 1 }));
+  await assert.rejects(review, { code: 'MAIL_CONTENT_UNAVAILABLE' });
+  const tail = await read(1024 * 1024);
+  assert.equal(tail.done, true); assert.equal(tail.attachment.availability, 'unverified'); assert.equal(tail.reviewReady, false);
+  await Promise.all([read(0), read(0)]);
+  assert.equal((await f.store.countMessages()).attachmentUnverified, 1);
+  await f.store.upsertIndexedMessage(record('large', { attachments: [attachment], attachmentCount: 1, reason: 'manual', indexedAt: NOW }));
+  assert.deepEqual((await f.store.getMessage('large')).attachments[0].servedChunks, [0, 1024 * 1024]);
+  const complete = await read(512 * 1024);
+  assert.equal(complete.attachment.availability, 'verified'); assert.equal(complete.reviewReady, true);
+  assert.equal((await f.store.countMessages()).attachmentUnverified, 0);
+  assert.equal((await review()).message.firstReview.email, actor.email);
+});
+
+test('zero-byte attachments require a successful transfer and body failures prevent review', async () => {
+  const f = fixture([A]);
+  f.messages.set('empty', gmailMessage('empty', 'body', [], { bytes: Buffer.alloc(0), name: 'empty.txt' }));
+  f.store.seed(record('empty', { attachmentCount: 1, unverifiedAttachmentCount: 1,
+    attachments: [{ partId: '0.1', name: 'empty.txt', mimeType: 'text/plain', size: 0, availability: 'unverified' }] }));
+  const result = await f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'empty', partId: '0.1', offset: 0 }));
+  assert.equal(result.done, true); assert.equal(result.attachment.availability, 'verified'); assert.equal(result.reviewReady, true);
+  for (const availability of ['unverified', 'unavailable']) {
+    f.store.seed(record(`body-${availability}`, { bodyAvailability: availability }));
+    await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: `body-${availability}`, expectedVersion: 1 })), { code: 'MAIL_CONTENT_UNAVAILABLE' });
+  }
+});

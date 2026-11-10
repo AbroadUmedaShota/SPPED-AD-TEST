@@ -26,7 +26,8 @@ export function mergeIndexedMessage(existing, incoming) {
   const changed = !manual && (existing.matchState !== incoming.matchState || existing.caseId !== incoming.caseId || existing.reason !== incoming.reason);
   const attachments = incoming.attachments.map((item) => {
     const old = (existing.attachments || []).find((entry) => entry.partId === item.partId && entry.name === item.name && entry.size === item.size);
-    return old ? { ...item, availability: old.availability, checkedAt: old.checkedAt } : item;
+    return old ? { ...old, ...item, availability: old.availability === 'verified' && old.transferVersion !== 1 ? 'unverified' : old.availability,
+      checkedAt: old.checkedAt } : item;
   });
   return { ...existing, ...incoming, attachments,
     unverifiedAttachmentCount: attachments.filter((item) => item.availability === 'unverified').length,

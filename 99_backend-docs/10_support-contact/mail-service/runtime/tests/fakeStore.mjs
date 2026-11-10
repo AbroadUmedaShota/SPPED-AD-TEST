@@ -1,5 +1,6 @@
 import { assertMail } from '../errors.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
+import { observeAttachment } from '../attachmentObservation.mjs';
 
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
@@ -126,13 +127,14 @@ export function fakeStore(caseIds = []) {
       assertMail(record, 'MAIL_NOT_FOUND', 404);
       store.seed({ ...record, bodyAvailability: availability, bodyCheckedAt: at });
     },
-    async recordAttachmentObservation(id, partId, availability, at) {
+    async recordAttachmentObservation(id, partId, availability, at, transfer) {
       const record = records.get(id);
       assertMail(record?.attachments?.some((item) => item.partId === partId), 'MAIL_ATTACHMENT_NOT_FOUND', 404);
-      const attachments = record.attachments.map((item) => item.partId === partId ? { ...item, availability, checkedAt: at } : item);
+      const attachments = record.attachments.map((item) => item.partId === partId ? observeAttachment(item, availability, at, transfer) : item);
       store.seed({ ...record, attachments,
         unverifiedAttachmentCount: attachments.filter((item) => item.availability === 'unverified').length,
         unavailableAttachmentCount: attachments.filter((item) => item.availability === 'unavailable').length });
+      return clone(attachments.find((item) => item.partId === partId));
     },
     async getSyncState() { return clone(sync); },
     async acquireSyncLease(id) { if (lease) return null; lease = id; return lease; },
