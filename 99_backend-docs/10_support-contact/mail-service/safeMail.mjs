@@ -35,12 +35,63 @@ export function safeMailText(value) {
   return scrubSecretUrls(String(value ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ''));
 }
 
+const activeHtmlTags = new Set(['script', 'style', 'iframe', 'object', 'svg']);
+const lineEndHtmlTags = new Set(['p', 'div', 'li', 'tr', 'blockquote']);
+
+function stripHtml(value) {
+  const output = [];
+  let index = 0;
+  let textStart = 0;
+  let activeTag = null;
+  while (index < value.length) {
+    if (value[index] !== '<') {
+      index += 1;
+      continue;
+    }
+    if (!activeTag && textStart < index) output.push(value.slice(textStart, index));
+    if (value.startsWith('<!--', index)) {
+      const end = value.indexOf('-->', index + 4);
+      if (end < 0) break;
+      index = end + 3;
+      textStart = index;
+      continue;
+    }
+    let cursor = index + 1;
+    const closing = value[cursor] === '/';
+    if (closing) cursor += 1;
+    const nameStart = cursor;
+    while (cursor < value.length && /[a-z0-9:-]/i.test(value[cursor])) cursor += 1;
+    const name = value.slice(nameStart, cursor).toLowerCase();
+    const nameEnd = cursor;
+    let quote = null;
+    while (cursor < value.length) {
+      const char = value[cursor];
+      if (quote) {
+        if (char === quote) quote = null;
+      } else if (char === '"' || char === "'") quote = char;
+      else if (char === '>') break;
+      cursor += 1;
+    }
+    // Consume each tag once; unfinished markup and active blocks never become visible text.
+    if (cursor === value.length) break;
+    if (activeTag) {
+      if (closing && name === activeTag && /^\s*$/.test(value.slice(nameEnd, cursor))) activeTag = null;
+    } else if (!closing && activeHtmlTags.has(name)) {
+      let endContent = cursor - 1;
+      while (endContent > index && /\s/.test(value[endContent])) endContent -= 1;
+      if (name !== 'svg' || value[endContent] !== '/') activeTag = name;
+    } else if ((!closing && name === 'br') || (closing && lineEndHtmlTags.has(name))) {
+      output.push('\n');
+    }
+    index = cursor + 1;
+    textStart = index;
+  }
+  if (index === value.length && !activeTag) output.push(value.slice(textStart));
+  return output.join('');
+}
+
 export function htmlToPlainText(value) {
-  const withoutActiveContent = String(value ?? '')
-    .replace(/<!--[^]*?-->/g, '')
-    .replace(/<(script|style|iframe|object|svg)\b[^>]*>[^]*?<\/\1\s*>/gi, '')
-    .replace(/<(?:br|\/p|\/div|\/li|\/tr|\/blockquote)\b[^>]*>/gi, '\n')
-    .replace(/<[^>]*>/g, '');
+  const withoutActiveContent = stripHtml(String(value ?? ''));
   const entities = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
   return safeMailText(withoutActiveContent.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (entity, name) => {
     if (name[0] !== '#') return entities[name.toLowerCase()];
