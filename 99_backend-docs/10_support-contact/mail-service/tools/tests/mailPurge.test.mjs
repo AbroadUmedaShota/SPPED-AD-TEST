@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createHash, randomUUID } from 'node:crypto';
 import { createMailPurge } from '../mailPurge.mjs';
 import { parsePurgeArguments, runPurgeCli } from '../purgeMailMetadata.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
-import { catalogDigest } from '../../runtime/service.mjs';
+import { catalogDigest, createMailService } from '../../runtime/service.mjs';
 import { createFirestoreStore } from '../../runtime/firestoreStore.mjs';
 import { suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createRequestId } from '../../runtime/requestIdentity.mjs';
@@ -49,6 +50,76 @@ test('case purge is dry-run first, deletes all linked records and persists only 
   assert.deepEqual(catalog.caseIds, [other]);
   assert.deepEqual(catalog.suppressedCaseIds, [target]);
   assert.deepEqual(db.records.get(retiredPath), { version: 1 });
+});
+
+const prePeriodObservation = { messageId: 'mailB', internalDate: '2020-01-01T00:00:00.000Z', detectedAt: '2026-11-11T00:00:00.000Z' };
+
+test('an unrelated case purge cannot remove a pre-period observation or permit a narrow full sync', async () => {
+  const sync = { state: 'failed', startAt: '2026-01-01T00:00:00.000Z', failedMessageIds: ['mailA', 'mailB'], failedCount: 2,
+    errorCode: 'MAIL_PERIOD_EXPANSION_REQUIRED', prePeriodObservation };
+  const { db, purge } = fixture({ [`${root}/meta/sync`]: sync });
+  const before = structuredClone([...db.records]);
+  await assert.rejects(purge.plan(target, 'unrelated-case'), { code: 'MAIL_PURGE_AMBIGUOUS' });
+  assert.deepEqual([...db.records], before);
+  const at = new Date('2026-11-11T00:00:00.000Z');
+  const execute = createMailService({ store: createFirestoreStore(db), gmail: {}, core: {}, now: () => at });
+  await assert.rejects(execute({ contractVersion: 1, operation: 'advanceSync', requestId: createRequestId(at), issuedAt: at.toISOString(),
+    actor: { email: 'staff@abroad-o.com', authMode: 'domain' }, payload: { executionId: randomUUID(), mode: 'full', startAt: '2025-01-01T00:00:00.000Z' } }),
+  { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  assert.deepEqual(db.records.get(`${root}/meta/sync`), sync);
+});
+
+test('purging the observed mail removes its observation and receipt through a partial resume', async () => {
+  const receiptId = 'observed-mail-receipt';
+  const extra = Object.fromEntries(Array.from({ length: 105 }, (_, index) => [`${root}/events/observed-${index}`, { messageId: 'mailB' }]));
+  const { db, purge } = fixture({ ...extra,
+    [`${root}/meta/sync`]: { state: 'failed', failedMessageIds: ['mailB'], prePeriodObservation },
+    [`${root}/receipts/${receiptId}`]: { fingerprint: 'observed', result: { message: { messageId: 'mailB', caseId: other } } }
+  });
+  const plan = await purge.plan(other, 'observed-case');
+  const runTransaction = db.runTransaction.bind(db);
+  let transactions = 0;
+  db.runTransaction = (operation) => ++transactions === 4 ? Promise.reject(new Error('synthetic transaction failure')) : runTransaction(operation);
+  await assert.rejects(purge.apply(other, 'observed-case', plan.planHash));
+  assert.deepEqual(db.records.get(`${root}/meta/sync`).prePeriodObservation, prePeriodObservation);
+  db.runTransaction = runTransaction;
+  await purge.apply(other, 'observed-case', plan.planHash);
+  assert.equal(db.records.has(`${root}/meta/sync`), false);
+  assert.equal(db.records.has(`${root}/receipts/${receiptId}`), false);
+  assert.equal(db.records.has(`${root}/messages/mailA`), true);
+  const store = createFirestoreStore(db);
+  await store.withAccess(async () => {
+    assert.equal(await store.isMessageSuppressed('mailB'), true);
+    await assert.rejects(store.getReceipt(receiptId, 'observed'), { code: 'MAIL_REQUEST_CONFLICT' });
+  });
+});
+
+test('a legacy partial purge rechecks an unrelated observation before deleting its frozen sync target', async () => {
+  const extra = Object.fromEntries(Array.from({ length: 105 }, (_, index) => [`${root}/events/legacy-${index}`, { messageId: 'mailA' }]));
+  const { db, purge } = fixture(extra);
+  const plan = await purge.plan(target, 'legacy-case');
+  const runTransaction = db.runTransaction.bind(db);
+  let transactions = 0;
+  db.runTransaction = (operation) => ++transactions === 4 ? Promise.reject(new Error('synthetic transaction failure')) : runTransaction(operation);
+  await assert.rejects(purge.apply(target, 'legacy-case', plan.planHash));
+  db.runTransaction = runTransaction;
+  // Emulate an immutable, already-validated job written by the old implementation.
+  const canonical = (value) => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object' ?
+    Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])])) : value;
+  const hash = (value) => createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
+  const sync = db.records.get(`${root}/meta/sync`);
+  sync.prePeriodObservation = structuredClone(prePeriodObservation);
+  const job = db.records.get(`${root}/meta/purgeJob`);
+  job.targets.find((item) => item.path === `${root}/meta/sync`).hash = hash(sync);
+  const { planHash: previousHash, ...source } = job;
+  job.planHash = hash(source);
+  db.records.get(`${root}/meta/purgeControl`).active.planHash = job.planHash;
+  const before = structuredClone([...db.records]);
+  await assert.rejects(purge.apply(target, 'legacy-case', job.planHash), { code: 'MAIL_PURGE_AMBIGUOUS' });
+  assert.deepEqual([...db.records], before);
+  assert.deepEqual(db.records.get(`${root}/meta/sync`).prePeriodObservation, prePeriodObservation);
+  assert.equal(db.records.has(`${root}/receipts/request-aaaaaaaaaaaa`), true);
+  await assert.rejects(createFirestoreStore(db).withAccess(() => Promise.resolve()), { code: 'MAIL_MAINTENANCE' });
 });
 
 test('purged recent request IDs keep only their fixed expiry while expired IDs need no tombstone', async () => {

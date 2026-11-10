@@ -22,6 +22,11 @@ const caseReferences = (value) => !value || typeof value !== 'object' ? [] : Arr
 const messageReferences = (value) => !value || typeof value !== 'object' ? [] : Array.isArray(value) ? value.flatMap(messageReferences) :
   Object.entries(value).flatMap(([key, item]) => ['messageId', 'messageIds'].includes(key) ? values(item) : messageReferences(item));
 const record = (snapshot) => ({ path: snapshot.ref.path, data: snapshot.data(), hash: hash(snapshot.data()) });
+const assertSyncObservationPurgeSafe = (sync, messageIds) => {
+  if (sync?.prePeriodObservation != null) {
+    assertMail(typeof sync.prePeriodObservation.messageId === 'string' && messageIds.includes(sync.prePeriodObservation.messageId), 'MAIL_PURGE_AMBIGUOUS', 409);
+  }
+};
 
 export function createMailPurge({ db, projectId, databaseId = '(default)', now = () => new Date() }) {
   assertMail(typeof projectId === 'string' && /^[a-z][a-z0-9-]{4,61}[a-z0-9]$/.test(projectId) &&
@@ -120,6 +125,8 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
     assertMail(excluded || messages.every((item) => item.data.caseId === caseId || !values(item.data).includes(caseId)), 'MAIL_PURGE_AMBIGUOUS', 409);
     assertMail(excluded || selected.every((item) => values(item.data.evidence || {}).filter((value) => CASE_ID.test(value)).every((value) => value === caseId)), 'MAIL_PURGE_AMBIGUOUS', 409);
     const targets = all.filter((item) => refers(item) || (!excluded && item.path === `${MAILBOX}/caseCoverage/${caseId}`));
+    const syncTarget = targets.find((item) => item.path === `${MAILBOX}/meta/sync`);
+    if (syncTarget) assertSyncObservationPurgeSafe(syncTarget.data, ids);
     for (const item of targets.filter((entry) => entry.path.startsWith(`${MAILBOX}/events/`))) {
       assertMail(caseReferences(item.data).every((value) => !excluded && value === caseId), 'MAIL_PURGE_SHARED_EVENT', 409);
     }
@@ -187,12 +194,14 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
     const generation = control?.generation;
     assertMail(Number.isSafeInteger(generation) && generation >= 0 && control?.active?.planHash === planHash, 'MAIL_MAINTENANCE', 503);
     const locked = async (transaction) => {
-      const [controlSnapshot, jobSnapshot] = await Promise.all([transaction.get(controlRef), transaction.get(jobRef)]);
+      const [controlSnapshot, jobSnapshot, syncSnapshot] = await Promise.all([transaction.get(controlRef), transaction.get(jobRef),
+        job.targets.some((item) => item.path === syncRef.path) ? transaction.get(syncRef) : null]);
       const current = snapshotData(controlSnapshot);
       const currentJob = snapshotData(jobSnapshot);
       assertMail(current?.generation === generation && current.active?.planHash === planHash && currentJob?.planHash === planHash,
         'MAIL_MAINTENANCE', 503);
       validateJob(currentJob);
+      if (syncSnapshot?.exists) assertSyncObservationPurgeSafe(syncSnapshot.data(), currentJob.messageIds);
       assertMail(['validating', 'deleting'].includes(current.active.stage) && Number.isSafeInteger(current.active.nextOffset) &&
         current.active.nextOffset >= 0 && current.active.nextOffset <= job.targets.length &&
         (current.active.stage !== 'validating' || current.active.nextOffset === 0), 'MAIL_PURGE_JOB_INVALID', 409);
