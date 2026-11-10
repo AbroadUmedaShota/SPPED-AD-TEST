@@ -14,14 +14,14 @@ last_reviewed: 2026-11-10
 
 | 用途 | 準備済みのprojectと設定 | 残る確認 |
 | --- | --- | --- |
-| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、Internal audience、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本人のGmail同意、資格情報のSecret version登録、セキュリティ評価の適用または除外根拠、初回読取後のquotaと費用。 |
+| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、External / Testing、テスト利用者0件、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本番用のbranding・公開ページ、制限付きscope審査とセキュリティ評価の適用または除外根拠、本人のGmail同意、Secret version登録、初回読取後のquotaと費用。 |
 | Cloud Run・Firestore・Secret Manager | `abroad-o.com` 組織の `spd-contact-viewer-20261110`。承認済み請求先、同project限定の月額3,000円予算通知、必要API、東京の保存先と専用サービスアカウントを準備済み。 | imageとCloud Run配備、数値固定のSecret version、GAS連携と実環境受入。 |
 
 OAuth clientの所属projectとSecret保存先のprojectは別に照合します。実行基盤側の予算通知はOAuth側projectを含みません。この準備状況は本番受入の完了を示さず、以後の変更と読戻しは切替記録を正本にします。
 
-同日のGoogle Auth Platform検証センターは、Internal構成のため検証不要と表示しました。`speed-ad.com` のWorkspace管理コンソールでは「内部アプリを信頼する」と、GmailのAPIアクセス「制限なし」を読戻しています。これは設定の確認であり、窓口本人のGmail同意、Secret version、実メール読取、Cloud Run・GAS第2段階の配備と受入は未実施です。
+推奨構成は既存の窓口OAuth専用projectを維持し、`customer@speed-ad.com` がGmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認する形です。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。現在、窓口のGmail同意・refresh token・Secret version・実メール読取は未実施です。
 
-Googleの[内部アプリのOAuth設定](https://developers.google.com/workspace/guides/configure-oauth-consent)は内部用途のscopeについてGoogleの追加審査不要としています。一方、[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)にはサーバー経由のデータアクセスに対する年次セキュリティ評価（CASA）の規定があります。検証センターの表示だけで今回の構成のCASA適用除外を確定せず、内部用途と別組織のCloud Runで処理する構成への適用を確認してから実メール接続へ進みます。
+アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しません。[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)に沿って、アプリ専用のホーム・プライバシー・利用規約、制限付きscope審査、サーバー処理に対する年次CASA評価の適用または除外根拠を本番接続前に確認します。既存の公開 `/privacy/` はGmail取得・利用者への共有・保存期間の説明が不足しています。改訂案を作成し、公開条件を照合してから反映します。審査申請・公開と評価費用はそれぞれ別に判断します。
 
 ## 1. 接続前に確定すること
 
@@ -29,7 +29,7 @@ Googleの[内部アプリのOAuth設定](https://developers.google.com/workspace
 | --- | --- |
 | 公式窓口 | `customer@speed-ad.com` 本人がGmail読取に同意し、対象期間の受信・送信メールと添付がこのメールボックスに保存されている。別アカウントからの代理送信など、保存されない経路は先に特定する。 |
 | OAuthの本番条件 | 実際のOAuth project所有組織、Audience、公開状態、要求scopeを確認し、`gmail.readonly` の審査・セキュリティ評価または適用除外の根拠を確定する。ドメイン名の違い、利用人数の少なさ、窓口1件だけという理由でInternal・個人利用の例外を推定しない。 |
-| 継続認可 | ExternalかつTestingのOAuth projectでは、このscopeのrefresh tokenは7日で失効する。本番の継続認可条件を整えてから窓口同意を取得する。毎週の再同意を本番運用の代用にしない。 |
+| 継続認可 | ExternalかつTestingのOAuth projectでは、このscopeの認可とrefresh tokenは[7日で失効する](https://support.google.com/cloud/answer/15549945?hl=en)。本番の継続認可条件を整えてから窓口同意を取得する。毎週の再同意を本番運用の代用にしない。 |
 | 費用 | Cloud Run、Firestore、Secret Manager、Artifact Registry、ビルドに使うサービスの請求先、予算、費用確認の担当と頻度を確定する。審査・評価に費用が発生する場合はCloud利用料と分けて判断する。 |
 | 配備対象 | project、region、Firestore database ID、Cloud Runサービス名、実行サービスアカウント、Secret名、GAS配備IDと復旧候補versionを確定する。Firestoreの配置場所は作成前に決める。 |
 
