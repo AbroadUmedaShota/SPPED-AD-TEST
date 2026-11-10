@@ -171,8 +171,10 @@ ID照合は[独立照合CLIとmanifest契約](../../../99_backend-docs/10_suppor
 
 ### 過去の案件一覧コピーの整理
 
-正本Sheetを読み直して新しい一覧を登録した後、不要になったFirestoreの `catalogSnapshots` は手動で整理する。`tools/retireMailCatalogs.mjs` の `plan` に `--project` と同じ `--confirm-project`、`--database '(default)'`、管理用の `--request-reference` を渡し、件数と `planHash` を確認する。`apply --plan-hash <確認したhash>` は1回25文書まで処理するため、`complete` まで同じ参照・hashで明示実行する。`nextSnapshot` があれば、その値を `--after-snapshot` に渡して次の計画を作る。1計画は25一覧・1,000文書・5MiB、全候補は1,000一覧までとし、上限超過は未整理として報告する。
+正本Sheetを読み直して新しい一覧を登録した後、不要になったFirestoreの `catalogSnapshots` は手動で整理する。`tools/retireMailCatalogs.mjs` の `plan` に `--project` と同じ `--confirm-project`、`--database '(default)'`、管理用の `--request-reference` を渡し、件数と `planHash` を確認する。`apply --plan-hash <確認したhash>` は1回5文書まで処理するため、`complete` まで同じ参照・hashで明示実行する。`nextPageToken` があれば、その値を `--page-token` に渡して次の計画を作る。同じpage tokenを対応するapplyにも渡す。1計画の探索は1一覧で、保護対象だけのページは削除0件でも次へ進む。全ページ後は先頭から再計画し、並行して追加された不要一覧が残っていないことを確認する。
 
-現行一覧と、実行中・失敗中の再開可能な同期が参照する一覧は削除しない。同期leaseが期限切れでもこの保護は維持する。live lease、他の保守処理、計画後の一覧・同期状態・対象文書の変化、未知の子collectionがあれば停止する。途中停止中はアプリ操作を保守gateで止めたまま、`status` で進捗を確認して同じ計画を再開する。`cancel` は残作業を中止してgateを解放する操作で、削除済み文書を復元しない。正本Sheet、メール記録、案件・メール・操作要求IDの再取込防止hashはこの整理の対象外。
+探索はGoogleのページ取得APIを自動ページングせずに呼び、親文書がなく子ページだけ残る一覧も含める。1一覧の子ページは25件ずつ取得して文書ごとにhash化するため、合計5MiB超でも整理できる。1計画は1,000文書までとし、通常の登録上限500ページを扱える。上限超過や未知の子collectionは未整理として停止・報告する。
+
+現行一覧と、実行中・失敗中の再開可能な同期が参照する一覧は、親文書・ページ番号・件数・digestの整合を検証して保護する。同期leaseが期限切れでもこの保護は維持する。live lease、他の保守処理、計画後の一覧・同期状態・対象文書の変化があれば停止する。途中停止中はアプリ操作を保守gateで止めたまま、`status` で進捗と `sourceState` を確認して同じ計画を再開する。`sourceState: unsafe` は保護対象の欠落・破損や削除途中対象への参照変更を示し、参照整合を復旧するまでgateを解除しない。`cancel` も現行・再開可能な参照先が完全で、既に触れた対象と重ならないことを確認する。削除済み文書は復元しない。正本Sheet、メール記録、再取込防止hashはこの整理の対象外。
 
 保守gateの世代が進むため、保存済みの「関連メールなし」確認は文脈不一致として再確認が必要になる場合がある。整理後に全件確認の残件を再表示し、必要な確認を行ってから受入証跡を採取する。

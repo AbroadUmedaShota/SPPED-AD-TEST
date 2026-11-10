@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createCatalogRetirement } from '../catalogRetirement.mjs';
+import { createCatalogRetirement, createCatalogDocumentPager } from '../catalogRetirement.mjs';
 import { parseCatalogRetirementArguments, runCatalogRetirementCli } from '../retireMailCatalogs.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
 import { createPurgeGate } from '../../runtime/purgeGate.mjs';
@@ -15,26 +15,48 @@ const row = { caseId: '00000000-0000-0000-0000-000000000001', handledStatus: 'æœ
 function fixture(extra = {}) {
   const digest = catalogDigest([row]);
   const db = memoryFirestore({
-    [`${ROOT}/meta/activeCatalog`]: { snapshotId: 'active', total: 1, digest },
+    [`${ROOT}/meta/activeCatalog`]: { snapshotId: 'zzactive', total: 1, digest },
     [`${ROOT}/meta/sync`]: { state: 'complete', catalogSnapshotId: 'old' },
-    [path('active')]: { complete: true, total: 1, pageCount: 1, digest },
-    [`${path('active')}/pages/0000`]: { pageIndex: 0, cases: [row] },
+    [path('zzactive')]: { complete: true, total: 1, pageCount: 1, digest },
+    [`${path('zzactive')}/pages/0000`]: { pageIndex: 0, cases: [row] },
     [path('old')]: { complete: true, total: 1, pageCount: 1, digest },
     [`${path('old')}/pages/0000`]: { pageIndex: 0, cases: [row] },
     ...extra
   });
-  return { db, cleanup: createCatalogRetirement({ db, projectId: 'test-project', now: () => new Date(NOW) }) };
+  const listCatalogPage = async (token = '', snapshotId = null) => {
+    const prefix = snapshotId === null ? ROOT + '/catalogSnapshots/' : path(snapshotId) + '/pages/';
+    const ids = [...new Set([...db.records.keys()].filter((key) => key.startsWith(prefix)).map((key) => key.slice(prefix.length).split('/')[0]))].filter((id) => id > token).sort();
+    const selected = ids.slice(0, snapshotId === null ? 1 : 25);
+    return { ids: selected, nextPageToken: ids.length > selected.length ? selected.at(-1) : null };
+  };
+  return { db, listCatalogPage, cleanup: createCatalogRetirement({ db, listCatalogPage, projectId: 'test-project', now: () => new Date(NOW) }) };
+}
+
+async function nextPlan(cleanup, token = '') {
+  let plan;
+  do { plan = await cleanup.plan('reference', token); token = plan.nextPageToken; } while (plan.snapshotCount === 0 && token);
+  return plan;
+}
+
+async function drain(cleanup) {
+  let token = '';
+  do {
+    const plan = await cleanup.plan('reference', token);
+    let result;
+    do { result = await cleanup.apply('reference', plan.planHash, token); } while (result.mode !== 'complete');
+    token = plan.nextPageToken;
+  } while (token);
 }
 
 test('dry-run is read-only and retired pages leave the active catalog usable', async () => {
   const { db, cleanup } = fixture();
   const before = JSON.stringify([...db.records]);
-  const plan = await cleanup.plan('reference');
+  const plan = await nextPlan(cleanup);
   assert.equal(JSON.stringify([...db.records]), before);
   assert.equal(plan.snapshotCount, 1);
   assert.equal(plan.documentCount, 2);
   assert.equal(JSON.stringify(plan).includes(row.caseId), false);
-  assert.equal((await cleanup.apply('reference', plan.planHash)).mode, 'complete');
+  assert.equal((await cleanup.apply('reference', plan.planHash, plan.pageToken)).mode, 'complete');
   assert(!db.records.has(path('old')));
   assert(!db.records.has(`${path('old')}/pages/0000`));
   assert.deepEqual((await createFirestoreStore(db).getCatalog()).cases, [row]);
@@ -49,10 +71,10 @@ test('running and failed sync pins survive even after lease expiry', async () =>
       [path('orphan')]: { complete: false },
       [`${path('orphan')}/pages/0000`]: { cases: [] }
     });
-    const plan = await cleanup.plan('reference');
+    const plan = await nextPlan(cleanup);
     assert.equal(plan.retainedSnapshotCount, 2);
-    await cleanup.apply('reference', plan.planHash);
-    assert(db.records.has(path('active')));
+    await cleanup.apply('reference', plan.planHash, plan.pageToken);
+    assert(db.records.has(path('zzactive')));
     assert(db.records.has(path('old')));
     assert(!db.records.has(path('orphan')));
   }
@@ -62,7 +84,7 @@ test('independent app capture remains complete after inactive snapshot retiremen
   const startAt = '2026-11-10T00:00:00.000Z';
   const cutoffAt = '2026-11-10T12:00:00.000Z';
   const { db, cleanup } = fixture({
-    [`${ROOT}/meta/sync`]: { state: 'complete', catalogSnapshotId: 'active', startAt, cutoffAt, failedCount: 0,
+    [`${ROOT}/meta/sync`]: { state: 'complete', catalogSnapshotId: 'zzactive', startAt, cutoffAt, failedCount: 0,
       historyId: '123', mode: 'full', executionId: 'synthetic-sync', lastSuccessAt: cutoffAt },
     [`${ROOT}/messages/mail1`]: { messageId: 'mail1', internalDate: startAt, matchState: 'matched', caseId: row.caseId,
       unavailable: false, bodyAvailability: 'verified', attachmentCount: 0, attachments: [], indexedGeneration: 'synthetic-sync',
@@ -71,8 +93,8 @@ test('independent app capture remains complete after inactive snapshot retiremen
   const capture = () => captureAppAcceptance({ db, runId: 'synthetic', key: Buffer.alloc(32, 7), startAt, cutoffAt, now: () => new Date(NOW) });
   const before = await capture();
   assert.equal(before.sourceComplete, true);
-  const plan = await cleanup.plan('reference');
-  await cleanup.apply('reference', plan.planHash);
+  const plan = await nextPlan(cleanup);
+  await cleanup.apply('reference', plan.planHash, plan.pageToken);
   const after = await capture();
   assert.equal(after.sourceComplete, true);
   assert.deepEqual(after.catalog, before.catalog);
@@ -82,15 +104,16 @@ test('independent app capture remains complete after inactive snapshot retiremen
 test('partial deletion keeps the gate closed and resumes from the same pinned plan', async () => {
   const pages = Object.fromEntries(Array.from({ length: 30 }, (_, index) => [`${path('old')}/pages/${String(index).padStart(4, '0')}`, { cases: [row] }]));
   const { db, cleanup } = fixture(pages);
-  const plan = await cleanup.plan('reference');
-  const partial = await cleanup.apply('reference', plan.planHash);
+  const plan = await nextPlan(cleanup);
+  const partial = await cleanup.apply('reference', plan.planHash, plan.pageToken);
   assert.equal(partial.mode, 'deleting');
-  assert.equal(partial.deletedCount, 25);
+  assert.equal(partial.deletedCount, 5);
   assert(db.records.has(path('old')));
   const gate = createPurgeGate(async () => db.records.get(`${ROOT}/meta/purgeControl`));
   await assert.rejects(gate.withAccess(async () => {}), { code: 'MAIL_MAINTENANCE' });
-  assert.equal((await cleanup.status('reference', plan.planHash)).deletedCount, 25);
-  assert.equal((await cleanup.apply('reference', plan.planHash)).mode, 'complete');
+  assert.equal((await cleanup.status('reference', plan.planHash)).deletedCount, 5);
+  let result;
+  do { result = await cleanup.apply('reference', plan.planHash, plan.pageToken); } while (result.mode !== 'complete');
   await gate.withAccess(async () => {});
   assert(![...db.records.keys()].some((key) => key.startsWith(`${path('old')}/`)));
 });
@@ -102,9 +125,9 @@ test('changed source or target before apply prevents all deletion', async () => 
     (db) => { db.records.delete(`${path('old')}/pages/0000`); }
   ]) {
     const { db, cleanup } = fixture();
-    const plan = await cleanup.plan('reference');
+    const plan = await nextPlan(cleanup);
     change(db);
-    await assert.rejects(cleanup.apply('reference', plan.planHash), { code: 'MAIL_CATALOG_RETIRE_PLAN_CHANGED' });
+    await assert.rejects(cleanup.apply('reference', plan.planHash, plan.pageToken), { code: 'MAIL_CATALOG_RETIRE_PLAN_CHANGED' });
     assert(db.records.has(path('old')));
     assert(!db.records.has(`${ROOT}/meta/catalogRetirementJob`));
   }
@@ -112,7 +135,7 @@ test('changed source or target before apply prevents all deletion', async () => 
 
 test('an interrupted deletion transaction rolls back its batch and resumes the locked job', async () => {
   const { db, cleanup } = fixture();
-  const plan = await cleanup.plan('reference');
+  const plan = await nextPlan(cleanup);
   const transaction = db.runTransaction;
   let interrupt = true;
   db.runTransaction = (operation) => transaction(async (tx) => {
@@ -120,33 +143,38 @@ test('an interrupted deletion transaction rolls back its batch and resumes the l
     if (interrupt && result?.mode === 'complete') { interrupt = false; throw new Error('synthetic interruption'); }
     return result;
   });
-  await assert.rejects(cleanup.apply('reference', plan.planHash), /synthetic interruption/);
+  await assert.rejects(cleanup.apply('reference', plan.planHash, plan.pageToken), /synthetic interruption/);
   assert(db.records.has(path('old')));
   assert.equal((await cleanup.status('reference', plan.planHash)).deletedCount, 0);
-  assert.equal((await cleanup.apply('reference', plan.planHash)).mode, 'complete');
+  assert.equal((await cleanup.apply('reference', plan.planHash, plan.pageToken)).mode, 'complete');
   assert(!db.records.has(path('old')));
 });
 
-test('source or remaining target changes during a partial run stop and permit cancellation', async () => {
+test('changed target stops deletion, while a changed active pointer cannot release a damaged source', async () => {
   for (const kind of ['active', 'page', 'new-page']) {
     const pages = Object.fromEntries(Array.from({ length: 30 }, (_, index) => [`${path('old')}/pages/${String(index).padStart(4, '0')}`, { cases: [row] }]));
     const { db, cleanup } = fixture(pages);
-    const plan = await cleanup.plan('reference');
-    await cleanup.apply('reference', plan.planHash);
+    const plan = await nextPlan(cleanup);
+    await cleanup.apply('reference', plan.planHash, plan.pageToken);
     if (kind === 'active') db.records.get(`${ROOT}/meta/activeCatalog`).snapshotId = 'old';
     if (kind === 'page') db.records.get(`${path('old')}/pages/0029`).cases = [];
     if (kind === 'new-page') db.records.set(`${path('old')}/pages/extra`, { cases: [] });
-    await assert.rejects(cleanup.apply('reference', plan.planHash));
+    await assert.rejects(async () => { for (let index = 0; index < 10; index++) await cleanup.apply('reference', plan.planHash, plan.pageToken); });
     assert(db.records.has(path('old')));
-    assert.equal((await cleanup.cancel('reference', plan.planHash)).deletedCount, 25);
+    if (kind === 'active') {
+      assert.equal((await cleanup.status('reference', plan.planHash)).sourceState, 'unsafe');
+      await assert.rejects(cleanup.cancel('reference', plan.planHash));
+      assert(db.records.get(`${ROOT}/meta/purgeControl`).active);
+      db.records.get(`${ROOT}/meta/activeCatalog`).snapshotId = 'zzactive';
+    }
+    assert((await cleanup.cancel('reference', plan.planHash)).deletedCount > 0);
     assert(!db.records.get(`${ROOT}/meta/purgeControl`).active);
   }
 });
 
 test('abandoned incomplete and absent-parent snapshots are retired, unknown nested data is preserved', async () => {
   const f = fixture({ [`${path('orphan')}/pages/0000`]: { cases: [] }, [path('incomplete')]: { complete: false } });
-  const plan = await f.cleanup.plan('reference');
-  await f.cleanup.apply('reference', plan.planHash);
+  await drain(f.cleanup);
   assert(!f.db.records.has(`${path('orphan')}/pages/0000`));
   assert(!f.db.records.has(path('incomplete')));
   for (const extra of [
@@ -173,17 +201,53 @@ test('live leases, maintenance jobs and malformed pins block cleanup', async () 
   }
 });
 
-test('snapshot cursor bounds each plan without including protected snapshots', async () => {
-  const extra = Object.fromEntries(Array.from({ length: 30 }, (_, index) => [path(`s${String(index).padStart(2, '0')}`), { complete: false }]));
+test('paginated discovery reaches 1001 snapshots and missing parent documents', async () => {
+  const extra = Object.fromEntries(Array.from({ length: 1001 }, (_, index) => [path(`s${String(index).padStart(4, '0')}`), { complete: false }]));
+  extra[`${path('orphan')}/pages/0000`] = { cases: [] };
   const { db, cleanup } = fixture(extra);
-  const first = await cleanup.plan('reference');
-  assert.equal(first.snapshotCount, 25);
-  let result;
-  do { result = await cleanup.apply('reference', first.planHash); } while (result.mode !== 'complete');
-  const next = await cleanup.plan('reference', first.nextSnapshot);
-  assert.equal(next.snapshotCount, 6);
-  await cleanup.apply('reference', next.planHash, first.nextSnapshot);
-  assert.deepEqual([...db.records.keys()].filter((key) => key.startsWith(`${ROOT}/catalogSnapshots/`)), [path('active'), `${path('active')}/pages/0000`]);
+  await drain(cleanup);
+  assert.deepEqual([...db.records.keys()].filter((key) => key.startsWith(`${ROOT}/catalogSnapshots/`)), [path('zzactive'), `${path('zzactive')}/pages/0000`]);
+});
+
+test('one snapshot larger than 5MiB is hashed incrementally and retired in bounded batches', async () => {
+  const extra = Object.fromEntries(Array.from({ length: 7 }, (_, index) => [`${path('old')}/pages/${String(index).padStart(4, '0')}`, { padding: 'x'.repeat(900000) }]));
+  const { db, cleanup } = fixture(extra);
+  const plan = await nextPlan(cleanup);
+  assert.equal(plan.documentCount, 8);
+  assert.equal((await cleanup.apply('reference', plan.planHash, plan.pageToken)).deletedCount, 5);
+  assert.equal((await cleanup.apply('reference', plan.planHash, plan.pageToken)).mode, 'complete');
+  assert(!db.records.has(path('old')));
+});
+
+test('protected catalogs must exist with complete numbered pages and matching declared content', async () => {
+  for (const change of [
+    (db) => db.records.delete(path('zzactive')),
+    (db) => db.records.delete(`${path('zzactive')}/pages/0000`),
+    (db) => { db.records.get(path('zzactive')).digest = 'a'.repeat(64); },
+    (db) => { db.records.get(path('zzactive')).total = 2; },
+    (db) => { db.records.get(`${path('zzactive')}/pages/0000`).pageIndex = 1; },
+    (db) => { db.records.get(`${ROOT}/meta/sync`).state = 'failed'; db.records.delete(path('old')); }
+  ]) {
+    const { db, cleanup } = fixture();
+    change(db);
+    await assert.rejects(cleanup.plan('reference'));
+    assert(db.records.has(`${path('old')}/pages/0000`));
+    assert(!db.records.has(`${ROOT}/meta/catalogRetirementJob`));
+  }
+});
+
+test('official pager uses bounded non-automatic showMissing discovery', async () => {
+  const calls = [];
+  const base = 'projects/test-project/databases/(default)/documents/' + ROOT;
+  const pager = createCatalogDocumentPager({ projectId: 'test-project', client: { async listDocuments(request, options) {
+    calls.push({ request, options });
+    return [[{ name: base + '/catalogSnapshots/orphan' }], null, { nextPageToken: 'next' }];
+  } } });
+  assert.deepEqual(await pager(), { ids: ['orphan'], nextPageToken: 'next' });
+  assert.equal(calls[0].request.showMissing, true);
+  assert.equal(calls[0].request.pageSize, 1);
+  assert.equal(calls[0].request.orderBy, undefined);
+  assert.deepEqual(calls[0].options, { autoPaginate: false });
 });
 
 test('CLI validates explicit project confirmation before connecting', async () => {
@@ -194,7 +258,11 @@ test('CLI validates explicit project confirmation before connecting', async () =
   assert.equal(called, false);
   const f = fixture();
   const output = [];
-  const result = await runCatalogRetirementCli(args, { createDatabase: async () => f.db, write: (value) => output.push(value) });
+  const result = await runCatalogRetirementCli(args, { createDatabase: async () => f.db, createPager: async () => ({ listCatalogPage: f.listCatalogPage }), write: (value) => output.push(value) });
   assert.equal(result.mode, 'dry-run');
   assert.equal(output.length, 1);
+  let terminated = false;
+  await assert.rejects(runCatalogRetirementCli(args, { createDatabase: async () => ({ terminate: async () => { terminated = true; } }),
+    createPager: async () => { throw new Error('synthetic pager failure'); } }), /synthetic pager failure/);
+  assert.equal(terminated, true);
 });
