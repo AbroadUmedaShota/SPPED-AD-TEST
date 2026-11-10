@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { createMarkerCleanup } from './markerCleanup.mjs';
+import { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE } from './mailboxOnboarding.mjs';
 
 export function parseMarkerArguments(args) {
   const options = {};
@@ -50,7 +51,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       const [{ SecretManagerServiceClient }, { OAuth2Client }, { createGmailAdapter }] = await Promise.all([
         import('@google-cloud/secret-manager'), import('google-auth-library'), import('../runtime/googleAdapters.mjs')]);
       return createGmailAdapter({ secretManager: new SecretManagerServiceClient(), secretVersion,
-        createOAuthClient: (clientId, clientSecret) => new OAuth2Client(clientId, clientSecret) });
+        createOAuthClient: (clientId, clientSecret) => new OAuth2Client(clientId, clientSecret),
+        requiredDisclosureVersion: MAILBOX_DISCLOSURE_VERSION, requiredDisclosureClause: MAILBOX_MARKER_DISCLOSURE });
     }
   }).catch((error) => {
     const code = /^MAIL_[A-Z_]+$/.test(error?.code || error?.message || '') ? error.code || error.message : 'MAIL_MARKER_FAILED';

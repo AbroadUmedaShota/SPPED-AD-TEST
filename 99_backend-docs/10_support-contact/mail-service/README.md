@@ -28,7 +28,7 @@
 
 2026-11-10時点の読戻しでは、Gmail読取用の検証環境として `speed-ad.com` 組織内に `spd-contact-mail-oauth-261110`（番号 `47432854912`）を用意し、Gmail API有効、External / Testing、テスト利用者0件、`gmail.readonly`だけの宣言、Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` の作成を確認した。窓口本人のGmail同意、refresh token、資格情報のSecret version登録、実メール読取は未実施である。
 
-正式な運営主体はアブロードアウトソーシング株式会社である。本番用には同社の `abroad-o.com` 組織に**新しいメール認可専用OAuth project**を置き、上記の既存projectは検証用として維持する構成を推奨する。本番projectは未作成で、project ID候補は `spd-contact-mail-prod-261110`。`customer@speed-ad.com` の本人だけが本番用の `gmail.readonly` を認可し、`@abroad-o.com` 利用者は既存GASの本人確認を使う。第1段階のログイン用projectにはGmail認可を統合しない。OAuth clientとCloud Runを同じprojectに置く必要はなく、資格情報は実行基盤側のSecret Managerに保存する。
+正式な運営主体はアブロードアウトソーシング株式会社である。同社の `abroad-o.com` 組織に本番メール認可専用OAuth project `spd-contact-mail-prod-261110`（番号 `322596549698`）を作成し、Gmail API、External / Testing、`gmail.readonly`、Desktop clientを設定した。上記の既存projectは検証用として維持する。`customer@speed-ad.com` の本人だけが本番用の `gmail.readonly` を認可し、`@abroad-o.com` 利用者は既存GASの本人確認を使う。第1段階のログイン用projectにはGmail認可を統合しない。OAuth clientとCloud Runを同じprojectに置く必要はなく、資格情報は実行基盤側のSecret Managerに保存する。本番projectは請求先未接続、テスト利用者0人、Gmail本人同意・Secret version未作成である。
 
 アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しない。External / Testingで取得するこのscopeの認可とrefresh tokenは[7日で失効](https://support.google.com/cloud/answer/15549945?hl=en)する。本番接続前にアプリ専用の公開ホームとプライバシー案内を整え、ホームに利用規約とプライバシー方針をリンクし、[制限付きscopeの審査とサーバー処理に対する年次CASA評価](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)の適用または除外根拠を確認する。[OAuthの本番ポリシー](https://developers.google.com/identity/protocols/oauth2/policies)はホームの両リンクと、本番・試験用のproject分離を求める。既存の公開 `/privacy/` にはGmail取得・利用者への共有・保存期間の説明が不足するため、改訂案を作成し、公開条件を確認してから反映する。審査申請・公開と、評価費用の判断は別に行う。
 
@@ -40,7 +40,7 @@ GASの第1段階version 7は単独で受入済み。第2段階が未配備また
 
 [データ管理・削除の案内](../../../docs/ハンドブック/運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に、読取り・共有・保存先、Google側のアクセス取消し、アプリ側データの削除申請と現状の制約を記載する。
 
-認可補助ツールは、対象期間の全送受信メール（迷惑メール・ゴミ箱を含み下書きを除く）の同期時照合、`abroad-o.com` の認証済み社員全員による照合待ちを含む本文・添付の閲覧と、「Gmail由来の照合・確認記録を案件終了後3年間保存する」方針を表示する。その実施説明 `MAIL_DATA_RETENTION_NOTICE` と削除申請先メール `MAIL_DATA_DELETION_CONTACT` が必須で、既定値は設けない。正本Sheetの `closed_at` と案件カタログから起算日・期限残件を扱い、期限到来分は下記の手動削除CLIで処理する。終了日時が不明の対応済み案件は残件として表示し、推定しない。自動期限削除は用意していないため、期限確認と手動削除の実施担当・頻度を運用で定める。対話端末で説明を読み「同意します」と入力した直後にだけGoogle同意画面を開く。非対話実行やフラグだけで同意を代行しない。Googleの窓口・scope確認後、同意した説明全文・version・SHA-256・同意日時・窓口を資格情報と同じSecret versionへ保存し、秘密を含まないreceiptを返す。
+認可補助ツールは、対象期間の全送受信メール（迷惑メール・ゴミ箱を含み下書きを除く）の同期時照合、`abroad-o.com` の認証済み社員全員による照合待ちを含む本文・添付の閲覧と、「Gmail由来の照合・確認記録を案件終了後3年間保存する」方針を表示する。マーカー整理時だけは、原本不在の確認に同期期間外・下書きを含むGmail全体のメールIDを列挙し、一時hash集合をFirestoreへ保存することも説明する。その実施説明 `MAIL_DATA_RETENTION_NOTICE` と削除申請先メール `MAIL_DATA_DELETION_CONTACT` が必須で、既定値は設けない。正本Sheetの `closed_at` と案件カタログから起算日・期限残件を扱い、期限到来分は下記の手動削除CLIで処理する。終了日時が不明の対応済み案件は残件として表示し、推定しない。自動期限削除は用意していないため、期限確認と手動削除の実施担当・頻度を運用で定める。対話端末で説明を読み「同意します」と入力した直後にだけGoogle同意画面を開く。非対話実行やフラグだけで同意を代行しない。Googleの窓口・scope確認後、同意した説明全文・version・SHA-256・同意日時・窓口を資格情報と同じSecret versionへ保存し、秘密を含まないreceiptを返す。
 
 補助ツールのCloud実行者には対象Secretだけの `secretmanager.secrets.get` と `secretmanager.versions.add` が必要。Secret値（資格情報）は読み取らず、指定したSecretのメタデータからproject IDを正式なproject number名へ解決し、その同じ親名へ保存する。返されたversionが別project・別Secretなら成功扱いにしない。保存応答不明時に自動再登録しない。
 

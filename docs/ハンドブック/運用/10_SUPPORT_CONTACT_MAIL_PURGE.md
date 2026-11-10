@@ -1,7 +1,7 @@
 ---
 owner: shared-docs
 status: prepared-not-executed
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 ---
 
 # お問い合わせメール記録の手動削除
@@ -60,7 +60,7 @@ node tools/purgeMailMetadata.mjs --project '<approved-project>' --confirm-projec
 
 `tools/cleanupMailMarkers.mjs` は管理者の明示操作で、`suppressedMessages` の最小hashだけを整理します。一般利用者のRPCには公開しません。実行には承認済みFirestoreの管理用ADCと、窓口Gmailの読取専用Secretの特定versionが必要です。案件hashと旧要求hashの整理はこの処理に含めません。
 
-現在の期間に見つからないだけでは、将来の期間拡大で再取込する恐れがあります。この実装は期間・ラベルで絞らず、下書き・Spam・Trashを含むGmail全体のIDを全ページ列挙し、原本が不在のときだけ候補にします。**「原本が同期対象にある間」より保守的に、Gmailに原本がある間は最小hashを保持する条件です。この保持範囲の本人判断は未確定で、実データ実行前に確定します。** 原本の本文・件名・アドレスは取得しません。[Gmail一覧API](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list)
+現在の期間に見つからないだけでは、将来の期間拡大で再取込する恐れがあります。この実装は期間・ラベルで絞らず、下書き・Spam・Trashを含むGmail全体のIDを全ページ列挙し、原本が不在のときだけ候補にします。**Gmailに原本がある間は、同期対象期間外でも最小hashを保持します。** 原本の本文・件名・アドレスは取得しません。期間外・下書き等を含むIDの列挙と、一時hash集合のFirestore保存は認可時の同意説明に含めます。旧版の同意記録しかないSecretでは整理を開始できません。[Gmail一覧API](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list)
 
 計画は最大250マーカーを文書ID順に読み、同期完了状態と期間・処理済み履歴ID・保存世代を固定します。Gmail profileの履歴IDが処理済み位置と一致しない場合は、マーカーを保持して停止します。cancelで保守を解除し、通常同期で削除履歴まで処理してから新しい計画を作ります。出力は件数・計画hash・次のhash cursor・走査上限だけです。
 

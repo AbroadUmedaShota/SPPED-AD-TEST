@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { createMarkerCleanup } from '../markerCleanup.mjs';
 import { parseMarkerArguments, runMarkerCli } from '../cleanupMailMarkers.mjs';
+import { MAILBOX, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, mailboxDisclosure } from '../mailboxOnboarding.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
 import { createPurgeGate, suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createGmailAdapter } from '../../runtime/googleAdapters.mjs';
@@ -197,6 +198,33 @@ test('CLI validates target and explicit operation before connecting and outputs 
   const outputs = [];
   await runMarkerCli(args, { createDatabase: async () => db, write: (value) => outputs.push(value) });
   assert.doesNotMatch(JSON.stringify(outputs), /customer@|present|absent|2026/);
+});
+
+test('marker cleanup rejects old or altered mailbox consent before creating an OAuth client', async () => {
+  const disclosure = mailboxDisclosure({ retentionNotice: '案件終了から3年で削除', deletionContact: 'ops@example.com' });
+  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure,
+    disclosureSha256: createHash('sha256').update(disclosure, 'utf8').digest('hex'),
+    acceptedAt: '2026-11-11T00:00:00.000Z', verifiedMailbox: MAILBOX };
+  let clients = 0;
+  const create = async (consentReceipt) => createGmailAdapter({
+    secretVersion: 'projects/test-project/secrets/mail/versions/1',
+    secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({
+      clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh', consentReceipt })) } }]; } },
+    createOAuthClient: () => { clients++; throw new Error('OAuth client should not be created'); },
+    requiredDisclosureVersion: MAILBOX_DISCLOSURE_VERSION,
+    requiredDisclosureClause: MAILBOX_MARKER_DISCLOSURE
+  });
+  const omittedClause = disclosure.replace(MAILBOX_MARKER_DISCLOSURE, '');
+  for (const old of [undefined, { ...receipt, disclosureVersion: '2026-11-10.1' },
+    { ...receipt, disclosure: 'altered' }, { ...receipt, acceptedAt: undefined },
+    { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, verifiedMailbox: 'wrong@example.com' },
+    { ...receipt, disclosure: omittedClause,
+      disclosureSha256: createHash('sha256').update(omittedClause, 'utf8').digest('hex') }]) {
+    await assert.rejects(create(old), { code: 'MAIL_CONSENT_OUTDATED' });
+  }
+  assert.equal(clients, 0);
+  await assert.rejects(create(receipt), /OAuth client should not be created/);
+  assert.equal(clients, 1);
 });
 
 test('all-mail ID enumeration includes Spam and Trash without period, label or draft filters', async () => {

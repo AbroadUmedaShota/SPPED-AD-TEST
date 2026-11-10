@@ -1,7 +1,7 @@
 ---
 owner: shared-docs
 status: infrastructure-prepared-not-deployed
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 ---
 
 # お問い合わせ確認アプリ・メール連携の本番運用手順
@@ -10,17 +10,17 @@ last_reviewed: 2026-11-10
 
 対象値を入力して段階ごとに実行するCLIと読戻しは[配備コマンド](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md)を参照してください。変更コマンドは既定で計画表示だけを行い、対象・操作・費用条件を照合してから実行します。
 
-この文書は配備と受入の手順です。2026-11-10時点で実行基盤の請求先・予算通知・API・Cloud資源は準備済みですが、Cloud Run配備、窓口Gmail同意、実メールの全件照合は完了していません。実行直前に状態を再照合し、対象project、region、Git SHA、GAS配備version、image digest、設定・検証結果を既存の切替・受入記録へ残します。秘密値や実メール本文は記録へ貼りません。
+この文書は配備と受入の手順です。2026-11-11時点で実行基盤の請求先・予算通知・API・Cloud資源と、親会社側のGmail認可専用projectは準備済みですが、Cloud Run配備、窓口Gmail同意、実メールの全件照合は完了していません。実行直前に状態を再照合し、対象project、region、Git SHA、GAS配備version、image digest、設定・検証結果を既存の切替・受入記録へ残します。秘密値や実メール本文は記録へ貼りません。
 
 | 用途 | 準備済みのprojectと設定 | 残る確認 |
 | --- | --- | --- |
 | 窓口Gmail用OAuthの検証環境 | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、External / Testing、テスト利用者0件、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本番用の資格情報・同意をこのprojectへ混在させない。 |
-| 窓口Gmail用OAuthの本番環境（推奨） | 正式運営主体アブロードアウトソーシング株式会社の `abroad-o.com` 組織に新規専用projectを置く。project ID候補は `spd-contact-mail-prod-261110`。現時点では未作成。第1段階ログイン用projectとは分ける。 | project新設とGmail API・External audience・`gmail.readonly`・Desktop clientの設定判断、branding・公開案内、制限付きscope審査とセキュリティ評価、本人のGmail同意、Secret version登録、quota・費用。 |
+| 窓口Gmail用OAuthの本番環境（準備済み） | アブロードアウトソーシング株式会社の `abroad-o.com` 組織に `spd-contact-mail-prod-261110`（番号 `322596549698`）を作成。Gmail API有効、External / Testing、`gmail.readonly` のみ、Desktop client `SPEED AD Mailbox Production` 1件、テスト利用者0件。請求先未接続。第1段階ログイン用projectとは分ける。 | branding・公開案内、制限付きscope審査とセキュリティ評価、本人のGmail同意、Secret version登録、quota・費用。 |
 | Cloud Run・Firestore・Secret Manager | `abroad-o.com` 組織の `spd-contact-viewer-20261110`。承認済み請求先、同project限定の月額3,000円予算通知、必要API、東京の保存先と専用サービスアカウントを準備済み。 | imageとCloud Run配備、数値固定のSecret version、GAS連携と実環境受入。 |
 
 OAuth clientの所属projectとSecret保存先のprojectは別に照合します。実行基盤側の予算通知はOAuth側projectを含みません。この準備状況は本番受入の完了を示さず、以後の変更と読戻しは切替記録を正本にします。
 
-推奨構成では、本番のGmail認可専用projectを運営法人の管理組織へ置き、既存の子会社側projectは検証用にします。`customer@speed-ad.com` だけが本番Gmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認します。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。現在、本番用projectも、窓口のGmail同意・refresh token・Secret version・実メール読取もありません。
+本番のGmail認可専用projectを運営法人の管理組織へ置き、既存の子会社側projectは検証用にします。`customer@speed-ad.com` だけが本番Gmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認します。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。窓口のGmail同意・refresh token・Secret version・実メール読取は未実施です。
 
 アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しません。[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)に沿って、アプリ専用の公開ホーム・プライバシー案内、制限付きscope審査、サーバー処理に対する年次CASA評価の適用または除外根拠を本番接続前に確認します。[OAuthの本番ポリシー](https://developers.google.com/identity/protocols/oauth2/policies)はホームから利用規約とプライバシー方針へのリンクと、本番・試験用projectの分離を求めます。既存の公開 `/privacy/` はGmail取得・利用者への共有・保存期間の説明が不足しています。改訂案を作成し、公開条件を照合してから反映します。審査申請・公開と評価費用はそれぞれ別に判断します。
 
@@ -29,7 +29,7 @@ OAuth clientの所属projectとSecret保存先のprojectは別に照合します
 | 確認事項 | 進められる条件 |
 | --- | --- |
 | 公式窓口 | `customer@speed-ad.com` 本人がGmail読取に同意し、対象期間の受信・送信メールと添付がこのメールボックスに保存されている。別アカウントからの代理送信など、保存されない経路は先に特定する。 |
-| 人による閲覧の同意記録 | 迷惑メール・ゴミ箱を含む対象期間の全送受信メール（下書き除外）の同期時本文照合と、認証済み `abroad-o.com` 社員全員・公式窓口による照合待ちを含む本文・添付の閲覧を説明する。窓口本人の明示入力後、Googleで窓口とscopeを確認し、説明全文・version・hash・同意日時・窓口を資格情報と同じSecret versionへ保存する。秘密を含まない成功receiptをprivate運用記録へ残す。 |
+| 人による閲覧の同意記録 | 迷惑メール・ゴミ箱を含む対象期間の全送受信メール（下書き除外）の同期時本文照合と、認証済み `abroad-o.com` 社員全員・公式窓口による照合待ちを含む本文・添付の閲覧を説明する。マーカー整理時の全Gmail ID列挙（期間外・下書き・迷惑メール・ゴミ箱を含む）と一時hash集合の保存も説明する。窓口本人の明示入力後、Googleで窓口とscopeを確認し、説明全文・version・hash・同意日時・窓口を資格情報と同じSecret versionへ保存する。秘密を含まない成功receiptをprivate運用記録へ残す。 |
 | OAuthの本番条件 | 実際のOAuth project所有組織、Audience、公開状態、要求scopeを確認し、`gmail.readonly` の審査・セキュリティ評価または適用除外の根拠を確定する。ドメイン名の違い、利用人数の少なさ、窓口1件だけという理由でInternal・個人利用の例外を推定しない。 |
 | 継続認可 | ExternalかつTestingのOAuth projectでは、このscopeの認可とrefresh tokenは[7日で失効する](https://support.google.com/cloud/answer/15549945?hl=en)。本番の継続認可条件を整えてから窓口同意を取得する。毎週の再同意を本番運用の代用にしない。 |
 | 費用 | Cloud Run、Firestore、Secret Manager、Artifact Registry、ビルドに使うサービスの請求先、予算、費用確認の担当と頻度を確定する。審査・評価に費用が発生する場合はCloud利用料と分けて判断する。 |

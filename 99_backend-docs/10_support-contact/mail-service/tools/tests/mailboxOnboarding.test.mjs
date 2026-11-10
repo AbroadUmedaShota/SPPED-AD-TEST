@@ -88,6 +88,9 @@ test('PKCE offline consent atomically stores verified credentials and the exact 
   assert.ok(calls.disclosure.includes(options.retentionNotice));
   assert.match(calls.disclosure, /案件終了後3年間/);
   assert.match(calls.disclosure, /迷惑メール・ゴミ箱を含み、下書きは除きます/);
+  assert.match(calls.disclosure, /同期対象期間外、下書き、迷惑メール、ゴミ箱も含めてGmail全体のメールIDを列挙/);
+  assert.match(calls.disclosure, /hash集合をFirestoreに処理完了または取消しまで一時保存/);
+  assert.match(calls.disclosure, /期間外メールの本文・添付は取得しません/);
   assert.match(calls.disclosure, /関連が未確定のメールも本文を取得して照合/);
   assert.match(calls.disclosure, /abroad-o.com の社員全員/);
   assert.match(calls.disclosure, /対象メールの本文・添付、照合待ち、確認記録/);

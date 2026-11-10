@@ -3,7 +3,8 @@ import { createServer } from 'node:http';
 
 export const MAILBOX = 'customer@speed-ad.com';
 export const GMAIL_READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
-export const MAILBOX_DISCLOSURE_VERSION = '2026-11-10.1';
+export const MAILBOX_DISCLOSURE_VERSION = '2026-11-11.1';
+export const MAILBOX_MARKER_DISCLOSURE = '再取込防止マーカーの整理: Gmail原本が存在する間はメールID由来の最小hashを保持します。原本がなくなったか確かめる管理者の手動整理では、通常の同期対象期間外、下書き、迷惑メール、ゴミ箱も含めてGmail全体のメールIDを列挙します。重複検査用のhash集合をFirestoreに処理完了または取消しまで一時保存します。この整理で期間外メールの本文・添付は取得しません。';
 const PROFILE_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/profile';
 const CALLBACK_PATH = '/oauth/callback';
 const CLEAN_CALLBACK_SCRIPT = "history.replaceState(null, '', '/complete');";
@@ -36,6 +37,7 @@ export function mailboxDisclosure(options) {
 対象アカウント: ${MAILBOX}
 要求権限: ${GMAIL_READONLY_SCOPE}（メールと添付の読取り。送信・変更・削除の権限は要求しません。）
 目的・取得範囲: 受付データから決まる対象期間の全送受信メールを列挙します。迷惑メール・ゴミ箱を含み、下書きは除きます。同期時に案件との関連が未確定のメールも本文を取得して照合し、判断できないメールは照合待ちとして表示します。後続同期では新着や変更も取得します。
+${MAILBOX_MARKER_DISCLOSURE}
 共有: アプリの認証を通った abroad-o.com の社員全員と公式窓口の利用者が、対象メールの本文・添付、照合待ち、確認記録を閲覧できます。問い合わせ対応のため、この範囲の人による閲覧に同意する場合だけ続行してください。Google Cloud上で処理・保存します。
 保存: 件名、差出人・宛先、日時、メール/スレッドID、添付名などの添付情報、案件との照合、確認者・日時、同期位置と監査記録をFirestoreへ保存します。本文は同期時の照合と閲覧時に、添付本体は閲覧時に取得し、一時メモリと画面で処理してFirestoreへ保存しません。継続読取りの資格情報と、この説明全文・説明version・hash・同意日時・確認済み窓口の同意記録を同じSecret Manager versionへ保存します。
 保存方針: Gmail由来の照合・確認記録は案件終了後3年間保存します。実施方法: ${options.retentionNotice.trim()}

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { assertMail, MailError } from './errors.mjs';
 import { createAttachmentCache } from './attachmentCache.mjs';
 
@@ -6,12 +7,24 @@ const GMAIL = 'https://gmail.googleapis.com/gmail/v1/users/me/';
 const READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 
 export async function createGmailAdapter({ secretManager, secretVersion, createOAuthClient, fetchImpl = fetch,
-  attachmentCache = createAttachmentCache() }) {
+  attachmentCache = createAttachmentCache(), requiredDisclosureVersion = null, requiredDisclosureClause = null }) {
   assertMail(/^projects\/[^/]+\/secrets\/[^/]+\/versions\/[^/]+$/.test(secretVersion || ''), 'MAIL_NOT_CONFIGURED', 503);
   const [secret] = await secretManager.accessSecretVersion({ name: secretVersion });
   let credentials;
   try { credentials = JSON.parse(secret.payload.data.toString('utf8')); } catch { throw new MailError('MAIL_NOT_CONFIGURED', 503); }
   assertMail(credentials.clientId && credentials.clientSecret && credentials.refreshToken, 'MAIL_NOT_CONFIGURED', 503);
+  if (requiredDisclosureVersion !== null) {
+    const receipt = credentials.consentReceipt;
+    assertMail(typeof requiredDisclosureVersion === 'string' && typeof requiredDisclosureClause === 'string' &&
+      requiredDisclosureClause.length > 0 && receipt?.disclosureVersion === requiredDisclosureVersion &&
+      receipt.verifiedMailbox === MAILBOX && typeof receipt.acceptedAt === 'string' &&
+      Number.isFinite(Date.parse(receipt.acceptedAt)) && new Date(receipt.acceptedAt).toISOString() === receipt.acceptedAt &&
+      typeof receipt.disclosure === 'string' && /^[a-f0-9]{64}$/.test(receipt.disclosureSha256 || '') &&
+      receipt.disclosure.includes(`説明version: ${requiredDisclosureVersion}`) &&
+      receipt.disclosure.includes(requiredDisclosureClause) &&
+      createHash('sha256').update(receipt.disclosure, 'utf8').digest('hex') === receipt.disclosureSha256,
+    'MAIL_CONSENT_OUTDATED', 403);
+  }
   const oauth = createOAuthClient(credentials.clientId, credentials.clientSecret);
   oauth.setCredentials({ refresh_token: credentials.refreshToken });
   let verified = false;
