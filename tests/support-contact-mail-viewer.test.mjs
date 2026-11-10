@@ -1187,3 +1187,77 @@ test('list, issue and reconcile reject partial or inconsistent sync state before
     if (operation === 'reconcile') assert.ok(app.mail.queue.reconcileRequestId);
   }
 });
+
+
+test('newer observed counts cannot hide definite non-dispatch while post-dispatch timeout stays receipt-only', async () => {
+  for (const failure of ['not-sent', 'post-dispatch-timeout']) {
+    const executionId = randomUUID();
+    const newer = syncResponse(executionId, 'running', { processedCount: 1, pendingCount: 2 }).sync;
+    const completed = syncResponse(executionId, 'complete', { processedCount: 2, pendingCount: 2 }).sync;
+    const bridgeApp = bridgeRuntime();
+    const originalToken = bridgeApp.api.ScriptApp.getIdentityToken;
+    if (failure === 'not-sent') bridgeApp.api.ScriptApp.getIdentityToken = () => '';
+    bridgeApp.respond((envelope) => envelope.operation === 'advanceSync' && failure === 'post-dispatch-timeout' ?
+      { status: 504, body: { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } } :
+      envelope.operation === 'getSyncRequestResult' ? { ok: true, found: true, receipt: { sync: completed }, sync: completed } : { ok: true, sync: completed });
+    let release;
+    let first = true;
+    const app = uiRuntime({
+      listContactMail: () => ({ ...list([]), sync: newer }),
+      advanceContactMailSync: (options) => {
+        const result = bridgeApp.api.advanceContactMailSync(options);
+        if (!first) return result;
+        first = false;
+        return new Promise((resolve) => { release = () => resolve(result); });
+      },
+    });
+    app.mail.sync = syncResponse(executionId).sync;
+    const waiting = app.ui.advanceContactMailSyncFromUi();
+    for (let turn = 0; !release && turn < 20; turn++) await Promise.resolve();
+    assert.ok(release);
+    const original = JSON.parse(JSON.stringify(app.calls.find((call) => call.name === 'advanceContactMailSync').args[0]));
+    await app.ui.loadContactMailList('case', { caseId });
+    release();
+    await waiting;
+    assert.equal(app.mail.sync, newer);
+    assert.match(app.element('mailSyncSummary').textContent, /照合待ち 2件/);
+    assert.equal(app.mail.syncProgress.requestId, original.requestId);
+    assert.equal(app.mail.syncProgress.requestPending, failure !== 'not-sent');
+    if (failure === 'not-sent') assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    else assert.doesNotMatch(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    bridgeApp.api.ScriptApp.getIdentityToken = originalToken;
+    await app.ui.advanceContactMailSyncFromUi();
+    const retry = app.calls.filter((call) => call.name === 'advanceContactMailSync').at(-1).args[0];
+    assert.equal(retry.requestId, original.requestId);
+    if (failure === 'not-sent') assert.deepEqual(JSON.parse(JSON.stringify(retry)), original);
+    else assert.equal(retry.confirmOnly, true);
+    assert.deepEqual(bridgeApp.calls.map((call) => call.envelope.operation), failure === 'not-sent' ? ['advanceSync'] : ['advanceSync', 'getSyncRequestResult']);
+    assert.equal(app.mail.syncProgress, null);
+  }
+});
+
+
+test('definite catalog non-dispatch clears an obsolete plan without replacing a newer period', async () => {
+  for (const cause of ['MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID']) {
+    const executionId = randomUUID();
+    const newer = { ...sync, executionId: randomUUID(), startAt: '2026-11-05T00:00:00.000Z', pendingCount: 2 };
+    let release;
+    const app = uiRuntime({ listContactMail: () => ({ ...list([]), sync: newer }),
+      advanceContactMailSync: (options) => new Promise((resolve) => { release = () => resolve({ ok: false,
+        error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause },
+        dispatch: { sent: false, operation: 'advanceSync', requestId: options.requestId, executionId: options.executionId } }); }) });
+    app.mail.sync = syncResponse(executionId).sync;
+    const waiting = app.ui.advanceContactMailSyncFromUi();
+    for (let turn = 0; !release && turn < 20; turn++) await Promise.resolve();
+    assert.ok(release);
+    await app.ui.loadContactMailList('case', { caseId });
+    release();
+    await waiting;
+    assert.equal(app.mail.sync, newer);
+    assert.equal(app.mail.periodStartAt, newer.startAt);
+    assert.equal(app.mail.syncProgress, null);
+    assert.match(app.element('mailSyncSummary').textContent, /照合待ち 2件/);
+    assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    assert.equal(app.calls.filter((call) => call.name === 'advanceContactMailSync').length, 1);
+  }
+});
