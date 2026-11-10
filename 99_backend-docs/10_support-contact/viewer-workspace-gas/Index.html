@@ -1385,6 +1385,8 @@
         MAIL_PERIOD_NARROWING: '同期開始日を後ろへ動かすことはできません。管理者に以前の開始日を確認してください。',
         MAIL_PERIOD_EXPANSION_REQUIRED: '開始日前のメールが見つかりました。同期開始日を見直し、全件同期を実行してください。',
         MAIL_CATALOG_CHANGED: '受付データが変わりました。同期を最初からやり直してください。',
+        MAIL_CATALOG_UNVERIFIED: '受付データが変わったか確認できません。前の保存結果は未確認です。更新して保存状態を読み直してください。',
+        MAIL_REQUEST_RECORDED_CATALOG_CHANGED: '前の操作は保存済みですが、受付データが変わりました。更新して現在の保存状態を読み直してください。',
         MAIL_FULL_SYNC_REQUIRED: '全件同期が必要です。',
         MAIL_HISTORY_EXPIRED: 'メールの同期履歴が失効しています。全件同期が必要です。',
         MAIL_SYNC_BUSY: '別のメール同期が進行中です。同期状態を更新してください。',
@@ -1517,7 +1519,7 @@
       ++current.serial;
       ++current.detailSerial;
       (current.urls || []).forEach((url) => URL.revokeObjectURL(url));
-      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'unobserved', error: '', writing: false, pendingWrite: null, noMail: null, pendingNoMail: null, noMailError: '', resolveCaseId: '', resolveReason: '', reconcilePageToken: '', reconcileRequestId: '', reconcileExpired: false, reconcileMessage: '', caseId: '', pageToken: '', page: null, attachmentSerial: (current.attachmentSerial || 0) + 1 });
+      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'unobserved', error: '', writing: false, pendingWrite: null, noMail: null, pendingNoMail: null, noMailError: '', resolveCaseId: '', resolveReason: '', reconcilePageToken: '', reconcileRequestId: '', reconcileExpired: false, reconcileNeedsReadback: false, reconcileMessage: '', catalogUnverified: false, caseId: '', pageToken: '', page: null, attachmentSerial: (current.attachmentSerial || 0) + 1 });
       const root = contactMailRoot(view);
       root.innerHTML = '';
       if (view === 'case') root.hidden = true;
@@ -1584,8 +1586,41 @@
     }
 
     function contactMailResult(result) {
-      if (!result || result.ok !== true) throw new Error(result && result.error && result.error.code || 'MAIL_SERVICE_UNAVAILABLE');
+      if (!result || result.ok !== true) {
+        const code = result && result.error && result.error.code || 'MAIL_SERVICE_UNAVAILABLE';
+        if (['MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_UNVERIFIED', 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_PERIOD_REQUIRED'].includes(code)) invalidateContactMailCatalog(code);
+        throw new Error(code);
+      }
       return result;
+    }
+
+    function invalidateContactMailCatalog(code) {
+      const notice = contactMailErrorText(code);
+      ++contactMailState.syncObservationSerial;
+      if (contactMailState.sync && contactMailState.sync.state !== 'not_started') {
+        const running = contactMailState.sync.state === 'running';
+        contactMailState.sync = { ...contactMailState.sync, state: running ? 'running' : 'needs_full_sync',
+          acceptanceReady: false, enumerationComplete: false, remainingPages: running, noMailContextToken: null, errorCode: code };
+      }
+      for (const view of ['case', 'queue']) {
+        const current = contactMailState[view];
+        const visible = current.status && current.status !== 'unobserved';
+        ++current.serial;
+        ++current.detailSerial;
+        current.attachmentSerial = (current.attachmentSerial || 0) + 1;
+        (current.urls || []).forEach((url) => URL.revokeObjectURL(url));
+        if (current.pendingNoMail) current.pendingNoMail.requiresReadback = true;
+        if (current.reconcileRequestId) current.reconcileNeedsReadback = true;
+        Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: visible ? 'failed' : 'unobserved',
+          error: notice, writing: false, noMail: { eligible: false, contextToken: null, confirmation: null, stale: true },
+          noMailError: notice, sync: contactMailState.sync, catalogUnverified: true, page: null });
+        if (visible && !(view === 'queue' && contactMailState.issues.active)) renderContactMailView(view);
+      }
+      ++contactMailState.issues.serial;
+      contactMailState.issues.result = null;
+      if (contactMailState.issues.active) renderContactMailIssues(notice);
+      document.getElementById('mailSyncSummary').textContent = `${notice} ${renderContactMailSync(contactMailState.sync)}`;
+      renderContactMailSyncButton();
     }
 
     function renderContactMailSync(sync) {
@@ -1917,7 +1952,7 @@
       const observationSerial = contactMailState.syncObservationSerial;
       ++current.detailSerial;
       current.urls.forEach((url) => URL.revokeObjectURL(url));
-      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'loading', error: '', pendingWrite: null, noMail: null, page: null, pageToken: options.pageToken || '' });
+      Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'loading', error: '', pendingWrite: current.catalogUnverified ? current.pendingWrite : null, noMail: null, page: null, pageToken: options.pageToken || '' });
       renderContactMailView(view);
       try {
         const result = contactMailResult(await callServer('listContactMail', contactMailOptions(current, { pageToken: current.pageToken })));
@@ -1929,6 +1964,10 @@
         current.page = result.page;
         current.sync = newerObservation ? contactMailState.sync : result.sync;
         current.noMail = current.scope === 'case' ? result.noMail : null;
+        current.catalogUnverified = false;
+        current.pendingWrite = null;
+        if (current.pendingNoMail?.requiresReadback && current.noMail && current.noMail.contextToken !== current.pendingNoMail.contextToken) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; }
+        if (current.reconcileNeedsReadback) { current.reconcileRequestId = ''; current.reconcilePageToken = ''; current.reconcileNeedsReadback = false; }
         if (current.noMail && (current.noMail.confirmation || current.pendingNoMail?.expired === true || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)))) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
         if (current.noMail && !current.pendingNoMail) current.noMailError = '';
         if (current.scope === 'pending' && current.reconcileExpired) {

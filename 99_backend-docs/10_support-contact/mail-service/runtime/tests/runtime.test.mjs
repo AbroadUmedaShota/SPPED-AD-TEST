@@ -59,6 +59,7 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   };
   const execute = createMailService({ store, gmail, core, now });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation,
+    sourceCatalogDigest: store.sourceCatalogDigest,
     requestId: createRequestId(now()), issuedAt: now().toISOString(), actor,
     payload: operation === 'advanceSync' && payload.mode ? { startAt: START, ...payload } : payload, ...changes });
   return { store, messages, calls, metadataCalls, gmail, execute, envelope };
@@ -112,6 +113,55 @@ test('rejects unsupported actor, operation, stale envelope and customer sync', a
   await assert.rejects(() => f.execute(f.envelope('getSyncStatus', {}, { issuedAt: '2020-01-01T00:00:00Z' })), { code: 'MAIL_INVALID_REQUEST' });
   await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' },
     { actor: { email: 'customer@speed-ad.com', authMode: 'customer-oauth' } })), { code: 'MAIL_FORBIDDEN' });
+});
+
+test('every protected mail operation requires the current source catalog before records, Gmail or receipts', async () => {
+  const f = fixture([A]);
+  let protectedCalls = 0;
+  for (const name of ['getMessage', 'getReceipt', 'listMessages', 'countMessages']) f.store[name] = async () => { protectedCalls++; throw new Error('must not be reached'); };
+  for (const operation of ['listCaseMail', 'listPendingMail', 'listUnreviewedMail', 'listMailIssues', 'getMail', 'getAttachmentChunk',
+    'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'reconcilePending']) {
+    for (const sourceCatalogDigest of [undefined, 'wrong', 'f'.repeat(64)]) {
+      await assert.rejects(f.execute(f.envelope(operation, {}, { sourceCatalogDigest })), { code: 'MAIL_CATALOG_CHANGED' }, operation);
+    }
+  }
+  assert.equal(protectedCalls, 0);
+  assert.equal(f.calls.length, 0);
+  assert.equal(f.store.events.length, 0);
+});
+
+test('a catalog change while reading mail suppresses the entire protected result', async () => {
+  const f = fixture([A]);
+  f.store.seed(record('reading')); f.messages.set('reading', gmailMessage('reading', 'private body'));
+  const before = await f.store.getCatalog();
+  const getMessage = f.gmail.getMessage;
+  f.gmail.getMessage = async (id) => { const value = await getMessage(id); f.store.setCatalog({ ...before, digest: 'e'.repeat(64) }); return value; };
+  await assert.rejects(f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'reading' })), { code: 'MAIL_CATALOG_CHANGED' });
+  assert.deepEqual(f.calls, ['reading']);
+});
+
+test('an old-catalog write receipt reports recorded history without replaying protected metadata', async () => {
+  const f = fixture([A]); f.store.seed(record('reviewed'));
+  const request = f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'reviewed', expectedVersion: 1 });
+  await f.execute(request);
+  const events = f.store.events.length;
+  const before = await f.store.getCatalog();
+  const cases = [{ caseId: A, handledStatus: '対応中', closedAt: null }];
+  f.store.setCatalog({ ...before, cases, digest: catalogDigest(cases) });
+  await assert.rejects(f.execute({ ...request, sourceCatalogDigest: f.store.sourceCatalogDigest }), { code: 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED' });
+  assert.equal(f.store.events.length, events);
+  assert.equal((await f.store.getMessage('reviewed')).firstReview.email, actor.email);
+});
+
+test('an old-catalog reconciliation receipt cannot advance the new catalog cursor', async () => {
+  const f = fixture([A]);
+  const request = f.envelope('reconcilePending', {});
+  await f.execute(request);
+  const before = await f.store.getCatalog();
+  const cases = [{ caseId: A, handledStatus: '対応中', closedAt: null }];
+  f.store.setCatalog({ ...before, cases, digest: catalogDigest(cases) });
+  await assert.rejects(f.execute({ ...request, sourceCatalogDigest: f.store.sourceCatalogDigest }), { code: 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED' });
+  assert.equal(f.calls.length, 0);
 });
 
 test('expired mutation IDs fail before storage even when the envelope timestamp is renewed', async () => {
@@ -175,7 +225,7 @@ test('stable pagination reaches 253 equal-date messages and previous page', asyn
   assert.deepEqual(previous.messages.map((item) => item.messageId), pages[0].messages.map((item) => item.messageId));
   await assert.rejects(() => f.execute(f.envelope('listPendingMail', { pageToken: pages[0].page.nextPageToken })), { code: 'MAIL_INVALID_REQUEST' });
   f.store.setCatalog({ complete: false, caseIds: [] });
-  await assert.rejects(() => f.execute(f.envelope('listCaseMail', { caseId: A })), { code: 'MAIL_CATALOG_INCOMPLETE' });
+  await assert.rejects(() => f.execute(f.envelope('listCaseMail', { caseId: A }, { sourceCatalogDigest: catalogDigest(caseEntries([A])) })), { code: 'MAIL_CATALOG_INCOMPLETE' });
 });
 
 test('mail and attachment enforce mapping and scrub notification secrets', async () => {

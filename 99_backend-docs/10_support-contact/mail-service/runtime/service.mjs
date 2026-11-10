@@ -11,6 +11,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
 const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'getMail',
   'getAttachmentChunk', 'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'getSyncStatus', 'getSyncRequestResult', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
+const CATALOG_OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'listMailIssues',
+  'getMail', 'getAttachmentChunk', 'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'reconcilePending']);
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
 const CHUNK_SIZE = ATTACHMENT_CHUNK_SIZE;
@@ -129,11 +131,12 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     return { eligible, contextToken: noMailContextToken(context), confirmation: noMailConfirmationSummary(valid ? stored : null), stale: Boolean(prior && !valid) };
   }
 
-  async function confirmCaseNoMail(payload, actor, requestId) {
+  async function confirmCaseNoMail(payload, actor, requestId, sourceCatalogDigest) {
     assertMail(UUID.test(requestId) && Object.keys(payload).sort().join(',') === 'caseId,contextToken' && /^[a-f0-9]{64}$/.test(payload.contextToken || ''));
     const id = caseId(payload.caseId);
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    assertMail(catalog.digest === sourceCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
     assertRetainedRecord({ caseId: id }, retentionPolicy(catalog, now()));
     const current = await caseNoMail(id);
     assertMail(current.eligible && current.contextToken === payload.contextToken, 'MAIL_MAPPING_CHANGED', 409);
@@ -418,7 +421,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     dataBase64: chunk.toString('base64'), done: offset + chunk.length === bytes.length };
   }
 
-  async function write(operation, payload, actor, requestId) {
+  async function write(operation, payload, actor, requestId, sourceCatalogDigest) {
     const id = messageId(payload.messageId);
     const startAt = await activeStartAt();
     assertMail(withinPeriod(await store.getMessage(id), startAt), 'MAIL_NOT_FOUND', 404);
@@ -428,9 +431,10 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const fingerprint = digest({ operation, payload, actor, startAt });
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    assertMail(catalog.digest === sourceCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
     const policy = retentionPolicy(catalog, now());
     if (current?.caseId) assertRetainedRecord(current, policy);
-    return store.mutate(requestId, fingerprint, async (transaction) => {
+    const result = await store.mutate(requestId, fingerprint, async (transaction) => {
       const record = await transaction.getMessage(id);
       assertMail(record, 'MAIL_NOT_FOUND', 404);
       assertRetainedRecord(record, policy);
@@ -439,7 +443,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (operation === 'markReviewed') {
         assertScope(record, payload);
         assertMail(record.matchState === 'matched' && !record.unavailable, 'MAIL_MAPPING_CHANGED', 409);
-        if (record.firstReview) return { message: summary(record) };
+        if (record.firstReview) return { message: summary(record), catalogDigest: catalog.digest };
         assertMail(attachmentReviewReady(record), 'MAIL_CONTENT_UNAVAILABLE', 410);
         assertMail(record.version === payload.expectedVersion, 'MAIL_MAPPING_CHANGED', 409);
         transition = core.recordFirstReview(record, { email: actor.email, verified: true }, now().toISOString());
@@ -467,8 +471,10 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         transaction.setMessage(demotion.record);
         transaction.addEvent({ ...demotion.event, requestId });
       }
-      return { message: summary(demotions.find((item) => item.record.messageId === id)?.record || transition.record) };
+      return { message: summary(demotions.find((item) => item.record.messageId === id)?.record || transition.record), catalogDigest: catalog.digest };
     }, startAt, catalog.digest);
+    assertMail(result.catalogDigest === sourceCatalogDigest, 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 409);
+    return result;
   }
 
   async function uploadCatalog(payload) {
@@ -567,13 +573,17 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     await store.upsertIndexedMessage(indexedRecord, latestCatalog.digest, policy);
   }
 
-  async function reconcilePending(payload, requestId, actor) {
+  async function reconcilePending(payload, requestId, actor, sourceCatalogDigest) {
     const startAt = await activeStartAt();
-    const fingerprint = digest({ operation: 'reconcilePending', payload, actor, startAt });
-    const receipt = await store.getReceipt(requestId, fingerprint);
-    if (receipt) return receipt;
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    assertMail(catalog.digest === sourceCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
+    const fingerprint = digest({ operation: 'reconcilePending', payload, actor, startAt });
+    const receipt = await store.getReceipt(requestId, fingerprint);
+    if (receipt) {
+      assertMail(receipt.sync?.catalogDigest === sourceCatalogDigest, 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 409);
+      return receipt;
+    }
     const scopeKey = `reconcile:${startAt}`;
     const cursor = parseCursor(payload.pageToken, scopeKey);
     assertMail(!cursor || cursor.direction === 'next');
@@ -762,19 +772,26 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const actor = validateActor(envelope.actor);
     const { operation, payload, requestId } = envelope;
     const mutation = ['markReviewed', 'resolvePending', 'confirmCaseNoMail', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending'].includes(operation);
+    const guardedCatalog = CATALOG_OPERATIONS.has(operation);
     if (mutation) assertCurrentRequestId(requestId, now());
+    if (guardedCatalog) assertMail(/^[a-f0-9]{64}$/.test(envelope.sourceCatalogDigest || ''), 'MAIL_CATALOG_CHANGED', 409);
     if (['uploadCaseCatalog', 'advanceSync', 'getSyncRequestResult', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
     return store.withAccess(async () => {
       // Recheck after acquiring the purge generation. Cleanup either precedes this
       // check or invalidates the generation of every subsequent transaction.
       if (mutation) assertCurrentRequestId(requestId, now());
+      if (guardedCatalog) {
+        const catalog = await store.getCatalog();
+        assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+        assertMail(catalog.digest === envelope.sourceCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
+      }
       let result;
       if (operation === 'listMailIssues') result = await listIssues(payload);
       else if (operation.startsWith('list')) result = await list(operation, payload);
       else if (operation === 'getMail') result = await getMail(payload);
       else if (operation === 'getAttachmentChunk') result = await attachment(payload);
-      else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);
-      else if (operation === 'confirmCaseNoMail') result = await confirmCaseNoMail(payload, actor, requestId);
+      else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId, envelope.sourceCatalogDigest);
+      else if (operation === 'confirmCaseNoMail') result = await confirmCaseNoMail(payload, actor, requestId, envelope.sourceCatalogDigest);
       else if (operation === 'getSyncStatus') result = { sync: await syncStatus() };
       else if (operation === 'getSyncRequestResult') {
         const original = payload.requestPayload;
@@ -785,7 +802,12 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       }
       else if (operation === 'uploadCaseCatalog') result = await uploadCatalog(payload);
       else if (operation === 'advanceSync') result = await advanceSync(payload, requestId, actor);
-      else if (operation === 'reconcilePending') result = await reconcilePending(payload, requestId, actor);
+      else if (operation === 'reconcilePending') result = await reconcilePending(payload, requestId, actor, envelope.sourceCatalogDigest);
+      if (guardedCatalog) {
+        const catalog = await store.getCatalog();
+        assertMail(catalog.complete && catalog.digest === envelope.sourceCatalogDigest,
+          mutation ? 'MAIL_CATALOG_UNVERIFIED' : 'MAIL_CATALOG_CHANGED', 409);
+      }
       return { ok: true, ...result };
     });
   }

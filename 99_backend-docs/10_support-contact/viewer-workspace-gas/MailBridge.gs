@@ -11,7 +11,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_SYNC_BUSY', 'MAIL_CONTENT_UNAVAILABLE', 'MAIL_HISTORY_EXPIRED', 'MAIL_INVALID_UPSTREAM',
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
-  'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
+  'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_UNVERIFIED', 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
   'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_PERIOD_NARROWING', 'MAIL_PERIOD_EXPANSION_REQUIRED', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_MAINTENANCE'
 ];
 
@@ -297,6 +297,14 @@ function callMailService_(operation, payload, context, requestId) {
   if (!serviceUrl) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
   // Only the configured Cloud Run origin is callable; redirects and arbitrary proxy URLs are forbidden.
   if (!/^https:\/\/[a-z0-9][a-z0-9.-]*\.run\.app$/.test(serviceUrl)) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
+  var guardedCatalog = ['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'listMailIssues', 'getMail',
+    'getAttachmentChunk', 'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'reconcilePending'].indexOf(operation) !== -1;
+  var source = null;
+  if (guardedCatalog) {
+    try { source = mailCatalogSource_(); } catch (error) {
+      return mailError_(error.message === 'MAIL_PERIOD_REQUIRED' ? 'MAIL_PERIOD_REQUIRED' : 'MAIL_CATALOG_INVALID');
+    }
+  }
   var identityToken;
   try { identityToken = ScriptApp.getIdentityToken(); } catch (_error) { return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH'); }
   if (!identityToken) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH');
@@ -308,6 +316,7 @@ function callMailService_(operation, payload, context, requestId) {
     actor: { email: context.email, authMode: context.authMode === 'google-oauth' ? 'customer-oauth' : 'domain' },
     payload: payload
   };
+  if (source) envelope.sourceCatalogDigest = source.digest;
   try {
     var response = UrlFetchApp.fetch(serviceUrl + '/rpc', {
       method: 'post', contentType: 'application/json', payload: JSON.stringify(envelope),
@@ -323,6 +332,11 @@ function callMailService_(operation, payload, context, requestId) {
     if (!result || typeof result !== 'object' || typeof result.ok !== 'boolean') return mailError_('MAIL_INVALID_RESPONSE');
     if (!result.ok) return mailError_(result.error && result.error.code);
     if (status !== 200) return mailError_('MAIL_INVALID_RESPONSE');
+    if (source) {
+      var latest;
+      try { latest = mailCatalogSource_(); } catch (_sourceError) { return mailError_('MAIL_CATALOG_UNVERIFIED'); }
+      if (latest.digest !== source.digest || latest.startAt !== source.startAt) return mailError_('MAIL_CATALOG_UNVERIFIED');
+    }
     return mailCurrentPeriodResult_(result);
   } catch (_error) {
     // Do not expose or log service responses, tokens, message bodies, or exception details.

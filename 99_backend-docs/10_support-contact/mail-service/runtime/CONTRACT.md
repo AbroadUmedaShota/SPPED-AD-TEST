@@ -12,7 +12,13 @@ Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audie
 
 ## POST /rpc
 
-入力は`{contractVersion:1,operation,requestId,issuedAt,actor:{email,authMode},payload}`。`actor`は認証済みGASが作り、browserが指定しない。`authMode`は社員の`domain`または検証済み窓口利用者の`customer-oauth`。issuedAtの許容差は120秒。
+入力は`{contractVersion:1,operation,requestId,issuedAt,actor:{email,authMode},payload}`。メール一覧・残件・詳細・添付・確認・照合・関連メールなし・再照合には、GASが現在の正本Sheetから作るtop-level `sourceCatalogDigest`も必須。`actor`とdigestは認証済みGASが作り、browserが指定しない。`authMode`は社員の`domain`または検証済み窓口利用者の`customer-oauth`。issuedAtの許容差は120秒。
+
+メールデータ操作は、Gmail本文取得・保存記録読取り・receipt再生の前に`sourceCatalogDigest`と有効カタログの一致を確認する。欠落・不一致は`MAIL_CATALOG_CHANGED`で停止する。確認・分類のtransactionは同じdigestを再検査し、応答前にも有効カタログを確認する。GASも成功応答を返す前にSheetを再読取りし、digest・開始日が変わった、または読取り不能なら本文・添付を含む応答全体を抑止して`MAIL_CATALOG_UNVERIFIED`を返す。送信済みの更新は成立した可能性があるため、未送信扱いにせず元要求IDを保持する。画面は旧本文・preview・関連メールなしの有効表示を消し、正常な読戻しで現在の状態を確認してから次の明示操作へ進む。
+
+digestは現在の認可条件であり、元の業務payloadとreceipt fingerprintへ加えない。確認・分類receiptには実行時catalogDigestを保存し、旧カタログの保存結果を現在の成功として返さない。再照合receiptも保存済みsync.catalogDigestを確認する。元操作の保存済みreceiptが現在条件に適合しない場合は、保護された旧結果を返さず`MAIL_REQUEST_RECORDED_CATALOG_CHANGED`で保存済みと示す。同期状態・同期receipt照会・カタログ登録・同期続行はこのguardから除外し、差分解消と結果照会の経路を維持する。
+
+各メールデータ操作でSheetを前後2回読み、Cloudではカタログを前後に確認する。GASからの追加Cloud往復は増やさない。SheetとFirestoreをまたぐ原子的な処理ではなく、検査直後のSheet変更は起こり得るため、最終受入の前後Sheet照合も必須とする。
 
 | operation | payload |
 | --- | --- |

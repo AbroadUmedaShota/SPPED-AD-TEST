@@ -28,6 +28,7 @@ for (const [kind, html] of [
       payload: { mimeType: 'text/html', body: { size: bytes.length, data: bytes.toString('base64url') } } }; } };
   const execute = createMailService({ store, gmail, core: { ...classification, ...mime, ...review, ...safeMail }, now: () => new Date(at) });
   const envelope = (operation, payload = {}) => ({ contractVersion: 1, operation, requestId: createRequestId(new Date(at)), issuedAt: at,
+    sourceCatalogDigest: store.sourceCatalogDigest,
     actor: { email: 'staff@abroad-o.com', authMode: 'domain' }, payload });
   const target = { scope: 'case', caseId, messageId: 'complex' };
   const detail = await execute(envelope('getMail', target));

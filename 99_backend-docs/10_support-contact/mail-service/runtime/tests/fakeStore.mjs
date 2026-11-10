@@ -1,14 +1,16 @@
 import { assertMail } from '../errors.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
-import { assertRetainedRecord, isRetainedRecord } from '../caseRetention.mjs';
+import { assertRetainedRecord, isRetainedRecord, normalizeCatalogCases } from '../caseRetention.mjs';
 import { observeAttachment } from '../attachmentObservation.mjs';
 import { suppressionKey } from '../purgeGate.mjs';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { noMailContext, noMailContextToken, validNoMailConfirmation } from '../noMailConfirmation.mjs';
 
 const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
+const withDigest = (catalog) => catalog.complete && Array.isArray(catalog.cases) && !catalog.digest ? { ...catalog,
+  digest: createHash('sha256').update(normalizeCatalogCases(catalog.cases).map((item) => JSON.stringify([item.caseId, item.handledStatus, item.closedAt])).join('\n')).digest('hex') } : catalog;
 
 export function fakeStore(caseIds = [], initialSync = null) {
   const records = new Map();
@@ -19,7 +21,7 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const suppressedMessages = new Map();
   const noMail = new Map();
   let mappingRevision = null;
-  let catalog = { complete: true, caseIds, cases: caseEntries(caseIds) };
+  let catalog = withDigest({ complete: true, caseIds, cases: caseEntries(caseIds) });
   let sync = clone(initialSync);
   let lease = null;
   let queue = Promise.resolve();
@@ -60,7 +62,8 @@ export function fakeStore(caseIds = [], initialSync = null) {
         return clone(result);
       });
     },
-    setCatalog(value) { catalog = value; },
+    get sourceCatalogDigest() { return catalog.digest; },
+    setCatalog(value) { catalog = withDigest(value); },
     async getCatalog() { return clone(catalog); },
     async getCoveredCaseIds({ startAt, cutoffAt } = {}) { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched' && (!startAt || item.internalDate >= startAt) && (!cutoffAt || item.internalDate <= cutoffAt)).map((item) => item.caseId))]; },
     async uploadCatalogPage(page, digest) {

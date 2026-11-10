@@ -69,6 +69,7 @@ test('mail bridge sends only server-verified actor to a fixed TLS endpoint', () 
   assert.ok(Math.abs(Date.parse(call.envelope.issuedAt) - createdAt) < 1000);
   assert.deepEqual(call.envelope.actor, { email: 'reader@abroad-o.com', authMode: 'domain' });
   assert.deepEqual(call.envelope.payload, { scope: 'case', caseId, pageToken: '' });
+  assert.equal(call.envelope.sourceCatalogDigest, app.api.mailCatalogSource_().digest);
   assert.equal(call.options.followRedirects, false);
   assert.equal(call.options.validateHttpsCertificates, true);
   assert.equal(call.options.headers.Authorization, 'Bearer server-only-google-identity-token');
@@ -76,6 +77,29 @@ test('mail bridge sends only server-verified actor to a fixed TLS endpoint', () 
   app.setActor({ email: 'customer@speed-ad.com', authMode: 'google-oauth' });
   app.api.listContactMail({ scope: 'pending' });
   assert.equal(app.calls.at(-1).envelope.actor.authMode, 'customer-oauth');
+});
+
+test('GAS protects every mail data response against a changed or unreadable Sheet source', () => {
+  for (const operation of ['listCaseMail', 'listPendingMail', 'listUnreviewedMail', 'listMailIssues', 'getMail', 'getAttachmentChunk',
+    'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'reconcilePending']) {
+    for (const failure of ['changed', 'unreadable']) {
+      const statuses = ['未対応'];
+      const app = bridgeRuntime({ statuses });
+      app.respond(() => {
+        if (failure === 'changed') statuses[0] = '対応中';
+        else app.api.getSheet_ = () => { throw new Error('private sheet error'); };
+        return { ok: true, message: { bodyText: 'private body' }, dataBase64: 'private attachment' };
+      });
+      const result = app.api.callMailService_(operation, {}, { email: 'reader@abroad-o.com', authMode: 'domain' }, randomUUID());
+      assert.equal(result.error.code, 'MAIL_CATALOG_UNVERIFIED', operation);
+      assert.equal(app.calls.length, 1);
+      assert.match(app.calls[0].envelope.sourceCatalogDigest, /^[a-f0-9]{64}$/);
+      assert.doesNotMatch(JSON.stringify(result), /private|dispatch|sent/);
+    }
+  }
+  const invalid = bridgeRuntime({ dates: [''] });
+  assert.equal(invalid.api.listContactMail({ scope: 'pending' }).error.code, 'MAIL_PERIOD_REQUIRED');
+  assert.equal(invalid.calls.length, 0);
 });
 
 test('mail configuration failures never look like a valid empty mailbox', () => {
@@ -494,10 +518,9 @@ test('a source change during an absence action invalidates its returned old-cata
   });
   const result = app.api.confirmContactCaseNoMail({ caseId, contextToken: sync.noMailContextToken, requestId: randomUUID() });
   assert.equal(writes, 1);
-  assert.equal(result.sync.state, 'needs_full_sync');
-  assert.equal(result.sync.acceptanceReady, false);
-  assert.equal(result.noMail.confirmation, null);
-  assert.equal(result.noMail.stale, true);
+  assert.equal(result.error.code, 'MAIL_CATALOG_UNVERIFIED');
+  assert.equal(result.sync, undefined);
+  assert.equal(result.noMail, undefined);
 });
 
 test('GAS projected absence invalidation reaches UI and retains the original unresolved request identity', async () => {
@@ -624,6 +647,7 @@ test('maximum decoded bodies survive runtime JSON, GAS bridge and UI without tru
       getMessage: async () => message, getAttachment: async () => { throw new Error('unexpected attachment'); }
     }, core: mime, now: () => new Date(at) });
     const result = await service({ contractVersion: 1, operation: 'getMail', requestId: randomUUID(), issuedAt: at,
+      sourceCatalogDigest: store.sourceCatalogDigest,
       actor: { email: 'reader@abroad-o.com', authMode: 'domain' }, payload: { scope: 'case', caseId, messageId: 'mail1' } });
     assert.equal(result.message.bodyAvailability, 'verified');
     assert.equal(result.message.bodyText, bodyText);
@@ -923,6 +947,69 @@ test('case no-mail confirmation is explicit and reads back the server actor and 
   await cancelled.ui.confirmContactCaseNoMailFromUi('case');
   assert.equal(cancelled.calls.filter((call) => call.name === 'confirmContactCaseNoMail').length, 0);
   assert.equal(Object.keys(cancelled.mail.noMailRequests).length, 0);
+});
+
+test('unverified catalog response clears old eligibility and retains the unknown no-mail request until current readback', async () => {
+  let refreshed = false;
+  const laterSync = { ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', noMailContextToken: 'b'.repeat(64) };
+  const app = uiRuntime({
+    listContactMail: () => ({ ...list([]), sync: refreshed ? laterSync : sync,
+      noMail: noMail({ eligible: true, contextToken: refreshed ? laterSync.noMailContextToken : sync.noMailContextToken }) }),
+    confirmContactCaseNoMail: () => ({ ok: false, error: { code: 'MAIL_CATALOG_UNVERIFIED' } })
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  const request = app.calls.find((call) => call.name === 'confirmContactCaseNoMail').args[0];
+  assert.equal(app.mail.case.pendingNoMail.requestId, request.requestId);
+  assert.equal(app.mail.noMailRequests[caseId].requestId, request.requestId);
+  assert.equal(app.mail.case.noMail.eligible, false);
+  assert.equal(app.mail.case.noMail.confirmation, null);
+  assert.equal(app.mail.sync.acceptanceReady, false);
+  assert.equal(app.mail.sync.state, 'needs_full_sync');
+  assert.equal(app.mail.case.status, 'failed');
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /この対象期間に関連メールなしと確認/);
+  refreshed = true;
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.equal(app.mail.case.status, 'loaded');
+  assert.equal(app.mail.case.pendingNoMail, null);
+  assert.equal(app.mail.noMailRequests[caseId], undefined);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.notEqual(app.calls.filter((call) => call.name === 'confirmContactCaseNoMail').at(-1).args[0].requestId, request.requestId);
+});
+
+test('catalog invalidation removes body and preview while preserving a possibly recorded review until readback', async () => {
+  let rejectWrite = true;
+  const app = uiRuntime({ listContactMail: () => list([summary()]), getContactMailMessage: () => ({ ok: true, message: detail() }),
+    markContactMailReviewed: () => rejectWrite ? { ok: false, error: { code: 'MAIL_CATALOG_UNVERIFIED' } } : { ok: true, message: summary() } });
+  await app.ui.loadContactMailList('case', { caseId });
+  app.mail.case.urls.push('blob:private');
+  await app.ui.writeContactMail('case', 'review');
+  const requestId = app.calls.find((call) => call.name === 'markContactMailReviewed').args[0].requestId;
+  assert.equal(app.mail.case.pendingWrite.requestId, requestId);
+  assert.equal(app.mail.case.message, null);
+  assert.equal(app.mail.case.messages.length, 0);
+  assert.deepEqual(app.revoked, ['blob:private']);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /本文/);
+  rejectWrite = false;
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.equal(app.mail.case.pendingWrite, null);
+  assert.equal(app.mail.case.message.bodyText, '本文');
+});
+
+test('catalog-unknown reconciliation keeps its request until successful pending readback permits a new explicit run', async () => {
+  const app = uiRuntime({ listContactMail: () => list([]),
+    reconcileContactMailPending: () => ({ ok: false, error: { code: 'MAIL_CATALOG_UNVERIFIED' } }) });
+  app.mail.queue.scope = 'pending';
+  await app.ui.loadContactMailList('queue');
+  await app.ui.reconcileContactMailPendingFromUi();
+  const requestId = app.calls.find((call) => call.name === 'reconcileContactMailPending').args[0].requestId;
+  assert.equal(app.mail.queue.reconcileRequestId, requestId);
+  assert.equal(app.mail.queue.reconcileNeedsReadback, true);
+  await app.ui.loadContactMailList('queue');
+  assert.equal(app.mail.queue.reconcileRequestId, '');
+  assert.equal(app.mail.queue.reconcilePageToken, '');
+  await app.ui.reconcileContactMailPendingFromUi();
+  assert.notEqual(app.calls.filter((call) => call.name === 'reconcileContactMailPending').at(-1).args[0].requestId, requestId);
 });
 
 test('post-cutoff case mail stays visible beside fixed-period no-mail confirmation across pages', async () => {
