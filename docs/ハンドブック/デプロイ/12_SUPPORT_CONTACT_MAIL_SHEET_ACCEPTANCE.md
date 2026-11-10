@@ -26,7 +26,7 @@
 3. 独立したGmail manifestを取得する。
 4. 読取り専用のApp manifestを取得する。
 5. 同じ入力でこの関数を再度呼び、Sheet-afterを取得する。
-6. Sheet-beforeとSheet-afterの全行・catalogDigestが一致し、Sheet-afterのcapturedAtがGmail/App取得後であることを照合器で確認する。
+6. Sheet-beforeとSheet-afterの全行が一致し、Sheet-afterのcapturedAtがGmail/App取得後であることを照合器で確認する。両receiptのcatalogDigestは受入記録で照合する。
 
 各呼出しでも正本を2回読み、受付ID・受付日時・状態・終了日時が一致した場合だけ完了結果を返します。200件の上限は設けず、保存先の全データ行を確認します。空の保存先、受付IDを欠く非空行、不正・重複ID、不正日時、状態と終了日時の不整合、基準日時より後の受付、読取り間の変更は固定エラーで停止します。行の不備を黙って省略せず、基準日時より後の受付があれば新しい基準で同期と採取をやり直します。
 

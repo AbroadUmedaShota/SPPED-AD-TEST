@@ -30,7 +30,7 @@ app固有キーは `catalog`、`syncComplete`、`residualCount`、`noMailConfirm
 
 ## source採取の条件
 
-1. 受入の期間とcutoffを固定し、業務更新・同期・削除と重ならない採取窓を用意する。Sheet-before → Gmail → app → Sheet-afterの順で採る。Sheet採取はそれぞれA/B/N/R列の全行を2回読み、ID・受付日時・状態・終了日時のprojectionが一致した場合だけmanifestを確定する。採取窓の前後Sheetも照合器で比較する。sourceをまたぐ原子的snapshotではなく、変更が観測されない限定された観測窓である。catalogとSheetの内容が変われば新しいrunで採り直す。
+1. 受入の期間とcutoffを固定し、業務更新・同期・削除と重ならない採取窓を用意する。Sheet-before → Gmail → app → Sheet-afterの順で採る。Sheet採取はそれぞれ全グリッドを2回読み、A/B/N/R列に相当するID・受付日時・状態・終了日時のprojectionが一致した場合だけmanifestを確定する。採取窓の前後Sheetも照合器で比較する。sourceをまたぐ原子的snapshotではなく、変更が観測されない限定された観測窓である。catalogとSheetの内容が変われば新しいrunで採り直す。
 2. `captureGmailAcceptance.mjs` は注入したGmail adapterの`getProfile`、検索条件なしの`listAllMessageIds`、本文を返さない`getMessageMetadata`だけを使う。全ID重複なし、全ページ末尾到達、全ID metadata成功、前後profileのhistoryId/messagesTotal不変、列挙実数とmessagesTotal一致を要求する。Gmailの`resultSizeEstimate`は完全性の証拠に使わない。途中失敗・変更・上限到来は失敗として保存し、自動retryしない。
 3. Firestoreはread-only transactionの同じsnapshotからcatalog・sync/lease/保守状態・全messages・削除診断・suppressionを読み、ID/doc整合とcatalog完全性を検証する。本文や宛先等はmanifestへ出さず、active lease・purge・同期失敗・未解決診断を残件とする。
 4. 採取元・時刻・version/digestと受入担当を既存のprivate記録へ残す。manifest自体は署名付き証拠ではないため、手作りの値から本番PASSを作らない。
