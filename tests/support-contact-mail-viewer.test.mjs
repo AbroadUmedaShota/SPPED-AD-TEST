@@ -136,7 +136,9 @@ test('catalog is authoritative, stable and bounded beyond 200 cases', () => {
   const ids = Array.from({ length: 1201 }, (_, index) => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`);
   const app = bridgeRuntime({ ids: ids.slice().reverse() });
   app.respond((envelope) => ({ ok: true, catalog: { complete: envelope.payload.pageIndex === envelope.payload.pageCount - 1 } }));
-  const first = app.api.advanceContactMailSync({ caseIds: ['untrusted'] });
+  const plan = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  assert.equal(app.calls.length, 0);
+  const first = app.api.advanceContactMailSync({ catalog: plan, caseIds: ['untrusted'] });
   assert.equal(first.catalog.complete, false);
   assert.equal(first.catalog.nextPageIndex, 5);
   assert.equal(app.calls.length, 5);
@@ -153,13 +155,34 @@ test('catalog is authoritative, stable and bounded beyond 200 cases', () => {
   assert.equal(app.calls.length, count);
 });
 
+test('catalog preparation never uploads and retry preserves snapshot pages while source changes conflict', () => {
+  const ids = Array.from({ length: 401 }, (_, index) => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`);
+  const app = bridgeRuntime({ ids });
+  const snapshotId = randomUUID();
+  const plan = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId } }).catalog;
+  assert.equal(app.calls.length, 0);
+  assert.equal(plan.snapshotId, snapshotId);
+  assert.equal(plan.nextPageIndex, 0);
+  app.respond((envelope) => app.calls.length === 2 ? { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } : { ok: true, catalog: { complete: envelope.payload.pageIndex === 2 } });
+  assert.equal(app.api.advanceContactMailSync({ catalog: plan }).error.code, 'MAIL_UPSTREAM_TIMEOUT');
+  const firstPages = app.calls.map((call) => call.envelope.payload);
+  assert.equal(app.api.advanceContactMailSync({ catalog: plan }).catalog.complete, true);
+  assert.deepEqual(app.calls.slice(2, 4).map((call) => call.envelope.payload), firstPages);
+  assert.ok(app.calls.every((call) => call.envelope.payload.snapshotId === snapshotId && call.envelope.payload.digest === plan.digest));
+  const before = app.calls.length;
+  ids.push('00000000-0000-4000-8000-999999999999');
+  assert.equal(app.api.advanceContactMailSync({ catalog: plan }).error.code, 'CONFLICT');
+  assert.equal(app.calls.length, before);
+  assert.throws(() => app.api.advanceContactMailSync({}), /同期ID/);
+});
+
 test('only domain users can upload catalog or advance a bounded sync', () => {
   const app = bridgeRuntime({ actor: { email: 'customer@speed-ad.com', authMode: 'google-oauth' } });
   assert.throws(() => app.api.advanceContactMailSync({}), /権限/);
   assert.equal(app.calls.length, 0);
   app.setActor({ email: 'reader@abroad-o.com', authMode: 'domain' });
   app.respond(() => ({ ok: true, catalog: { complete: true } }));
-  const catalog = app.api.advanceContactMailSync({}).catalog;
+  const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
   app.calls.length = 0;
   const executionId = randomUUID();
   app.api.advanceContactMailSync({ executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, requestId: randomUUID() });
@@ -170,7 +193,7 @@ test('full sync period comes from earliest authoritative date with whole-mailbox
   for (const [date, expected] of [['2026-11-10T04:00:00Z', '2026-11-08T15:00:00.000Z'], [new Date('2026-11-10T23:00:00Z'), '2026-11-09T15:00:00.000Z'], ['', null], ['invalid', null], ['2026-02-30T00:00:00Z', null]]) {
     const app = bridgeRuntime({ dates: [date] });
     app.respond(() => ({ ok: true, catalog: { complete: true } }));
-    const catalog = app.api.advanceContactMailSync({}).catalog;
+    const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
     assert.equal(catalog.startAt, expected);
     app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, startAt: '2099-01-01T00:00:00Z' });
     assert.equal(app.calls.at(-1).envelope.payload.startAt || null, expected);
@@ -179,7 +202,14 @@ test('full sync period comes from earliest authoritative date with whole-mailbox
 
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
-const sync = { state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false };
+const sync = { state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: null, historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
+const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', ...extra } });
+const catalogResponse = (options, total = 1) => {
+  const catalog = { ...options.catalog, digest: 'a'.repeat(64), pageCount: Math.max(1, Math.ceil(total / 200)), total, startAt: null };
+  catalog.nextPageIndex = options.prepareCatalog ? 0 : Math.min(catalog.nextPageIndex + 5, catalog.pageCount);
+  catalog.complete = !options.prepareCatalog && catalog.nextPageIndex === catalog.pageCount;
+  return { ok: true, catalog };
+};
 const list = (messages, page = {}) => ({ ok: true, messages, page: { nextPageToken: '', previousPageToken: '', pageSize: 50, ...page }, sync });
 
 function uiRuntime(handlers = {}) {
@@ -341,10 +371,10 @@ test('empty case mail is an observed mapping result with incomplete-work guidanc
 test('foreground sync continues successful batches and retains unknown-result request ID for manual retry', async () => {
   let advances = 0;
   const app = uiRuntime({ advanceContactMailSync: (options) => {
-    if (!options.executionId) return { ok: true, catalog: { complete: true, nextPageIndex: 1, pageCount: 1, digest: 'digest', snapshotId: randomUUID() } };
+    if (!options.executionId) return catalogResponse(options);
     advances++;
     if (advances === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
-    return { ok: true, sync: { ...sync, state: advances === 2 ? 'running' : 'complete', executionId: options.executionId } };
+    return syncResponse(options.executionId, advances === 2 ? 'running' : 'complete');
   } });
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(advances, 1);
@@ -355,11 +385,11 @@ test('foreground sync continues successful batches and retains unknown-result re
   assert.equal(requests[0].args[0].requestId, requests[1].args[0].requestId);
   assert.notEqual(requests[1].args[0].requestId, requests[2].args[0].requestId);
   assert.equal(app.mail.syncProgress, null);
-  assert.equal(app.calls.filter((call) => call.name === 'advanceContactMailSync' && !call.args[0].executionId).length, 1);
+  assert.equal(app.calls.filter((call) => call.name === 'advanceContactMailSync' && !call.args[0].executionId).length, 2);
 });
 
 test('foreground sync yields after 20 successful batches and preserves case detail', async () => {
-  const app = uiRuntime({ advanceContactMailSync: (options) => ({ ok: true, sync: { ...sync, state: 'running', executionId: options.executionId } }) });
+  const app = uiRuntime({ advanceContactMailSync: (options) => syncResponse(options.executionId) });
   const executionId = randomUUID();
   app.mail.sync = { ...sync, state: 'running', executionId };
   app.state.detail = { submission_id: caseId, internal_note: '編集中' };
@@ -373,11 +403,11 @@ test('foreground sync yields after 20 successful batches and preserves case deta
 });
 
 test('catalog upload remains bounded and failed execution resumes only until success', async () => {
-  const catalogApp = uiRuntime({ advanceContactMailSync: () => ({ ok: true, catalog: { complete: false, nextPageIndex: 5, pageCount: 7 } }) });
+  const catalogApp = uiRuntime({ advanceContactMailSync: (options) => catalogResponse(options, 1201) });
   await catalogApp.ui.advanceContactMailSyncFromUi();
-  assert.equal(catalogApp.calls.length, 1);
+  assert.equal(catalogApp.calls.length, 2);
   assert.equal(catalogApp.mail.syncProgress.catalog.nextPageIndex, 5);
-  const app = uiRuntime({ advanceContactMailSync: (options) => ({ ok: true, sync: { ...sync, state: options.resume ? 'running' : 'complete', executionId: options.executionId } }) });
+  const app = uiRuntime({ advanceContactMailSync: (options) => syncResponse(options.executionId, options.resume ? 'running' : 'complete') });
   app.mail.sync = { ...sync, state: 'failed', executionId: randomUUID() };
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(app.calls.length, 2);
@@ -387,7 +417,7 @@ test('catalog upload remains bounded and failed execution resumes only until suc
 
 test('stop control waits for the current result and prevents further foreground requests', async () => {
   let finish;
-  const app = uiRuntime({ advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve({ ok: true, sync: { ...sync, state: 'running', executionId: options.executionId } }); }) });
+  const app = uiRuntime({ advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve(syncResponse(options.executionId)); }) });
   app.mail.sync = { ...sync, state: 'running', executionId: randomUUID() };
   const pending = app.ui.advanceContactMailSyncFromUi();
   await new Promise(setImmediate);
@@ -405,7 +435,7 @@ test('stop control waits for the current result and prevents further foreground 
 
 test('sync observation timeout stops without retry and ignores late response', async () => {
   let finish;
-  const handlers = { advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve({ ok: true, sync: { ...sync, state: 'complete', executionId: options.executionId } }); }) };
+  const handlers = { advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve(syncResponse(options.executionId, 'complete')); }) };
   const app = uiRuntime(handlers);
   app.mail.sync = { ...sync, state: 'running', executionId: randomUUID() };
   const pending = app.ui.advanceContactMailSyncFromUi();
@@ -421,7 +451,7 @@ test('sync observation timeout stops without retry and ignores late response', a
   await new Promise(setImmediate);
   assert.equal(app.mail.sync.state, 'running');
   assert.equal(app.mail.syncProgress.requestId, requestId);
-  handlers.advanceContactMailSync = (options) => ({ ok: true, sync: { ...sync, state: 'complete', executionId: options.executionId } });
+  handlers.advanceContactMailSync = (options) => syncResponse(options.executionId, 'complete');
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(app.calls[1].args[0].requestId, requestId);
   assert.deepEqual(app.calls[1].args[0], app.calls[0].args[0]);
@@ -432,8 +462,8 @@ test('explicit failed-status observation starts a distinct resume request after 
   const executionId = randomUUID();
   let advances = 0;
   const app = uiRuntime({
-    advanceContactMailSync: (options) => ++advances === 1 ? { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } : { ok: true, sync: { ...sync, executionId, state: 'complete' } },
-    getContactMailSyncStatus: () => ({ ok: true, sync: { ...sync, executionId, state: 'failed' } }),
+    advanceContactMailSync: (options) => ++advances === 1 ? { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } : syncResponse(executionId, 'complete'),
+    getContactMailSyncStatus: () => syncResponse(executionId, 'failed'),
   });
   app.mail.sync = { ...sync, state: 'running', executionId };
   await app.ui.advanceContactMailSyncFromUi();
@@ -449,7 +479,7 @@ test('explicit failed-status observation starts a distinct resume request after 
 });
 
 test('successful full-sync-required response stops foreground continuation', async () => {
-  const app = uiRuntime({ advanceContactMailSync: (options) => ({ ok: true, sync: { ...sync, executionId: options.executionId, state: 'needs_full_sync' } }) });
+  const app = uiRuntime({ advanceContactMailSync: (options) => syncResponse(options.executionId, 'needs_full_sync') });
   app.mail.sync = { ...sync, state: 'running', executionId: randomUUID() };
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(app.calls.length, 1);
@@ -470,7 +500,7 @@ test('malformed sync responses stop continuation and retain unresolved request i
 
 test('auth loss invalidates in-flight sync results and clears continuation controls', async () => {
   let finish;
-  const app = uiRuntime({ advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve({ ok: true, sync: { ...sync, state: 'running', executionId: options.executionId } }); }) });
+  const app = uiRuntime({ advanceContactMailSync: (options) => new Promise((resolve) => { finish = () => resolve(syncResponse(options.executionId)); }) });
   app.mail.sync = { ...sync, state: 'running', executionId: randomUUID() };
   const pending = app.ui.advanceContactMailSyncFromUi();
   await new Promise(setImmediate);
@@ -483,6 +513,112 @@ test('auth loss invalidates in-flight sync results and clears continuation contr
   assert.equal(app.mail.syncBusy, false);
   assert.equal(app.element('stopMailSyncButton').hidden, true);
   assert.equal(app.element('mailSyncSummary').textContent, '');
+});
+
+test('busy response after an unknown outcome retains the exact pending request for manual retry', async () => {
+  let attempts = 0;
+  const app = uiRuntime({ advanceContactMailSync: (options) => {
+    attempts++;
+    if (attempts < 3) return { ok: false, error: { code: attempts === 1 ? 'MAIL_UPSTREAM_TIMEOUT' : 'MAIL_SYNC_BUSY' } };
+    return syncResponse(options.executionId, 'complete');
+  } });
+  app.mail.sync = syncResponse(randomUUID()).sync;
+  await app.ui.advanceContactMailSyncFromUi();
+  const original = JSON.parse(JSON.stringify(app.calls[0].args[0]));
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.ok(app.mail.syncProgress);
+  assert.equal(app.mail.syncProgress.requestId, original.requestId);
+  assert.deepEqual(JSON.parse(JSON.stringify(app.mail.syncProgress.requestPayload)), { executionId: original.executionId });
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[2].args[0])), original);
+  assert.equal(app.mail.syncProgress, null);
+});
+
+test('first catalog preparation has a client snapshot and retries unknown upload with identical plan', async () => {
+  let uploads = 0;
+  const digest = 'a'.repeat(64);
+  const app = uiRuntime({ advanceContactMailSync: (options) => {
+    if (options.prepareCatalog) return { ok: true, catalog: { ...options.catalog, digest, pageCount: 1, total: 1, complete: false, nextPageIndex: 0, startAt: null } };
+    if (!options.executionId) {
+      uploads++;
+      if (uploads === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
+      return { ok: true, catalog: { ...options.catalog, complete: true, nextPageIndex: 1 } };
+    }
+    return syncResponse(options.executionId, 'complete');
+  } });
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.match(app.calls[0].args[0].catalog.snapshotId, /^[a-f0-9-]{36}$/);
+  assert.equal(app.calls[0].args[0].prepareCatalog, true);
+  const firstUpload = JSON.parse(JSON.stringify(app.calls[1].args[0]));
+  assert.equal(firstUpload.catalog.digest, digest);
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[2].args[0])), firstUpload);
+  assert.equal(app.mail.syncProgress, null);
+});
+
+test('unknown catalog preparation retains the same client snapshot before any write', async () => {
+  let preparations = 0;
+  const app = uiRuntime({ advanceContactMailSync: (options) => {
+    if (options.prepareCatalog && ++preparations === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
+    return options.executionId ? syncResponse(options.executionId, 'complete') : catalogResponse(options);
+  } });
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(app.calls.length, 1);
+  const first = JSON.parse(JSON.stringify(app.calls[0].args[0]));
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[1].args[0])), first);
+  assert.equal(app.calls[2].args[0].catalog.snapshotId, first.catalog.snapshotId);
+  assert.equal(app.mail.syncProgress, null);
+});
+
+test('well-formed initial not-started sync status remains observable', async () => {
+  const initial = { ...sync, state: 'not_started', executionId: null, mode: null, cutoffAt: null, startAt: null, lastSuccessAt: null, historyAvailable: false, enumerationComplete: false };
+  const app = uiRuntime({ getContactMailSyncStatus: () => ({ ok: true, sync: initial }) });
+  await app.ui.loadContactMailSyncStatus();
+  assert.equal(app.mail.sync, initial);
+  assert.match(app.element('mailSyncSummary').textContent, /未同期/);
+});
+
+test('minimal running sync response is rejected before foreground continuation', async () => {
+  const app = uiRuntime({ advanceContactMailSync: (options) => ({ ok: true, sync: { state: 'running', executionId: options.executionId } }) });
+  app.mail.sync = syncResponse(randomUUID()).sync;
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(app.calls.length, 1);
+  assert.ok(app.mail.syncProgress.requestId);
+  assert.match(app.element('mailSyncSummary').textContent, /応答を確認できません/);
+});
+
+test('inconsistent sync progress fields stop without adopting or advancing the response', async () => {
+  for (const change of [
+    { remainingPages: false }, { processedCount: undefined }, { processedCount: NaN }, { processedCount: Infinity }, { processedCount: -1 },
+    { enumerationComplete: true }, { phase: 'unknown' }, { mode: 'unknown' }, { cutoffAt: 'invalid' }, { cutoffAt: '2026-02-30T00:00:00Z' },
+    { pendingCount: -1 }, { bodyUnverifiedCount: undefined }, { coverageUnverifiedCaseCount: Infinity }, { acceptanceReady: true },
+    { processedCount: 3 }, { cutoffAt: '2026-11-11T00:00:00Z' }, { startAt: '2026-11-01T00:00:00Z' }, { mode: 'history' },
+  ]) {
+    const executionId = randomUUID();
+    const app = uiRuntime({ advanceContactMailSync: () => syncResponse(executionId, 'running', change) });
+    const previous = syncResponse(executionId, 'running', { processedCount: 4 }).sync;
+    app.mail.sync = previous;
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(app.calls.length, 1, JSON.stringify(change));
+    assert.equal(app.mail.sync, previous);
+    assert.ok(app.mail.syncProgress.requestId);
+    assert.match(app.element('mailSyncSummary').textContent, /応答を確認できません/);
+  }
+});
+
+test('malformed status observation cannot replace a pending unknown-result request', async () => {
+  const executionId = randomUUID();
+  const app = uiRuntime({
+    advanceContactMailSync: () => ({ ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } }),
+    getContactMailSyncStatus: () => ({ ok: true, sync: { state: 'failed', executionId } }),
+  });
+  app.mail.sync = syncResponse(executionId).sync;
+  await app.ui.advanceContactMailSyncFromUi();
+  const requestId = app.mail.syncProgress.requestId;
+  await app.ui.loadContactMailSyncStatus();
+  assert.equal(app.mail.syncProgress.requestId, requestId);
+  assert.equal(app.mail.sync.state, 'running');
 });
 
 test('pending re-evaluation is explicit, bounded and domain-only', async () => {

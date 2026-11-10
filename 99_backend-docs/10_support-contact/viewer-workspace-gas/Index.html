@@ -1494,6 +1494,7 @@
       try {
         const result = contactMailResult(await callServer('getContactMailSyncStatus'));
         if (serial !== contactMailState.syncSerial) return;
+        validateContactMailSync(result.sync);
         contactMailState.sync = result.sync;
         const progress = contactMailState.syncProgress;
         if (progress && result.sync && result.sync.executionId === progress.executionId) {
@@ -1539,6 +1540,42 @@
       });
     }
 
+    function validateContactMailSync(sync, executionId) {
+      const invalid = () => { throw new Error('MAIL_INVALID_RESPONSE'); };
+      if (!sync || !['not_started', 'running', 'complete', 'needs_full_sync', 'failed'].includes(sync.state) ||
+          (executionId && sync.executionId !== executionId) ||
+          sync.remainingPages !== (sync.state === 'running') || sync.enumerationComplete !== (sync.state === 'complete') ||
+          typeof sync.historyAvailable !== 'boolean' || typeof sync.acceptanceReady !== 'boolean' ||
+          !['enumerate', 'finalize'].includes(sync.phase)) invalid();
+      const counts = ['processedCount', 'pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount'];
+      if (counts.some((key) => !Number.isSafeInteger(sync[key]) || sync[key] < 0) ||
+          (sync.coverageUnverifiedCaseCount !== null && (!Number.isSafeInteger(sync.coverageUnverifiedCaseCount) || sync.coverageUnverifiedCaseCount < 0))) invalid();
+      const validDate = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 19) === value.slice(0, 19);
+      if (sync.lastSuccessAt !== null && !validDate(sync.lastSuccessAt)) invalid();
+      if (sync.state === 'not_started') {
+        if (executionId || sync.executionId !== null || sync.mode !== null || sync.cutoffAt !== null || sync.startAt !== null || sync.processedCount !== 0) invalid();
+      } else if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(sync.executionId || '') || !['full', 'history'].includes(sync.mode) || !validDate(sync.cutoffAt) ||
+          (sync.startAt !== null && (!validDate(sync.startAt) || Date.parse(sync.startAt) > Date.parse(sync.cutoffAt)))) invalid();
+      if (sync.mode === 'history' && sync.phase !== 'enumerate') invalid();
+      const previous = contactMailState.sync;
+      if (previous && previous.executionId === sync.executionId &&
+          ((Number.isSafeInteger(previous.processedCount) && sync.processedCount < previous.processedCount) ||
+           (previous.cutoffAt && sync.cutoffAt !== previous.cutoffAt) || (previous.mode && sync.mode !== previous.mode) ||
+           (Object.prototype.hasOwnProperty.call(previous, 'startAt') && sync.startAt !== previous.startAt) ||
+           (previous.phase === 'finalize' && sync.phase !== 'finalize'))) invalid();
+      if (sync.acceptanceReady && (sync.state !== 'complete' || sync.coverageUnverifiedCaseCount !== 0 || counts.some((key) => key !== 'processedCount' && sync[key] !== 0))) invalid();
+    }
+
+    function validateContactMailCatalog(catalog, previous, prepared) {
+      if (!catalog || catalog.snapshotId !== previous.snapshotId || !/^[a-f0-9]{64}$/.test(catalog.digest || '') ||
+          !Number.isSafeInteger(catalog.total) || catalog.total < 0 || catalog.pageCount !== Math.max(1, Math.ceil(catalog.total / 200)) ||
+          !Number.isSafeInteger(catalog.nextPageIndex) || catalog.nextPageIndex < 0 || catalog.nextPageIndex > catalog.pageCount ||
+          typeof catalog.complete !== 'boolean' || (catalog.startAt !== null && (typeof catalog.startAt !== 'string' || !Number.isFinite(Date.parse(catalog.startAt)))) ||
+          (prepared ? catalog.complete || catalog.nextPageIndex !== 0 :
+            catalog.digest !== previous.digest || catalog.total !== previous.total || catalog.pageCount !== previous.pageCount || catalog.startAt !== previous.startAt ||
+            catalog.nextPageIndex !== Math.min(previous.nextPageIndex + 5, previous.pageCount) || catalog.complete !== (catalog.nextPageIndex === catalog.pageCount))) throw new Error('MAIL_INVALID_RESPONSE');
+    }
+
     async function advanceContactMailSyncFromUi() {
       if (contactMailState.syncBusy || !viewerContext.allowed || viewerContext.authMode !== 'domain') return;
       const serial = ++contactMailState.syncSerial;
@@ -1552,10 +1589,18 @@
       try {
         if (!progress.executionId) {
           element.textContent = '正本の受付IDを照合中...';
-          const catalogResult = contactMailResult(await callContactMailSync(progress.catalog ? { catalog: progress.catalog } : {}));
+          progress.catalog = progress.catalog || { snapshotId: window.crypto.randomUUID(), nextPageIndex: 0 };
+          if (!progress.catalog.digest) {
+            const prepared = contactMailResult(await callContactMailSync({ prepareCatalog: true, catalog: progress.catalog }));
+            if (serial !== contactMailState.syncSerial) return;
+            validateContactMailCatalog(prepared.catalog, progress.catalog, true);
+            progress.catalog = prepared.catalog;
+            if (contactMailState.syncStopRequested) { element.textContent = '受付ID登録の続行を止めました。続行ボタンから再開できます。'; return; }
+          }
+          const catalogResult = contactMailResult(await callContactMailSync({ catalog: progress.catalog }));
           if (serial !== contactMailState.syncSerial) return;
           const catalog = catalogResult.catalog;
-          if (!catalog || typeof catalog.complete !== 'boolean' || !Number.isInteger(catalog.nextPageIndex) || !Number.isInteger(catalog.pageCount) || catalog.nextPageIndex > catalog.pageCount) throw new Error('MAIL_INVALID_RESPONSE');
+          validateContactMailCatalog(catalog, progress.catalog, false);
           progress.catalog = catalog;
           progress.periodText = catalog.startAt ? `同期対象: ${formatDate(catalog.startAt)}以降` : '受付日時に欠落・不正または受付なしのため、同期対象は公式窓口の全保存メールです。';
           if (!catalog.complete) { element.textContent = `受付IDを照合中: ${catalog.nextPageIndex} / ${catalog.pageCount}ページ。続行ボタンで次へ進めます。`; return; }
@@ -1577,7 +1622,7 @@
             ...progress.requestPayload, requestId: progress.requestId,
           }));
           if (serial !== contactMailState.syncSerial) return;
-          if (!result.sync || !['running', 'complete', 'needs_full_sync', 'failed'].includes(result.sync.state) || result.sync.executionId !== progress.executionId) throw new Error('MAIL_INVALID_RESPONSE');
+          validateContactMailSync(result.sync, progress.executionId);
           progress.started = true;
           progress.requestId = '';
           progress.requestPayload = null;
@@ -1594,7 +1639,7 @@
         }
       } catch (error) {
         if (serial !== contactMailState.syncSerial) return;
-        if (['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT', 'MAIL_SYNC_BUSY'].includes(error.message)) contactMailState.syncProgress = null;
+        if (['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
         element.textContent = `${contactMailErrorText(error.message)} 自動では再試行しません。送信済みの処理が終了したとは限りません。同期状態を更新するか、続行ボタンから明示的に再確認できます。`;
       } finally {
         if (serial === contactMailState.syncSerial) { contactMailState.syncBusy = false; renderContactMailSyncButton(); }

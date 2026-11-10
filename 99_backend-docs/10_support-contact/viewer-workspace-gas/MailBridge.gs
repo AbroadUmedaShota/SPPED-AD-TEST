@@ -103,9 +103,10 @@ function advanceContactMailSync(options, authProof) {
   var digest = source.digest;
   var pageCount = Math.max(1, Math.ceil(ids.length / 200));
   var previous = options.catalog || {};
-  var snapshotId = previous.snapshotId ? mailUuid_(previous.snapshotId) : Utilities.getUuid();
-  var pageIndex = previous.nextPageIndex || 0;
-  if (previous.digest && previous.digest !== digest) return mailError_('CONFLICT');
+  var snapshotId = mailUuid_(previous.snapshotId);
+  if (options.prepareCatalog === true) return { ok: true, catalog: { snapshotId: snapshotId, digest: digest, nextPageIndex: 0, pageCount: pageCount, total: ids.length, complete: false, startAt: source.startAt } };
+  var pageIndex = previous.nextPageIndex;
+  if (previous.digest !== digest || previous.pageCount !== pageCount || previous.total !== ids.length || previous.startAt !== source.startAt) return mailError_('CONFLICT');
   if (!Number.isInteger(pageIndex) || pageIndex < 0 || pageIndex >= pageCount) throw new Error('受付ID照合のページが不正です。');
   var lastResult;
   var end = Math.min(pageCount, pageIndex + 5);
