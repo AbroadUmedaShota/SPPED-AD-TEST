@@ -42,6 +42,8 @@ GmailメールIDと案件IDをSHA-256で変換した最小マーカーを保持�
 
 人が除外を確定した時刻 `excludedAt` をサーバーで記録します。旧記録の空欄は推定せず、削除対象から外して `unknownExclusionCount` に表示します。下書きの自動除外は対象外です。
 
+案件参照を含む履歴や他メールと共有する記録を持つ期限切れ除外メールは、関連記録とともに保持して `unsafeExclusionCount` に数えます。他の安全な期限切れ除外メールの処理は進め、保持した残件は個別に照合します。
+
 ```powershell
 node tools/purgeMailMetadata.mjs --project '<approved-project>' --confirm-project '<same-project>' --database '(default)' --expired-exclusions --request-reference '<verified-retention-operation>'
 ```

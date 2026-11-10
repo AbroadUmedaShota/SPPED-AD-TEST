@@ -143,6 +143,37 @@ test('review request UUIDs are not case references, while actual shared event ca
   await assert.rejects(shared.purge.plan(target, 'shared'), { code: 'MAIL_PURGE_SHARED_EVENT' });
 });
 
+test('unsafe expired exclusions remain residuals without blocking independent safe deletions', async () => {
+  const expired = (messageId) => ({ messageId, matchState: 'excluded', sourceKind: 'mail', excludedAt: '2023-11-10T09:00:00.000Z' });
+  const db = memoryFirestore({
+    [`${root}/messages/safe`]: expired('safe'),
+    [`${root}/messages/unsafe`]: expired('unsafe'),
+    [`${root}/messages/shared`]: expired('shared'),
+    [`${root}/messages/another`]: expired('another'),
+    [`${root}/messages/recent`]: { ...expired('recent'), excludedAt: '2026-11-10T09:00:00.000Z' },
+    [`${root}/events/safe-event`]: { messageId: 'safe', requestId: other },
+    [`${root}/events/unsafe-event`]: { messageId: 'unsafe', previous: { caseId: target }, next: { caseId: null } },
+    [`${root}/events/recent-shared-event`]: { messageId: 'another', related: { messageId: 'recent' } },
+    [`${root}/receipts/request-shared-uuid`]: { result: { messages: [{ messageId: 'unsafe' }, { messageId: 'shared' }] } },
+    [`${root}/meta/sync`]: { state: 'complete', failedMessageIds: ['safe', 'unsafe'] }
+  });
+  const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-10T09:00:00.000Z') });
+  const before = JSON.stringify([...db.records]);
+  const plan = await purge.planExpiredExclusions('partial-exclusions');
+  assert.equal(plan.messageCount, 1);
+  assert.equal(plan.unsafeExclusionCount, 3);
+  assert.equal(JSON.stringify([...db.records]), before);
+  await purge.applyExpiredExclusions('partial-exclusions', plan.planHash);
+  assert(!db.records.has(`${root}/messages/safe`));
+  assert(!db.records.has(`${root}/events/safe-event`));
+  for (const path of ['messages/unsafe', 'messages/shared', 'messages/another', 'messages/recent', 'events/unsafe-event', 'events/recent-shared-event', 'receipts/request-shared-uuid']) {
+    assert(db.records.has(`${root}/${path}`));
+  }
+  const residual = await purge.planExpiredExclusions('remaining-exclusions');
+  assert.equal(residual.messageCount, 0);
+  assert.equal(residual.unsafeExclusionCount, 3);
+});
+
 test('unvalidated jobs recheck expiry after reopening, validation failure and interruption', async () => {
   for (const scenario of ['reopened', 'validation-error', 'interrupted']) {
     const cases = [{ caseId: target, handledStatus: '対応済み', closedAt: '2023-11-10T09:00:00.000Z' },
@@ -209,6 +240,36 @@ test('a delayed duplicate purge cannot delete data created after the completed g
   release();
   await rejected;
   assert.deepEqual(db.records.get(`${root}/meta/sync`), newSync);
+});
+
+test('a stale pre-lock scan cannot acquire a new job after another purge completes', async () => {
+  const { db, purge } = fixture();
+  const plan = await purge.plan(target, 'stale-lock');
+  const originalTransaction = db.runTransaction.bind(db);
+  let transactions = 0;
+  let release;
+  let paused;
+  const waiting = new Promise((resolve) => { paused = resolve; });
+  db.runTransaction = async (operation) => {
+    if (++transactions === 1) {
+      paused();
+      await new Promise((resolve) => { release = resolve; });
+    }
+    return originalTransaction(operation);
+  };
+  const stale = purge.apply(target, 'stale-lock', plan.planHash);
+  await waiting;
+  const rejected = assert.rejects(stale, { code: 'MAIL_PURGE_PLAN_CHANGED' });
+  await purge.apply(target, 'stale-lock', plan.planHash);
+  const newSync = { state: 'complete', historyId: 'after-completion' };
+  db.records.set(`${root}/meta/sync`, newSync);
+  release();
+  await rejected;
+  assert.deepEqual(db.records.get(`${root}/meta/sync`), newSync);
+  assert.equal(db.records.get(`${root}/meta/purgeControl`).active, undefined);
+  assert(!db.records.has(`${root}/meta/purgeJob`));
+  const store = createFirestoreStore(db);
+  assert.equal((await store.withAccess(() => store.getMessage('mailB'))).caseId, other);
 });
 
 test('unknown collections and nested data block a partial deletion', async () => {
