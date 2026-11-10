@@ -1,8 +1,8 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
-import { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE } from '../runtime/mailboxDisclosure.mjs';
+import { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE } from '../runtime/mailboxDisclosure.mjs';
 
-export { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE };
+export { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE };
 
 export const MAILBOX = 'customer@speed-ad.com';
 export const GMAIL_READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
@@ -39,6 +39,7 @@ export function mailboxDisclosure(options) {
 要求権限: ${GMAIL_READONLY_SCOPE}（メールと添付の読取り。送信・変更・削除の権限は要求しません。）
 ${MAILBOX_SYNC_DISCLOSURE}
 ${MAILBOX_MARKER_DISCLOSURE}
+${MAILBOX_ACCEPTANCE_DISCLOSURE}
 共有: アプリの認証を通った abroad-o.com の社員全員と公式窓口の利用者が、対象メールの本文・添付、照合待ち、確認記録を閲覧できます。問い合わせ対応のため、この範囲の人による閲覧に同意する場合だけ続行してください。Google Cloud上で処理・保存します。
 保存: 件名、差出人・宛先、日時、メール/スレッドID、添付名などの添付情報、案件との照合、確認者・日時、同期位置と監査記録をFirestoreへ保存します。本文は同期時の照合と閲覧時に取得します。添付本体は主に閲覧時に取得しますが、Gmailのメール応答に本文と一緒に含まれる添付データは同期時にも一時的に受信します。本文・添付本体はサーバーの一時メモリと利用者画面で処理し、Firestoreへ保存しません。継続読取りの資格情報と、この説明全文・説明version・hash・同意日時・確認済み窓口の同意記録を同じSecret Manager versionへ保存します。
 保存方針: Gmail由来の照合・確認記録は案件終了後3年間、除外したメールの記録は除外確定後3年間保存します。照合待ちの記録は案件への照合または除外を確定するまで3年間の起算日が決まらないため保持します。期限削除は管理者が手動で実行します。実施方法: ${options.retentionNotice.trim()}

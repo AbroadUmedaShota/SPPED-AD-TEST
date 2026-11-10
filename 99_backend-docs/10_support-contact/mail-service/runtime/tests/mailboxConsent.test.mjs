@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createRuntimeGmailAdapter } from '../mailboxConsent.mjs';
-import { MAILBOX, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, mailboxDisclosure } from '../../tools/mailboxOnboarding.mjs';
+import { MAILBOX, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE, mailboxDisclosure } from '../../tools/mailboxOnboarding.mjs';
 
 const disclosure = mailboxDisclosure({ retentionNotice: '管理者が期限を確認して手動削除', deletionContact: 'ops@example.com' });
 const digest = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
@@ -20,14 +20,17 @@ test('normal runtime rejects missing, old and altered consent before constructin
   });
   const omittedSync = disclosure.replace(MAILBOX_SYNC_DISCLOSURE, '');
   const omittedMarker = disclosure.replace(MAILBOX_MARKER_DISCLOSURE, '');
+  const omittedAcceptance = disclosure.replace(MAILBOX_ACCEPTANCE_DISCLOSURE, '');
   for (const invalid of [undefined, { ...receipt, disclosureVersion: '2026-11-11.2' },
     { ...receipt, disclosureVersion: '2026-11-11.3' },
     { ...receipt, disclosureVersion: '2026-11-11.4' },
+    { ...receipt, disclosureVersion: '2026-11-11.5' },
     { ...receipt, verifiedMailbox: 'other@example.com' }, { ...receipt, acceptedAt: undefined },
     { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, acceptedAt: '2026-11-11T00:00:00Z' },
     { ...receipt, disclosureSha256: '0'.repeat(64) },
     { ...receipt, disclosure: omittedSync, disclosureSha256: digest(omittedSync) },
-    { ...receipt, disclosure: omittedMarker, disclosureSha256: digest(omittedMarker) }]) {
+    { ...receipt, disclosure: omittedMarker, disclosureSha256: digest(omittedMarker) },
+    { ...receipt, disclosure: omittedAcceptance, disclosureSha256: digest(omittedAcceptance) }]) {
     await assert.rejects(create(invalid), { code: 'MAIL_CONSENT_OUTDATED' });
   }
   // Callers cannot disable the runtime's mandatory receipt checks through options.

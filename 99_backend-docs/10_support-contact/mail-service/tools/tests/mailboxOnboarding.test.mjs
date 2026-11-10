@@ -93,6 +93,10 @@ test('PKCE offline consent atomically stores verified credentials and the exact 
   assert.match(calls.disclosure, /迷惑メール・ゴミ箱を含み、下書きは除きます/);
   assert.match(calls.disclosure, /同期対象期間外、下書き、迷惑メール、ゴミ箱も含めてGmail全体のメールIDを列挙/);
   assert.match(calls.disclosure, /hash集合をFirestoreに処理完了または取消しまで一時保存/);
+  assert.match(calls.disclosure, /全件確認の受入照合/);
+  assert.match(calls.disclosure, /Gmail全体のメールID・ラベル・内部日時を一時取得/);
+  assert.match(calls.disclosure, /hash・内部日時・下書きかどうかを管理者限定の端末ファイルへ一時保存/);
+  assert.match(calls.disclosure, /一時鍵とsourceファイルは当該受入作業終了時に削除/);
   assert.match(calls.disclosure, /純粋な下書きも、削除履歴を未確認メールの削除と誤判定しないため、メールID由来の最小hashだけを保持/);
   assert.match(calls.disclosure, /下書きの元ID、ラベル、内部日時、件名、宛先、本文、添付はこの記録に保存しません/);
   assert.match(calls.disclosure, /原本不在と削除履歴の処理済みを確認した後に最小hashを整理/);

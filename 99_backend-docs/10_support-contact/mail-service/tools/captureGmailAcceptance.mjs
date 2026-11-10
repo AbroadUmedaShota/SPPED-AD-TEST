@@ -5,8 +5,8 @@ const date = (v) => typeof v === 'string' && Number.isFinite(Date.parse(v)) && n
 const validProfile = (v) => v?.emailAddress?.toLowerCase() === 'customer@speed-ad.com' &&
   typeof v.historyId === 'string' && /^[0-9]{1,30}$/.test(v.historyId) && Number.isSafeInteger(v.messagesTotal) && v.messagesTotal >= 0;
 
-// Injectable read-only capture, deliberately without a credential-loading CLI.
-// A future live caller must validate the acceptance-purpose disclosure/consent first.
+// Injectable read-only capture; the separate CLI validates the current receipt
+// through createRuntimeGmailAdapter before passing an authenticated adapter here.
 export async function captureGmailAcceptance({ gmail, runId, key, hashKeyId, startAt, cutoffAt,
   now = () => new Date(), maxRows = 100000, maxPages = 10000 }) {
   if (!/^[A-Za-z0-9._-]{1,80}$/.test(runId || '') || !Buffer.isBuffer(key) || key.length < 32 ||

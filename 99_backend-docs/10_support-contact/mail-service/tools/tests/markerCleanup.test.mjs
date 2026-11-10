@@ -3,7 +3,8 @@ import test from 'node:test';
 import { createHash, randomUUID } from 'node:crypto';
 import { createMarkerCleanup } from '../markerCleanup.mjs';
 import { parseMarkerArguments, runMarkerCli } from '../cleanupMailMarkers.mjs';
-import { MAILBOX, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, mailboxDisclosure } from '../mailboxOnboarding.mjs';
+import { MAILBOX, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE, mailboxDisclosure } from '../mailboxOnboarding.mjs';
+import { createRuntimeGmailAdapter } from '../../runtime/mailboxConsent.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
 import { createPurgeGate, suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createGmailAdapter } from '../../runtime/googleAdapters.mjs';
@@ -206,23 +207,25 @@ test('marker cleanup rejects old or altered mailbox consent before creating an O
     disclosureSha256: createHash('sha256').update(disclosure, 'utf8').digest('hex'),
     acceptedAt: '2026-11-11T00:00:00.000Z', verifiedMailbox: MAILBOX };
   let clients = 0;
-  const create = async (consentReceipt) => createGmailAdapter({
+  const create = async (consentReceipt) => createRuntimeGmailAdapter({
     secretVersion: 'projects/test-project/secrets/mail/versions/1',
     secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({
       clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh', consentReceipt })) } }]; } },
-    createOAuthClient: () => { clients++; throw new Error('OAuth client should not be created'); },
-    requiredDisclosureVersion: MAILBOX_DISCLOSURE_VERSION,
-    requiredDisclosureClause: MAILBOX_MARKER_DISCLOSURE
+    createOAuthClient: () => { clients++; throw new Error('OAuth client should not be created'); }
   });
   const omittedClause = disclosure.replace(MAILBOX_MARKER_DISCLOSURE, '');
+  const omittedAcceptance = disclosure.replace(MAILBOX_ACCEPTANCE_DISCLOSURE, '');
   for (const old of [undefined, { ...receipt, disclosureVersion: '2026-11-10.1' },
     { ...receipt, disclosureVersion: '2026-11-11.1' },
     { ...receipt, disclosureVersion: '2026-11-11.3' },
     { ...receipt, disclosureVersion: '2026-11-11.4' },
+    { ...receipt, disclosureVersion: '2026-11-11.5' },
     { ...receipt, disclosure: 'altered' }, { ...receipt, acceptedAt: undefined },
     { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, verifiedMailbox: 'wrong@example.com' },
     { ...receipt, disclosure: omittedClause,
-      disclosureSha256: createHash('sha256').update(omittedClause, 'utf8').digest('hex') }]) {
+      disclosureSha256: createHash('sha256').update(omittedClause, 'utf8').digest('hex') },
+    { ...receipt, disclosure: omittedAcceptance,
+      disclosureSha256: createHash('sha256').update(omittedAcceptance, 'utf8').digest('hex') }]) {
     await assert.rejects(create(old), { code: 'MAIL_CONSENT_OUTDATED' });
   }
   assert.equal(clients, 0);
