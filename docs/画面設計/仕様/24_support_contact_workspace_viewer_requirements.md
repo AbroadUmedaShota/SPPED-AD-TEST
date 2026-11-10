@@ -68,7 +68,7 @@ last_reviewed: 2026-11-10
 | `getAttachmentPreview(submissionId, fileId, authProof?)` | 対象行に紐づく添付画像のbase64プレビュー |
 | `updateContactSubmissionStatus(submissionId, status, note, authProof?)` | ステータス・メモ・更新者・更新日時の保存 |
 
-上記2本の認証RPC以外の内部関数は末尾 `_` とし、削除・テスト・整理・セットアップの公開入口を設けない。必須列がないシートはエラーとし、閲覧時に列を作成しない。
+第1段階までの受付・認証RPCは上記の入口に限定する。第2段階のメールRPCは `MailBridge.gs` に設け、各呼出しで既存の利用者認可を行う。その他の内部関数は末尾 `_` とし、削除・テスト・整理・セットアップの公開入口を設けない。必須列がないシートはエラーとし、閲覧時に列を作成しない。
 
 一覧の `options` は既存の `status` / `query` / `limit` に加え、`pageSize` / `pageToken` / 任意の `selectedId` を受ける。`pageSize` がある場合は `limit` より優先し、1〜200へ制限する。未指定時は従来どおり100件。返却する `page` は `size`、検索・状態絞込み後の `total`、表示範囲の `from` / `to`（1始まり、0件は0）、`previousPageToken` / `nextPageToken` を持つ。`selectedId` がある場合はサーバーの絞込み結果への包含を `selectedMatches` の真偽値で返し、条件外ならページトークンを使わず先頭ページを返す。指定なしの `selectedMatches` はnull。ページトークンは並び順の日時・受付IDと検索・状態条件を保持し、別条件や不正なトークンは拒否する。トークンは認可情報ではなく、各呼出しで既存の利用者認可を行う。画面は件数・範囲・ページトークン・受付IDの整合を検証してから一覧を採用する。
 
@@ -81,7 +81,7 @@ last_reviewed: 2026-11-10
 - `未対応` / `対応中` / `対応済み` / `保留` のみ保存可能。存在しないIDや不正ステータスでは書き込まない。
 - 保存対象は対応状態、内部メモ、実更新者、更新日時だけ。メモは前後空白を除去し、数式として評価されない文字列で保存する。同時編集は従来どおり後から保存した値が残る。
 - 投稿内容・メモ・添付名をHTMLとして実行せずエスケープする。テンプレート内JSONは `<` をUnicodeエスケープし、投稿元/添付リンクはHTTP(S)のみに制限する。
-- 外部OCRや外部解析を追加しない。manifestスコープは `spreadsheets`、`drive.readonly`、`userinfo.email`、`script.external_request` のみ。OAuth要求は `openid email` のみ。
+- 外部OCRや外部解析を追加しない。第1段階のmanifestスコープは `spreadsheets`、`drive.readonly`、`userinfo.email`、`script.external_request`。第2段階はCloud Run呼出し用のID token取得に `openid` を追加し、GASへGmailスコープは追加しない。既存の利用者本人確認で要求するOAuthスコープは `openid email` のみ。
 
 ## 検証と配備後受入
 

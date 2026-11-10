@@ -26,7 +26,7 @@ Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audie
 | advanceSync | executionId、開始時mode:full/history、任意startAt、catalogSnapshotId/catalogDigest。失敗した同じ実行の明示再開だけresume:true |
 | reconcilePending | 任意pageToken |
 
-catalog・同期・再照合は社員操作だけに限定する。catalog digestは、小文字UUIDの重複を除いて昇順に並べ、改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用する。
+catalog・同期・再照合は社員操作だけに限定する。catalog digestは、重複のない小文字UUIDを昇順に並べ、改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用する。
 
 残件一覧は種類を選び、保存済みメールを日時・messageId降順に50件ずつ走査する。該当0件のページにも次ページが残る場合がある。同期失敗で未登録のメールID、案件別の関連メール有無が未確認の受付ID、取得前削除で種類未確認のIDも50件ずつ列挙する。受付ID一覧・失敗ID一覧の対象集合が変化したcursorは拒否し、更新して先頭から確認する。取得不能のメールは保存済みメタ情報と添付descriptorを表示し、本文取得不能でも添付確認経路を維持する。
 
