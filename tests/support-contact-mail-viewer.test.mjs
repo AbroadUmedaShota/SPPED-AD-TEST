@@ -18,7 +18,7 @@ test('mail service exposes only the authenticated business RPC surface', () => {
   assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'confirmContactCaseNoMail', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
-function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, statuses, closedDates, url = 'https://contact-mail-example.a.run.app' } = {}) {
+function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, statuses, closedDates, historyStartAt = '2026-11-08T15:00:00.000Z', url = 'https://contact-mail-example.a.run.app' } = {}) {
   const calls = [];
   const reads = [];
   const sourceDates = () => dates === undefined ? ids.map(() => '2026-11-10T00:00:00.000Z') : dates;
@@ -26,7 +26,7 @@ function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'doma
   const context = {
     requireViewer_() { if (!actor) throw new Error('権限がありません'); return actor; },
     findSubmission_(id) { reads.push(id); return ids.includes(id) ? { record: { submission_id: id } } : null; },
-    getProperty_: () => url,
+    getProperty_: (key) => key === 'MAIL_HISTORY_START_AT' ? historyStartAt : url,
     getSheet_: () => ({ getDataRange: () => ({ getValues: () => { const values = sourceDates(); return [values ? ['submission_id', 'submitted_at', 'handled_status', 'closed_at'] : ['submission_id', 'handled_status', 'closed_at'], ...ids.map((id, index) => values ? [id, values[index], statuses?.[index] || '未対応', closedDates?.[index] || ''] : [id, statuses?.[index] || '未対応', closedDates?.[index] || ''])]; } }) }),
     ensureHeaders_: () => sourceDates() ? ['submission_id', 'submitted_at', 'handled_status', 'closed_at'] : ['submission_id', 'handled_status', 'closed_at'],
     ScriptApp: { getIdentityToken: () => 'server-only-google-identity-token' },
@@ -40,7 +40,7 @@ function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'doma
   };
   vm.createContext(context);
   vm.runInContext(bridge, context, { filename: 'MailBridge.gs' });
-  return { api: context, calls, reads, respond(fn) { response = fn; }, setActor(value) { actor = value; }, setUrl(value) { url = value; } };
+  return { api: context, calls, reads, respond(fn) { response = fn; }, setActor(value) { actor = value; }, setUrl(value) { url = value; }, setHistoryStartAt(value) { historyStartAt = value; } };
 }
 
 test('every mail RPC authorizes before Sheet or service access', () => {
@@ -217,9 +217,9 @@ test('only domain users can upload catalog or advance a bounded sync', () => {
   assert.deepEqual(app.calls[0].envelope.payload, { executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, startAt: catalog.startAt });
 });
 
-test('sync period comes only from valid authoritative dates and is sent for full and history starts', () => {
+test('explicit sync period is bounded by authoritative dates and sent for full and history starts', () => {
   for (const [date, expected] of [['2026-11-10T04:00:00Z', '2026-11-08T15:00:00.000Z'], [new Date('2026-11-10T23:00:00Z'), '2026-11-09T15:00:00.000Z']]) {
-    const app = bridgeRuntime({ dates: [date] });
+    const app = bridgeRuntime({ dates: [date], historyStartAt: expected });
     app.respond(() => ({ ok: true, catalog: { complete: true } }));
     const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
     assert.equal(catalog.startAt, expected);
@@ -239,8 +239,41 @@ test('unknown period stops empty, missing and invalid Sheet dates before any ser
   }
 });
 
-test('unknown first-sync confirmation preserves the original plan after Sheet dates or IDs change', () => {
-  for (const change of ['date', 'new-case']) {
+test('sync requires an explicit canonical JST-midnight start no later than the Sheet safety bound', () => {
+  for (const historyStartAt of ['', null, 'invalid', '2026-11-08T15:00:00Z', '2026-11-08T15:00:00.001Z',
+    '2026-11-08T00:00:00.000Z', '2026-11-09T15:00:00.000Z', '2026-02-30T15:00:00.000Z']) {
+    const app = bridgeRuntime({ historyStartAt });
+    assert.throws(() => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }), /MAIL_PERIOD_REQUIRED/);
+    assert.equal(app.calls.length, 0);
+  }
+  const app = bridgeRuntime({ historyStartAt: '2026-01-01T15:00:00.000Z' });
+  const plan = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  assert.equal(plan.startAt, '2026-01-01T15:00:00.000Z');
+});
+
+test('Sheet date corrections and earliest-row removal never move the configured beginning later', () => {
+  const ids = [caseId, '22222222-2222-4222-8222-222222222222'];
+  const dates = ['2026-10-01T00:00:00.000Z', '2026-11-10T00:00:00.000Z'];
+  const app = bridgeRuntime({ ids, dates, historyStartAt: '2026-09-29T15:00:00.000Z' });
+  const prepare = () => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  assert.equal(prepare().startAt, '2026-09-29T15:00:00.000Z');
+  ids.shift(); dates.shift();
+  assert.equal(prepare().startAt, '2026-09-29T15:00:00.000Z');
+  dates[0] = '2026-09-01T00:00:00.000Z';
+  assert.throws(prepare, /MAIL_PERIOD_REQUIRED/);
+  assert.equal(app.calls.length, 0);
+});
+
+test('changing the configured beginning invalidates prepared uploads before dispatch', () => {
+  const app = bridgeRuntime();
+  const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  app.setHistoryStartAt('2026-10-01T15:00:00.000Z');
+  assert.equal(app.api.advanceContactMailSync({ catalog }).error.code, 'CONFLICT');
+  assert.equal(app.calls.length, 0);
+});
+
+test('unknown first-sync confirmation preserves the original plan after Sheet dates, IDs or period setting change', () => {
+  for (const change of ['date', 'new-case', 'period']) {
     const ids = [caseId];
     const dates = ['2026-11-10T04:00:00Z'];
     const app = bridgeRuntime({ ids, dates });
@@ -249,7 +282,8 @@ test('unknown first-sync confirmation preserves the original plan after Sheet da
     app.api.advanceContactMailSync(options);
     const original = JSON.parse(JSON.stringify(app.calls.at(-1).envelope.payload));
     if (change === 'date') dates[0] = '2026-10-01T04:00:00Z';
-    else { ids.push('22222222-2222-4222-8222-222222222222'); dates.push('2026-11-10T04:00:00Z'); }
+    else if (change === 'new-case') { ids.push('22222222-2222-4222-8222-222222222222'); dates.push('2026-11-10T04:00:00Z'); }
+    else app.setHistoryStartAt('2026-10-01T15:00:00.000Z');
     app.api.advanceContactMailSync({ ...options, confirmOnly: true });
     const confirmation = app.calls.at(-1).envelope;
     assert.equal(confirmation.operation, 'getSyncRequestResult');
@@ -343,6 +377,31 @@ function uiRuntime(handlers = {}) {
   return { ui: context, calls, elements, element, revoked, timers, mail: vm.runInContext('contactMailState', context), state: vm.runInContext('state', context),
     expireSyncCall() { const entry = [...timers].find(([, timer]) => timer.delay === 120000); assert.ok(entry); timers.delete(entry[0]); entry[1].fn(); } };
 }
+
+test('a changed configured period projects old status as unverified without rewriting its receipt', () => {
+  const startAt = '2026-11-08T15:00:00.000Z';
+  const completed = { ...sync, startAt, bodyUnverifiedCount: 0, acceptanceReady: true, noMailContextToken: 'a'.repeat(64) };
+  const confirmation = { email: 'reader@abroad-o.com', at: '2026-11-10T01:00:00.000Z', startAt, cutoffAt: completed.cutoffAt };
+  const app = bridgeRuntime({ historyStartAt: startAt });
+  app.respond(() => ({ ok: true, sync: completed, receipt: { sync: completed },
+    noMail: { eligible: true, contextToken: 'a'.repeat(64), confirmation, stale: false } }));
+  assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, true);
+  app.setHistoryStartAt('2026-10-01T15:00:00.000Z');
+  const result = app.api.getContactMailSyncStatus();
+  assert.equal(result.sync.startAt, startAt);
+  assert.equal(result.sync.state, 'needs_full_sync');
+  assert.equal(result.sync.acceptanceReady, false);
+  assert.equal(result.sync.enumerationComplete, false);
+  assert.equal(result.sync.errorCode, 'MAIL_PERIOD_REQUIRED');
+  assert.equal(result.receipt.sync.state, 'complete');
+  assert.equal(result.receipt.sync.acceptanceReady, true);
+  assert.deepEqual(JSON.parse(JSON.stringify(result.noMail)), { eligible: false, contextToken: null, confirmation: null, stale: true });
+  const ui = uiRuntime();
+  ui.ui.validateContactMailSync(result.sync);
+  ui.ui.validateContactCaseNoMail(result.noMail, result.sync);
+  app.setHistoryStartAt('');
+  assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, false);
+});
 
 test('mail UI navigates individual messages across page boundaries and renders text safely', async () => {
   const app = uiRuntime({
@@ -1662,7 +1721,7 @@ test('retention residual counts are visible and can never accompany technical re
 test('closure before receipt fails closed while equal and later receipt times are allowed', () => {
   const submitted = '2026-01-01T00:00:00.000Z';
   for (const closedAt of ['2025-12-31T23:59:59.999Z', submitted, '2026-01-01T00:00:00.001Z']) {
-    const app = bridgeRuntime({ dates: [submitted], statuses: ['対応済み'], closedDates: [closedAt] });
+    const app = bridgeRuntime({ dates: [submitted], statuses: ['対応済み'], closedDates: [closedAt], historyStartAt: '2025-12-30T15:00:00.000Z' });
     const operation = () => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } });
     if (closedAt < submitted) assert.throws(operation, /MAIL_CATALOG_INVALID/);
     else assert.equal(operation().ok, true);

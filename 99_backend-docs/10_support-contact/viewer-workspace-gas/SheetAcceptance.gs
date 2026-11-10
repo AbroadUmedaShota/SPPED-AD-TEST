@@ -83,7 +83,8 @@ function mailAcceptanceReadSource_(cutoffAt) {
     if (!rows.length || rows.length > 100000 || !isFinite(earliest)) throw new Error('invalid');
     rows.sort(function (a, b) { return a.caseId < b.caseId ? -1 : a.caseId > b.caseId ? 1 : 0; });
     var day = 86400000;
-    return { rows: rows, startAt: new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString() };
+    var derivedStartAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
+    return { rows: rows, startAt: mailHistoryStartAt_(derivedStartAt) };
   } catch (error) {
     if (error.message === 'MAIL_ACCEPTANCE_CUTOFF_CHANGED') throw error;
     throw new Error('MAIL_ACCEPTANCE_SOURCE_INVALID');

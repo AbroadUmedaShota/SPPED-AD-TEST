@@ -12,6 +12,8 @@ const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure, dis
   disclosureSha256: digest(disclosure), acceptedAt: '2026-11-11T00:00:00.000Z', verifiedMailbox: MAILBOX };
 
 test('normal runtime rejects missing, old and altered consent before constructing an OAuth client', async () => {
+  assert.match(disclosure, /管理者が開始日を明示設定した対象期間/);
+  assert.doesNotMatch(disclosure, /受付データから決まる対象期間/);
   assert.match(disclosure, /同期・再照合の対象判定では、対象期間外・下書きを含む候補メールのID・ラベル・内部日時だけを先に一時取得/);
   let clients = 0;
   const create = (consentReceipt, overrides = {}) => createRuntimeGmailAdapter({
@@ -28,6 +30,7 @@ test('normal runtime rejects missing, old and altered consent before constructin
     { ...receipt, disclosureVersion: '2026-11-11.4' },
     { ...receipt, disclosureVersion: '2026-11-11.5' },
     { ...receipt, disclosureVersion: '2026-11-11.7' },
+    { ...receipt, disclosureVersion: '2026-11-11.9' },
     { ...receipt, verifiedMailbox: 'other@example.com' }, { ...receipt, acceptedAt: undefined },
     { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, acceptedAt: '2026-11-11T01:05:00.001Z' },
     { ...receipt, disclosureParameters: undefined },

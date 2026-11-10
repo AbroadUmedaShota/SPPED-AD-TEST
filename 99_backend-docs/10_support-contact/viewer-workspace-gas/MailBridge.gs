@@ -12,7 +12,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
   'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
-  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_MAINTENANCE'
+  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_PERIOD_NARROWING', 'MAIL_PERIOD_EXPANSION_REQUIRED', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_MAINTENANCE'
 ];
 
 function listContactMail(options, authProof) {
@@ -196,8 +196,33 @@ function mailCatalogSource_() {
     return ('0' + ((byte + 256) % 256).toString(16)).slice(-2);
   }).join('');
   var day = 86400000;
-  var startAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
+  var derivedStartAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
+  var startAt = mailHistoryStartAt_(derivedStartAt);
   return { ids: ids, cases: cases, digest: digest, startAt: startAt };
+}
+
+function mailHistoryStartAt_(derivedStartAt) {
+  var startAt = getProperty_('MAIL_HISTORY_START_AT', '');
+  var millis = mailSubmittedAtMillis_(startAt);
+  if (typeof startAt !== 'string' || !isFinite(millis) || new Date(millis).toISOString() !== startAt ||
+      (millis + 32400000) % 86400000 !== 0 || (derivedStartAt && startAt > derivedStartAt)) throw new Error('MAIL_PERIOD_REQUIRED');
+  return startAt;
+}
+
+function mailCurrentPeriodResult_(result) {
+  if (!result.sync || result.sync.state === 'not_started') return result;
+  var startAt = null;
+  try { startAt = mailHistoryStartAt_(); } catch (_error) { /* An unset period cannot verify old results. */ }
+  if (startAt && result.sync.startAt === startAt) return result;
+  result.sync.state = 'needs_full_sync';
+  result.sync.acceptanceReady = false;
+  result.sync.enumerationComplete = false;
+  result.sync.remainingPages = false;
+  result.sync.noMailContextToken = null;
+  result.sync.errorCode = 'MAIL_PERIOD_REQUIRED';
+  if (result.noMail) result.noMail = { eligible: false, contextToken: null, confirmation: null,
+    stale: Boolean(result.noMail.confirmation || result.noMail.stale) };
+  return result;
 }
 
 function mailSubmittedAtMillis_(value) {
@@ -291,7 +316,7 @@ function callMailService_(operation, payload, context, requestId) {
     if (!result || typeof result !== 'object' || typeof result.ok !== 'boolean') return mailError_('MAIL_INVALID_RESPONSE');
     if (!result.ok) return mailError_(result.error && result.error.code);
     if (status !== 200) return mailError_('MAIL_INVALID_RESPONSE');
-    return result;
+    return mailCurrentPeriodResult_(result);
   } catch (_error) {
     // Do not expose or log service responses, tokens, message bodies, or exception details.
     return mailError_('MAIL_SERVICE_UNAVAILABLE');

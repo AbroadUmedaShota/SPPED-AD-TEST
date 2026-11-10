@@ -14,10 +14,12 @@ const submittedAt = '2026-11-10T00:00:00.000Z';
 const options = { runId: 'acceptance-1', startAt: '2026-11-08T15:00:00.000Z', cutoffAt: '2026-11-10T01:00:00.000Z', hashKeyBase64: key.toString('base64') };
 const row = (caseId = id) => [caseId, submittedAt, '未対応', ''];
 
-function runtime({ actor = { authMode: 'domain' }, snapshots = [[headers, row()]] } = {}) {
+function runtime({ actor = { authMode: 'domain' }, snapshots = [[headers, row()]], historyStarts = [options.startAt] } = {}) {
   let reads = 0;
+  let propertyReads = 0;
   const context = {
     requireViewer_() { if (!actor) throw new Error('AUTH_REQUIRED'); return actor; },
+    getProperty_: (name) => name === 'MAIL_HISTORY_START_AT' ? historyStarts[Math.min(propertyReads++, historyStarts.length - 1)] : null,
     getSheet_: () => ({ getDataRange: () => ({ getValues: () => snapshots[Math.min(reads++, snapshots.length - 1)] }) }),
     ensureHeaders_: () => headers,
     Utilities: {
@@ -82,6 +84,17 @@ test('Sheet acceptance export rejects drift, rows after cutoff, and an unrelated
   const later = row(); later[1] = '2026-11-10T02:00:00.000Z';
   assert.throws(() => runtime({ snapshots: [[headers, later]] }).api.exportContactMailSheetAcceptance(options), /MAIL_ACCEPTANCE_CUTOFF_CHANGED/);
   assert.throws(() => runtime().api.exportContactMailSheetAcceptance({ ...options, startAt: '2026-11-09T00:00:00.000Z' }), /MAIL_ACCEPTANCE_INPUT_INVALID/);
+});
+
+test('Sheet acceptance uses the same explicit earlier period and detects setting drift', () => {
+  const earlier = '2026-01-01T15:00:00.000Z';
+  const result = runtime({ historyStarts: [earlier] }).api.exportContactMailSheetAcceptance({ ...options, startAt: earlier });
+  assert.equal(result.manifest.startAt, earlier);
+  assert.equal(result.manifest.rows.length, 1);
+  for (const value of ['', null, 'invalid', '2026-11-08T15:00:00Z', '2026-11-09T15:00:00.000Z']) {
+    assert.throws(() => runtime({ historyStarts: [value] }).api.exportContactMailSheetAcceptance(options), /MAIL_ACCEPTANCE_SOURCE_INVALID/);
+  }
+  assert.throws(() => runtime({ historyStarts: [options.startAt, earlier] }).api.exportContactMailSheetAcceptance(options), /MAIL_ACCEPTANCE_SOURCE_CHANGED/);
 });
 
 test('Sheet acceptance export rejects header drift and hides source exception details', () => {

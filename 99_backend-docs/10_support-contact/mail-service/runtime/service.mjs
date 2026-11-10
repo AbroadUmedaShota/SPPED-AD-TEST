@@ -572,6 +572,12 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const fingerprint = digest({ operation: 'advanceSync', payload, actor });
     const receipt = await store.getReceipt(requestId, fingerprint);
     if (receipt) return receipt;
+    const observedState = await store.getSyncState();
+    if (observedState?.executionId && observedState.executionId !== payload.executionId) {
+      const requestedStartAt = periodStart(payload.startAt);
+      const priorStartAt = periodStart(observedState?.startAt);
+      assertMail(!requestedStartAt || !priorStartAt || requestedStartAt <= priorStartAt, 'MAIL_PERIOD_NARROWING', 409);
+    }
     let catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
     const lease = await store.acquireSyncLease(requestId, now().toISOString());
@@ -592,6 +598,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         if (payload.mode === 'history') assertMail(state?.historyId, 'MAIL_FULL_SYNC_REQUIRED', 409);
         const startAt = periodStart(payload.startAt);
         assertMail(startAt, 'MAIL_PERIOD_REQUIRED', 409);
+        assertMail(!state?.executionId || !periodStart(state.startAt) || startAt <= periodStart(state.startAt), 'MAIL_PERIOD_NARROWING', 409);
         const mode = payload.mode === 'history' && startAt !== periodStart(state?.startAt) ? 'full' : payload.mode;
         const startedAt = now().toISOString();
         assertMail(startAt <= startedAt, 'MAIL_INVALID_REQUEST');

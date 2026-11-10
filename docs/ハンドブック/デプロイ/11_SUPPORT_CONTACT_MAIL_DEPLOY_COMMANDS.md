@@ -335,7 +335,9 @@ service URL、ready revision、image digest、実行SA、custom audience、5環�
 
 ## 7. GASの最終version・公開配備
 
-Cloud Runの読戻し後、GAS editorの対象project設定でScript Property **`MAIL_SERVICE_URL`だけ**を読戻し済みの`https://...run.app`へ設定し、保存後の同じ欄で再確認します。全propertiesの出力や置換をしません。claspにはScript Propertiesを直接設定する標準コマンドがないため、この手順を架空のCLIで置き換えません。[Propertiesの設定](https://developers.google.com/apps-script/guides/properties#manage_script_properties_manually)
+Cloud Runの読戻し後、GAS editorの対象project設定でScript Property **`MAIL_SERVICE_URL`**を読戻し済みの`https://...run.app`へ設定し、保存後の同じ欄で再確認します。第2段階の同期には **`MAIL_HISTORY_START_AT`** も必須です。実メールの過去履歴調査に基づく有限の開始日を、ミリ秒付き正規UTC ISOのJST 00:00として設定します。最古受付JST日の前日以前に限り、未設定・不正・これより後なら同期とSheet受入取得は停止します。Sheet由来日は候補上限であり、古い関連メールが存在しない証明ではありません。開始日と根拠をprivate運用記録に残し、保存後の同じ欄で再確認します。全propertiesの出力や置換をしません。claspにはScript Propertiesを直接設定する標準コマンドがないため、この手順を架空のCLIで置き換えません。[Propertiesの設定](https://developers.google.com/apps-script/guides/properties#manage_script_properties_manually)
+
+開始日を変更しても送信済みの旧実行は中止されず、旧期間のbatchが続行される場合があります。旧実行の結果やレシートを新期間の完了へ読み替えず、新期間の全件同期と独立受入を実施します。開始日を広げた後に、この設定と短縮拒否を扱わない旧コードへ戻す場合は同期を停止し、旧期間の完了表示を受入へ流用しません。保存済み記録・レシートと設定開始日は保持します。
 
 採用SHAのコードを再pushし、一時claims関数がないこととmanifest・Sheet/Drive参照先を読み戻します。ここで初めて最終versionを作成します。
 
