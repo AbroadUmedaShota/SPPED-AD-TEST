@@ -70,41 +70,60 @@ function assertScope(record, payload) {
   if (scope === 'unreviewed') assertMail(record.matchState === 'matched', 'MAIL_MAPPING_CHANGED', 409);
 }
 
+function periodStart(value) {
+  return typeof value === 'string' && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : null;
+}
+
+function withinPeriod(record, startAt) {
+  return Boolean(startAt && typeof record?.internalDate === 'string' && record.internalDate >= startAt);
+}
+
 export function createMailService({ store, gmail, core, now = () => new Date(), trustedAnchor = () => false }) {
   assertMail(store && gmail && core, 'MAIL_NOT_CONFIGURED', 503);
 
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
-    const counts = await store.countMessages();
-    const unobservedDeletedCount = await store.countUnobservedDeletions();
+    const startAt = periodStart(state?.startAt);
+    const counts = startAt ? await store.countMessages({ startAt }) : {
+      pending: null, unreviewed: null, unavailable: null, bodyUnverified: null, bodyUnavailable: null,
+      attachmentUnverified: null, attachmentUnavailable: null
+    };
+    const unobservedDeletedCount = startAt ? await store.countUnobservedDeletions() : null;
     const catalog = await store.getCatalog();
-    const covered = new Set(await store.getCoveredCaseIds());
+    const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt }) : []);
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id));
-    const enumerationComplete = state?.state === 'complete';
+    const enumerationComplete = Boolean(startAt) && state?.state === 'complete';
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
       counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
     return {
-      state: state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
-      pendingCount: counts.pending, unreviewedCount: counts.unreviewed, failedCount: state?.failedCount || 0,
-      unavailableCount: counts.unavailable, remainingPages: state?.state === 'running',
-      startAt: state?.startAt || null, cutoffAt: state?.cutoffAt || null, errorCode: state?.errorCode || null,
+      state: !startAt && state ? 'needs_full_sync' : state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
+      pendingCount: counts.pending, unreviewedCount: counts.unreviewed, failedCount: startAt ? state?.failedCount || 0 : null,
+      unavailableCount: counts.unavailable, remainingPages: Boolean(startAt && state?.state === 'running'),
+      startAt: startAt || null, cutoffAt: state?.cutoffAt || null, errorCode: !startAt && state ? 'MAIL_PERIOD_REQUIRED' : state?.errorCode || null,
       processedCount: state?.processedCount || 0, phase: state?.phase || 'enumerate',
-      failedMessageIds: state?.failedMessageIds || [],
+      failedMessageIds: startAt ? state?.failedMessageIds || [] : [],
       unobservedDeletedCount,
-      executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(state?.historyId),
-      enumerationComplete, acceptanceReady: enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0,
-      coverageUnverifiedCaseCount: catalog.complete ? coverageUnverified.length : null,
-      coverageUnverifiedCaseIds: coverageUnverified.slice(0, 50),
+      executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(startAt && state?.historyId),
+      enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0,
+      coverageUnverifiedCaseCount: catalog.complete && startAt ? coverageUnverified.length : null,
+      coverageUnverifiedCaseIds: startAt ? coverageUnverified.slice(0, 50) : [],
       bodyUnverifiedCount: counts.bodyUnverified, bodyUnavailableCount: counts.bodyUnavailable,
       attachmentUnverifiedCount: counts.attachmentUnverified, attachmentUnavailableCount: counts.attachmentUnavailable
     };
   }
 
-  async function requireRecord(payload) {
+  async function activeStartAt() {
+    const startAt = periodStart((await store.getSyncState())?.startAt);
+    assertMail(startAt, 'MAIL_PERIOD_REQUIRED', 409);
+    return startAt;
+  }
+
+  async function requireRecord(payload, { allowUnavailable = false } = {}) {
     const record = await store.getMessage(messageId(payload.messageId));
     assertMail(record, 'MAIL_NOT_FOUND', 404);
+    assertMail(withinPeriod(record, await activeStartAt()), 'MAIL_NOT_FOUND', 404);
     assertScope(record, payload);
-    assertMail(!record.unavailable, 'MAIL_CONTENT_UNAVAILABLE', 410);
+    if (!allowUnavailable) assertMail(!record.unavailable, 'MAIL_CONTENT_UNAVAILABLE', 410);
     return record;
   }
 
@@ -124,6 +143,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function list(operation, payload) {
+    const startAt = await activeStartAt();
     const mode = operation === 'listCaseMail' ? 'case' : operation === 'listPendingMail' ? 'pending' : 'unreviewed';
     const targetCaseId = mode === 'case' ? caseId(payload.caseId) : null;
     if (targetCaseId) {
@@ -131,14 +151,16 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
       assertMail(catalog.caseIds.includes(targetCaseId), 'MAIL_CASE_NOT_FOUND', 404);
     }
-    const scopeKey = `${mode}:${targetCaseId || ''}`;
+    const scopeKey = `${mode}:${targetCaseId || ''}:${startAt}`;
     const cursor = parseCursor(payload.pageToken, scopeKey);
-    const result = await store.listMessages({ mode, caseId: targetCaseId, cursor, limit: PAGE_SIZE + 1 });
+    const result = await store.listMessages({ mode, caseId: targetCaseId, startAt, cursor, limit: PAGE_SIZE + 1 });
     const more = result.length > PAGE_SIZE;
     let records = result.slice(0, PAGE_SIZE);
     if (cursor?.direction === 'previous') records = records.reverse();
     const hasPrevious = cursor?.direction === 'previous' ? more : Boolean(cursor);
     const hasNext = cursor?.direction === 'previous' ? Boolean(cursor) : more;
+    const sync = await syncStatus();
+    assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
     return {
       messages: records.map(summary),
       page: {
@@ -146,20 +168,18 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         previousPageToken: hasPrevious && records.length ? cursorToken(records[0], 'previous', scopeKey) : '',
         pageSize: PAGE_SIZE
       },
-      sync: await syncStatus()
+      sync
     };
   }
 
   async function getMail(payload) {
-    const record = await store.getMessage(messageId(payload.messageId));
-    assertMail(record, 'MAIL_NOT_FOUND', 404);
-    assertScope(record, payload);
+    const record = await requireRecord(payload, { allowUnavailable: true });
     const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable', reviewReady: false,
       attachments: (item.attachments || []).map(({ partId, name, mimeType, size, availability }) => ({ partId, name, mimeType, size, availability })) } });
     if (record.unavailable) return metadataOnly(record);
     let message;
     try { message = await fetchMessage(record.messageId); } catch (error) {
-      if (error.code === 'MAIL_CONTENT_UNAVAILABLE') return metadataOnly(await store.getMessage(record.messageId));
+      if (error.code === 'MAIL_CONTENT_UNAVAILABLE') return metadataOnly(await requireRecord(payload, { allowUnavailable: true }));
       throw error;
     }
     const parsed = core.inspectMime(message);
@@ -179,10 +199,11 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function listIssues(payload) {
+    const startAt = await activeStartAt();
     const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted'];
     const kind = payload.kind;
     assertMail(kinds.includes(kind));
-    const scopeKey = `issues:${kind}`;
+    const scopeKey = `issues:${kind}:${startAt}`;
     let cursor = null;
     if (payload.pageToken) {
       assertMail(typeof payload.pageToken === 'string' && /^[A-Za-z0-9_-]{1,2048}$/.test(payload.pageToken));
@@ -206,7 +227,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (kind === 'coverage') {
         const catalog = await store.getCatalog();
         assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-        const covered = new Set(await store.getCoveredCaseIds());
+        const covered = new Set(await store.getCoveredCaseIds({ startAt }));
         ids = catalog.caseIds.filter((id) => !covered.has(id)).sort();
       } else ids = [...new Set(state?.failedMessageIds || [])].sort();
       const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });
@@ -214,13 +235,13 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       assertMail(Number.isSafeInteger(offset) && offset >= 0 && (!cursor || cursor.snapshot === snapshot), 'MAIL_MAPPING_CHANGED', 409);
       const pageIds = ids.slice(offset, offset + PAGE_SIZE);
       targets = await Promise.all(pageIds.map(async (id) => kind === 'coverage' ? { type: 'case', caseId: id } :
-        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => item && ['matched', 'pending'].includes(item.matchState) ? summary(item) : null) }));
+        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && ['matched', 'pending'].includes(item.matchState) ? summary(item) : null) }));
       if (kind === 'failed' && !ids.length && state?.state === 'failed') targets = [{ type: 'sync', errorCode: state.errorCode || 'MAIL_SYNC_FAILED' }];
       if (offset + PAGE_SIZE < ids.length) nextPageToken = token({ offset: offset + PAGE_SIZE, snapshot });
       scannedCount = pageIds.length;
     } else {
       if (cursor) assertMail(ID.test(cursor.id) && Number.isFinite(Date.parse(cursor.at)));
-      const rows = await store.listIndexedScope({ cutoffAt: '9999-12-31T23:59:59.999Z', cursor, limit: PAGE_SIZE + 1 });
+      const rows = await store.listIndexedScope({ startAt, cutoffAt: '9999-12-31T23:59:59.999Z', cursor, limit: PAGE_SIZE + 1 });
       const pageRows = rows.slice(0, PAGE_SIZE);
       const filters = {
         pending: (item) => item.matchState === 'pending', unreviewed: (item) => item.matchState === 'matched' && !item.firstReview,
@@ -233,7 +254,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).internalDate });
       scannedCount = pageRows.length;
     }
-    return { kind, targets, scannedCount, page: { nextPageToken, pageSize: PAGE_SIZE }, sync: await syncStatus() };
+    const sync = await syncStatus();
+    assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
+    return { kind, targets, scannedCount, page: { nextPageToken, pageSize: PAGE_SIZE }, sync };
   }
 
   async function attachment(payload) {
@@ -264,12 +287,15 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function write(operation, payload, actor, requestId) {
     const id = messageId(payload.messageId);
+    const startAt = await activeStartAt();
+    assertMail(withinPeriod(await store.getMessage(id), startAt), 'MAIL_NOT_FOUND', 404);
     assertMail(Number.isSafeInteger(payload.expectedVersion) && payload.expectedVersion >= 1);
-    const fingerprint = digest({ operation, payload, actor });
+    const fingerprint = digest({ operation, payload, actor, startAt });
     const catalog = operation === 'resolvePending' ? await store.getCatalog() : null;
     return store.mutate(requestId, fingerprint, async (transaction) => {
       const record = await transaction.getMessage(id);
       assertMail(record, 'MAIL_NOT_FOUND', 404);
+      assertMail(withinPeriod(record, periodStart((await transaction.getSyncState())?.startAt)), 'MAIL_NOT_FOUND', 404);
       let transition;
       if (operation === 'markReviewed') {
         assertScope(record, payload);
@@ -302,7 +328,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         transaction.addEvent({ ...demotion.event, requestId });
       }
       return { message: summary(demotions.find((item) => item.record.messageId === id)?.record || transition.record) };
-    });
+    }, startAt);
   }
 
   async function uploadCatalog(payload) {
@@ -368,18 +394,20 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function reconcilePending(payload, requestId, actor) {
-    const fingerprint = digest({ operation: 'reconcilePending', payload, actor });
+    const startAt = await activeStartAt();
+    const fingerprint = digest({ operation: 'reconcilePending', payload, actor, startAt });
     const receipt = await store.getReceipt(requestId, fingerprint);
     if (receipt) return receipt;
     const catalog = await store.getCatalog();
     assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
-    const cursor = parseCursor(payload.pageToken, 'reconcile');
+    const scopeKey = `reconcile:${startAt}`;
+    const cursor = parseCursor(payload.pageToken, scopeKey);
     assertMail(!cursor || cursor.direction === 'next');
-    const records = await store.listMessages({ mode: 'pending', cursor, limit: WORK_SIZE + 1 });
+    const records = await store.listMessages({ mode: 'pending', startAt, cursor, limit: WORK_SIZE + 1 });
     const batch = records.slice(0, WORK_SIZE);
-    for (const record of batch) await indexMessage(record.messageId, catalog);
+    for (const record of batch) await indexMessage(record.messageId, catalog, { startAt });
     const result = { processedCount: batch.length,
-      page: { nextPageToken: records.length > WORK_SIZE ? cursorToken(batch.at(-1), 'next', 'reconcile') : '', previousPageToken: '', pageSize: WORK_SIZE },
+      page: { nextPageToken: records.length > WORK_SIZE ? cursorToken(batch.at(-1), 'next', scopeKey) : '', previousPageToken: '', pageSize: WORK_SIZE },
       sync: await syncStatus() };
     await store.saveReceipt(requestId, fingerprint, result);
     return result;
@@ -404,20 +432,20 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         await store.setSyncState(state, lease);
       }
       if (state?.executionId !== payload.executionId) {
-        assertMail(!state || state.state !== 'running', 'MAIL_SYNC_BUSY', 409);
+        assertMail(!state || state.state !== 'running' || !periodStart(state.startAt), 'MAIL_SYNC_BUSY', 409);
         assertMail(['full', 'history'].includes(payload.mode));
         if (payload.catalogSnapshotId !== undefined) assertMail(payload.catalogSnapshotId === catalog.snapshotId && payload.catalogDigest === catalog.digest, 'MAIL_CATALOG_CHANGED', 409);
         if (payload.mode === 'history') assertMail(state?.historyId, 'MAIL_FULL_SYNC_REQUIRED', 409);
+        const startAt = periodStart(payload.startAt);
+        assertMail(startAt, 'MAIL_PERIOD_REQUIRED', 409);
+        const mode = payload.mode === 'history' && startAt !== periodStart(state?.startAt) ? 'full' : payload.mode;
         const startedAt = now().toISOString();
+        assertMail(startAt <= startedAt, 'MAIL_INVALID_REQUEST');
         const profile = await gmail.getProfile();
         assertMail(profile.emailAddress?.toLowerCase() === 'customer@speed-ad.com', 'MAIL_MAILBOX_MISMATCH', 403);
         // History must cover a snapshot requested after this time, not the later processing completion time.
-        const at = payload.mode === 'history' ? startedAt : now().toISOString();
-        if (payload.startAt !== undefined) assertMail(typeof payload.startAt === 'string' && Number.isFinite(Date.parse(payload.startAt)));
-        const suppliedStartAt = payload.startAt ? new Date(payload.startAt).toISOString() : null;
-        const startAt = payload.mode === 'history' ? (state?.startAt || null) : suppliedStartAt;
-        assertMail(!startAt || startAt <= at);
-        state = { executionId: payload.executionId, mode: payload.mode, state: 'running', pageToken: null,
+        const at = mode === 'history' ? startedAt : now().toISOString();
+        state = { executionId: payload.executionId, mode, state: 'running', pageToken: null,
           startAt, cutoffAt: at, historyId: state?.historyId || null,
           initialHistoryId: String(profile.historyId || ''), failedCount: 0, processedCount: 0,
           catalogSnapshotId: catalog.snapshotId || null,
@@ -425,6 +453,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         assertMail(/^\d+$/.test(state.initialHistoryId), 'MAIL_INVALID_UPSTREAM', 502);
         await store.setSyncState(state, lease);
       }
+      assertMail(periodStart(state?.startAt), 'MAIL_PERIOD_REQUIRED', 409);
       assertMail(state.state === 'running', state.state === 'complete' ? 'MAIL_SYNC_COMPLETE' : 'MAIL_FULL_SYNC_REQUIRED', 409);
       if (state.phase === 'finalize') {
         const records = await store.listIndexedScope({ startAt: state.startAt, cutoffAt: state.cutoffAt, cursor: state.finalizeCursor, limit: PAGE_SIZE + 1 });

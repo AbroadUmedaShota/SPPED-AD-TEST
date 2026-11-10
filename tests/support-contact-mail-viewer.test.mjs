@@ -14,7 +14,7 @@ test('mail service exposes only the authenticated business RPC surface', () => {
   assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
-function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, url = 'https://contact-mail-example.a.run.app' } = {}) {
+function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates = ids.map(() => '2026-11-10T00:00:00.000Z'), url = 'https://contact-mail-example.a.run.app' } = {}) {
   const calls = [];
   const reads = [];
   let response = () => ({ ok: true });
@@ -186,17 +186,28 @@ test('only domain users can upload catalog or advance a bounded sync', () => {
   app.calls.length = 0;
   const executionId = randomUUID();
   app.api.advanceContactMailSync({ executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt, requestId: randomUUID() });
-  assert.deepEqual(app.calls[0].envelope.payload, { executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest });
+  assert.deepEqual(app.calls[0].envelope.payload, { executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, startAt: catalog.startAt });
 });
 
-test('full sync period comes from earliest authoritative date with whole-mailbox fallback', () => {
-  for (const [date, expected] of [['2026-11-10T04:00:00Z', '2026-11-08T15:00:00.000Z'], [new Date('2026-11-10T23:00:00Z'), '2026-11-09T15:00:00.000Z'], ['', null], ['invalid', null], ['2026-02-30T00:00:00Z', null]]) {
+test('sync period comes only from valid authoritative dates and is sent for full and history starts', () => {
+  for (const [date, expected] of [['2026-11-10T04:00:00Z', '2026-11-08T15:00:00.000Z'], [new Date('2026-11-10T23:00:00Z'), '2026-11-09T15:00:00.000Z']]) {
     const app = bridgeRuntime({ dates: [date] });
     app.respond(() => ({ ok: true, catalog: { complete: true } }));
     const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
     assert.equal(catalog.startAt, expected);
     app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt, startAt: '2099-01-01T00:00:00Z' });
     assert.equal(app.calls.at(-1).envelope.payload.startAt || null, expected);
+    app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'history', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt });
+    assert.equal(app.calls.at(-1).envelope.payload.startAt, expected);
+  }
+});
+
+test('unknown period stops empty, missing and invalid Sheet dates before any service or Gmail request', () => {
+  for (const options of [{ ids: [] }, { dates: null }, { dates: [''] }, { dates: ['invalid'] }, { dates: ['2026-02-30T00:00:00Z'] }, { ids: [caseId, '22222222-2222-4222-8222-222222222222'], dates: ['2026-11-10T00:00:00Z', ''] }]) {
+    const app = bridgeRuntime(options);
+    assert.throws(() => app.api.advanceContactMailSync({}), /MAIL_PERIOD_REQUIRED/);
+    assert.throws(() => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }), /MAIL_PERIOD_REQUIRED/);
+    assert.equal(app.calls.length, 0);
   }
 });
 
@@ -261,7 +272,7 @@ const syncCallResponse = (options, state = 'running', extra = {}) => {
   return options.confirmOnly ? { ...result, found: true, receipt: { sync: result.sync } } : result;
 };
 const catalogResponse = (options, total = 1) => {
-  const catalog = { ...options.catalog, digest: 'a'.repeat(64), pageCount: Math.max(1, Math.ceil(total / 200)), total, startAt: null };
+  const catalog = { ...options.catalog, digest: 'a'.repeat(64), pageCount: Math.max(1, Math.ceil(total / 200)), total, startAt: '2026-11-01T00:00:00.000Z' };
   catalog.nextPageIndex = options.prepareCatalog ? 0 : Math.min(catalog.nextPageIndex + 5, catalog.pageCount);
   catalog.complete = !options.prepareCatalog && catalog.nextPageIndex === catalog.pageCount;
   return { ok: true, catalog };
@@ -639,7 +650,7 @@ test('first catalog preparation has a client snapshot and retries unknown upload
   let uploads = 0;
   const digest = 'a'.repeat(64);
   const app = uiRuntime({ advanceContactMailSync: (options) => {
-    if (options.prepareCatalog) return { ok: true, catalog: { ...options.catalog, digest, pageCount: 1, total: 1, complete: false, nextPageIndex: 0, startAt: null } };
+    if (options.prepareCatalog) return { ok: true, catalog: { ...options.catalog, digest, pageCount: 1, total: 1, complete: false, nextPageIndex: 0, startAt: '2026-11-01T00:00:00.000Z' } };
     if (!options.executionId) {
       uploads++;
       if (uploads === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };

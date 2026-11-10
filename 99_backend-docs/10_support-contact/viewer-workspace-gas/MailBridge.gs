@@ -9,7 +9,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_CASE_NOT_FOUND',
   'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
-  'MAIL_SCOPE_MISMATCH'
+  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED'
 ];
 
 function listContactMail(options, authProof) {
@@ -93,12 +93,12 @@ function advanceContactMailSync(options, authProof) {
       payload.catalogSnapshotId = mailUuid_(options.catalogSnapshotId);
       payload.catalogDigest = options.catalogDigest;
       var plannedStartAt = options.catalogStartAt;
-      if (plannedStartAt !== null && (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt)) throw new Error('同期対象期間が不正です。');
+      if (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt) throw new Error('同期対象期間が不正です。');
       if (options.confirmOnly !== true) {
         var source = mailCatalogSource_();
         if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return mailPreDispatchError_('advanceSync', payload, requestId, 'MAIL_CATALOG_CHANGED');
       }
-      if (options.mode === 'full' && plannedStartAt) payload.startAt = plannedStartAt;
+      payload.startAt = plannedStartAt;
     }
     if (options.resume === true) payload.resume = true;
     if (options.confirmOnly === true) {
@@ -151,11 +151,12 @@ function mailCatalogSource_() {
     else earliest = Math.min(earliest, time);
   });
   ids.sort();
+  if (invalidDate || !isFinite(earliest)) throw new Error('MAIL_PERIOD_REQUIRED');
   var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, ids.join('\n'), Utilities.Charset.UTF_8).map(function (byte) {
     return ('0' + ((byte + 256) % 256).toString(16)).slice(-2);
   }).join('');
   var day = 86400000;
-  var startAt = !invalidDate && isFinite(earliest) ? new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString() : null;
+  var startAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
   return { ids: ids, digest: digest, startAt: startAt };
 }
 

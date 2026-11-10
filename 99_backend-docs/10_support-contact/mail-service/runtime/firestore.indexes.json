@@ -10,7 +10,11 @@
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "internalDate", "order": "DESCENDING" }, { "fieldPath": "messageId", "order": "DESCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "unavailable", "order": "ASCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "bodyAvailability", "order": "ASCENDING" }] },
-    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "unverifiedAttachmentCount", "order": "ASCENDING" }, { "fieldPath": "unavailableAttachmentCount", "order": "ASCENDING" }] }
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "unverifiedAttachmentCount", "order": "ASCENDING" }, { "fieldPath": "unavailableAttachmentCount", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "unavailable", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "bodyAvailability", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }, { "fieldPath": "caseId", "order": "ASCENDING" }] },
+    { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }, { "fieldPath": "unverifiedAttachmentCount", "order": "ASCENDING" }, { "fieldPath": "unavailableAttachmentCount", "order": "ASCENDING" }] }
   ],
   "fieldOverrides": []
 }

@@ -5,14 +5,14 @@ import { observeAttachment } from '../attachmentObservation.mjs';
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
 
-export function fakeStore(caseIds = []) {
+export function fakeStore(caseIds = [], initialSync = null) {
   const records = new Map();
   const receipts = new Map();
   const pages = new Map();
   const events = [];
   const deletionDiagnostics = new Map();
   let catalog = { complete: true, caseIds };
-  let sync = null;
+  let sync = clone(initialSync);
   let lease = null;
   let queue = Promise.resolve();
   const serial = (fn) => { const task = queue.then(fn); queue = task.catch(() => {}); return task; };
@@ -21,7 +21,7 @@ export function fakeStore(caseIds = []) {
     seed(record) { records.set(record.messageId, clone(record)); },
     setCatalog(value) { catalog = value; },
     async getCatalog() { return clone(catalog); },
-    async getCoveredCaseIds() { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched').map((item) => item.caseId))]; },
+    async getCoveredCaseIds({ startAt } = {}) { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched' && (!startAt || item.internalDate >= startAt)).map((item) => item.caseId))]; },
     async uploadCatalogPage(page, digest) {
       const snapshot = pages.get(page.snapshotId) || { ...page, pages: new Map() };
       assertMail(snapshot.digest === page.digest && snapshot.total === page.total && snapshot.pageCount === page.pageCount, 'MAIL_REQUEST_CONFLICT', 409);
@@ -51,8 +51,8 @@ export function fakeStore(caseIds = []) {
       version: (old?.version || 0) + (old?.sourceKind === 'draft' ? 0 : 1) });
       deletionDiagnostics.delete(id);
     },
-    async listMessages({ mode, caseId, cursor, limit }) {
-      let items = [...records.values()].filter((item) => mode === 'case' ? item.caseId === caseId && item.matchState === 'matched' :
+    async listMessages({ mode, caseId, startAt, cursor, limit }) {
+      let items = [...records.values()].filter((item) => !startAt || item.internalDate >= startAt).filter((item) => mode === 'case' ? item.caseId === caseId && item.matchState === 'matched' :
         mode === 'pending' ? item.matchState === 'pending' : item.matchState === 'matched' && !item.firstReview).sort(order);
       if (cursor) {
         const anchor = { internalDate: cursor.at, messageId: cursor.id };
@@ -66,8 +66,8 @@ export function fakeStore(caseIds = []) {
       if (cursor) items = items.filter((item) => order(item, { internalDate: cursor.at, messageId: cursor.id }) > 0);
       return clone(items.slice(0, limit));
     },
-    async countMessages() {
-      const all = [...records.values()];
+    async countMessages({ startAt } = {}) {
+      const all = [...records.values()].filter((item) => !startAt || item.internalDate >= startAt);
       const active = all.filter((item) => item.matchState !== 'excluded');
       return {
         pending: active.filter((item) => item.matchState === 'pending').length,
@@ -92,12 +92,13 @@ export function fakeStore(caseIds = []) {
       if (old) assertMail(old.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409);
       else receipts.set(id, { fingerprint, result: clone(result) });
     },
-    async mutate(id, fingerprint, fn) {
+    async mutate(id, fingerprint, fn, expectedStartAt) {
       return serial(async () => {
+        if (expectedStartAt) assertMail(sync?.startAt === expectedStartAt, 'MAIL_MAPPING_CHANGED', 409);
         const old = await store.getReceipt(id, fingerprint);
         if (old) return old;
         const writes = [];
-        const result = await fn({ getMessage: store.getMessage, getThreadMessages: store.findThreadMessages,
+        const result = await fn({ getSyncState: store.getSyncState, getMessage: store.getMessage, getThreadMessages: store.findThreadMessages,
           setMessage(record) { writes.push(() => store.seed(record)); },
           addEvent(event) { writes.push(() => events.push(clone(event))); }
         });

@@ -24,7 +24,7 @@ Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audie
 | getSyncRequestResult | requestId、元のadvanceSync requestPayload。読取り専用で同じactor・内容の保存済みレシートと現在の同期状態を返す |
 | listMailIssues | kind:pending/unreviewed/unavailable/bodyUnverified/bodyUnavailable/attachmentUnverified/attachmentUnavailable/failed/coverage/deleted、任意pageToken |
 | uploadCaseCatalog | snapshotId、pageIndex、pageCount、total、digest、caseIds（200件以下） |
-| advanceSync | executionId、開始時mode:full/history、任意startAt、catalogSnapshotId/catalogDigest。失敗した同じ実行の明示再開だけresume:true |
+| advanceSync | executionId、開始時mode:full/historyと必須startAt、catalogSnapshotId/catalogDigest。失敗した同じ実行の明示再開だけresume:true |
 | reconcilePending | 任意pageToken |
 
 catalog・同期・再照合は社員操作だけに限定する。catalog digestは、重複のない小文字UUIDを昇順に並べ、改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用する。
@@ -45,7 +45,10 @@ GASの`advanceSync`送信前に、正本検査での計画変更、固定URLの�
 
 ## 同期と未達の扱い
 
-全同期はspam/trashを含む全mailboxの指定開始日〜開始時cutoffを列挙し、GmailページごとのIDだけを一時保持する。1要求のGmail本文処理は最大5通。全列挙後、過去indexの同じ対象期間を50件ずつ確認し、今回列挙されなかったものは取得不能へ残す。開始時historyIdを保存し、その後のhistory同期で全同期中の新着を回収する。history同期は同じ開始日を保ち、新着を含める。history期限切れは全同期必要として表示する。
+全同期はspam/trashを含むmailboxの確定した開始日〜開始時cutoffを列挙し、GmailページごとのIDだけを一時保持する。開始日は正本Sheetの全受付日時が有効な場合だけ最古JST日の前日から導出する。受付なし・日時欠損・不正日付ではGAS登録とGmail呼出しの前に`MAIL_PERIOD_REQUIRED`で停止し、全期間へ広げない。Cloud RunとGmail adapterも開始日なしの列挙を拒否する。1要求のGmail本文処理は最大5通。全列挙後、過去indexの同じ対象期間を50件ずつ確認し、今回列挙されなかったものは取得不能へ残す。開始時historyIdを保存し、その後のhistory同期で全同期中の新着を回収する。開始要求の期間が保存済み期間と異なる場合はhistory要求でも全同期へ切り替え、新しい期間を全件照合する。継続中の実行は開始時の期間を保持する。history期限切れは全同期必要として表示する。
+
+現在の開始日より前の保存済みメールはmetadata・確認記録・監査履歴を保持したまま、案件・照合待ち・未確認・残件一覧、件数、案件coverageから除外する。本文・添付の直接取得、確認済み・手動照合もサーバーで拒否する。期間変更前のcursorは再利用できない。開始日を持たない旧同期状態ではメールを公開せず、新しい全同期を要する。期間内coverageは対象メールのcase IDを投影して集計するため、実環境でFirestore読取量を確認する。
+取得前削除で元日時が分からない診断は、期間外と推定せず残件として保持する。
 
 履歴同期の`cutoffAt`は開始時のprofile取得直前に固定し、最終履歴ページのhistoryIdがそのprofileで観測したhistoryId以上になるまで完了しない。本文処理が長引いた場合や同じ実行を失敗から再開した場合も、この基準日時と開始時の履歴位置を保持する。`lastSuccessAt`は処理完了日時であり、同期済み範囲をその時刻まで広げる値ではない。履歴応答に含まれた基準日時後のメールも取得し、返却されたhistoryIdを次回の開始位置に使う。最終ページ取得後の新着は次回の履歴同期で回収する。全同期はprofileのhistoryIdを観測してからcutoffを固定し、次回の履歴同期でその観測後の新着を回収する。
 

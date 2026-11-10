@@ -34,7 +34,11 @@ export function createFirestoreStore(db) {
 
   return {
     getCatalog,
-    async getCoveredCaseIds() { return (await coverage.where('count', '>', 0).get()).docs.map((item) => item.id); },
+    async getCoveredCaseIds({ startAt } = {}) {
+      if (!startAt) return (await coverage.where('count', '>', 0).get()).docs.map((item) => item.id);
+      const found = await messages.where('matchState', '==', 'matched').where('internalDate', '>=', startAt).select('caseId').get();
+      return [...new Set(found.docs.map((item) => item.data().caseId))];
+    },
     async uploadCatalogPage(page, makeDigest) {
       const ref = snapshots.doc(page.snapshotId);
       const pageRef = ref.collection('pages').doc(String(page.pageIndex).padStart(4, '0'));
@@ -86,8 +90,9 @@ export function createFirestoreStore(db) {
         updateCoverage(transaction, existing, record);
       });
     },
-    async listMessages({ mode, caseId, cursor, limit }) {
+    async listMessages({ mode, caseId, startAt, cursor, limit }) {
       let query = messages;
+      if (startAt) query = query.where('internalDate', '>=', startAt);
       if (mode === 'case') query = query.where('caseId', '==', caseId).where('matchState', '==', 'matched');
       if (mode === 'pending') query = query.where('matchState', '==', 'pending');
       if (mode === 'unreviewed') query = query.where('matchState', '==', 'matched').where('firstReview', '==', null);
@@ -96,12 +101,13 @@ export function createFirestoreStore(db) {
       if (cursor) query = query.startAfter(cursor.at, cursor.id);
       return (await query.limit(limit).get()).docs.map((item) => item.data());
     },
-    async countMessages() {
-      const active = messages.where('matchState', 'in', ['matched', 'pending']);
+    async countMessages({ startAt } = {}) {
+      const scoped = startAt ? messages.where('internalDate', '>=', startAt) : messages;
+      const active = scoped.where('matchState', 'in', ['matched', 'pending']);
       const [pending, unavailable, unreviewed, bodyUnverified, bodyUnavailable, attachments] = await Promise.all([
-        messages.where('matchState', '==', 'pending').count().get(),
+        scoped.where('matchState', '==', 'pending').count().get(),
         active.where('unavailable', '==', true).count().get(),
-        messages.where('matchState', '==', 'matched').where('firstReview', '==', null).count().get(),
+        scoped.where('matchState', '==', 'matched').where('firstReview', '==', null).count().get(),
         active.where('bodyAvailability', '==', 'unverified').count().get(),
         active.where('bodyAvailability', '==', 'unavailable').count().get(),
         active.aggregate({ unverified: AggregateField.sum('unverifiedAttachmentCount'), unavailable: AggregateField.sum('unavailableAttachmentCount') }).get()
@@ -123,9 +129,11 @@ export function createFirestoreStore(db) {
       }
       return [...results.values()];
     },
-    async mutate(requestId, fingerprint, operation) {
+    async mutate(requestId, fingerprint, operation, expectedStartAt) {
       const receiptRef = mailbox.collection('receipts').doc(requestId);
       return db.runTransaction(async (transaction) => {
+        const state = data(await transaction.get(syncRef));
+        if (expectedStartAt) assertMail(state?.startAt === expectedStartAt, 'MAIL_MAPPING_CHANGED', 409);
         const receipt = data(await transaction.get(receiptRef));
         if (receipt) {
           assertMail(receipt.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409);
@@ -134,6 +142,7 @@ export function createFirestoreStore(db) {
         const pendingWrites = [];
         const originals = new Map();
         const result = await operation({
+          async getSyncState() { return state; },
           async getMessage(id) { const record = data(await transaction.get(messages.doc(id))); originals.set(id, record); return record; },
           async getThreadMessages(threadId) {
             const found = (await transaction.get(messages.where('threadId', '==', threadId))).docs.map((item) => item.data());

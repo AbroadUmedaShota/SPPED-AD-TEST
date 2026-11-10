@@ -1363,6 +1363,7 @@
         MAIL_REQUEST_CONFLICT: '操作内容が競合しました。更新して確認してください。',
         MAIL_CATALOG_INVALID: '受付IDの照合を確認できません。同期を最初からやり直してください。',
         MAIL_CATALOG_INCOMPLETE: '受付IDの照合が未完了です。',
+        MAIL_PERIOD_REQUIRED: '同期対象期間を決められません。正本の受付日時を確認してから同期してください。',
         MAIL_CATALOG_CHANGED: '受付データが変わりました。同期を最初からやり直してください。',
         MAIL_FULL_SYNC_REQUIRED: '全件同期が必要です。',
         MAIL_HISTORY_EXPIRED: 'メールの同期履歴が失効しています。全件同期が必要です。',
@@ -1483,7 +1484,7 @@
       const unavailable = Number.isInteger(sync.unavailableCount) ? sync.unavailableCount : '不明';
       const count = (key) => Number.isInteger(sync[key]) ? sync[key] : '不明';
       const coverage = Number.isInteger(sync.coverageUnverifiedCaseCount) ? `${sync.coverageUnverifiedCaseCount}件` : '未取得';
-      const period = sync.state === 'not_started' ? '対象期間は同期開始時に確認' : `対象期間: ${sync.startAt ? `${formatDate(sync.startAt)}以降` : '公式窓口の全保存メール'} / 基準日時: ${formatDate(sync.cutoffAt)}`;
+      const period = sync.state === 'not_started' ? '対象期間は同期開始時に確認' : `対象期間: ${sync.startAt ? `${formatDate(sync.startAt)}以降` : '開始日未確定・同期停止'} / 基準日時: ${formatDate(sync.cutoffAt)}`;
       return `${labels[sync.state] || '同期状態不明'} / ${period} / 最終成功: ${formatDate(sync.lastSuccessAt)} / 照合待ち ${pending}件・取得失敗 ${failed}件・取得不能 ${unavailable}件 / 本文未検証 ${count('bodyUnverifiedCount')}件・本文取得不能 ${count('bodyUnavailableCount')}件 / 添付未検証 ${count('attachmentUnverifiedCount')}件・添付取得不能 ${count('attachmentUnavailableCount')}件 / 関連メールの有無が未確認の案件 ${coverage}${Number.isInteger(sync.unobservedDeletedCount) ? ` / 取得前に削除され種類未確認 ${sync.unobservedDeletedCount}件` : ''}${sync.remainingPages ? ' / 未取得のページあり' : ''}${sync.acceptanceReady === true ? ' / 同期・照合・取得の技術残件は0件です。実受入は別途確認してください。' : ' / 全件確認に必要な処理が残っています。'} 対象は「全件確認の残件」から確認できます。関連メールがない案件は受入時の照合記録で確認してください。`;
     }
 
@@ -1584,7 +1585,7 @@
       if (!catalog || catalog.snapshotId !== previous.snapshotId || !/^[a-f0-9]{64}$/.test(catalog.digest || '') ||
           !Number.isSafeInteger(catalog.total) || catalog.total < 0 || catalog.pageCount !== Math.max(1, Math.ceil(catalog.total / 200)) ||
           !Number.isSafeInteger(catalog.nextPageIndex) || catalog.nextPageIndex < 0 || catalog.nextPageIndex > catalog.pageCount ||
-          typeof catalog.complete !== 'boolean' || (catalog.startAt !== null && (typeof catalog.startAt !== 'string' || !Number.isFinite(Date.parse(catalog.startAt)))) ||
+          typeof catalog.complete !== 'boolean' || (typeof catalog.startAt !== 'string' || !Number.isFinite(Date.parse(catalog.startAt))) ||
           (prepared ? catalog.complete || catalog.nextPageIndex !== 0 :
             catalog.digest !== previous.digest || catalog.total !== previous.total || catalog.pageCount !== previous.pageCount || catalog.startAt !== previous.startAt ||
             catalog.nextPageIndex !== Math.min(previous.nextPageIndex + 5, previous.pageCount) || catalog.complete !== (catalog.nextPageIndex === catalog.pageCount))) throw new Error('MAIL_INVALID_RESPONSE');
@@ -1618,7 +1619,7 @@
           validateContactMailCatalog(catalog, progress.catalog, false);
           progress.catalogPending = false;
           progress.catalog = catalog;
-          progress.periodText = catalog.startAt ? `同期対象: ${formatDate(catalog.startAt)}以降` : '受付日時に欠落・不正または受付なしのため、同期対象は公式窓口の全保存メールです。';
+          progress.periodText = `同期対象: ${formatDate(catalog.startAt)}以降`;
           if (!catalog.complete) { element.textContent = `受付IDを照合中: ${catalog.nextPageIndex} / ${catalog.pageCount}ページ。続行ボタンで次へ進めます。`; return; }
           progress.executionId = window.crypto.randomUUID();
           progress.mode = sync.historyAvailable && sync.state !== 'needs_full_sync' ? 'history' : 'full';

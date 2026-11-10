@@ -58,8 +58,9 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
     async getMessage(id) { return read(`messages/${encodeURIComponent(id)}`, { format: 'full' }); },
     async getAttachment(id, attachmentId) { return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`); },
     async listMessages({ pageToken, startAt, cutoffAt }) {
+      assertMail(typeof startAt === 'string' && Number.isFinite(Date.parse(startAt)), 'MAIL_PERIOD_REQUIRED', 409);
       const query = ['-in:drafts'];
-      if (startAt) query.push(`after:${Math.floor(Date.parse(startAt) / 1000) - 1}`);
+      query.push(`after:${Math.floor(Date.parse(startAt) / 1000) - 1}`);
       if (cutoffAt) query.push(`before:${Math.floor(Date.parse(cutoffAt) / 1000) + 1}`);
       const result = await read('messages', { maxResults: 50, includeSpamTrash: true, pageToken, q: query.join(' ') });
       assertMail(result.messages === undefined || Array.isArray(result.messages), 'MAIL_INVALID_UPSTREAM', 502);

@@ -8,6 +8,7 @@ import { createMailService, catalogDigest } from '../service.mjs';
 import { MailError } from '../errors.mjs';
 import { createMailHttpServer } from '../http.mjs';
 import { createGmailAdapter } from '../googleAdapters.mjs';
+import { createFirestoreStore } from '../firestoreStore.mjs';
 import { fakeStore } from './fakeStore.mjs';
 
 const coreRoot = process.env.MAIL_CORE_DIR ? pathToFileURL(`${resolve(process.env.MAIL_CORE_DIR)}/`) : new URL('../../', import.meta.url);
@@ -16,6 +17,7 @@ const core = Object.assign({}, ...modules);
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
 const NOW = '2026-11-10T09:00:00.000Z';
+const START = '2026-01-01T00:00:00.000Z';
 const actor = { email: 'staff@abroad-o.com', authMode: 'domain' };
 const encode = (text) => Buffer.from(text).toString('base64url');
 const plainPart = (text) => ({ mimeType: 'text/plain', body: { size: Buffer.byteLength(text), data: encode(text) } });
@@ -33,7 +35,7 @@ function record(id, changes = {}) {
     unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0, ...changes };
 }
 function fixture(ids = [A, B], now = () => new Date(NOW)) {
-  const store = fakeStore(ids);
+  const store = fakeStore(ids, { state: 'not_started', startAt: START });
   const messages = new Map();
   const calls = [];
   const gmail = {
@@ -45,7 +47,8 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   };
   const execute = createMailService({ store, gmail, core, now });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation,
-    requestId: randomUUID(), issuedAt: now().toISOString(), actor, payload, ...changes });
+    requestId: randomUUID(), issuedAt: now().toISOString(), actor,
+    payload: operation === 'advanceSync' && payload.mode ? { startAt: START, ...payload } : payload, ...changes });
   return { store, messages, calls, gmail, execute, envelope };
 }
 
@@ -235,6 +238,146 @@ test('full sync advances one page, replays same request, finalizes stale records
   assert.equal((await f.store.getMessage('deleted')).unavailable, true);
 });
 
+test('missing or invalid periods fail before Gmail profile or enumeration, including legacy running state', async () => {
+  for (const startAt of [undefined, null, '', 'invalid']) {
+    const f = fixture();
+    let gmailCalls = 0;
+    f.gmail.getProfile = f.gmail.listMessages = async () => { gmailCalls++; throw new Error('must not access Gmail'); };
+    const request = f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' });
+    if (startAt === undefined) delete request.payload.startAt;
+    else request.payload.startAt = startAt;
+    await assert.rejects(() => f.execute(request), { code: 'MAIL_PERIOD_REQUIRED' });
+    assert.equal(gmailCalls, 0);
+  }
+  const f = fixture();
+  const executionId = randomUUID();
+  const lease = await f.store.acquireSyncLease('legacy');
+  await f.store.setSyncState({ executionId, state: 'running', mode: 'full' }, lease);
+  await f.store.releaseSyncLease(lease);
+  let lists = 0;
+  f.gmail.listMessages = async () => { lists++; throw new Error('must not enumerate'); };
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId })), { code: 'MAIL_PERIOD_REQUIRED' });
+  assert.equal(lists, 0);
+  f.store.seed(record('legacy'));
+  await assert.rejects(() => f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'legacy' })), { code: 'MAIL_PERIOD_REQUIRED' });
+  const status = await f.execute(f.envelope('getSyncStatus'));
+  assert.equal(status.sync.acceptanceReady, false);
+  assert.equal(status.sync.unreviewedCount, null);
+  assert.equal(status.sync.state, 'needs_full_sync');
+  assert.equal(status.sync.errorCode, 'MAIL_PERIOD_REQUIRED');
+});
+
+test('narrowed period hides old mail from all queues and direct operations while retaining audit records', async () => {
+  const f = fixture();
+  const oldAt = '2026-02-01T00:00:00.000Z';
+  const recentStart = '2026-11-01T00:00:00.000Z';
+  for (const id of ['old-reviewed', 'old-unreviewed', 'old-pending']) {
+    const message = gmailMessage(id, `受付ID: ${A}`, [], id === 'old-reviewed' ? { bytes: Buffer.from('old attachment') } : null);
+    message.internalDate = String(Date.parse(oldAt));
+    f.messages.set(id, message);
+  }
+  for (let index = 0; index < 53; index++) f.messages.set(`recent-${String(index).padStart(3, '0')}`, gmailMessage(`recent-${String(index).padStart(3, '0')}`));
+  async function run(startAt, mode = 'full') {
+    const executionId = randomUUID();
+    let result = await f.execute(f.envelope('advanceSync', { executionId, mode, startAt }));
+    while (result.sync.state === 'running') result = await f.execute(f.envelope('advanceSync', { executionId }));
+    assert.equal(result.sync.state, 'complete');
+    return result;
+  }
+  await run(START);
+  for (const [id, target] of [['old-reviewed', B], ['old-unreviewed', A]]) await f.execute(f.envelope('resolvePending', {
+    messageId: id, expectedVersion: 1, action: 'match', caseId: target, reason: '本文を照合'
+  }));
+  await f.execute(f.envelope('getMail', { scope: 'case', caseId: B, messageId: 'old-reviewed' }));
+  await f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: B, messageId: 'old-reviewed', partId: '0.1', offset: 0 }));
+  const review = f.envelope('markReviewed', { scope: 'case', caseId: B, messageId: 'old-reviewed', expectedVersion: 2 });
+  await f.execute(review);
+  await f.store.markUnavailable('old-unreviewed', NOW);
+  const oldRecords = ['old-reviewed', 'old-unreviewed', 'old-pending'].map((id) => structuredClone(f.store.records.get(id)));
+  const events = structuredClone(f.store.events);
+  const broadPage = await f.execute(f.envelope('listPendingMail'));
+  const broadIssues = await f.execute(f.envelope('listMailIssues', { kind: 'pending' }));
+  assert.ok(broadPage.page.nextPageToken);
+  const narrowed = await run(recentStart, 'history');
+  assert.equal(narrowed.sync.mode, 'full');
+  assert.equal(narrowed.sync.startAt, recentStart);
+  assert.equal(narrowed.sync.pendingCount, 53);
+  assert.equal(narrowed.sync.unreviewedCount, 0);
+  assert.equal(narrowed.sync.unavailableCount, 0);
+  assert.equal(narrowed.sync.coverageUnverifiedCaseCount, 2);
+  assert.deepEqual(['old-reviewed', 'old-unreviewed', 'old-pending'].map((id) => f.store.records.get(id)), oldRecords);
+  assert.deepEqual(f.store.events, events);
+  await assert.rejects(() => f.execute(f.envelope('listPendingMail', { pageToken: broadPage.page.nextPageToken })), { code: 'MAIL_INVALID_REQUEST' });
+  await assert.rejects(() => f.execute(f.envelope('listMailIssues', { kind: 'pending', pageToken: broadIssues.page.nextPageToken })), { code: 'MAIL_INVALID_REQUEST' });
+  const ids = [];
+  let pageToken = '';
+  do {
+    const result = await f.execute(f.envelope('listPendingMail', { pageToken }));
+    ids.push(...result.messages.map((item) => item.messageId));
+    pageToken = result.page.nextPageToken;
+  } while (pageToken);
+  assert.equal(ids.length, 53); assert.equal(new Set(ids).size, 53);
+  assert.ok(ids.every((id) => id.startsWith('recent-')));
+  assert.deepEqual((await f.execute(f.envelope('listCaseMail', { caseId: A }))).messages, []);
+  assert.deepEqual((await f.execute(f.envelope('listUnreviewedMail'))).messages, []);
+  for (const kind of ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable']) {
+    const issues = await f.execute(f.envelope('listMailIssues', { kind }));
+    assert.ok(issues.targets.every((item) => item.messageId.startsWith('recent-')));
+  }
+  const calls = f.calls.length;
+  for (const [operation, payload] of [
+    ['getMail', { scope: 'case', caseId: B, messageId: 'old-reviewed' }],
+    ['getMail', { scope: 'pending', messageId: 'old-pending' }],
+    ['getAttachmentChunk', { scope: 'case', caseId: B, messageId: 'old-reviewed', partId: '0.1', offset: 0 }],
+    ['resolvePending', { messageId: 'old-pending', action: 'exclude', expectedVersion: 1, reason: '対象外' }]
+  ]) await assert.rejects(() => f.execute(f.envelope(operation, payload)), { code: 'MAIL_NOT_FOUND' });
+  await assert.rejects(() => f.execute(review), { code: 'MAIL_NOT_FOUND' });
+  assert.equal(f.calls.length, calls);
+  const visible = await f.execute(f.envelope('getMail', { scope: 'pending', messageId: 'recent-000' }));
+  assert.match(visible.message.bodyText, /受付ID/);
+});
+
+test('a period change between write preflight and transaction prevents review or receipt replay', async () => {
+  const f = fixture([A]);
+  f.store.seed(record('old', { internalDate: '2026-02-01T00:00:00.000Z' }));
+  const mutate = f.store.mutate.bind(f.store);
+  f.store.mutate = async (...args) => {
+    const lease = await f.store.acquireSyncLease('narrow');
+    await f.store.setSyncState({ state: 'complete', startAt: '2026-11-01T00:00:00.000Z' }, lease);
+    await f.store.releaseSyncLease(lease);
+    return mutate(...args);
+  };
+  await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'old', expectedVersion: 1 })), { code: 'MAIL_MAPPING_CHANGED' });
+  assert.equal((await f.store.getMessage('old')).firstReview, null);
+  assert.equal(f.store.events.length, 0);
+  assert.equal(f.store.receipts.size, 0);
+});
+
+test('Firestore query boundary applies the active period to lists, counts and case coverage', async () => {
+  const rows = [record('old', { internalDate: START, caseId: B, unavailable: true, unverifiedAttachmentCount: 4 }),
+    record('recent'), record('pending', { matchState: 'pending', caseId: null })];
+  class Query {
+    constructor(filters = [], fields = null) { this.filters = filters; this.fields = fields; }
+    doc() { return this; }
+    collection() { return this; }
+    where(field, operator, value) { return new Query([...this.filters, [field, operator, value]], this.fields); }
+    select(...fields) { return new Query(this.filters, fields); }
+    orderBy() { return this; }
+    limit() { return this; }
+    startAfter() { return this; }
+    matching() { return rows.filter((row) => this.filters.every(([field, operator, value]) => operator === '>=' ? row[field] >= value : operator === 'in' ? value.includes(row[field]) : row[field] === value)); }
+    async get() { return { docs: this.matching().map((row) => ({ id: row.messageId, data: () => this.fields ? Object.fromEntries(this.fields.map((field) => [field, row[field]])) : row })) }; }
+    count() { return { get: async () => ({ data: () => ({ count: this.matching().length }) }) }; }
+    aggregate() { return { get: async () => ({ data: () => ({ unverified: this.matching().reduce((sum, row) => sum + row.unverifiedAttachmentCount, 0), unavailable: this.matching().reduce((sum, row) => sum + row.unavailableAttachmentCount, 0) }) }) }; }
+  }
+  const store = createFirestoreStore({ collection: () => new Query() });
+  const startAt = '2026-11-01T00:00:00.000Z';
+  assert.deepEqual((await store.listMessages({ mode: 'case', caseId: A, startAt, limit: 51 })).map((row) => row.messageId), ['recent']);
+  assert.deepEqual(await store.getCoveredCaseIds({ startAt }), [A]);
+  const counts = await store.countMessages({ startAt });
+  assert.equal(counts.pending, 1); assert.equal(counts.unreviewed, 1); assert.equal(counts.unavailable, 0); assert.equal(counts.attachmentUnverified, 0);
+});
+
 test('explicit pending reconciliation promotes only proven descendants after manual mapping', async () => {
   const f = fixture([A]);
   f.messages.set('parent', gmailMessage('parent'));
@@ -295,7 +438,7 @@ test('history retains the original period and direction comes from Gmail SENT la
   const spoofed = gmailMessage('spoofed', 'reply', [{ name: 'From', value: 'customer@speed-ad.com' }]);
   f.messages.set('old', old); f.messages.set('sent', sent); f.messages.set('spoofed', spoofed);
   f.gmail.listHistory = async () => ({ messageIds: ['old', 'sent', 'spoofed'], historyId: '200' });
-  const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history', startAt: '2026-11-01T00:00:00.000Z' }));
   assert.equal(result.sync.startAt, '2026-11-01T00:00:00.000Z');
   assert.equal(await f.store.getMessage('old'), null);
   assert.equal((await f.store.getMessage('sent')).direction, 'sent');
@@ -419,7 +562,9 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
       return String(url).endsWith('/profile') ? { emailAddress: 'customer@speed-ad.com', historyId: '3' } : { messages: [{ id: 'a' }], nextPageToken: 'next' };
     } }; }
   });
-  const result = await adapter.listMessages({ pageToken: 'page2', cutoffAt: NOW });
+  await assert.rejects(() => adapter.listMessages({ pageToken: 'page2', cutoffAt: NOW }), { code: 'MAIL_PERIOD_REQUIRED' });
+  assert.equal(calls.length, 0);
+  const result = await adapter.listMessages({ pageToken: 'page2', startAt: START, cutoffAt: NOW });
   assert.deepEqual(result.messageIds, ['a']); assert.equal(result.nextPageToken, 'next');
   assert.equal(calls.length, 2); assert.ok(calls[1].url.includes('includeSpamTrash=true'));
   assert.ok(new URL(calls[1].url).searchParams.get('q').includes('-in:drafts'));
@@ -643,7 +788,7 @@ test('residual list pages identify unindexed failures, unavailable attachments a
   }));
   const failedIds = Array.from({ length: 121 }, (_, i) => `unindexed-${i}`);
   const lease = await f.store.acquireSyncLease('test');
-  await f.store.setSyncState({ state: 'failed', executionId: 'run', failedMessageIds: failedIds, failedCount: failedIds.length }, lease);
+  await f.store.setSyncState({ state: 'failed', startAt: START, executionId: 'run', failedMessageIds: failedIds, failedCount: failedIds.length }, lease);
   await f.store.releaseSyncLease(lease);
   for (const [kind, expected] of [['pending', 123], ['unavailable', 62], ['bodyUnavailable', 123], ['attachmentUnavailable', 123], ['failed', 121], ['coverage', 121]]) {
     const targets = []; let pageToken = ''; let pages = 0;
