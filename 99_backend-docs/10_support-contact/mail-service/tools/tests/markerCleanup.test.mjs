@@ -202,13 +202,14 @@ test('CLI validates target and explicit operation before connecting and outputs 
 });
 
 test('marker cleanup rejects old or altered mailbox consent before creating an OAuth client', async () => {
-  const disclosure = mailboxDisclosure({ retentionNotice: '案件終了から3年で削除', deletionContact: 'ops@example.com' });
-  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure,
+  const disclosureParameters = { retentionNotice: '案件終了から3年で削除', deletionContact: 'ops@example.com' };
+  const disclosure = mailboxDisclosure(disclosureParameters);
+  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure, disclosureParameters,
     disclosureSha256: createHash('sha256').update(disclosure, 'utf8').digest('hex'),
     acceptedAt: '2026-11-11T00:00:00.000Z', verifiedMailbox: MAILBOX };
   let clients = 0;
   const create = async (consentReceipt) => createRuntimeGmailAdapter({
-    secretVersion: 'projects/test-project/secrets/mail/versions/1',
+    secretVersion: 'projects/test-project/secrets/mail/versions/1', now: () => Date.parse('2026-11-11T01:00:00.000Z'),
     secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({
       clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh', consentReceipt })) } }]; } },
     createOAuthClient: () => { clients++; throw new Error('OAuth client should not be created'); }

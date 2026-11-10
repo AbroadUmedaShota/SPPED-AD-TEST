@@ -77,6 +77,7 @@ test('PKCE offline consent atomically stores verified credentials and the exact 
   assert.equal(calls.profile.url, 'https://gmail.googleapis.com/gmail/v1/users/me/profile');
   assert.equal(calls.profile.request.redirect, 'error');
   const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION,
+    disclosureParameters: { retentionNotice: options.retentionNotice, deletionContact: options.deletionContact },
     disclosureSha256: createHash('sha256').update(calls.disclosure, 'utf8').digest('hex'), acceptedAt, verifiedMailbox: MAILBOX };
   assert.deepEqual(calls.writes, [{ parent: canonicalSecretName,
     payload: { clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: 'synthetic-refresh',

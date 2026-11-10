@@ -45,7 +45,7 @@ node tools/captureGmailAcceptanceCli.mjs --project APPROVED_PROJECT --confirm-pr
 
 対象projectはSecret versionのproject表記と完全一致、versionは正の数値を指定する。Secretのproject ID/number表記を混在させず、既存記録から同じ正本名へ揃える。日時はミリ秒付きUTC ISOで、cutoffは未来にしない。保存先は事前に管理者がアクセスを制限した既存の絶対パスのディレクトリとし、32byteの一時keyファイルと新規JSON出力をその直下へ置く。全sourceで同じkey bytesを使う。app採取も同じ `--private-dir` / `--key-file` 方式とし、Sheetには同じbytesのbase64を渡す。keyをコマンド引数・ログ・共有repoへ渡さない。
 
-実行前にGoogle審査・評価要件と社員全員の人による閲覧条件を解決し、関連メールなしの案件確認も含む説明version `2026-11-11.7` へ本人が明示同意したSecret versionを用意する。CLIは既存の `createRuntimeGmailAdapter` で同意記録を検証してからOAuth clientを作る。全メールmetadataを1通ずつ読むため、profile件数、Gmail quotaと月額3,000円の予算通知を確認して実行規模を判断する。予算通知は支出停止の上限ではない。上限100,000件、10,000ページを超える場合や途中変更・失敗は未完了とし、黙って省略・自動retryしない。
+実行前にGoogle審査・評価要件と社員全員の人による閲覧条件を解決し、関連メールなしの案件確認も含む説明version `2026-11-11.8` へ本人が明示同意したSecret versionを用意する。CLIは既存の `createRuntimeGmailAdapter` で同意記録を検証してからOAuth clientを作る。全メールmetadataを1通ずつ読むため、profile件数、Gmail quotaと月額3,000円の予算通知を確認して実行規模を判断する。予算通知は支出停止の上限ではない。上限100,000件、10,000ページを超える場合や途中変更・失敗は未完了とし、黙って省略・自動retryしない。
 
 実採取だけは同じ引数へ `--execute` を追加する。出力はSecret参照前に排他的に新規作成し、既存ファイルを上書きしない。本文や資格情報を表示せず、成功/未完了の固定コード・件数・固定エラーだけを端末へ返す。失敗時に空または不完全な予約ファイルが残ることがある。その内容は受入証拠にならない。管理者が状態を調べ、当該の空・不完全ファイルを明示削除した後に、新しい採取を明示実行する。自動再実行や自動上書きは行わない。
 

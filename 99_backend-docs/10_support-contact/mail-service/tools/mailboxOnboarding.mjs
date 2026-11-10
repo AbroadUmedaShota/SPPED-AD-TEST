@@ -1,11 +1,8 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
-import { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE } from '../runtime/mailboxDisclosure.mjs';
+import { MAILBOX, GMAIL_READONLY_SCOPE, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE, mailboxDisclosure, validRetentionNotice, validDeletionContact } from '../runtime/mailboxDisclosure.mjs';
 
-export { MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE };
-
-export const MAILBOX = 'customer@speed-ad.com';
-export const GMAIL_READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
+export { MAILBOX, GMAIL_READONLY_SCOPE, MAILBOX_DISCLOSURE_VERSION, MAILBOX_MARKER_DISCLOSURE, MAILBOX_SYNC_DISCLOSURE, MAILBOX_ACCEPTANCE_DISCLOSURE, mailboxDisclosure };
 const PROFILE_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/profile';
 const CALLBACK_PATH = '/oauth/callback';
 const CLEAN_CALLBACK_SCRIPT = "history.replaceState(null, '', '/complete');";
@@ -24,29 +21,9 @@ export function validateOnboardingOptions(options) {
   requireValue(/^projects\/[A-Za-z0-9._:-]+\/secrets\/[A-Za-z0-9_-]+$/.test(options.secretName || ''), 'INVALID_SECRET_NAME');
   requireValue(typeof options.clientId === 'string' && options.clientId.length <= 512 && /^[^\s]+\.apps\.googleusercontent\.com$/.test(options.clientId), 'OAUTH_CLIENT_REQUIRED');
   requireValue(typeof options.clientSecret === 'string' && options.clientSecret.trim() && options.clientSecret.length <= 4096 && !/[\r\n]/.test(options.clientSecret), 'OAUTH_CLIENT_REQUIRED');
-  requireValue(typeof options.retentionNotice === 'string' && options.retentionNotice.trim() && options.retentionNotice.length <= 500 &&
-    !/[\u0000-\u001f\u007f-\u009f]/.test(options.retentionNotice), 'DATA_HANDLING_NOTICE_REQUIRED');
-  requireValue(typeof options.deletionContact === 'string' && options.deletionContact.length <= 254 &&
-    /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}$/.test(options.deletionContact), 'DATA_DELETION_CONTACT_REQUIRED');
+  requireValue(validRetentionNotice(options.retentionNotice), 'DATA_HANDLING_NOTICE_REQUIRED');
+  requireValue(validDeletionContact(options.deletionContact), 'DATA_DELETION_CONTACT_REQUIRED');
   return options;
-}
-
-export function mailboxDisclosure(options) {
-  return `SPEED AD お問い合わせ確認アプリ：Gmailデータの利用について
-説明version: ${MAILBOX_DISCLOSURE_VERSION}
-運営主体: アブロードアウトソーシング株式会社
-対象アカウント: ${MAILBOX}
-要求権限: ${GMAIL_READONLY_SCOPE}（メールと添付の読取り。送信・変更・削除の権限は要求しません。）
-${MAILBOX_SYNC_DISCLOSURE}
-${MAILBOX_MARKER_DISCLOSURE}
-${MAILBOX_ACCEPTANCE_DISCLOSURE}
-共有: アプリの認証を通った abroad-o.com の社員全員と公式窓口の利用者が、対象メールの本文・添付、照合待ち、確認記録を閲覧できます。問い合わせ対応のため、この範囲の人による閲覧に同意する場合だけ続行してください。Google Cloud上で処理・保存します。
-保存: 件名、差出人・宛先、日時、メール/スレッドID、添付名などの添付情報、案件との照合、メールごとの確認者・日時、関連メールなしの案件確認者・日時・対象期間、同期位置と監査記録をFirestoreへ保存します。関連メールなしの確認は同期範囲や照合結果が変わると再確認が必要です。本文は同期時の照合と閲覧時に取得します。添付本体は主に閲覧時に取得しますが、Gmailのメール応答に本文と一緒に含まれる添付データは同期時にも一時的に受信します。本文・添付本体はサーバーの一時メモリと利用者画面で処理し、Firestoreへ保存しません。継続読取りの資格情報と、この説明全文・説明version・hash・同意日時・確認済み窓口の同意記録を同じSecret Manager versionへ保存します。
-保存方針: Gmail由来の照合・確認記録と関連メールなしの案件確認記録は案件終了後3年間、除外したメールの記録は除外確定後3年間保存します。照合待ちの記録は案件への照合または除外を確定するまで3年間の起算日が決まらないため保持します。期限削除は管理者が手動で実行します。実施方法: ${options.retentionNotice.trim()}
-下書きとの矛盾: 既存の通常メールが現在の下書きと判定された場合は、既存の監査・確認記録を保持し、案件との紐付けを外した取得不能の照合待ちとして人の判断を待ちます。新しい下書き本文を取得・保存しません。
-停止・削除: Googleアカウントの接続管理から本アプリのアクセスを取り消せます。取消し後も保存済みデータは残るため、削除申請は ${options.deletionContact} へ対象の案件ID/メールIDを連絡してください。取消しやアプリ側データ削除でGmailの元メールは削除しません。
-詳細: mail-service READMEの「データの管理・削除」を確認してください。
-Google Workspaceから得た情報はGoogle User Data PolicyのLimited Use要件に従って扱います。`;
 }
 
 export function createProof(random = randomBytes) {
@@ -145,6 +122,7 @@ export async function authorizeMailbox(options, { createOAuthClient, secretManag
   let acceptedAt;
   try { acceptedAt = new Date(now()).toISOString(); } catch { throw new OnboardingError('CONSENT_TIME_UNAVAILABLE'); }
   const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION,
+    disclosureParameters: { retentionNotice: options.retentionNotice.trim(), deletionContact: options.deletionContact },
     disclosureSha256: createHash('sha256').update(disclosure, 'utf8').digest('hex'), acceptedAt, verifiedMailbox: MAILBOX };
   const secretName = await resolveSecretName(secretManager, options.secretName);
   const proof = createProof(random);

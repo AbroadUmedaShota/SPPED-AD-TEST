@@ -103,10 +103,11 @@ test('real CLI default and malformed arguments never import Google clients or ex
 });
 
 test('capture factory rejects old and omitted acceptance consent before OAuth construction', async () => {
-  const disclosure = mailboxDisclosure({ retentionNotice: '合成の手動削除方法', deletionContact: 'ops@example.com' });
+  const disclosureParameters = { retentionNotice: '合成の手動削除方法', deletionContact: 'ops@example.com' };
+  const disclosure = mailboxDisclosure(disclosureParameters);
   const digest = (value) => createHash('sha256').update(value).digest('hex');
-  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure, disclosureSha256: digest(disclosure),
-    acceptedAt: NOW.toISOString(), verifiedMailbox: 'customer@speed-ad.com' };
+  const receipt = { disclosureVersion: MAILBOX_DISCLOSURE_VERSION, disclosure, disclosureParameters, disclosureSha256: digest(disclosure),
+    acceptedAt: '2020-01-01T00:00:00.000Z', verifiedMailbox: 'customer@speed-ad.com' };
   let clients = 0; let consentReceipt;
   const load = async () => [{ SecretManagerServiceClient: class {
     async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'synthetic-id',
