@@ -1408,7 +1408,8 @@
     function validContactMailSummary(message) {
       return message && typeof message === 'object' && /^[a-zA-Z0-9_-]{1,128}$/.test(message.messageId) &&
         ['matched', 'pending', 'excluded'].includes(message.matchState) && Number.isInteger(message.version) && message.version > 0 &&
-        typeof message.internalDate === 'string' && typeof message.subject === 'string' && typeof message.from === 'string' &&
+        typeof message.internalDate === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(message.internalDate) &&
+        Number.isFinite(Date.parse(message.internalDate)) && typeof message.subject === 'string' && typeof message.from === 'string' &&
         typeof message.to === 'string' && ['sent', 'received', 'unknown'].includes(message.direction) &&
         Number.isInteger(message.attachmentCount) && message.attachmentCount >= 0 &&
         (message.firstReview == null || (typeof message.firstReview.email === 'string' && typeof message.firstReview.at === 'string'));
@@ -1437,9 +1438,19 @@
       if (scope === 'case') {
         validateContactCaseNoMail(result.noMail, result.sync);
         if ((result.noMail.eligible || result.noMail.confirmation) &&
-          (result.messages.length || result.page.nextPageToken || result.page.previousPageToken)) throw new Error('MAIL_INVALID_RESPONSE');
+          result.messages.some((message) => !contactMailAfterAcceptanceCutoff(message, result.sync))) throw new Error('MAIL_INVALID_RESPONSE');
       }
       return result;
+    }
+
+    function contactMailInAcceptancePeriod(message, sync) {
+      const at = Date.parse(message && message.internalDate);
+      return Number.isFinite(at) && sync && at >= Date.parse(sync.startAt) && at <= Date.parse(sync.cutoffAt);
+    }
+
+    function contactMailAfterAcceptanceCutoff(message, sync) {
+      const at = Date.parse(message && message.internalDate);
+      return Number.isFinite(at) && sync && at > Date.parse(sync.cutoffAt);
     }
 
     function validateContactCaseNoMail(value, sync) {
@@ -1906,7 +1917,7 @@
         current.page = result.page;
         current.sync = newerObservation ? contactMailState.sync : result.sync;
         current.noMail = current.scope === 'case' ? result.noMail : null;
-        if (current.noMail && (current.noMail.confirmation || current.messages.length)) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
+        if (current.noMail && (current.noMail.confirmation || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)))) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
         if (current.noMail && !current.pendingNoMail) current.noMailError = '';
         current.status = 'loaded';
         renderContactMailView(view);
@@ -1937,6 +1948,11 @@
         const result = contactMailResult(await callServer('getContactMailMessage', contactMailOptions(current, { messageId })));
         if (serial !== current.detailSerial) return;
         current.message = validateContactMailMessage(result, messageId);
+        if (current.scope === 'case' && current.noMail && (current.noMail.eligible || current.noMail.confirmation) &&
+          !contactMailAfterAcceptanceCutoff(current.message, current.sync)) {
+          current.noMail = { eligible: false, contextToken: null, confirmation: null, stale: true };
+          throw new Error('MAIL_INVALID_RESPONSE');
+        }
         if ((current.scope === 'case' && (current.message.caseId !== current.caseId || current.message.matchState !== 'matched')) ||
           (current.scope === 'pending' && current.message.matchState !== 'pending') ||
           (current.scope === 'unreviewed' && (current.message.matchState !== 'matched' || current.message.firstReview))) throw new Error('MAIL_INVALID_RESPONSE');
@@ -1965,13 +1981,13 @@
 
     function contactCaseNoMailHtml(current) {
       const noMail = current.noMail;
-      if (current.scope !== 'case' || current.messages.length || !noMail) return '';
+      if (current.scope !== 'case' || !noMail || (current.messages.length && !noMail.eligible && !noMail.confirmation && !noMail.stale && !current.pendingNoMail)) return '';
       const confirmation = noMail.confirmation;
       const record = confirmation ? `<p class="mail-review">関連メールなし確認済み / 確認者: ${escapeHtml(confirmation.email)} / 確認日時: ${escapeHtml(formatDate(confirmation.at))}<br>対象期間: ${escapeHtml(formatDate(confirmation.startAt))} ～ ${escapeHtml(formatDate(confirmation.cutoffAt))}</p>` :
-        `<p class="muted">${noMail.stale ? '前の「関連メールなし」確認は対象条件が変わったため失効しています。再確認が必要です。' : 'この対象期間の関連メールの有無は未確認です。'} 同期・照合の未完了を確認し、案件の受付内容と照合してください。</p>`;
+        `<p class="muted">${noMail.stale ? '前の「関連メールなし」確認は対象条件が変わったため失効しています。再確認が必要です。' : 'この対象期間の関連メールの有無は未確認です。'} 同期・照合の未完了を確認し、案件の受付内容と照合してください。<br>対象期間: ${escapeHtml(formatDate(current.sync.startAt))} ～ ${escapeHtml(formatDate(current.sync.cutoffAt))}</p>`;
       const action = current.pendingNoMail ? `<button type="button" data-mail-no-mail-confirm ${current.writing ? 'disabled' : ''}>前の確認操作を再確認</button>` :
         !confirmation && noMail.eligible ? `<button type="button" data-mail-no-mail-confirm ${current.writing ? 'disabled' : ''}>この対象期間に関連メールなしと確認</button>` : '';
-      return `${record}${action}${!confirmation && !noMail.eligible && !current.pendingNoMail ? '<p class="muted">同期・照合待ち・取得失敗などを解消し、更新してから確認してください。</p>' : ''}<p class="error" role="status">${escapeHtml(current.noMailError || '')}</p>`;
+      return `${record}${current.messages.some((message) => contactMailAfterAcceptanceCutoff(message, current.sync)) ? '<p class="muted">基準日時より後のメールは「関連メールなし」確認の対象外です。</p>' : ''}${action}${!confirmation && !noMail.eligible && !current.pendingNoMail ? '<p class="muted">同期・照合待ち・取得失敗などを解消し、更新してから確認してください。</p>' : ''}<p class="error" role="status">${escapeHtml(current.noMailError || '')}</p>`;
     }
 
     function renderContactMailView(view) {
@@ -1995,11 +2011,12 @@
       root.innerHTML = `${heading}
         ${current.scope === 'issues' ? '<p><button type="button" data-mail-issues-back>残件一覧に戻る</button></p>' : ''}
         <p class="mail-sync">${escapeHtml(renderContactMailSync(current.sync))}</p>
+        ${contactCaseNoMailHtml(current)}
         ${current.scope === 'pending' && viewerContext.authMode === 'domain' ? `<p><button type="button" data-mail-reconcile ${current.writing ? 'disabled' : ''}>${current.reconcilePageToken ? '照合待ちの再照合を続行' : '照合待ちを再照合'}</button> <span role="status">${escapeHtml(current.reconcileMessage || '')}</span></p>` : ''}
         <div class="mail-navigation"><button type="button" data-mail-prev ${previousDisabled ? 'disabled' : ''}>← 前のメール</button>
         <select data-mail-select aria-label="メールを選択" ${current.writing || !current.messages.length ? 'disabled' : ''}>${current.messages.map((item, index) => `<option value="${index}" ${index === current.selectedIndex ? 'selected' : ''}>${escapeHtml(formatDate(item.internalDate))} ${item.firstReview ? '確認済み' : '未確認'} ${escapeHtml(contactMailText(item.subject || '（件名なし）'))}</option>`).join('')}</select>
         <button type="button" data-mail-next ${nextDisabled ? 'disabled' : ''}>次のメール →</button><button type="button" data-mail-reload ${current.writing ? 'disabled' : ''}>更新</button></div>
-        ${!current.messages.length ? `<p class="muted">${current.scope === 'case' ? '現在紐付いているメールは0件です。' : '現在の条件で表示できるメールは0件です。同期・照合の未完了も確認してください。'}</p>${contactCaseNoMailHtml(current)}` : current.detailError ? `<p class="error" role="status">${escapeHtml(current.detailError)}</p>` : !message ? '<p class="muted" role="status">メール本文を読み込み中...</p>' : `
+        ${!current.messages.length ? `<p class="muted">${current.scope === 'case' ? '現在紐付いているメールは0件です。' : '現在の条件で表示できるメールは0件です。同期・照合の未完了も確認してください。'}</p>` : current.detailError ? `<p class="error" role="status">${escapeHtml(current.detailError)}</p>` : !message ? '<p class="muted" role="status">メール本文を読み込み中...</p>' : `
           <h3>${escapeHtml(contactMailText(message.subject || '（件名なし）'))}</h3>
           <div class="grid"><div class="label">日時</div><div>${escapeHtml(formatDate(message.internalDate))}</div><div class="label">送受信</div><div>${message.direction === 'sent' ? '送信' : message.direction === 'received' ? '受信' : '送受信不明'}</div><div class="label">差出人</div><div>${escapeHtml(contactMailText(message.from))}</div><div class="label">宛先</div><div>${escapeHtml(contactMailText(message.to))}</div><div class="label">案件</div><div>${escapeHtml(message.caseId || '照合待ち')}</div>${message.reason ? `<div class="label">照合の状態</div><div>${escapeHtml(contactMailMatchReason(message.reason))}</div>` : ''}${message.matchState === 'pending' && message.evidence && Array.isArray(message.evidence.bodyCaseIds) && message.evidence.bodyCaseIds.length ? `<div class="label">本文の受付ID</div><div>${escapeHtml(message.evidence.bodyCaseIds.join(' / '))}</div>` : ''}</div>
           <div class="mail-review">${contactMailReviewHtml(message, current.writing)}</div>
@@ -2063,7 +2080,7 @@
 
     async function confirmContactCaseNoMailFromUi(view) {
       const current = contactMailState[view];
-      if (current.scope !== 'case' || current.status !== 'loaded' || current.writing || current.messages.length || !current.noMail) return;
+      if (current.scope !== 'case' || current.status !== 'loaded' || current.writing || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)) || !current.noMail) return;
       if (!current.pendingNoMail) {
         if (!current.noMail.eligible || current.noMail.confirmation || !window.confirm('表示中の対象期間について、この案件に関連するメールがないことを確認しましたか？')) return;
         current.pendingNoMail = { caseId: current.caseId, contextToken: current.noMail.contextToken, requestId: window.crypto.randomUUID() };

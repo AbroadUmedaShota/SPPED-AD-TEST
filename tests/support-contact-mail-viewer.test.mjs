@@ -612,6 +612,69 @@ test('case no-mail confirmation is explicit and reads back the server actor and 
   assert.equal(Object.keys(cancelled.mail.noMailRequests).length, 0);
 });
 
+test('post-cutoff case mail stays visible beside fixed-period no-mail confirmation across pages', async () => {
+  let confirmed = false;
+  const dates = { later: '2026-11-10T00:00:00.002Z', earlier: '2026-11-10T00:00:00.001Z' };
+  const app = uiRuntime({ listContactMail: (options) => ({ ...list([summary(options.pageToken === 'next' ? 'earlier' : 'later', {
+    internalDate: dates[options.pageToken === 'next' ? 'earlier' : 'later'] })], options.pageToken === 'next' ? { previousPageToken: 'previous' } : { nextPageToken: 'next' }),
+  noMail: confirmed ? noMail({ confirmation: noMailConfirmation }) : noMail({ eligible: true }) }),
+  getContactMailMessage: (options) => ({ ok: true, message: detail(options.messageId, { internalDate: dates[options.messageId], bodyText: '基準日時後の本文' }) }),
+  confirmContactCaseNoMail: () => { confirmed = true; return { ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync }; } });
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.match(app.element('caseMailSection').innerHTML, /基準日時後の本文/);
+  assert.match(app.element('caseMailSection').innerHTML, /この対象期間に関連メールなしと確認/);
+  assert.match(app.element('caseMailSection').innerHTML, /基準日時より後のメールは「関連メールなし」確認の対象外/);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.match(app.element('caseMailSection').innerHTML, /関連メールなし確認済み/);
+  assert.match(app.element('caseMailSection').innerHTML, /基準日時後の本文/);
+  assert.equal(app.mail.case.message.messageId, 'later');
+  await app.ui.moveContactMail('case', 1);
+  assert.equal(app.mail.case.message.messageId, 'earlier');
+  assert.match(app.element('caseMailSection').innerHTML, /関連メールなし確認済み/);
+  await app.ui.moveContactMail('case', -1);
+  assert.equal(app.mail.case.message.messageId, 'later');
+  assert.equal(app.calls.filter((call) => call.name === 'confirmContactCaseNoMail').length, 1);
+});
+
+test('in-period or malformed listed mail cannot accompany no-mail eligibility or confirmation', async () => {
+  for (const at of [sync.startAt, sync.cutoffAt, '2026-11-05T00:00:00.000Z', 'invalid']) {
+    for (const state of [noMail({ eligible: true }), noMail({ confirmation: noMailConfirmation })]) {
+      const app = uiRuntime({ listContactMail: () => ({ ...list([summary('mail1', { internalDate: at })]), noMail: state }) });
+      await app.ui.loadContactMailList('case', { caseId });
+      assert.equal(app.mail.case.status, 'failed');
+      assert.doesNotMatch(app.element('caseMailSection').innerHTML, /関連メールなし確認済み|data-mail-no-mail-confirm/);
+    }
+  }
+  const contradictory = uiRuntime({ listContactMail: () => ({ ...list([summary('mail1', { internalDate: '2026-11-10T00:00:00.001Z' })]), noMail: noMail({ eligible: true }) }),
+    getContactMailMessage: () => ({ ok: true, message: detail('mail1', { internalDate: sync.cutoffAt }) }) });
+  await contradictory.ui.loadContactMailList('case', { caseId });
+  assert.equal(contradictory.mail.case.noMail.eligible, false);
+  assert.match(contradictory.mail.case.detailError, /応答を確認できません/);
+});
+
+test('unknown no-mail operation survives post-cutoff mail and page-boundary readback with the same identity', async () => {
+  let attempts = 0;
+  const after = '2026-11-10T00:00:00.001Z';
+  const app = uiRuntime({ listContactMail: (options) => ({ ...list([summary(options.pageToken === 'next' ? 'after2' : 'after1', { internalDate: after })],
+    options.pageToken === 'next' ? { previousPageToken: 'previous' } : { nextPageToken: 'next' }), noMail: noMail({ eligible: true }) }),
+  getContactMailMessage: (options) => ({ ok: true, message: detail(options.messageId, { internalDate: after }) }),
+  confirmContactCaseNoMail: () => ++attempts === 1 ? { ok: false, error: { code: 'MAIL_SERVICE_UNAVAILABLE' } } :
+    { ok: true, noMail: noMail({ confirmation: noMailConfirmation }), sync } });
+  await app.ui.loadContactMailList('case', { caseId });
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  const requestId = app.mail.case.pendingNoMail.requestId;
+  await app.ui.moveContactMail('case', 1);
+  assert.equal(app.mail.case.message.messageId, 'after2');
+  assert.equal(app.mail.case.pendingNoMail.requestId, requestId);
+  assert.match(app.element('caseMailSection').innerHTML, /前の確認操作を再確認/);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  const writes = app.calls.filter((call) => call.name === 'confirmContactCaseNoMail');
+  assert.deepEqual(writes[0].args[0], writes[1].args[0]);
+  assert.equal(app.mail.case.pendingNoMail, null);
+  assert.equal(app.mail.case.message.messageId, 'after2');
+  assert.match(app.element('caseMailSection').innerHTML, /関連メールなし確認済み/);
+});
+
 test('no-mail UI rejects malformed eligibility and shows stale confirmation as requiring review', async () => {
   const stale = uiRuntime({ listContactMail: () => ({ ...list([]), sync: { ...sync, noMailContextToken: 'b'.repeat(64) }, noMail: noMail({ stale: true, eligible: true, contextToken: 'b'.repeat(64) }) }) });
   await stale.ui.loadContactMailList('case', { caseId });
