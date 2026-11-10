@@ -5,8 +5,9 @@ import { spawnSync } from 'node:child_process';
 import { mkdtemp, writeFile, readFile, rm, rmdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { captureAppAcceptance, noMailEvidenceRows, parseAppCaptureArguments, runAppCaptureCli } from '../captureAppAcceptance.mjs';
+import { captureAppAcceptance, parseAppCaptureArguments, runAppCaptureCli } from '../captureAppAcceptance.mjs';
 import { prepareCaptureFiles } from '../privateCaptureFiles.mjs';
+import { noMailContext } from '../../runtime/noMailConfirmation.mjs';
 
 const ROOT = 'contactMailboxes/customer-speed-ad';
 const CASE = '00000000-0000-0000-0000-000000000001';
@@ -141,12 +142,35 @@ test('invalid context cannot contact Firestore', async () => {
   assert.equal(f.transactions(), 0);
 });
 
-test('no-mail evidence requires the same context and hash-only exact rows', () => {
-  const context = { runId: 'acceptance-1', hashKeyId: digest(KEY), startAt: START, cutoffAt: END };
-  const input = { schemaVersion: 1, ...context, rows: [{ caseHash: hmac('case', CASE), evidenceHash: hmac('evidence', 'private-receipt-1') }] };
-  assert.deepEqual(noMailEvidenceRows(input, context), input.rows);
-  assert.throws(() => noMailEvidenceRows({ ...input, runId: 'other-run' }, context), /MAIL_ACCEPTANCE_INPUT_INVALID/);
-  assert.throws(() => noMailEvidenceRows({ ...input, rows: [{ ...input.rows[0], note: 'PRIVATE TEXT' }] }, context), /MAIL_ACCEPTANCE_INPUT_INVALID/);
+test('no-mail evidence is projected only from current audited Firestore confirmations', async () => {
+  const f = fixture(); f.records.delete(`${ROOT}/messages/abc123`);
+  const active = f.records.get(`${ROOT}/meta/activeCatalog`);
+  const context = noMailContext({ ...active, complete: true }, f.records.get(`${ROOT}/meta/sync`));
+  const confirmation = { caseId: CASE, email: 'staff@abroad-o.com', at: END, requestId: '00000000-0000-4000-8000-000000000001', context };
+  f.records.set(`${ROOT}/caseCoverage/${CASE}`, { noMailConfirmed: true, noMailConfirmation: confirmation });
+  let result = await f.capture();
+  assert.equal(result.sourceComplete, true); assert.equal(result.noMailConfirmations.length, 1);
+  assert.equal(result.noMailConfirmations[0].caseHash, hmac('case', CASE));
+  assert.equal(JSON.stringify(result).includes('staff@abroad-o.com'), false);
+  f.records.get(`${ROOT}/meta/sync`).executionId = 'new-sync';
+  result = await f.capture(); assert.deepEqual(result.noMailConfirmations, []);
+  confirmation.email = 'arbitrary@example.test';
+  result = await f.capture(); assert.ok(result.errors.includes('APP_NO_MAIL_CONFIRMATION_INVALID'));
+});
+
+test('captures audited absence confirmations for more than 200 cases from all catalog pages', async () => {
+  const f = fixture(); f.records.delete(`${ROOT}/messages/abc123`);
+  const rows = Array.from({ length: 203 }, (_, index) => ({ caseId: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`, handledStatus: '未対応', closedAt: null }));
+  const catalogDigest = digest(rows.map((row) => JSON.stringify([row.caseId, row.handledStatus, row.closedAt])).join('\n'));
+  f.records.set(`${ROOT}/meta/activeCatalog`, { snapshotId: 'snapshot', total: rows.length, digest: catalogDigest });
+  f.records.set(`${ROOT}/catalogSnapshots/snapshot`, { complete: true, pageCount: 2, total: rows.length, digest: catalogDigest });
+  f.records.set(`${ROOT}/catalogSnapshots/snapshot/pages/0000`, { pageIndex: 0, cases: rows.slice(0, 200) });
+  f.records.set(`${ROOT}/catalogSnapshots/snapshot/pages/0001`, { pageIndex: 1, cases: rows.slice(200) });
+  const context = noMailContext({ complete: true, snapshotId: 'snapshot', digest: catalogDigest }, f.records.get(`${ROOT}/meta/sync`));
+  for (const row of rows) f.records.set(`${ROOT}/caseCoverage/${row.caseId}`, { noMailConfirmed: true,
+    noMailConfirmation: { caseId: row.caseId, email: 'staff@abroad-o.com', at: END, requestId: row.caseId, context } });
+  const result = await f.capture(); assert.equal(result.sourceComplete, true); assert.equal(result.catalog.length, 203);
+  assert.equal(result.noMailConfirmations.length, 203); assert.equal(new Set(result.noMailConfirmations.map((row) => row.caseHash)).size, 203);
 });
 
 test('completion timestamp follows the snapshot read and retention unknowns remain incomplete', async () => {
@@ -176,7 +200,8 @@ test('App CLI requires complete context and absolute private paths before prepar
     const values = cliArgs(); values[values.indexOf(name) + 1] = value;
     assert.throws(() => parseAppCaptureArguments(values, new Date(NOW)), /MAIL_ACCEPTANCE_INPUT_INVALID/);
   }
-  for (const values of [['--execute'], [...cliArgs(), '--execute', '--execute'], [...cliArgs(), '--unknown', 'private']]) {
+  for (const values of [['--execute'], [...cliArgs(), '--execute', '--execute'], [...cliArgs(), '--unknown', 'private'],
+    [...cliArgs(), '--no-mail-confirmations', resolve('handcrafted.json')]]) {
     assert.throws(() => parseAppCaptureArguments(values, new Date(NOW)), /MAIL_ACCEPTANCE_INPUT_INVALID/);
   }
 });
@@ -247,25 +272,24 @@ test('App CLI real argument failures emit only a fixed code without paths or env
   assert.equal(result.status, 2); assert.equal(result.stdout, ''); assert.equal(result.stderr, 'MAIL_ACCEPTANCE_INPUT_INVALID\n');
 });
 
-test('App CLI closes files and erases key after evidence, output and database cleanup failures', async () => {
-  for (const stage of ['evidence', 'output', 'terminate']) {
+test('App CLI closes files and erases key after output and database cleanup failures', async () => {
+  for (const stage of ['output', 'terminate']) {
     const folder = await mkdtemp(join(tmpdir(), 'app-private-failure-'));
     const keyFile = join(folder, 'run.key'); const outputFile = join(folder, 'app.json');
     let key; let constructed = 0;
     try {
       await writeFile(keyFile, Buffer.alloc(32, 7), { mode: 0o600 });
       const args = [...cliArgs(folder), '--execute'];
-      if (stage === 'evidence') args.push('--no-mail-confirmations', join(folder, 'evidence.json'));
       const f = fixture(); f.db.terminate = async () => { if (stage === 'terminate') throw new Error('private cleanup failure'); };
       await assert.rejects(runAppCaptureCli(args, { now: () => new Date(NOW), write: () => {},
         prepare: async (options) => {
           const files = await prepareCaptureFiles({ ...options, ...(process.platform === 'win32' ? { inspectWindows: async () => {} } : {}) });
           key = files.key;
           return { ...files, write: stage === 'output' ? async () => { throw new Error('private output failure'); } : files.write };
-        }, readEvidence: async () => { throw new Error('private evidence failure'); },
+        },
         createDb: async () => { constructed++; return f.db; }
-      }), /private (?:evidence|output|cleanup) failure/);
-      assert.equal(constructed, stage === 'evidence' ? 0 : 1);
+      }), /private (?:output|cleanup) failure/);
+      assert.equal(constructed, 1);
       assert.equal(key.every((value) => value === 0), true);
     } finally { await Promise.all([keyFile, outputFile].map((path) => rm(path, { force: true }))); await rmdir(folder); }
   }

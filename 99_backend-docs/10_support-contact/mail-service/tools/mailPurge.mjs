@@ -59,7 +59,7 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
     const root = await mailbox.get();
     assertMail(!root.exists || Object.keys(root.data()).length === 0, 'MAIL_PURGE_UNSUPPORTED_COLLECTION', 409);
     const meta = await mailbox.collection('meta').get();
-    assertMail(meta.docs.every((item) => ['sync', 'syncLease', 'activeCatalog', 'purgeControl', 'purgeJob', 'markerCleanupJob'].includes(item.id)), 'MAIL_PURGE_UNSUPPORTED_COLLECTION', 409);
+    assertMail(meta.docs.every((item) => ['sync', 'syncLease', 'activeCatalog', 'mappingRevision', 'purgeControl', 'purgeJob', 'markerCleanupJob'].includes(item.id)), 'MAIL_PURGE_UNSUPPORTED_COLLECTION', 409);
     const all = [];
     let scanBytes = 0;
     for (const name of SCANNED) {

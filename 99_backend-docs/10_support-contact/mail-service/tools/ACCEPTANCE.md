@@ -26,7 +26,7 @@ Gmail行は `{messageHash, internalDate, draft}`。列挙は全メールボッ�
 
 app行は `{messageHash, internalDate, classification, caseHash, manualExclusion, unavailable, bodyVerified, attachmentCount, attachments, firstReview}`。分類はmatched・pending・excluded。明示的な手動除外だけを対象外として認める。suppression markerだけを到達済みメールへ変換しない。matchedは既知案件・本文取得成功・確認記録・全添付の取得成功が必要。firstReviewはnullまたは `{actorHash, at}`。attachmentsは `{availability, transferVersion, transferSize, servedChunks}` の配列で、名前等を含めない。未観測transfer値はnull/null/[]とする。verified・version1でも512KiB刻みの全offsetが揃わなければ未完了とする（0byte添付もoffset0が必要）。
 
-app固有キーは `catalog`、`syncComplete`、`residualCount`、`noMailConfirmations`。後者は `{caseHash, evidenceHash}` の配列で、関連メールなしを人が正本と照合したprivate記録を参照する。関連メールあり案件への確認・未知案件・重複記録を拒否する。確認根拠がないメールなし案件は残件とする。
+app固有キーは `catalog`、`syncComplete`、`residualCount`、`noMailConfirmations`。後者は `{caseHash, evidenceHash}` の配列で、アプリ内で明示確認した関連メールなしの記録を採取器が正本Firestoreから投影する。カタログ・同期範囲・分類revision・削除generationの変更後は古い確認を採用しない。外部で手作りした確認ファイルは入力しない。関連メールあり案件への確認・未知案件・重複記録を拒否する。完全なGmail/App集合照合と確認根拠が揃わないメールなし案件は残件とする。
 
 ## source採取の条件
 

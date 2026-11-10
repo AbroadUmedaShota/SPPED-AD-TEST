@@ -48,6 +48,24 @@ test('case purge is dry-run first, deletes all linked records and persists only 
   assert.deepEqual(catalog.suppressedCaseIds, [target]);
 });
 
+test('case purge removes no-mail confirmation actor, event and receipt from the existing coverage scope', async () => {
+  const confirmation = { caseId: target, email: 'no-mail-reviewer@abroad-o.com', at: '2026-11-11T00:00:00.000Z',
+    requestId: 'no-mail-request-111111', context: { executionId: 'sync-1' } };
+  const { db, purge } = fixture({
+    [`${root}/caseCoverage/${target}`]: { count: 0, noMailConfirmed: true, noMailConfirmation: confirmation },
+    [`${root}/events/no-mail-event`]: { type: 'case.no_mail_confirmed', caseId: target, actor: confirmation.email },
+    [`${root}/receipts/no-mail-request-111111`]: { fingerprint: 'no-mail', result: { confirmation } },
+    [`${root}/meta/mappingRevision`]: { token: '00000000-0000-4000-8000-000000000001' }
+  });
+  const plan = await purge.plan(target, 'no-mail-deletion');
+  await purge.apply(target, 'no-mail-deletion', plan.planHash);
+  assert.equal(db.records.has(`${root}/caseCoverage/${target}`), false);
+  assert.equal(db.records.has(`${root}/events/no-mail-event`), false);
+  assert.equal(db.records.has(`${root}/receipts/no-mail-request-111111`), false);
+  assert.equal(JSON.stringify([...db.records]).includes(confirmation.email), false);
+  assert.equal(db.records.has(`${root}/meta/mappingRevision`), true);
+});
+
 test('changed plans, unresolved references, shared history and active sync fail before deletion', async () => {
   for (const extra of [
     { [`${root}/messages/pending`]: { messageId: 'pending', caseId: null, evidence: { bodyCaseIds: [target] } } },

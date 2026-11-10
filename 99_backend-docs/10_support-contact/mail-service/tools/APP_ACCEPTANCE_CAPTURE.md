@@ -16,6 +16,6 @@ active catalog、catalog snapshot全ページ、sync/lease/purge状態、全mess
 
 件名・本文・送受信者・添付名・添付bytesは出力しません。添付の到達判定に必要な転送状態、最初の確認者のhashと日時だけを投影します。hashもprivate受入記録として扱います。ID不一致、catalogページ欠落・digest不一致、進行中のlease/purge、同期失敗、削除診断、保存期限の未解決を固定エラーコードで残します。抑止マーカーだけでは到達できたメールと扱いません。
 
-`sourceComplete` は採取が検証条件を満たしたことを示します。関連メールなし案件の業務根拠は自動生成せず、`--no-mail-confirmations ABSOLUTE_PRIVATE_EVIDENCE_PATH` で別に確認済みのhashだけを取り込めます。証拠ファイルは厳密に `schemaVersion:1`、同じ `runId/hashKeyId/startAt/cutoffAt`、`rows:[{caseHash,evidenceHash}]` を持つJSONです。caseHashはcase種別、private証拠記録の参照から作るevidenceHashはevidence種別で同じkeyを使います。本文や自由記述を追加したファイル、別実行の証拠は受け付けません。module APIからは同じ配列を `noMailConfirmations` へ渡せます。
+`sourceComplete` は採取が検証条件を満たしたことを示します。関連メールなし案件は、アプリ内の明示確認で保存した確認者・日時・対象範囲を、既存の `caseCoverage` から同じread-only transactionで読みます。カタログ・同期実行・期間・履歴位置・分類revision・削除generationが現在と一致し、紐付けメール、照合待ち、失敗、種類不明削除、進行中leaseがない確認だけを `{caseHash,evidenceHash}` へ投影します。evidenceHashは記録全体の固定参照から同じ一時keyで作るHMACです。確認者のメールアドレスや受付IDは出力しません。古い確認は採用せず、不正な確認記録は採取不合格にします。手作りの `--no-mail-confirmations` 入力は受け付けません。
 
 照合後は一時キーとsource manifestを削除し、件数・判定と内容を含まないdigest等を既存記録へ残します。全件照合器の結果、人による内容確認、別利用者による確認記録の読戻しを合わせて本番受入を判定します。このCLIの合成試験は実Firestoreと本番保存先ACLの受入結果ではありません。

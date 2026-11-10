@@ -1,8 +1,8 @@
 import { createHash, createHmac } from 'node:crypto';
-import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { prepareCaptureFiles } from './privateCaptureFiles.mjs';
+import { noMailContext, validNoMailConfirmation, wellFormedNoMailConfirmation } from '../runtime/noMailConfirmation.mjs';
 
 const ROOT = 'contactMailboxes/customer-speed-ad';
 const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -22,39 +22,29 @@ const expiresAt = (at) => {
   return value.toISOString();
 };
 
-export function noMailEvidenceRows(input, context) {
-  if (!input || Object.keys(input).sort().join(',') !== 'cutoffAt,hashKeyId,rows,runId,schemaVersion,startAt' ||
-      input.schemaVersion !== 1 || ['runId', 'hashKeyId', 'startAt', 'cutoffAt'].some((name) => input[name] !== context[name]) ||
-      !Array.isArray(input.rows) || input.rows.length > MAX_ROWS || !input.rows.every((item) => item &&
-        Object.keys(item).sort().join(',') === 'caseHash,evidenceHash' && HASH.test(item.caseHash || '') && HASH.test(item.evidenceHash || ''))) invalid();
-  return structuredClone(input.rows);
-}
-
 // Reads one Firestore snapshot. No runtime RPC, classification, or mutation is invoked.
-export async function captureAppAcceptance({ db, runId, key, startAt, cutoffAt, now = () => new Date(), noMailConfirmations = [] }) {
+export async function captureAppAcceptance({ db, runId, key, startAt, cutoffAt, now = () => new Date() }) {
   if (!db || typeof db.runTransaction !== 'function' || !/^[A-Za-z0-9._-]{1,80}$/.test(runId || '') ||
-      !Buffer.isBuffer(key) || key.length < 32 || !date(startAt) || !date(cutoffAt) || startAt > cutoffAt ||
-      !Array.isArray(noMailConfirmations) || noMailConfirmations.length > MAX_ROWS) invalid();
+      !Buffer.isBuffer(key) || key.length < 32 || !date(startAt) || !date(cutoffAt) || startAt > cutoffAt) invalid();
   const capturedAt = now().toISOString();
   if (!date(capturedAt) || capturedAt < cutoffAt) invalid();
   const idHash = (kind, value) => createHmac('sha256', key).update(`${kind}\0${value}`).digest('hex');
-  if (!noMailConfirmations.every((item) => item && Object.keys(item).sort().join(',') === 'caseHash,evidenceHash' &&
-      HASH.test(item.caseHash || '') && HASH.test(item.evidenceHash || ''))) invalid();
   const manifest = { schemaVersion: 1, source: 'app', runId, hashKeyId: hash(key), startAt, cutoffAt, capturedAt,
     sourceComplete: false, errors: [], pages: [], rows: [], catalog: [], syncComplete: false, residualCount: 0,
-    noMailConfirmations: structuredClone(noMailConfirmations) };
+    noMailConfirmations: [] };
   const errors = new Set();
   try {
     await db.runTransaction(async (transaction) => {
       const doc = (path) => db.doc(`${ROOT}/${path}`);
       const collection = (path) => db.collection(`${ROOT}/${path}`);
-      const [activeDoc, syncDoc, leaseDoc, controlDoc, messageDocs, diagnostics, suppressedMessages, suppressedCases] = await Promise.all([
+      const [activeDoc, syncDoc, leaseDoc, controlDoc, messageDocs, diagnostics, suppressedMessages, suppressedCases, coverageDocs, revisionDoc] = await Promise.all([
         transaction.get(doc('meta/activeCatalog')), transaction.get(doc('meta/sync')),
         transaction.get(doc('meta/syncLease')), transaction.get(doc('meta/purgeControl')),
         transaction.get(collection('messages').select('messageId', 'internalDate', 'matchState', 'caseId', 'manualClassification',
           'reason', 'unavailable', 'bodyAvailability', 'attachmentCount', 'attachments', 'firstReview', 'excludedAt', 'indexedGeneration')),
         transaction.get(collection('deletionDiagnostics').select('messageId')),
-        transaction.get(collection('suppressedMessages').select()), transaction.get(collection('suppressedCases').select())
+        transaction.get(collection('suppressedMessages').select()), transaction.get(collection('suppressedCases').select()),
+        transaction.get(collection('caseCoverage')), transaction.get(doc('meta/mappingRevision'))
       ]);
       const active = data(activeDoc); const sync = data(syncDoc); const lease = data(leaseDoc); const control = data(controlDoc);
       if (control?.active) errors.add('APP_PURGE_ACTIVE');
@@ -141,6 +131,26 @@ export async function captureAppAcceptance({ db, runId, key, startAt, cutoffAt, 
       if (diagnostics.docs.length) errors.add('APP_DELETION_UNRESOLVED');
       if (diagnostics.docs.some((item) => !ID.test(item.id) || item.data().messageId !== item.id)) errors.add('APP_DELETION_INVALID');
       manifest.residualCount = diagnostics.docs.length + (Number.isSafeInteger(sync?.failedCount) ? sync.failedCount : 1);
+      const revision = data(revisionDoc);
+      if (revision && (Object.keys(revision).join(',') !== 'token' || !UUID.test(revision.token || ''))) errors.add('APP_MAPPING_REVISION_INVALID');
+      const context = noMailContext({ complete: true, snapshotId: active.snapshotId, digest: active.digest }, sync, revision?.token ?? null, control?.generation ?? 0);
+      if (coverageDocs.docs.length > MAX_ROWS) errors.add('APP_ROW_LIMIT');
+      const linked = new Set(manifest.rows.filter((item) => item.classification === 'matched' && item.internalDate >= startAt && item.internalDate <= cutoffAt).map((item) => item.caseHash));
+      const pending = manifest.rows.some((item) => item.classification === 'pending' && item.internalDate >= startAt && item.internalDate <= cutoffAt);
+      for (const item of coverageDocs.docs) {
+        const value = item.data(); const confirmation = value.noMailConfirmation;
+        if (confirmation == null && value.noMailConfirmed !== true) continue;
+        if (!UUID.test(item.id) || !wellFormedNoMailConfirmation(confirmation) || confirmation.caseId !== item.id ||
+            typeof value.noMailConfirmed !== 'boolean' || !seenCases.has(item.id) || confirmation.at > capturedAt) {
+          errors.add('APP_NO_MAIL_CONFIRMATION_INVALID'); continue;
+        }
+        if (value.noMailConfirmed && validNoMailConfirmation(confirmation, context) && !linked.has(idHash('case', item.id)) &&
+            manifest.syncComplete && !pending && !diagnostics.docs.length && (!lease || date(lease.expiresAt) && lease.expiresAt <= capturedAt)) {
+          manifest.noMailConfirmations.push({ caseHash: idHash('case', item.id), evidenceHash: idHash('evidence', JSON.stringify({
+            caseId: confirmation.caseId, email: confirmation.email, at: confirmation.at, requestId: confirmation.requestId,
+            context: Object.fromEntries(Object.keys(confirmation.context).sort().map((name) => [name, confirmation.context[name]])) })) });
+        }
+      }
     }, { readOnly: true });
   } catch {
     errors.add('APP_CAPTURE_FAILED');
@@ -158,7 +168,7 @@ export function parseAppCaptureArguments(args, now = new Date()) {
   if (args.length === 0) return { execute: false, configured: false };
   if (args.length === 1 && args[0] === '--help') return { help: true };
   const options = {}; const required = ['--project', '--database', '--run-id', '--start-at', '--cutoff-at', '--private-dir', '--key-file', '--out'];
-  const allowed = new Set([...required, '--no-mail-confirmations']);
+  const allowed = new Set(required);
   let execute = false;
   for (let index = 0; index < args.length; index++) {
     if (args[index] === '--execute' && !execute) { execute = true; continue; }
@@ -170,25 +180,21 @@ export function parseAppCaptureArguments(args, now = new Date()) {
       !/^[A-Za-z0-9._-]{1,80}$/.test(options['--run-id']) || !date(options['--start-at']) || !date(options['--cutoff-at']) ||
       options['--start-at'] > options['--cutoff-at'] || options['--cutoff-at'] > now.toISOString() ||
       !['--private-dir', '--key-file', '--out'].every((name) => isAbsolute(options[name])) ||
-      !/\.json$/i.test(options['--out']) || (options['--no-mail-confirmations'] && !isAbsolute(options['--no-mail-confirmations']))) invalid();
+      !/\.json$/i.test(options['--out'])) invalid();
   return { execute, configured: true, projectId: options['--project'], databaseId: options['--database'],
     runId: options['--run-id'], startAt: options['--start-at'], cutoffAt: options['--cutoff-at'],
-    privateDir: resolve(options['--private-dir']), keyFile: resolve(options['--key-file']), outputFile: resolve(options['--out']),
-    noMailFile: options['--no-mail-confirmations'] ? resolve(options['--no-mail-confirmations']) : null };
+    privateDir: resolve(options['--private-dir']), keyFile: resolve(options['--key-file']), outputFile: resolve(options['--out']) };
 }
 
 export async function runAppCaptureCli(args, { prepare = prepareCaptureFiles, createDb = async (options) => {
   const { Firestore } = await import('@google-cloud/firestore');
   return new Firestore({ projectId: options.projectId, databaseId: options.databaseId });
-}, readEvidence = async (path) => {
-  if ((await stat(path)).size > 10 * 1024 * 1024) invalid();
-  return JSON.parse(await readFile(path, 'utf8'));
 }, now = () => new Date(), write = (value) => process.stdout.write(`${JSON.stringify(value)}\n`) } = {}) {
   const options = parseAppCaptureArguments(args, now());
   if (options.help) {
     write({ operation: 'readOnlyAppAcceptanceCapture', executeByDefault: false,
       required: ['--project', '--database', '--run-id', '--start-at', '--cutoff-at', '--private-dir', '--key-file', '--out'],
-      optional: ['--no-mail-confirmations'], executionFlag: '--execute',
+      executionFlag: '--execute',
       prerequisites: 'Existing read-only ADC, restricted private directory, shared temporary 32-byte run key file' });
     return { execute: false };
   }
@@ -197,11 +203,9 @@ export async function runAppCaptureCli(args, { prepare = prepareCaptureFiles, cr
   let db;
   try {
     if (!options.execute) { write({ execute: false, operation: 'readOnlyAppAcceptanceCapture' }); return { execute: false }; }
-    const noMailConfirmations = options.noMailFile ? noMailEvidenceRows(await readEvidence(options.noMailFile),
-      { runId: options.runId, hashKeyId: hash(files.key), startAt: options.startAt, cutoffAt: options.cutoffAt }) : [];
     db = await createDb(options);
     const manifest = await captureAppAcceptance({ db, runId: options.runId, key: files.key,
-      startAt: options.startAt, cutoffAt: options.cutoffAt, noMailConfirmations, now });
+      startAt: options.startAt, cutoffAt: options.cutoffAt, now });
     await files.write(manifest);
     const result = { execute: true, sourceComplete: manifest.sourceComplete, errors: manifest.errors,
       caseCount: manifest.catalog.length, messageCount: manifest.rows.length };

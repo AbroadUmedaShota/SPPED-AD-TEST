@@ -4,11 +4,12 @@ import { validateActor } from './auth.mjs';
 import { mixedThreadDemotions } from './mixedThread.mjs';
 import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObservation.mjs';
 import { normalizeCatalogCases, catalogRetention, retentionPolicy, isRetainedRecord, assertRetainedRecord } from './caseRetention.mjs';
+import { noMailContext, noMailContextToken, validNoMailConfirmation, noMailConfirmationSummary } from './noMailConfirmation.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
 const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'getMail',
-  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'getSyncRequestResult', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
+  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'getSyncStatus', 'getSyncRequestResult', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
 const CHUNK_SIZE = ATTACHMENT_CHUNK_SIZE;
@@ -82,6 +83,46 @@ function withinPeriod(record, startAt) {
 export function createMailService({ store, gmail, core, now = () => new Date(), trustedAnchor = () => false }) {
   assertMail(store && typeof store.withAccess === 'function' && gmail && core, 'MAIL_NOT_CONFIGURED', 503);
 
+  async function confirmationContext(catalog, state) {
+    return noMailContext(catalog, state, await store.getMappingRevision?.() ?? null, await store.getPurgeGeneration?.() ?? 0);
+  }
+
+  async function availableConfirmationContext(catalog, state, counts, deleted) {
+    if (counts.pending !== 0 || deleted !== 0 || await store.hasActiveSyncLease?.(now().toISOString())) return null;
+    return confirmationContext(catalog, state);
+  }
+
+  async function confirmedNoMailIds(catalog, state, counts, deleted) {
+    const context = await availableConfirmationContext(catalog, state, counts, deleted);
+    return context && store.getConfirmedNoMailCaseIds ? store.getConfirmedNoMailCaseIds(context, now().toISOString()) : [];
+  }
+
+  async function caseNoMail(id) {
+    const state = await store.getSyncState();
+    const [catalog, stored, counts, deleted] = await Promise.all([store.getCatalog(),
+      store.getCaseNoMailConfirmation?.(id) ?? null, store.countMessages({ startAt: periodStart(state?.startAt) }), store.countUnobservedDeletions()]);
+    const context = await availableConfirmationContext(catalog, state, counts, deleted);
+    const linked = context ? await store.listMessages({ mode: 'case', caseId: id, startAt: context.startAt, limit: 1 }) : [];
+    const eligible = Boolean(context && catalog.caseIds.includes(id) && !linked.length);
+    const valid = eligible && stored?.caseId === id && stored.at <= now().toISOString() && validNoMailConfirmation(stored, context);
+    return { eligible, contextToken: noMailContextToken(context), confirmation: noMailConfirmationSummary(valid ? stored : null), stale: Boolean(stored && !valid) };
+  }
+
+  async function confirmCaseNoMail(payload, actor, requestId) {
+    assertMail(UUID.test(requestId) && Object.keys(payload).sort().join(',') === 'caseId,contextToken' && /^[a-f0-9]{64}$/.test(payload.contextToken || ''));
+    const id = caseId(payload.caseId);
+    const catalog = await store.getCatalog();
+    assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    assertRetainedRecord({ caseId: id }, retentionPolicy(catalog, now()));
+    const current = await caseNoMail(id);
+    assertMail(current.eligible && current.contextToken === payload.contextToken, 'MAIL_MAPPING_CHANGED', 409);
+    await store.confirmCaseNoMail({ caseId: id, caseEntry: catalog.cases.find((entry) => entry.caseId === id), contextToken: payload.contextToken, email: actor.email,
+      at: now().toISOString(), requestId, fingerprint: digest({ operation: 'confirmCaseNoMail', payload, actor }) });
+    const noMail = await caseNoMail(id); const sync = await syncStatus();
+    assertMail(noMail.contextToken === sync.noMailContextToken, 'MAIL_MAPPING_CHANGED', 409);
+    return { noMail, sync };
+  }
+
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
     const startAt = periodStart(state?.startAt);
@@ -93,10 +134,17 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const catalog = await store.getCatalog();
     const retention = catalog.complete ? catalogRetention(catalog, now()) : null;
     const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt }) : []);
-    const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id));
+    const confirmationScope = startAt ? await availableConfirmationContext(catalog, state, counts, unobservedDeletedCount) : null;
+    const confirmed = new Set(confirmationScope && store.getConfirmedNoMailCaseIds ? await store.getConfirmedNoMailCaseIds(confirmationScope, now().toISOString()) : []);
+    const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id));
     const enumerationComplete = Boolean(startAt) && state?.state === 'complete';
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
       counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
+    if (confirmationScope) {
+      const latest = await confirmationContext(await store.getCatalog(), await store.getSyncState());
+      assertMail(noMailContextToken(latest) === noMailContextToken(confirmationScope) &&
+        !(await store.hasActiveSyncLease?.(now().toISOString())), 'MAIL_MAPPING_CHANGED', 409);
+    }
     return {
       state: !startAt && state ? 'needs_full_sync' : state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
       pendingCount: counts.pending, unreviewedCount: counts.unreviewed, failedCount: startAt ? state?.failedCount || 0 : null,
@@ -108,6 +156,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0 && retention.unknownClosureCaseIds.length === 0 && retention.expiredCaseIds.length === 0,
       coverageUnverifiedCaseCount: catalog.complete && startAt ? coverageUnverified.length : null,
       coverageUnverifiedCaseIds: startAt ? coverageUnverified.slice(0, 50) : [],
+      noMailContextToken: noMailContextToken(confirmationScope),
       unknownClosureCaseCount: retention ? retention.unknownClosureCaseIds.length : null,
       expiredCaseCount: retention ? retention.expiredCaseIds.length : null,
       bodyUnverifiedCount: counts.bodyUnverified, bodyUnavailableCount: counts.bodyUnavailable,
@@ -191,6 +240,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const sync = await syncStatus();
     assertMail(periodStart(sync.startAt) === startAt, 'MAIL_MAPPING_CHANGED', 409);
     assertMail((await store.getCatalog()).digest === catalog.digest, 'MAIL_CATALOG_CHANGED', 409);
+    const noMail = targetCaseId ? await caseNoMail(targetCaseId) : null;
+    assertMail(!noMail || noMail.contextToken === sync.noMailContextToken, 'MAIL_MAPPING_CHANGED', 409);
     return {
       messages: records.map(summary),
       page: {
@@ -198,7 +249,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         previousPageToken: hasPrevious && scanned.length ? cursorToken(scanned[0], 'previous', scopeKey) : '',
         pageSize: PAGE_SIZE
       },
-      sync
+      sync,
+      ...(targetCaseId ? { noMail } : {})
     };
   }
 
@@ -262,7 +314,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
         const covered = new Set(await store.getCoveredCaseIds({ startAt }));
         const retention = catalogRetention(catalog, now());
-        ids = kind === 'unknownClosure' ? retention.unknownClosureCaseIds : kind === 'expiredRetention' ? retention.expiredCaseIds : catalog.caseIds.filter((id) => !covered.has(id)).sort();
+        const confirmed = new Set(await confirmedNoMailIds(catalog, state, await store.countMessages({ startAt }), await store.countUnobservedDeletions()));
+        ids = kind === 'unknownClosure' ? retention.unknownClosureCaseIds : kind === 'expiredRetention' ? retention.expiredCaseIds : catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id)).sort();
       } else ids = [...new Set(state?.failedMessageIds || [])].sort();
       const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });
       const offset = cursor?.offset || 0;
@@ -631,6 +684,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       else if (operation === 'getMail') result = await getMail(payload);
       else if (operation === 'getAttachmentChunk') result = await attachment(payload);
       else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);
+      else if (operation === 'confirmCaseNoMail') result = await confirmCaseNoMail(payload, actor, requestId);
       else if (operation === 'getSyncStatus') result = { sync: await syncStatus() };
       else if (operation === 'getSyncRequestResult') {
         const original = payload.requestPayload;

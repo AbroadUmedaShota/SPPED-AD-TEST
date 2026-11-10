@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { captureAppAcceptance } from '../captureAppAcceptance.mjs';
 import { captureGmailAcceptance } from '../captureGmailAcceptance.mjs';
 import { hashAcceptanceId, reconcileAcceptance } from '../acceptanceReconciliation.mjs';
+import { noMailContext } from '../../runtime/noMailConfirmation.mjs';
 
 const ROOT = 'contactMailboxes/customer-speed-ad';
 const KEY = Buffer.alloc(32, 19);
@@ -13,7 +14,7 @@ const START = '2026-11-10T00:00:00.000Z';
 const CUTOFF = '2026-11-10T12:00:00.000Z';
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 
-function appDatabase() {
+function appDatabase(noMail = false) {
   const caseRow = { caseId: CASE, handledStatus: '未対応', closedAt: null };
   const digest = hash(JSON.stringify([CASE, '未対応', null]));
   const records = new Map([
@@ -28,6 +29,13 @@ function appDatabase() {
       indexedGeneration: 'sync-1', attachments: [],
       firstReview: { email: 'reviewer@abroad-o.com', at: CUTOFF } }]
   ]);
+  if (noMail) {
+    records.delete(`${ROOT}/messages/${MESSAGE}`);
+    const context = noMailContext({ complete: true, snapshotId: 'snapshot', digest }, records.get(`${ROOT}/meta/sync`));
+    records.set(`${ROOT}/caseCoverage/${CASE}`, { noMailConfirmed: true, noMailConfirmation: {
+      caseId: CASE, email: 'reviewer@abroad-o.com', at: '2026-11-10T13:00:00.000Z', requestId: '00000000-0000-4000-8000-000000000001', context
+    } });
+  }
   const snapshot = (path) => ({ id: path.split('/').at(-1), exists: records.has(path),
     data: () => structuredClone(records.get(path)) });
   return {
@@ -69,4 +77,21 @@ test('independent Gmail and Firestore captures reconcile with Sheet projection i
   assert.equal(result.businessAcceptance, 'unverified');
   assert.deepEqual(result.failures, []);
   assert.equal(JSON.stringify({ gmail, app }).includes(MESSAGE), false);
+});
+
+test('in-app no-mail record reconciles only when independent Gmail enumeration is also complete and empty', async () => {
+  const gmail = await captureGmailAcceptance({ gmail: {
+    getProfile: async () => ({ emailAddress: 'customer@speed-ad.com', historyId: '123', messagesTotal: 0 }),
+    listAllMessageIds: async () => ({ messageIds: [], nextPageToken: null }),
+    getMessageMetadata: async () => { throw new Error('empty mailbox must not fetch metadata'); }
+  }, runId: 'integration-1', key: KEY, hashKeyId: hash(KEY), startAt: START, cutoffAt: CUTOFF,
+  now: () => new Date('2026-11-10T14:00:00.000Z') });
+  const app = await captureAppAcceptance({ db: appDatabase(true), runId: 'integration-1', key: KEY,
+    startAt: START, cutoffAt: CUTOFF, now: () => new Date('2026-11-10T15:00:00.000Z') });
+  const input = { sheet: sheet('2026-11-10T13:00:00.000Z'), gmail, app, sheetAfter: sheet('2026-11-10T16:00:00.000Z') };
+  assert.equal(app.noMailConfirmations.length, 1); assert.equal(reconcileAcceptance(input).technicalReady, true);
+  gmail.rows.push({ messageHash: hashAcceptanceId('message', 'missed-mail', KEY), internalDate: START, draft: false });
+  gmail.pages[0].rowCount = 1;
+  assert.equal(reconcileAcceptance(input).technicalReady, false);
+  assert.ok(reconcileAcceptance(input).failures.some((item) => item.code === 'GMAIL_MESSAGE_MISSING'));
 });

@@ -3,6 +3,8 @@ import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions }
 import { assertRetainedRecord, isRetainedRecord } from '../caseRetention.mjs';
 import { observeAttachment } from '../attachmentObservation.mjs';
 import { suppressionKey } from '../purgeGate.mjs';
+import { randomUUID } from 'node:crypto';
+import { noMailContext, noMailContextToken, validNoMailConfirmation } from '../noMailConfirmation.mjs';
 
 const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const clone = (value) => structuredClone(value);
@@ -15,6 +17,8 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const events = [];
   const deletionDiagnostics = new Map();
   const suppressedMessages = new Map();
+  const noMail = new Map();
+  let mappingRevision = null;
   let catalog = { complete: true, caseIds, cases: caseEntries(caseIds) };
   let sync = clone(initialSync);
   let lease = null;
@@ -23,7 +27,38 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const store = {
     records, receipts, events, suppressedMessages,
     withAccess: (operation) => operation(),
-    seed(record) { records.set(record.messageId, clone(record)); },
+    seed(record) {
+      const before = records.get(record.messageId);
+      if (before?.matchState !== record.matchState || before?.caseId !== record.caseId) {
+        mappingRevision = randomUUID();
+        if (before?.caseId) noMail.delete(before.caseId);
+        if (record.caseId) noMail.delete(record.caseId);
+      }
+      records.set(record.messageId, clone(record));
+    },
+    async getMappingRevision() { return mappingRevision; },
+    async getPurgeGeneration() { return 0; },
+    async hasActiveSyncLease() { return Boolean(lease); },
+    async getCaseNoMailConfirmation(id) { return clone(noMail.get(id) || null); },
+    async getConfirmedNoMailCaseIds(context, at) { return [...noMail].filter(([, value]) => value.at <= at && validNoMailConfirmation(value, context)).map(([id]) => id); },
+    async confirmCaseNoMail({ caseId, contextToken, email, at, requestId, fingerprint }) {
+      return serial(async () => {
+        const context = noMailContext(catalog, sync, mappingRevision);
+        assertMail(context && noMailContextToken(context) === contextToken, 'MAIL_MAPPING_CHANGED', 409);
+        assertMail(!lease, 'MAIL_SYNC_BUSY', 409);
+        assertMail(!deletionDiagnostics.size && ![...records.values()].some((item) => item.internalDate >= context.startAt &&
+          (item.matchState === 'pending' || item.matchState === 'matched' && item.caseId === caseId)), 'MAIL_MAPPING_CHANGED', 409);
+        const receipt = await store.getReceipt(requestId, fingerprint);
+        if (receipt) return receipt;
+        const previous = noMail.get(caseId);
+        const confirmation = validNoMailConfirmation(previous, context) ? previous : { caseId, email, at, requestId, context };
+        noMail.set(caseId, clone(confirmation));
+        if (confirmation !== previous) events.push({ type: 'case.no_mail_confirmed', caseId, actor: email, at, requestId, context });
+        const result = { confirmation };
+        await store.saveReceipt(requestId, fingerprint, result);
+        return clone(result);
+      });
+    },
     setCatalog(value) { catalog = value; },
     async getCatalog() { return clone(catalog); },
     async getCoveredCaseIds({ startAt } = {}) { return [...new Set([...records.values()].filter((item) => item.matchState === 'matched' && (!startAt || item.internalDate >= startAt)).map((item) => item.caseId))]; },
@@ -60,6 +95,7 @@ export function fakeStore(caseIds = [], initialSync = null) {
       if (historicalMail && !current && old.sourceKind !== 'draft') return;
       if (!historicalMail) {
         suppressedMessages.set(key, { version: 1 });
+        if (old) { mappingRevision = randomUUID(); if (old.caseId) noMail.delete(old.caseId); }
         records.delete(id);
         deletionDiagnostics.delete(id);
         return;
