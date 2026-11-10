@@ -12,6 +12,8 @@
 
 `mail-service/` で `npm ci` → `npm test`。GAS viewerはリポジトリ直下で `node --test tests/support-contact-workspace-viewer.test.mjs` とメールUI追加試験を実行する。テストは合成データと偽のGmail/Firestore/Google認証を使い、実メールやCloudの受入結果ではない。
 
+[合成データのChrome画面](evidence/phase2-mail-synthetic-chrome.png)は、案件詳細内のメール本文、確認記録、PDF・画像・テキスト添付の表示例である。実メール画面の証拠ではない。
+
 ## 公開前に必要な設定と判断
 
 1. 公式窓口本人による読取同意と、対象期間の受信・送信メールがそのメールボックスに保存されていることの確認。過去分は受付IDだけで自動確定せず、照合待ちから利用者が確定・除外する。
