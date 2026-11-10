@@ -33,6 +33,7 @@ test('complete manifests reconcile at both inclusive period boundaries', () => {
   assert.equal(run(f).idReconciliationPass, true);
   assert.equal(run(f).technicalReady, true);
   assert.equal(run(f).businessAcceptance, 'unverified');
+  assert.equal(run(f).counts.prePeriodMessageCount, 0);
 });
 
 for (const source of ['sheet', 'gmail', 'app']) test(`duplicate ${source} IDs fail before set comparison`, () => {
@@ -56,7 +57,11 @@ test('incomplete, cyclic, skipped and mismatched page chains fail closed', () =>
     (m) => { m.pages[0].index = 1; }, (m) => { m.pages[0].rowCount = 0; },
     (m) => { m.pages.push({ index: 1, requestTokenHash: null, nextTokenHash: null, rowCount: 0 }); }
   ];
-  for (const mutate of mutations) { const f = fixture(); mutate(f.gmail); assert.equal(run(f).idReconciliationPass, false); }
+  for (const mutate of mutations) {
+    const f = fixture(); mutate(f.gmail); const result = run(f);
+    assert.equal(result.idReconciliationPass, false);
+    assert.equal(result.technicalReady, false);
+  }
 });
 
 test('source context mismatch and invalid dates fail closed', () => {
@@ -65,13 +70,53 @@ test('source context mismatch and invalid dates fail closed', () => {
   }
 });
 
-test('drafts and out of period Gmail IDs do not require app records', () => {
+test('drafts before the start and Gmail IDs after the cutoff do not require app records', () => {
   const f = fixture();
   f.gmail.rows.push({ messageHash: id('draft'), internalDate: START, draft: true },
-    { messageHash: id('old'), internalDate: '2026-10-31T23:59:59.999Z', draft: false },
+    { messageHash: id('old-draft'), internalDate: '2026-10-31T23:59:59.999Z', draft: true },
     { messageHash: id('new'), internalDate: '2026-11-11T00:00:00.001Z', draft: false });
   f.gmail.pages[0].rowCount += 3;
   assert.equal(run(f).technicalReady, true);
+  assert.equal(run(f).counts.prePeriodMessageCount, 0);
+});
+
+test('non-draft Gmail messages before the start remain counted residuals even with app exclusions', () => {
+  const f = fixture();
+  const old = { messageHash: id('old'), internalDate: '2026-10-31T23:59:59.999Z', draft: false };
+  f.gmail.rows.push(old, { ...old, messageHash: id('older'), internalDate: '2026-10-01T00:00:00.000Z' });
+  f.gmail.pages[0].rowCount += 2;
+  f.app.rows.push({ ...structuredClone(f.app.rows[0]), messageHash: old.messageHash, internalDate: old.internalDate,
+    classification: 'excluded', caseHash: null, manualExclusion: true });
+  f.app.pages[0].rowCount++;
+  const result = run(f);
+  assert.equal(result.idReconciliationPass, true);
+  assert.equal(result.technicalReady, false);
+  assert.equal(result.businessAcceptance, 'unverified');
+  assert.equal(result.counts.prePeriodMessageCount, 2);
+  assert.deepEqual(result.failures, [{ code: 'GMAIL_PREPERIOD_UNREVIEWED', source: 'gmail', count: 2, category: 'content' }]);
+  assert.ok(!JSON.stringify(result).includes(old.messageHash));
+
+  for (const source of Object.values(f)) source.startAt = '2026-10-01T00:00:00.000Z';
+  f.app.rows.push({ ...structuredClone(f.app.rows.at(-1)), messageHash: id('older'), internalDate: f.gmail.rows.at(-1).internalDate });
+  f.app.pages[0].rowCount++;
+  assert.equal(run(f).technicalReady, true);
+  assert.equal(run(f).counts.prePeriodMessageCount, 0);
+});
+
+test('duplicate or malformed pre-period Gmail rows and incomplete sources cannot establish readiness', () => {
+  const old = { messageHash: id('old'), internalDate: '2026-10-31T23:59:59.999Z', draft: false };
+  const duplicate = fixture(); duplicate.gmail.rows.push(old, structuredClone(old)); duplicate.gmail.pages[0].rowCount += 2;
+  const result = run(duplicate);
+  assert.equal(result.counts.prePeriodMessageCount, 1);
+  assert.equal(result.technicalReady, false);
+  assert.ok(result.failures.some((x) => x.code === 'DUPLICATE_ID'));
+  for (const mutate of [
+    (f) => { f.gmail.rows.push({ ...old, unexpected: true }); f.gmail.pages[0].rowCount++; },
+    (f) => { f.gmail.sourceComplete = false; },
+    (f) => { f.gmail.pages[0].nextTokenHash = id('unfinished'); }
+  ]) {
+    const f = fixture(); mutate(f); assert.equal(run(f).technicalReady, false);
+  }
 });
 
 test('pending, unavailable, unreviewed and unverified content remain residuals', () => {

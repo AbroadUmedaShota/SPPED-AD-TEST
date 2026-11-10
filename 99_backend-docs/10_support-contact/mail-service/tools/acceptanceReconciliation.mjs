@@ -96,6 +96,7 @@ export function reconcileAcceptance(input) {
     const after = sheetAfterCases.get(id);
     if (after && (row.submittedAt !== after.submittedAt || row.handledStatus !== after.handledStatus || row.closedAt !== after.closedAt)) add('SHEET_CHANGED', 'sheetAfter');
   }
+  let prePeriodMessageCount = 0;
   const messages = (m, source) => {
     const all = new Set(); const selected = new Map();
     for (const row of m?.rows || []) {
@@ -114,13 +115,17 @@ export function reconcileAcceptance(input) {
               (item.transferSize === null || Number.isSafeInteger(item.transferSize) && item.transferSize >= 0) &&
               array(item.servedChunks) && item.servedChunks.every(Number.isSafeInteger))))) { add('MESSAGE_INVALID', source); continue; }
       if (all.has(row.messageHash)) add('DUPLICATE_ID', source);
-      else all.add(row.messageHash);
+      else {
+        all.add(row.messageHash);
+        if (source === 'gmail' && !row.draft && row.internalDate < m.startAt) prePeriodMessageCount++;
+      }
       if (row.internalDate >= m.startAt && row.internalDate <= m.cutoffAt && !row.draft) selected.set(row.messageHash, row);
     }
     return selected;
   };
   const gmailMessages = messages(sources.gmail, 'gmail');
   const appMessages = messages(app, 'app');
+  if (prePeriodMessageCount) add('GMAIL_PREPERIOD_UNREVIEWED', 'gmail', prePeriodMessageCount, 'content');
   compare(gmailMessages, appMessages, 'GMAIL_MESSAGE_MISSING', 'APP_MESSAGE_EXTRA', 'app');
   const covered = new Set();
   for (const [id, row] of appMessages) {
@@ -157,5 +162,5 @@ export function reconcileAcceptance(input) {
   return { schemaVersion: 1, idReconciliationPass: !failures.some((item) => item.category === 'identity'),
     technicalReady: failures.length === 0, businessAcceptance: 'unverified',
     counts: { sheetCases: sheetCases.size, appCases: appCases.size, gmailMessages: gmailMessages.size,
-      appMessages: appMessages.size, noMailCaseCount }, failures };
+      appMessages: appMessages.size, prePeriodMessageCount, noMailCaseCount }, failures };
 }

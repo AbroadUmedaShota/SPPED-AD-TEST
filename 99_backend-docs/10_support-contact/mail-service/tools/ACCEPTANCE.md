@@ -10,7 +10,9 @@ App採取は現行一覧IDの再利用防止hashも読み、`retiredCatalogs` �
 node tools/verifyMailAcceptance.mjs --sheet PRIVATE/sheet-before.json --gmail PRIVATE/gmail.json --app PRIVATE/app.json --sheet-after PRIVATE/sheet-after.json
 ```
 
-標準出力は件数と固定エラーコードだけ。終了codeは技術残件なしが0、照合不一致・残件ありが1、引数・JSON・ファイル読取不正が2。Sheetは1件以上を必須とし、Sheet前・Gmail・App・Sheet後の取得時刻は厳密に昇順でなければ不合格にする。同じSheetファイルやコピーを前後に渡しても合格しない。`idReconciliationPass` はID集合・source完全性・案件状態の一致、`technicalReady` はさらに本文・添付・初回確認・照合残件なしを表す。`businessAcceptance` は常に `unverified`。入力の真正性、内容の目視確認、フォーム添付への到達、別利用者の確認記録読戻しはこのCLIだけでは証明しない。
+標準出力は件数と固定エラーコードだけ。終了codeは技術残件なしが0、照合不一致・残件ありが1、引数・JSON・ファイル読取不正が2。Sheetは1件以上を必須とし、Sheet前・Gmail・App・Sheet後の取得時刻は厳密に昇順でなければ不合格にする。同じSheetファイルやコピーを前後に渡しても合格しない。`idReconciliationPass` は期間内のID集合・source完全性・案件状態の一致、`technicalReady` はさらに本文・添付・初回確認・照合残件と開始日前の未確認履歴がないことを表す。`businessAcceptance` は常に `unverified`。入力の真正性、内容の目視確認、フォーム添付への到達、別利用者の確認記録読戻しはこのCLIだけでは証明しない。
+
+全メール列挙で観測した開始日前の非下書きメールは、重複なしの件数を `counts.prePeriodMessageCount` に返す。1件でもあれば `GMAIL_PREPERIOD_UNREVIEWED` の残件となり、期間内のIDが一致しても `technicalReady` はfalseにする。件名・送信者から無関係とは推定せず、手作りの確認ファイルや期間外のApp除外記録で回避できない。古い無関係メールもこの残件に含むため、管理者が明示的に開始日を前へ広げて全同期し、必要なメール確認やApp内の手動除外を行ってから、同じ期間で全sourceを採り直す。照合器は開始日を自動変更しない。sourceが不完全・不正な結果の件数0は旧メール不在の証拠ではない。また、現在のGmailに存在しない永久削除済みメールや、過去に移行されなかったメールの不在・完全性は証明しない。
 
 ## manifest version 1
 
@@ -24,7 +26,7 @@ node tools/verifyMailAcceptance.mjs --sheet PRIVATE/sheet-before.json --gmail PR
 
 Sheet行は `{caseHash, submittedAt, handledStatus, closedAt}`。正本の全非空受付IDを対象にし、受付日時の欠落・不正・宣言期間外を拒否する。app catalog行は `{caseHash, handledStatus, closedAt}`。受付ID集合と状態・終了日時の組を比較する。statusは既存4状態、終了日時はnullまたは「対応済み」のUTC ISO日時。
 
-Gmail行は `{messageHash, internalDate, draft}`。列挙は全メールボックス（迷惑メール・ゴミ箱・下書き・期間外を含む）とし、照合器で正確な期間とDRAFT以外へ絞る。同期と同じ検索式を再利用しない。
+Gmail行は `{messageHash, internalDate, draft}`。列挙は全メールボックス（迷惑メール・ゴミ箱・下書き・期間外を含む）とし、照合器は期間内の非下書きIDをAppと比較する。開始日前の非下書きIDは未確認履歴の残件にし、開始日時ちょうどのメールは期間内とする。下書きと基準日時より後のメールはApp照合を要求しない。同期と同じ検索式を再利用しない。
 
 app行は `{messageHash, internalDate, classification, caseHash, manualExclusion, unavailable, bodyVerified, attachmentCount, attachments, firstReview}`。分類はmatched・pending・excluded。明示的な手動除外だけを対象外として認める。suppression markerだけを到達済みメールへ変換しない。matchedは既知案件・本文取得成功・確認記録・全添付の取得成功が必要。firstReviewはnullまたは `{actorHash, at}`。attachmentsは `{availability, transferVersion, transferSize, servedChunks}` の配列で、名前等を含めない。未観測transfer値はnull/null/[]とする。verified・version1でも512KiB刻みの全offsetが揃わなければ未完了とする（0byte添付もoffset0が必要）。
 
@@ -47,7 +49,7 @@ node tools/captureGmailAcceptanceCli.mjs --project APPROVED_PROJECT --confirm-pr
 
 対象projectはSecret versionのproject表記と完全一致、versionは正の数値を指定する。Secretのproject ID/number表記を混在させず、既存記録から同じ正本名へ揃える。日時はミリ秒付きUTC ISOで、cutoffは未来にしない。保存先は事前に管理者がアクセスを制限した既存の絶対パスのディレクトリとし、32byteの一時keyファイルと新規JSON出力をその直下へ置く。全sourceで同じkey bytesを使う。app採取も同じ `--private-dir` / `--key-file` 方式とし、Sheetには同じbytesのbase64を渡す。keyをコマンド引数・ログ・共有repoへ渡さない。
 
-実行前にGoogle審査・評価要件と社員全員の人による閲覧条件を解決し、関連メールなしの案件確認も含む説明version `2026-11-11.9` へ本人が明示同意したSecret versionを用意する。CLIは既存の `createRuntimeGmailAdapter` で同意記録を検証してからOAuth clientを作る。全メールmetadataを1通ずつ読むため、profile件数、Gmail quotaと月額3,000円の予算通知を確認して実行規模を判断する。予算通知は支出停止の上限ではない。上限100,000件、10,000ページを超える場合や途中変更・失敗は未完了とし、黙って省略・自動retryしない。
+実行前にGoogle審査・評価要件と社員全員の人による閲覧条件を解決し、関連メールなしの案件確認も含む説明version `2026-11-11.10` へ本人が明示同意したSecret versionを用意する。CLIは既存の `createRuntimeGmailAdapter` で同意記録を検証してからOAuth clientを作る。全メールmetadataを1通ずつ読むため、profile件数、Gmail quotaと月額3,000円の予算通知を確認して実行規模を判断する。予算通知は支出停止の上限ではない。上限100,000件、10,000ページを超える場合や途中変更・失敗は未完了とし、黙って省略・自動retryしない。
 
 実採取だけは同じ引数へ `--execute` を追加する。出力はSecret参照前に排他的に新規作成し、既存ファイルを上書きしない。本文や資格情報を表示せず、成功/未完了の固定コード・件数・固定エラーだけを端末へ返す。失敗時に空または不完全な予約ファイルが残ることがある。その内容は受入証拠にならない。管理者が状態を調べ、当該の空・不完全ファイルを明示削除した後に、新しい採取を明示実行する。自動再実行や自動上書きは行わない。
 
