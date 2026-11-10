@@ -105,7 +105,7 @@ test('alternative content selection fetches bodies within one text budget and sk
     return { data: Buffer.from(attachmentId === 'plain' ? '\r\n' : htmlText).toString('base64url') };
   };
   const mail = message({ mimeType: 'multipart/alternative', parts: [plain, html] });
-  assert.equal(await readMessageText(mail, fetchAttachment, { maxTextBytes: plain.body.size + html.body.size }), 'body\r\n');
+  assert.equal(await readMessageText(mail, fetchAttachment, { maxTextBytes: plain.body.size + html.body.size }), 'body\n');
   assert.deepEqual(fetched, ['plain', 'html']);
   await assert.rejects(readMessageText(mail, fetchAttachment, { maxTextBytes: plain.body.size + html.body.size - 1 }), /MAIL_SIZE_LIMIT/);
   mail.payload.parts[0] = part('plain body');

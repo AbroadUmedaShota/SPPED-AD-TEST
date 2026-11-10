@@ -12,6 +12,7 @@
   "dependencies": {
     "@google-cloud/firestore": "9.4.0",
     "@google-cloud/secret-manager": "8.0.0",
-    "google-auth-library": "11.3.4"
+    "google-auth-library": "11.3.4",
+    "parse5": "8.1.1"
   }
 }

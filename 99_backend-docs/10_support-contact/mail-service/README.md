@@ -10,6 +10,12 @@
 - Cloud Runは公式窓口のGmailを `gmail.readonly` で読み、FirestoreにメールID、メール単位の案件照合、最初の確認者・日時、同期位置と監査イベントを記録する。本文と添付バイト列は閲覧時に取得し、Firestoreへ保存しない。
 - 添付はGAS経由の分割取得で画面へ渡す。対応ステータスと内部メモは従来のSheet RPCだけが更新し、メール側の処理から変更しない。
 
+## HTML本文の依存ライブラリと制限
+
+HTMLの構文解釈には [parse5](https://github.com/inikulin/parse5) `8.1.1`（MIT、package-lockで推移依存も固定）を使う。手書きのタグ除去では、通常文章の `<` やSVG/object内のコメントを誤って処理し、本文欠落や非表示の受付IDが照合へ漏れるため導入した。`parseFragment`の構文木からテキストだけを反復走査し、script・style・iframe・object・svgの配下とコメントを除外する。HTMLを実行せず、外部リソースも取得しない。解析済み文字参照を二重にデコードせず、収集後に既存の秘密付きURL除去を適用する。
+
+既存の本文元バイト上限2MiBに加え、構文木のメモリ増大を避けるため、解析前に`<`の直後が英字・`/`・`!`・`?`の候補を最大20,000箇所に制限する。候補はコメント等の内部も数える保守的な資源制限で、HTMLの表示解釈には使わない。超過は`MAIL_HTML_STRUCTURE_LIMIT`を返し、同期・閲覧では本文取得不能の残件となる。本文を黙って切り詰めたり、取得確認済みの空本文にしたりせず、そのメールを確認できる状態へ解消するまで全件受入は未達とする。HTMLの改行コードと無効な文字参照はHTML標準の規則で正規化する。
+
 ## ローカル検証
 
 `mail-service/` で `npm ci` → `npm test`。GAS viewerはリポジトリ直下で `node --test tests/support-contact-workspace-viewer.test.mjs tests/support-contact-mail-viewer.test.mjs` を実行する。テストは合成データと偽のGmail/Firestore/Google認証を使い、実メールやCloudの受入結果ではない。
