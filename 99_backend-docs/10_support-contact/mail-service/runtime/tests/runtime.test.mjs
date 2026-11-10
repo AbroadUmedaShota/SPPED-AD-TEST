@@ -486,19 +486,17 @@ test('history retains the original period and direction comes from Gmail SENT la
   const run = randomUUID();
   await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full', startAt: '2026-11-01T00:00:00.000Z' }));
   await f.execute(f.envelope('advanceSync', { executionId: run }));
-  const old = gmailMessage('old'); old.internalDate = String(Date.parse('2020-01-01T00:00:00Z'));
   const sent = gmailMessage('sent'); sent.labelIds = ['SENT'];
   const spoofed = gmailMessage('spoofed', 'reply', [{ name: 'From', value: 'customer@speed-ad.com' }]);
-  f.messages.set('old', old); f.messages.set('sent', sent); f.messages.set('spoofed', spoofed);
-  f.gmail.listHistory = async () => ({ messageIds: ['old', 'sent', 'spoofed'], historyId: '200' });
+  f.messages.set('sent', sent); f.messages.set('spoofed', spoofed);
+  f.gmail.listHistory = async () => ({ messageIds: ['sent', 'spoofed'], historyId: '200' });
   const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history', startAt: '2026-11-01T00:00:00.000Z' }));
   assert.equal(result.sync.startAt, '2026-11-01T00:00:00.000Z');
-  assert.equal(await f.store.getMessage('old'), null);
   assert.equal((await f.store.getMessage('sent')).direction, 'sent');
   assert.equal((await f.store.getMessage('spoofed')).direction, 'received');
 });
 
-test('history filters old label changes and draft edits before requesting body or attachment data', async () => {
+test('history stops at pre-period mail before body retrieval and requires a wider full sync', async () => {
   const f = fixture([A]);
   const run = randomUUID();
   await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
@@ -511,17 +509,38 @@ test('history filters old label changes and draft edits before requesting body o
   f.messages.set(old.id, old); f.messages.set(draft.id, draft); f.messages.set(eligible.id, eligible);
   let attachmentCalls = 0;
   f.gmail.getAttachment = async () => { attachmentCalls++; throw new Error('unexpected attachment fetch'); };
-  f.gmail.listHistory = async () => ({ messageIds: [old.id, draft.id, eligible.id], historyId: '200' });
-  const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
-  assert.equal(result.sync.state, 'complete');
-  assert.deepEqual(f.metadataCalls, [old.id, draft.id, eligible.id]);
-  assert.deepEqual(f.calls, [eligible.id]);
+  f.gmail.listHistory = async () => ({ messageIds: [draft.id, old.id, eligible.id], historyId: '200' });
+  const executionId = randomUUID();
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, mode: 'history' })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  assert.deepEqual(f.metadataCalls, [draft.id, old.id]);
+  assert.deepEqual(f.calls, []);
   assert.equal(attachmentCalls, 0);
   assert.equal(await f.store.getMessage(old.id), null);
   assert.equal(await f.store.getMessage(draft.id), null);
   assert.deepEqual(f.store.suppressedMessages.get(suppressionKey('message', draft.id)), { version: 1 });
   assert.equal(f.store.records.has(draft.id), false);
+  assert.equal(await f.store.getMessage(eligible.id), null);
+  const failed = await f.store.getSyncState();
+  assert.equal(failed.state, 'failed');
+  assert.equal(failed.errorCode, 'MAIL_PERIOD_EXPANSION_REQUIRED');
+  assert.equal(failed.historyId, '100');
+  assert.equal(failed.pageToken, null);
+  assert.equal(failed.processedCount, 1);
+  assert.equal(failed.inFlightPage.index, 1);
+  assert.deepEqual(failed.failedMessageIds, [old.id]);
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, resume: true })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  for (const payload of [{ mode: 'full', startAt: START }, { mode: 'history', startAt: '2025-01-01T00:00:00.000Z' }]) {
+    await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), ...payload })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  }
+  assert.deepEqual(await f.store.getSyncState(), failed);
+  const recoveryId = randomUUID();
+  let recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId, mode: 'full', startAt: '2025-01-01T00:00:00.000Z' }));
+  while (recovered.sync.state === 'running') recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId }));
+  assert.equal(recovered.sync.state, 'complete');
+  assert.equal(recovered.sync.startAt, '2025-01-01T00:00:00.000Z');
+  assert.equal((await f.store.getMessage(old.id)).bodyAvailability, 'verified');
   assert.equal((await f.store.getMessage(eligible.id)).bodyAvailability, 'verified');
+  assert.equal(f.calls.includes(draft.id), false);
 });
 
 test('full sync filters period boundaries and rejects invalid metadata before full-message retrieval', async () => {

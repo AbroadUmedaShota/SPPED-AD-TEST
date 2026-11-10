@@ -485,6 +485,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         return;
       }
       internalDate = new Date(Number(metadata.internalDate)).toISOString();
+      if (scope.rejectPrePeriod && scope.startAt && internalDate < scope.startAt) {
+        throw new MailError('MAIL_PERIOD_EXPANSION_REQUIRED', 409);
+      }
       if ((scope.startAt && internalDate < scope.startAt) || (scope.cutoffAt && internalDate > scope.cutoffAt)) return;
       message = await gmail.getMessage(id);
       assertMail(message?.id === id && message.internalDate === metadata.internalDate, 'MAIL_INVALID_UPSTREAM', 502);
@@ -588,6 +591,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (state?.executionId === payload.executionId && state.catalogSnapshotId) catalog = await store.getCatalog(state.catalogSnapshotId);
       assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
       if (state?.executionId === payload.executionId && state.state === 'failed' && payload.resume === true) {
+        assertMail(state.errorCode !== 'MAIL_PERIOD_EXPANSION_REQUIRED', 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
         state = { ...state, state: 'running', errorCode: null, failedCount: 0 };
         await store.setSyncState(state, lease);
       }
@@ -598,6 +602,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         if (payload.mode === 'history') assertMail(state?.historyId, 'MAIL_FULL_SYNC_REQUIRED', 409);
         const startAt = periodStart(payload.startAt);
         assertMail(startAt, 'MAIL_PERIOD_REQUIRED', 409);
+        if (state?.errorCode === 'MAIL_PERIOD_EXPANSION_REQUIRED') {
+          assertMail(payload.mode === 'full' && startAt < periodStart(state.startAt), 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
+        }
         assertMail(!state?.executionId || !periodStart(state.startAt) || startAt <= periodStart(state.startAt), 'MAIL_PERIOD_NARROWING', 409);
         const mode = payload.mode === 'history' && startAt !== periodStart(state?.startAt) ? 'full' : payload.mode;
         const startedAt = now().toISOString();
@@ -668,7 +675,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         const id = page.messageIds[state.inFlightPage.index];
         try { await indexMessage(messageId(id), catalog, { ...(state.mode === 'full' ? {
           startAt: state.startAt, cutoffAt: state.cutoffAt, generation: state.executionId
-        } : { startAt: state.startAt }), draftEvidence: page.draftIds?.includes(id) === true }); }
+        } : { startAt: state.startAt, rejectPrePeriod: true }), draftEvidence: page.draftIds?.includes(id) === true }); }
         catch (error) { state.failedMessageIds = [id]; throw error; }
         state.inFlightPage.index += 1;
         state.processedCount += 1;
