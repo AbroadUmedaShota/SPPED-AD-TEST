@@ -317,3 +317,58 @@ test('HTTP authenticates before dispatch and never echoes arbitrary failures', a
   assert.equal(failed.status, 503); assert.equal((await failed.json()).error.code, 'MAIL_UNAVAILABLE');
   assert.ok(!JSON.stringify(logs).includes('Gmail body')); assert.ok(!JSON.stringify(logs).includes('Bearer'));
 });
+
+
+test('later manual conflicts withdraw inherited links in either case order and preserve explicit decisions', async () => {
+  for (const [firstCase, secondCase] of [[A, B], [B, A]]) {
+    const f = fixture();
+    const sharedThread = 'mixed-thread';
+    const firstReview = { email: 'first@abroad-o.com', at: NOW };
+    f.store.seed(record('first', { threadId: sharedThread, matchState: 'pending', caseId: null, rfcMessageId: '<first@test.example>' }));
+    const first = await f.execute(f.envelope('resolvePending', { messageId: 'first', action: 'match', caseId: firstCase, expectedVersion: 1, reason: 'receipt checked' }));
+    assert.equal((await f.store.getMessage('first')).manualClassification, true);
+    f.store.seed(record('reply', { threadId: sharedThread, matchState: 'pending', caseId: null }));
+    const reply = gmailMessage('reply', 'reply', [{ name: 'In-Reply-To', value: '<first@test.example>' }]);
+    reply.threadId = sharedThread; f.messages.set('reply', reply);
+    await f.execute(f.envelope('reconcilePending'));
+    const inherited = await f.store.getMessage('reply');
+    assert.equal(inherited.caseId, firstCase);
+    f.store.seed({ ...inherited, firstReview });
+    f.store.seed(record('second', { threadId: sharedThread, matchState: 'pending', caseId: null }));
+    await f.execute(f.envelope('resolvePending', { messageId: 'second', action: 'match', caseId: secondCase, expectedVersion: 1, reason: 'another receipt checked' }));
+    const withdrawn = await f.store.getMessage('reply');
+    assert.equal(withdrawn.matchState, 'pending'); assert.equal(withdrawn.caseId, null);
+    assert.equal(withdrawn.reason, 'mixed_thread'); assert.equal(withdrawn.version, inherited.version + 1);
+    assert.deepEqual(withdrawn.firstReview, firstReview);
+    assert.equal((await f.store.getMessage('first')).caseId, firstCase);
+    assert.equal((await f.store.getMessage('first')).version, first.message.version);
+    assert.equal((await f.store.getMessage('second')).caseId, secondCase);
+    assert.ok(f.store.events.some((event) => event.type === 'mail.auto_match_withdrawn' && event.messageId === 'reply'));
+    await f.execute(f.envelope('reconcilePending'));
+    assert.equal((await f.store.getMessage('reply')).matchState, 'pending');
+    assert.deepEqual(new Set(await f.store.getCoveredCaseIds()), new Set([A, B]));
+  }
+});
+
+test('new indexed case evidence withdraws older auto links and reindex preserves manual mappings', async () => {
+  for (const order of [['parent', 'reply', 'other', 'excluded'], ['excluded', 'other', 'reply', 'parent']]) {
+    const f = fixture();
+    const sharedThread = 'indexed-mixed-thread';
+    f.store.seed(record('parent', { threadId: sharedThread, reason: 'manual', manualClassification: true, rfcMessageId: '<parent@test.example>' }));
+    f.store.seed(record('reply', { threadId: sharedThread, reason: 'verified_reply_ancestry', version: 4 }));
+    f.store.seed(record('excluded', { threadId: sharedThread, caseId: null, matchState: 'excluded', reason: 'manual', manualClassification: true }));
+    for (const [id, body, headers] of [['parent', `受付ID: ${A}`, []], ['reply', 'reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]], ['other', `受付ID: ${B}`, []], ['excluded', `受付ID: ${B}`, []]]) {
+      const message = gmailMessage(id, body, headers); message.threadId = sharedThread; f.messages.set(id, message);
+    }
+    f.gmail.listMessages = async () => ({ messageIds: order });
+    const executionId = randomUUID();
+    await f.execute(f.envelope('advanceSync', { executionId, mode: 'full' }));
+    assert.equal((await f.store.getMessage('reply')).matchState, 'pending');
+    assert.equal((await f.store.getMessage('reply')).caseId, null);
+    const parent = await f.store.getMessage('parent');
+    assert.equal(parent.caseId, A); assert.equal(parent.reason, 'manual'); assert.equal(parent.manualClassification, true);
+    assert.equal((await f.store.getMessage('other')).matchState, 'pending');
+    assert.equal((await f.store.getMessage('excluded')).matchState, 'excluded');
+    assert.ok(f.store.events.some((event) => event.messageId === 'reply' && event.next.matchState === 'pending'));
+  }
+});

@@ -1,4 +1,5 @@
 import { assertMail } from '../errors.mjs';
+import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
 
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
@@ -61,6 +62,7 @@ export function fakeStore(caseIds = []) {
         attachmentUnavailable: active.reduce((sum, item) => sum + (item.unavailableAttachmentCount || 0), 0)
       };
     },
+    async findThreadMessages(threadId) { return clone([...records.values()].filter((record) => record.threadId === threadId)); },
     async findReferences(ids) { return clone([...records.values()].filter((record) => ids.includes(record.rfcMessageId))); },
     async getReceipt(id, fingerprint) {
       const receipt = receipts.get(id);
@@ -78,7 +80,7 @@ export function fakeStore(caseIds = []) {
         const old = await store.getReceipt(id, fingerprint);
         if (old) return old;
         const writes = [];
-        const result = await fn({ getMessage: store.getMessage,
+        const result = await fn({ getMessage: store.getMessage, getThreadMessages: store.findThreadMessages,
           setMessage(record) { writes.push(() => store.seed(record)); },
           addEvent(event) { writes.push(() => events.push(clone(event))); }
         });
@@ -88,19 +90,14 @@ export function fakeStore(caseIds = []) {
       });
     },
     async upsertIndexedMessage(incoming) {
-      const old = records.get(incoming.messageId);
-      if (!old) { store.seed(incoming); return; }
-      const promote = old.matchState === 'pending' && old.reason !== 'manual' && incoming.matchState === 'matched';
-      const attachments = incoming.attachments.map((item) => {
-        const previous = (old.attachments || []).find((entry) => entry.partId === item.partId && entry.name === item.name && entry.size === item.size);
-        return previous ? { ...item, availability: previous.availability, checkedAt: previous.checkedAt } : item;
-      });
-      store.seed({ ...old, ...incoming, attachments,
-        unverifiedAttachmentCount: attachments.filter((item) => item.availability === 'unverified').length,
-        unavailableAttachmentCount: attachments.filter((item) => item.availability === 'unavailable').length,
-        matchState: promote ? incoming.matchState : old.matchState, caseId: promote ? incoming.caseId : old.caseId,
-        reason: promote ? incoming.reason : old.reason, evidence: promote ? incoming.evidence : old.evidence,
-        version: old.version + (promote ? 1 : 0), firstReview: old.firstReview || null });
+      const before = records.get(incoming.messageId);
+      const merged = mergeIndexedMessage(before, incoming);
+      const threadRecords = [...records.values()].filter((record) => record.threadId === incoming.threadId && record.messageId !== incoming.messageId);
+      const demotions = mixedThreadDemotions([...threadRecords, merged], incoming.indexedAt);
+      store.seed(merged);
+      const event = indexedClassificationEvent(before, merged, incoming.indexedAt);
+      if (event) events.push(clone(event));
+      for (const demotion of demotions) { store.seed(demotion.record); events.push(clone(demotion.event)); }
     },
     async markUnavailable(id, at) {
       const old = records.get(id) || { messageId: id, internalDate: at, matchState: 'pending', caseId: null,

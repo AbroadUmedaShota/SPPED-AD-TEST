@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { AggregateField, FieldValue } from '@google-cloud/firestore';
 import { assertMail } from './errors.mjs';
 import { canonicalJson } from './service.mjs';
+import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from './mixedThread.mjs';
 
 export function createFirestoreStore(db) {
   const mailbox = db.collection('contactMailboxes').doc('customer-speed-ad');
@@ -80,6 +81,9 @@ export function createFirestoreStore(db) {
         bodyUnverified: bodyUnverified.data().count, bodyUnavailable: bodyUnavailable.data().count,
         attachmentUnverified: attachments.data().unverified || 0, attachmentUnavailable: attachments.data().unavailable || 0 };
     },
+    async findThreadMessages(threadId) {
+      return (await messages.where('threadId', '==', threadId).get()).docs.map((item) => item.data());
+    },
     async findReferences(ids) {
       const results = new Map();
       for (let start = 0; start < ids.length; start += 30) {
@@ -102,6 +106,11 @@ export function createFirestoreStore(db) {
         const originals = new Map();
         const result = await operation({
           async getMessage(id) { const record = data(await transaction.get(messages.doc(id))); originals.set(id, record); return record; },
+          async getThreadMessages(threadId) {
+            const found = (await transaction.get(messages.where('threadId', '==', threadId))).docs.map((item) => item.data());
+            found.forEach((record) => originals.set(record.messageId, record));
+            return found;
+          },
           setMessage(record) { pendingWrites.push(() => { transaction.set(messages.doc(record.messageId), record); updateCoverage(transaction, originals.get(record.messageId), record); }); },
           addEvent(event) { pendingWrites.push(() => transaction.set(mailbox.collection('events').doc(), event)); }
         });
@@ -135,23 +144,22 @@ export function createFirestoreStore(db) {
       const ref = messages.doc(incoming.messageId);
       await db.runTransaction(async (transaction) => {
         const existing = data(await transaction.get(ref));
-        if (!existing) { transaction.set(ref, incoming); updateCoverage(transaction, null, incoming); return; }
-        const promote = existing.matchState === 'pending' && !existing.manualClassification && incoming.matchState === 'matched';
-        const attachments = incoming.attachments.map((item) => {
-          const observed = (existing.attachments || []).find((old) => old.partId === item.partId && old.name === item.name && old.size === item.size);
-          return observed ? { ...item, availability: observed.availability, checkedAt: observed.checkedAt } : item;
-        });
-        const merged = { ...existing, ...incoming, attachments,
-          unverifiedAttachmentCount: attachments.filter((item) => item.availability === 'unverified').length,
-          unavailableAttachmentCount: attachments.filter((item) => item.availability === 'unavailable').length,
-          matchState: promote ? incoming.matchState : existing.matchState,
-          caseId: promote ? incoming.caseId : existing.caseId,
-          reason: promote ? incoming.reason : existing.reason,
-          evidence: promote ? incoming.evidence : existing.evidence,
-          version: existing.version + (promote ? 1 : 0), firstReview: existing.firstReview || null,
-          manualClassification: existing.manualClassification || false };
-        transaction.set(ref, merged);
-        updateCoverage(transaction, existing, merged);
+        const threadRecords = incoming.threadId ? (await transaction.get(messages.where('threadId', '==', incoming.threadId))).docs.map((item) => item.data()) : [];
+        const merged = mergeIndexedMessage(existing, incoming);
+        const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== incoming.messageId), merged], incoming.indexedAt);
+        const final = demotions.find((item) => item.record.messageId === incoming.messageId)?.record || merged;
+        transaction.set(ref, final);
+        updateCoverage(transaction, existing, final);
+        const event = indexedClassificationEvent(existing, merged, incoming.indexedAt);
+        if (event) transaction.set(mailbox.collection('events').doc(), event);
+        for (const demotion of demotions) {
+          if (demotion.record.messageId !== incoming.messageId) {
+            const before = threadRecords.find((item) => item.messageId === demotion.record.messageId);
+            transaction.set(messages.doc(demotion.record.messageId), demotion.record);
+            updateCoverage(transaction, before, demotion.record);
+          }
+          transaction.set(mailbox.collection('events').doc(), demotion.event);
+        }
       });
     },
     async markUnavailable(id, at) {

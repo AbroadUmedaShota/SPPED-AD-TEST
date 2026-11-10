@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { assertMail, MailError } from './errors.mjs';
 import { validateActor } from './auth.mjs';
+import { mixedThreadDemotions } from './mixedThread.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
@@ -213,9 +214,15 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
           expectedVersion: payload.expectedVersion, reason: payload.reason
         }, { email: actor.email, verified: true }, now().toISOString(), catalog.caseIds);
       }
+      const threadRecords = transition.record.threadId ? await transaction.getThreadMessages(transition.record.threadId) : [];
+      const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== id), transition.record], now().toISOString());
       transaction.setMessage(transition.record);
       if (transition.event) transaction.addEvent({ ...transition.event, requestId });
-      return { message: summary(transition.record) };
+      for (const demotion of demotions) {
+        transaction.setMessage(demotion.record);
+        transaction.addEvent({ ...demotion.event, requestId });
+      }
+      return { message: summary(demotions.find((item) => item.record.messageId === id)?.record || transition.record) };
     });
   }
 
@@ -247,8 +254,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     catch { bodyAvailability = 'unavailable'; }
     const referenceIds = core.replyMessageIds(message.payload?.headers || []);
     const referenceMatches = await store.findReferences(referenceIds.slice(0, 100));
+    const threadMatches = message.threadId ? await store.findThreadMessages(message.threadId) : [];
     const classification = bodyAvailability === 'verified' && referenceIds.length <= 100 ? core.classifyMessage({ bodyText, headers: message.payload?.headers || [],
-      trustedAnchor: trustedAnchor(message) === true }, catalog.caseIds, referenceMatches) :
+      trustedAnchor: trustedAnchor(message) === true }, catalog.caseIds, referenceMatches, threadMatches.filter((item) => item.messageId !== id)) :
       { matchState: 'pending', caseId: null, reason: bodyAvailability === 'verified' ? 'evidence_limit' : 'body_unavailable', evidence: { bodyCaseIds: [], currentCaseIds: [], parentMessageIds: [] } };
     for (const key of ['bodyCaseIds', 'currentCaseIds', 'parentMessageIds']) {
       if (classification.evidence[key].length > 100) {

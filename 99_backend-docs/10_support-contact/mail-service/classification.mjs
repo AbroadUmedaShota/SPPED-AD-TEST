@@ -27,7 +27,13 @@ export function replyMessageIds(headers) {
 }
 
 /** trustedAnchor must be established by the intake-template/transport adapter, never by UI input. */
-export function classifyMessage({ bodyText = '', headers = [], trustedAnchor = false }, knownCaseIds, referenceMatches = []) {
+export function threadCaseIds(records) {
+  return [...new Set(records.filter((item) => item.matchState !== 'excluded').flatMap((item) => [
+    item.matchState === 'matched' ? item.caseId : null, ...(item.evidence?.bodyCaseIds || [])
+  ]).map(normalizeCaseId).filter(Boolean))].sort();
+}
+
+export function classifyMessage({ bodyText = '', headers = [], trustedAnchor = false }, knownCaseIds, referenceMatches = [], threadMatches = []) {
   const known = new Set([...knownCaseIds].map(normalizeCaseId).filter(Boolean));
   const allBodyIds = caseIdsIn(bodyText);
   const currentIds = caseIdsIn(currentMessageText(bodyText));
@@ -39,6 +45,8 @@ export function classifyMessage({ bodyText = '', headers = [], trustedAnchor = f
   const parentIds = [...new Set(parents.filter((item) => item.matchState === 'matched').map((item) => normalizeCaseId(item.caseId)).filter(Boolean))].sort();
   const evidence = { bodyCaseIds: allBodyIds, currentCaseIds: currentIds, parentMessageIds: parents.map((item) => String(item.messageId)).sort() };
   const pending = (reason) => ({ matchState: 'pending', caseId: null, reason, evidence });
+  const threadIds = threadCaseIds(threadMatches);
+  if (threadIds.length && new Set([...threadIds, ...allBodyIds, ...parentIds]).size > 1) return pending('mixed_thread');
   if (allBodyIds.some((id) => !known.has(id)) || parentIds.some((id) => !known.has(id))) return pending('unknown_case_id');
   if (parents.some((item) => item.matchState !== 'matched')) return pending('unresolved_reply_parent');
   if (nearestParents.some((id) => !parents.some((parent) => parent.rfcMessageId === id))) return pending('unresolved_reply_parent');

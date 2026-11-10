@@ -211,3 +211,14 @@ test('reconciliation exposes pending, unavailable, unindexed and uncovered cases
   assert.equal(complete.complete, true);
   assert.equal(complete.counts.unreviewed, 1);
 });
+
+
+test('a reply to one parent stays pending when another case exists in the same thread', () => {
+  const parent = { ...matched, rfcMessageId: '<parent@example.com>', reason: 'manual' };
+  const other = { ...matched, messageId: 'other', caseId: caseB, reason: 'manual' };
+  for (const thread of [[parent, other], [other, parent]]) {
+    const result = classifyMessage({ headers: [{ name: 'In-Reply-To', value: '<parent@example.com>' }] }, caseIds, [parent], thread);
+    assert.equal(result.matchState, 'pending');
+    assert.equal(result.reason, 'mixed_thread');
+  }
+});
