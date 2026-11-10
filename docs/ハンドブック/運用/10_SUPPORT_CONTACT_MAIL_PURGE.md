@@ -44,6 +44,8 @@ GmailメールIDと案件IDをSHA-256で変換した最小マーカーを保持�
 
 案件参照を含む履歴や他メールと共有する記録を持つ期限切れ除外メールは、関連記録とともに保持して `unsafeExclusionCount` に数えます。他の安全な期限切れ除外メールの処理は進め、保持した残件は個別に照合します。
 
+削除する返信が保持中の親メールを参照するだけなら、返信側の照合根拠・確認記録を削除し、親メールは保持します。保持する別メールから削除候補への参照がある場合は、削除候補も残件として保持します。
+
 ```powershell
 node tools/purgeMailMetadata.mjs --project '<approved-project>' --confirm-project '<same-project>' --database '(default)' --expired-exclusions --request-reference '<verified-retention-operation>'
 ```

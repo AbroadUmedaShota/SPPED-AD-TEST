@@ -19,7 +19,7 @@ const values = (value) => typeof value === 'string' ? [value] : Array.isArray(va
 const caseReferences = (value) => !value || typeof value !== 'object' ? [] : Array.isArray(value) ? value.flatMap(caseReferences) :
   Object.entries(value).flatMap(([key, item]) => key === 'caseId' || key === 'caseIds' || key.endsWith('CaseId') || key.endsWith('CaseIds') ? values(item).filter((id) => CASE_ID.test(id)) : caseReferences(item));
 const messageReferences = (value) => !value || typeof value !== 'object' ? [] : Array.isArray(value) ? value.flatMap(messageReferences) :
-  Object.entries(value).flatMap(([key, item]) => ['messageId', 'messageIds', 'parentMessageIds'].includes(key) ? values(item) : messageReferences(item));
+  Object.entries(value).flatMap(([key, item]) => ['messageId', 'messageIds'].includes(key) ? values(item) : messageReferences(item));
 const record = (snapshot) => ({ path: snapshot.ref.path, data: snapshot.data(), hash: hash(snapshot.data()) });
 
 export function createMailPurge({ db, projectId, databaseId = '(default)', now = () => new Date() }) {
@@ -96,8 +96,10 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
       const protect = (id) => { if (!unsafe.has(id)) { unsafe.add(id); queue.push(id); } };
       for (const item of all.filter((entry) => entry.path !== `${MAILBOX}/meta/sync`)) {
         const refs = [...new Set(values(item.data).filter((value) => candidates.has(value)))];
-        for (const id of refs) related.get(id).push(refs);
-        if (caseReferences(item.data).length || messageReferences(item.data).some((id) => !candidates.has(id))) {
+        const owners = messageReferences(item.data);
+        // Retaining a child protects its referenced parent; retaining a parent does not protect the child.
+        for (const id of owners.filter((value) => candidates.has(value))) related.get(id).push(refs);
+        if (caseReferences(item.data).length || owners.some((id) => !candidates.has(id))) {
           refs.forEach(protect);
         }
       }

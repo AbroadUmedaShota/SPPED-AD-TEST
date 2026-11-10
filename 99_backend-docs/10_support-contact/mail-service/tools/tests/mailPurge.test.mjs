@@ -174,6 +174,43 @@ test('unsafe expired exclusions remain residuals without blocking independent sa
   assert.equal(residual.unsafeExclusionCount, 3);
 });
 
+test('an expired excluded child can delete its own evidence and review while retaining its parent', async () => {
+  for (const unsafeExpiredParent of [false, true]) {
+    const parent = unsafeExpiredParent ? { messageId: 'parent', matchState: 'excluded', sourceKind: 'mail', excludedAt: '2023-11-10T09:00:00.000Z' } :
+      { messageId: 'parent', matchState: 'matched', caseId: target, sourceKind: 'mail' };
+    const db = memoryFirestore({
+      [`${root}/messages/parent`]: parent,
+      [`${root}/messages/child`]: { messageId: 'child', matchState: 'excluded', sourceKind: 'mail', excludedAt: '2023-11-10T09:00:00.000Z',
+        evidence: { parentMessageIds: ['parent'] }, firstReview: { actor: 'reviewer@example.com', at: '2023-10-01T00:00:00.000Z' } },
+      [`${root}/events/child-review`]: { type: 'mail.reviewed', messageId: 'child', requestId: other },
+      [`${root}/receipts/request-child-review`]: { result: { message: { messageId: 'child', evidence: { parentMessageIds: ['parent'] } } } },
+      ...(unsafeExpiredParent ? { [`${root}/events/parent-case`]: { messageId: 'parent', previous: { caseId: target } } } : {})
+    });
+    const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-10T09:00:00.000Z') });
+    const plan = await purge.planExpiredExclusions('child-expiry');
+    assert.equal(plan.messageCount, 1);
+    assert.equal(plan.unsafeExclusionCount, unsafeExpiredParent ? 1 : 0);
+    await purge.applyExpiredExclusions('child-expiry', plan.planHash);
+    assert.deepEqual(db.records.get(`${root}/messages/parent`), parent);
+    for (const path of ['messages/child', 'events/child-review', 'receipts/request-child-review']) assert(!db.records.has(`${root}/${path}`));
+    assert(db.records.has(`${root}/suppressedMessages/${suppressionKey('message', 'child')}`));
+  }
+});
+
+test('an incoming reference from a retained reply still protects an expired excluded parent', async () => {
+  const db = memoryFirestore({
+    [`${root}/messages/parent`]: { messageId: 'parent', matchState: 'excluded', sourceKind: 'mail', excludedAt: '2023-11-10T09:00:00.000Z' },
+    [`${root}/messages/retained`]: { messageId: 'retained', matchState: 'pending', evidence: { parentMessageIds: ['parent'] } }
+  });
+  const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-10T09:00:00.000Z') });
+  const plan = await purge.planExpiredExclusions('incoming-expiry');
+  assert.equal(plan.messageCount, 0);
+  assert.equal(plan.unsafeExclusionCount, 1);
+  await purge.applyExpiredExclusions('incoming-expiry', plan.planHash);
+  assert(db.records.has(`${root}/messages/parent`));
+  assert(db.records.has(`${root}/messages/retained`));
+});
+
 test('unvalidated jobs recheck expiry after reopening, validation failure and interruption', async () => {
   for (const scenario of ['reopened', 'validation-error', 'interrupted']) {
     const cases = [{ caseId: target, handledStatus: '対応済み', closedAt: '2023-11-10T09:00:00.000Z' },
