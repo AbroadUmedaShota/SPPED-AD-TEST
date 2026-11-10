@@ -83,6 +83,8 @@ Gmail adapterは添付取得応答を固定窓口・message ID・attachment ID�
 
 新しい同期状態を観測済みでも、要求ID・実行IDが一致するGAS確定未送信結果は元要求へ反映する。未送信要求を結果不明に変えず、新しい期間・件数表示を保持して同じ要求の明示送信または受付ID計画の作り直しを案内する。送信後のtimeoutや認証失敗には適用しない。
 
+Sync status exposes the active `catalogDigest` and `catalogSnapshotId` (null when unavailable). A completed execution pinned to another active catalog is reported as `needs_full_sync`, with `historyAvailable` and `acceptanceReady` false; a new history request against a changed catalog runs a full enumeration. Running old executions retain their running state. No-mail context already requires the execution snapshot to equal the active snapshot. GAS compares the current Sheet catalog digest and selected beginning before presenting readiness, and reads sync status plus the current Sheet again before dispatching a no-mail confirmation. A known mismatch prevents that mutation. This is not an atomic Sheet/Firestore transaction; independent before/after Sheet acceptance must still detect later source changes.
+
 ## Case closure catalog and retention residuals
 
 `uploadCaseCatalog` requires `cases` (up to 200) instead of an ID-only `caseIds` payload. Each entry has exactly `{caseId, handledStatus, closedAt}`: a lower-case UUID, one of 未対応/対応中/対応済み/保留, and canonical UTC ISO or null. Non-completed entries cannot have a closure timestamp; future or malformed dates fail closed. GAS also requires receipt time ≤ closure time ≤ current time before uploading. The digest covers sorted JSON tuples `[caseId, handledStatus, closedAt]` joined by newline. Firestore verifies the complete snapshot count/digest on read and returns both full `cases` and derived `caseIds`. Legacy ID-only pages must be re-uploaded; no dates are inferred.

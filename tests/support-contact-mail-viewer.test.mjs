@@ -100,9 +100,13 @@ test('case/message/part/version validation stops invalid service operations', ()
 
 test('no-mail bridge validates case, fixed context and explicit request identity before dispatch', () => {
   const app = bridgeRuntime();
+  app.respond((envelope) => envelope.operation === 'getSyncStatus' ? syncResponse(sync.executionId, 'complete', {
+    startAt: '2026-11-08T15:00:00.000Z'
+  }) : { ok: true });
   const requestId = randomUUID();
   app.api.confirmContactCaseNoMail({ caseId, contextToken: 'a'.repeat(64), requestId, actor: { email: 'spoof@example.com' } });
-  const envelope = app.calls[0].envelope;
+  assert.equal(app.calls[0].envelope.operation, 'getSyncStatus');
+  const envelope = app.calls[1].envelope;
   assert.equal(envelope.operation, 'confirmCaseNoMail');
   assert.equal(envelope.requestId, requestId);
   assert.deepEqual(envelope.payload, { caseId, contextToken: 'a'.repeat(64) });
@@ -111,7 +115,7 @@ test('no-mail bridge validates case, fixed context and explicit request identity
     { caseId: 'missing', contextToken: 'a'.repeat(64), requestId }, { caseId, contextToken: 'a'.repeat(64), requestId: '../unsafe' }]) {
     assert.throws(() => app.api.confirmContactCaseNoMail(options));
   }
-  assert.equal(app.calls.length, 1);
+  assert.equal(app.calls.length, 2);
   app.setActor({ email: 'customer@speed-ad.com', authMode: 'google-oauth' });
   app.api.confirmContactCaseNoMail({ caseId, contextToken: 'b'.repeat(64), requestId: randomUUID() });
   assert.equal(app.calls.at(-1).envelope.actor.authMode, 'customer-oauth');
@@ -329,6 +333,8 @@ const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'th
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
 const sync = { unknownClosureCaseCount: 0, expiredCaseCount: 0, executionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: '2026-11-01T00:00:00.000Z', historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
 sync.noMailContextToken = 'a'.repeat(64);
+sync.catalogDigest = createHash('sha256').update(JSON.stringify([caseId, '未対応', null])).digest('hex');
+sync.catalogSnapshotId = 'catalog-1';
 const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', noMailContextToken: state === 'complete' ? sync.noMailContextToken : null, ...extra } });
 const syncCallResponse = (options, state = 'running', extra = {}) => {
   const result = syncResponse(options.executionId, state, extra);
@@ -422,6 +428,76 @@ test('an earlier corrected Sheet receipt invalidates old readiness and no-mail c
   const ui = uiRuntime();
   ui.ui.validateContactMailSync(result.sync);
   ui.ui.validateContactCaseNoMail(result.noMail, result.sync);
+});
+
+test('case, status and closure drift invalidate old readiness and block absence writes until catalog sync recovers', () => {
+  for (const kind of ['case', 'status', 'closure']) {
+    const startAt = '2026-11-08T15:00:00.000Z';
+    const ids = [caseId]; const dates = ['2026-11-10T00:00:00.000Z'];
+    const statuses = [kind === 'closure' ? '対応済み' : '未対応'];
+    const closedDates = [kind === 'closure' ? '2026-11-10T01:00:00.000Z' : ''];
+    const app = bridgeRuntime({ ids, dates, statuses, closedDates, historyStartAt: startAt });
+    let digest = app.api.mailCatalogSource_().digest;
+    let snapshotId = 'catalog-1'; let executionId = sync.executionId;
+    let needsSync = false; let original = true; let confirmations = 0;
+    const status = () => ({ ok: true, sync: { ...sync, startAt, executionId, catalogDigest: digest, catalogSnapshotId: snapshotId,
+      state: needsSync ? 'needs_full_sync' : 'complete', enumerationComplete: !needsSync, historyAvailable: !needsSync,
+      bodyUnverifiedCount: 0, acceptanceReady: original && !needsSync, noMailContextToken: needsSync ? null : original ? 'a'.repeat(64) : 'b'.repeat(64) },
+      noMail: { eligible: !needsSync, contextToken: needsSync ? null : original ? 'a'.repeat(64) : 'b'.repeat(64),
+        confirmation: original ? { ...noMailConfirmation, startAt } : null, stale: !original } });
+    app.respond((envelope) => {
+      if (envelope.operation === 'getSyncStatus') return status();
+      if (envelope.operation === 'uploadCaseCatalog') {
+        digest = envelope.payload.digest; snapshotId = envelope.payload.snapshotId; needsSync = true; original = false;
+        return { ok: true, catalog: { complete: true } };
+      }
+      if (envelope.operation === 'advanceSync') {
+        assert.equal(envelope.payload.mode, 'full'); assert.equal(envelope.payload.startAt, startAt);
+        assert.equal(envelope.payload.catalogDigest, digest);
+        executionId = envelope.payload.executionId; needsSync = false; return status();
+      }
+      assert.equal(envelope.operation, 'confirmCaseNoMail'); confirmations++; return { ok: true };
+    });
+    assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, true);
+    if (kind === 'case') { ids.push('22222222-2222-4222-8222-222222222222'); dates.push(dates[0]); }
+    else if (kind === 'status') statuses[0] = '対応中';
+    else closedDates[0] = '2026-11-10T02:00:00.000Z';
+    const stale = app.api.getContactMailSyncStatus();
+    assert.equal(stale.sync.startAt, startAt);
+    assert.equal(stale.sync.state, 'needs_full_sync'); assert.equal(stale.sync.acceptanceReady, false);
+    assert.equal(stale.noMail.eligible, false); assert.equal(stale.noMail.confirmation, null);
+    assert.equal(app.api.confirmContactCaseNoMail({ caseId, contextToken: 'a'.repeat(64), requestId: randomUUID() }).error.code, 'MAIL_CATALOG_CHANGED');
+    assert.equal(confirmations, 0);
+    const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+    const uploaded = app.api.advanceContactMailSync({ catalog }).catalog;
+    assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, false);
+    app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'full', catalogSnapshotId: uploaded.snapshotId,
+      catalogDigest: uploaded.digest, catalogStartAt: uploaded.startAt, requestId: randomUUID() });
+    const recovered = app.api.getContactMailSyncStatus();
+    assert.equal(recovered.sync.state, 'complete');
+    assert.equal(recovered.sync.catalogDigest, app.api.mailCatalogSource_().digest);
+    app.api.confirmContactCaseNoMail({ caseId, contextToken: 'b'.repeat(64), requestId: randomUUID() });
+    assert.equal(confirmations, 1);
+  }
+});
+
+test('a source change during an absence action invalidates its returned old-catalog confirmation', () => {
+  const startAt = '2026-11-08T15:00:00.000Z';
+  const statuses = ['未対応'];
+  const app = bridgeRuntime({ statuses, historyStartAt: startAt });
+  const current = () => ({ ok: true, sync: { ...sync, startAt, bodyUnverifiedCount: 0, acceptanceReady: true },
+    noMail: { eligible: true, contextToken: sync.noMailContextToken, confirmation: { ...noMailConfirmation, startAt }, stale: false } });
+  let writes = 0;
+  app.respond((envelope) => {
+    if (envelope.operation === 'getSyncStatus') return current();
+    assert.equal(envelope.operation, 'confirmCaseNoMail'); writes++; statuses[0] = '対応中'; return current();
+  });
+  const result = app.api.confirmContactCaseNoMail({ caseId, contextToken: sync.noMailContextToken, requestId: randomUUID() });
+  assert.equal(writes, 1);
+  assert.equal(result.sync.state, 'needs_full_sync');
+  assert.equal(result.sync.acceptanceReady, false);
+  assert.equal(result.noMail.confirmation, null);
+  assert.equal(result.noMail.stale, true);
 });
 
 test('changed period preserves old running batches across reload and permits a new full sync after completion', async () => {

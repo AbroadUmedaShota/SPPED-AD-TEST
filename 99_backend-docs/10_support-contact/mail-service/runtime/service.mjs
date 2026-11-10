@@ -154,12 +154,15 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     };
     const unobservedDeletedCount = startAt ? await store.countUnobservedDeletions() : null;
     const catalog = await store.getCatalog();
+    const catalogCurrent = catalog.complete && /^[a-f0-9]{64}$/.test(catalog.digest || '') &&
+      typeof catalog.snapshotId === 'string' && state?.catalogSnapshotId === catalog.snapshotId;
     const retention = catalog.complete ? catalogRetention(catalog, now()) : null;
     const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt, cutoffAt }) : []);
     const confirmationScope = startAt ? await availableConfirmationContext(catalog, state, counts, unobservedDeletedCount) : null;
     const confirmed = new Set(confirmationScope && store.getConfirmedNoMailCaseIds ? await store.getConfirmedNoMailCaseIds(confirmationScope, now().toISOString()) : []);
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id));
-    const enumerationComplete = Boolean(startAt && cutoffAt && startAt <= cutoffAt) && state?.state === 'complete';
+    const catalogChanged = Boolean(state?.catalogSnapshotId && catalog.snapshotId && state.catalogSnapshotId !== catalog.snapshotId);
+    const enumerationComplete = Boolean(startAt && cutoffAt && startAt <= cutoffAt) && state?.state === 'complete' && !catalogChanged;
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
       counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
     if (confirmationScope) {
@@ -168,14 +171,16 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         !(await store.hasActiveSyncLease?.(now().toISOString())), 'MAIL_MAPPING_CHANGED', 409);
     }
     return {
-      state: !startAt && state ? 'needs_full_sync' : state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
+      state: (!startAt && state) || (catalogChanged && state?.state !== 'running') ? 'needs_full_sync' : state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
       pendingCount: counts.pending, unreviewedCount: counts.unreviewed, failedCount: startAt ? state?.failedCount || 0 : null,
       unavailableCount: counts.unavailable, remainingPages: Boolean(startAt && state?.state === 'running'),
       startAt: startAt || null, cutoffAt: state?.cutoffAt || null, errorCode: !startAt && state ? 'MAIL_PERIOD_REQUIRED' : state?.errorCode || null,
       processedCount: state?.processedCount || 0, phase: state?.phase || 'enumerate',
       unobservedDeletedCount,
-      executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(startAt && state?.historyId),
-      enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0 && retention.unknownClosureCaseIds.length === 0 && retention.expiredCaseIds.length === 0,
+      executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(startAt && state?.historyId && !catalogChanged),
+      enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalogCurrent && residual === 0 && coverageUnverified.length === 0 && retention.unknownClosureCaseIds.length === 0 && retention.expiredCaseIds.length === 0,
+      catalogDigest: catalog.complete && /^[a-f0-9]{64}$/.test(catalog.digest || '') ? catalog.digest : null,
+      catalogSnapshotId: catalog.complete && typeof catalog.snapshotId === 'string' ? catalog.snapshotId : null,
       coverageUnverifiedCaseCount: catalog.complete && startAt ? coverageUnverified.length : null,
       coverageUnverifiedCaseIds: startAt ? coverageUnverified.slice(0, 50) : [],
       noMailContextToken: noMailContextToken(confirmationScope),
@@ -609,7 +614,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
           assertMail(prePeriodObservation && payload.mode === 'full' && startAt <= prePeriodObservation.internalDate, 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
         }
         assertMail(!state?.executionId || !periodStart(state.startAt) || startAt <= periodStart(state.startAt), 'MAIL_PERIOD_NARROWING', 409);
-        const mode = payload.mode === 'history' && startAt !== periodStart(state?.startAt) ? 'full' : payload.mode;
+        const mode = payload.mode === 'history' && (startAt !== periodStart(state?.startAt) ||
+          (state?.catalogSnapshotId || null) !== (catalog.snapshotId || null)) ? 'full' : payload.mode;
         const startedAt = now().toISOString();
         assertMail(startAt <= startedAt, 'MAIL_INVALID_REQUEST');
         const profile = await gmail.getProfile();

@@ -56,7 +56,14 @@ function confirmContactCaseNoMail(options, authProof) {
   var contextToken = options && options.contextToken;
   if (typeof contextToken !== 'string' || !/^[a-f0-9]{64}$/.test(contextToken)) throw new Error('関連メールなし確認の対象条件が不正です。');
   if (!options || typeof options.requestId !== 'string' || !options.requestId) throw new Error('メール操作の識別子が必要です。');
-  return callMailService_('confirmCaseNoMail', { caseId: caseId, contextToken: contextToken }, context, mailRequestId_(options.requestId));
+  var requestId = mailRequestId_(options.requestId);
+  var status = callMailService_('getSyncStatus', {}, context);
+  if (!status.ok) return status;
+  var source;
+  try { source = mailCatalogSource_(); } catch (_error) { return mailError_('MAIL_CATALOG_CHANGED'); }
+  if (!status.sync || status.sync.state !== 'complete' || status.sync.catalogDigest !== source.digest ||
+      status.sync.startAt !== source.startAt || status.sync.noMailContextToken !== contextToken) return mailError_('MAIL_CATALOG_CHANGED');
+  return callMailService_('confirmCaseNoMail', { caseId: caseId, contextToken: contextToken }, context, requestId);
 }
 
 function resolveContactMailPending(options, authProof) {
@@ -211,9 +218,9 @@ function mailHistoryStartAt_(derivedStartAt) {
 
 function mailCurrentPeriodResult_(result) {
   if (!result.sync || result.sync.state === 'not_started') return result;
-  var startAt = null;
-  try { startAt = mailCatalogSource_().startAt; } catch (_error) { /* An invalid source cannot verify old results. */ }
-  if (startAt && result.sync.startAt === startAt) return result;
+  var source = null;
+  try { source = mailCatalogSource_(); } catch (_error) { /* An invalid source cannot verify old results. */ }
+  if (source && result.sync.startAt === source.startAt && result.sync.catalogDigest === source.digest) return result;
   if (result.sync.state !== 'running') result.sync.state = 'needs_full_sync';
   result.sync.acceptanceReady = false;
   result.sync.enumerationComplete = false;

@@ -57,6 +57,39 @@ test('pending mail, source failures, active lease and a current case match prohi
   }
 });
 
+test('active catalog identity invalidates old completion and absence until a new full sync', async () => {
+  const f = fixture();
+  const before = await f.execute(f.envelope('listCaseMail', { caseId: A }));
+  await f.execute(f.envelope('confirmCaseNoMail', { caseId: A, contextToken: before.noMail.contextToken }));
+  assert.equal((await f.execute(f.envelope('getSyncStatus'))).sync.acceptanceReady, true);
+  const entries = [{ caseId: A, handledStatus: '対応中', closedAt: null }];
+  const snapshotId = randomUUID(); const digest = catalogDigest(entries);
+  await f.execute(f.envelope('uploadCaseCatalog', { snapshotId, pageIndex: 0, pageCount: 1, total: 1, digest, cases: entries }));
+  const stale = await f.execute(f.envelope('listCaseMail', { caseId: A }));
+  assert.equal(stale.sync.catalogDigest, digest);
+  assert.equal(stale.sync.catalogSnapshotId, snapshotId);
+  assert.equal(stale.sync.state, 'needs_full_sync');
+  assert.equal(stale.sync.acceptanceReady, false);
+  assert.equal(stale.noMail.eligible, false);
+  assert.equal(stale.noMail.confirmation, null);
+  await assert.rejects(f.execute(f.envelope('confirmCaseNoMail', { caseId: A, contextToken: before.noMail.contextToken })), { code: 'MAIL_MAPPING_CHANGED' });
+  const execute = createMailService({ store: f.store, gmail: {
+    async getProfile() { return { emailAddress: 'customer@speed-ad.com', historyId: '456' }; },
+    async listMessages() { return { messageIds: [] }; },
+    async listHistory() { throw new Error('changed catalog must use full sync'); }
+  }, core: {}, now: () => new Date(NOW) });
+  const executionId = randomUUID();
+  let result = await execute(f.envelope('advanceSync', { executionId, mode: 'history', startAt: START, catalogSnapshotId: snapshotId, catalogDigest: digest }));
+  while (result.sync.state === 'running') result = await execute(f.envelope('advanceSync', { executionId }));
+  assert.equal(result.sync.mode, 'full');
+  assert.equal(result.sync.catalogDigest, digest);
+  const current = await execute(f.envelope('listCaseMail', { caseId: A }));
+  assert.equal(current.noMail.eligible, true);
+  assert.notEqual(current.noMail.contextToken, before.noMail.contextToken);
+  const confirmed = await execute(f.envelope('confirmCaseNoMail', { caseId: A, contextToken: current.noMail.contextToken }));
+  assert.equal(confirmed.sync.acceptanceReady, true);
+});
+
 test('sync, catalog and unrelated classification changes invalidate old absence and receipt replay', async () => {
   for (const kind of ['sync', 'catalog', 'classification']) {
     const f = fixture(); const token = (await f.execute(f.envelope('listCaseMail', { caseId: A }))).noMail.contextToken;

@@ -1674,6 +1674,8 @@
           (executionId && sync.executionId !== executionId) ||
           sync.remainingPages !== (sync.state === 'running') || sync.enumerationComplete !== (sync.state === 'complete') ||
           typeof sync.historyAvailable !== 'boolean' || typeof sync.acceptanceReady !== 'boolean' ||
+          !(sync.catalogDigest === null || typeof sync.catalogDigest === 'string' && /^[a-f0-9]{64}$/.test(sync.catalogDigest)) ||
+          !(sync.catalogSnapshotId === null || typeof sync.catalogSnapshotId === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(sync.catalogSnapshotId)) ||
           !(sync.noMailContextToken === null || typeof sync.noMailContextToken === 'string' && /^[a-f0-9]{64}$/.test(sync.noMailContextToken)) ||
           !['enumerate', 'finalize'].includes(sync.phase)) invalid();
       const counts = ['processedCount', 'pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount'];
@@ -1699,6 +1701,7 @@
         if (sync[key] !== null && (!Number.isSafeInteger(sync[key]) || sync[key] < 0)) invalid();
       }
       if (sync.acceptanceReady && (sync.unknownClosureCaseCount !== 0 || sync.expiredCaseCount !== 0)) invalid();
+      if (sync.acceptanceReady && (sync.catalogDigest === null || sync.catalogSnapshotId === null)) invalid();
       if (sync.acceptanceReady && (sync.state !== 'complete' || sync.coverageUnverifiedCaseCount !== 0 || counts.some((key) => key !== 'processedCount' && sync[key] !== 0))) invalid();
     }
 
