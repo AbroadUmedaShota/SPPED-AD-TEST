@@ -408,9 +408,11 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         assertMail(['full', 'history'].includes(payload.mode));
         if (payload.catalogSnapshotId !== undefined) assertMail(payload.catalogSnapshotId === catalog.snapshotId && payload.catalogDigest === catalog.digest, 'MAIL_CATALOG_CHANGED', 409);
         if (payload.mode === 'history') assertMail(state?.historyId, 'MAIL_FULL_SYNC_REQUIRED', 409);
+        const startedAt = now().toISOString();
         const profile = await gmail.getProfile();
         assertMail(profile.emailAddress?.toLowerCase() === 'customer@speed-ad.com', 'MAIL_MAILBOX_MISMATCH', 403);
-        const at = now().toISOString();
+        // History must cover a snapshot requested after this time, not the later processing completion time.
+        const at = payload.mode === 'history' ? startedAt : now().toISOString();
         if (payload.startAt !== undefined) assertMail(typeof payload.startAt === 'string' && Number.isFinite(Date.parse(payload.startAt)));
         const suppliedStartAt = payload.startAt ? new Date(payload.startAt).toISOString() : null;
         const startAt = payload.mode === 'history' ? (state?.startAt || null) : suppliedStartAt;
@@ -457,7 +459,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (page.nextPageToken) assertMail(page.nextPageToken !== state.pageToken, 'MAIL_INVALID_UPSTREAM', 502);
       if (state.mode === 'history') {
         assertMail(/^\d+$/.test(String(page.historyId || '')) && BigInt(page.historyId) >= BigInt(state.historyId) &&
-          (!state.lastPageHistoryId || BigInt(page.historyId) >= BigInt(state.lastPageHistoryId)), 'MAIL_INVALID_UPSTREAM', 502);
+          (!state.lastPageHistoryId || BigInt(page.historyId) >= BigInt(state.lastPageHistoryId)) &&
+          (page.nextPageToken || BigInt(page.historyId) >= BigInt(state.initialHistoryId)), 'MAIL_INVALID_UPSTREAM', 502);
         state.lastPageHistoryId = String(page.historyId);
       }
       if (!state.inFlightPage) {
@@ -494,10 +497,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         ...(!page.nextPageToken && state.mode === 'full' ? { phase: 'finalize', finalizeCursor: null } : {}) };
       if (complete) {
         const historyId = state.mode === 'history' ? String(page.historyId || '') : state.initialHistoryId;
-        assertMail(/^\d+$/.test(historyId), 'MAIL_INVALID_UPSTREAM', 502);
+        assertMail(/^\d+$/.test(historyId) && BigInt(historyId) >= BigInt(state.initialHistoryId), 'MAIL_INVALID_UPSTREAM', 502);
         state.historyId = historyId;
         state.lastSuccessAt = now().toISOString();
-        if (state.mode === 'history') state.cutoffAt = state.lastSuccessAt;
       }
       const result = { sync: await syncStatus(state) };
       await store.setSyncState(state, lease, { requestId, fingerprint, result });

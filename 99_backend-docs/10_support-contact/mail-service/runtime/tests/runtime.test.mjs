@@ -32,7 +32,7 @@ function record(id, changes = {}) {
     firstReview: null, unavailable: false, bodyAvailability: 'verified', attachments: [],
     unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0, ...changes };
 }
-function fixture(ids = [A, B]) {
+function fixture(ids = [A, B], now = () => new Date(NOW)) {
   const store = fakeStore(ids);
   const messages = new Map();
   const calls = [];
@@ -43,9 +43,9 @@ function fixture(ids = [A, B]) {
     async listMessages() { return { messageIds: [...messages.keys()] }; },
     async listHistory() { return { messageIds: [], historyId: '200' }; }
   };
-  const execute = createMailService({ store, gmail, core, now: () => new Date(NOW) });
+  const execute = createMailService({ store, gmail, core, now });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation,
-    requestId: randomUUID(), issuedAt: NOW, actor, payload, ...changes });
+    requestId: randomUUID(), issuedAt: now().toISOString(), actor, payload, ...changes });
   return { store, messages, calls, gmail, execute, envelope };
 }
 
@@ -220,6 +220,81 @@ test('history retains the original period and direction comes from Gmail SENT la
   assert.equal(await f.store.getMessage('old'), null);
   assert.equal((await f.store.getMessage('sent')).direction, 'sent');
   assert.equal((await f.store.getMessage('spoofed')).direction, 'received');
+});
+
+test('history cutoff survives delayed processing and resume while the next run captures interim arrivals', async () => {
+  let time = Date.parse(NOW);
+  const f = fixture([A], () => new Date(time));
+  let snapshotHistoryId = '100'; let profileCalls = 0;
+  f.gmail.getProfile = async () => {
+    profileCalls++;
+    time += 5000;
+    return { emailAddress: 'customer@speed-ad.com', historyId: snapshotHistoryId };
+  };
+  const full = randomUUID();
+  const enumerated = await f.execute(f.envelope('advanceSync', { executionId: full, mode: 'full' }));
+  const fullCutoff = enumerated.sync.cutoffAt;
+  time += 15 * 60000;
+  const finalized = await f.execute(f.envelope('advanceSync', { executionId: full }));
+  assert.equal(finalized.sync.cutoffAt, fullCutoff);
+  assert.equal(finalized.sync.lastSuccessAt, new Date(time).toISOString());
+
+  time = Date.parse('2026-11-10T10:00:00.000Z'); snapshotHistoryId = '200';
+  const batch = Array.from({ length: 6 }, (_, i) => `batch-${i}`);
+  batch.forEach((id) => f.messages.set(id, gmailMessage(id)));
+  const starts = [];
+  f.gmail.listHistory = async ({ startHistoryId }) => {
+    starts.push(startHistoryId);
+    return startHistoryId === '100' ? { messageIds: batch, historyId: '200' } : { messageIds: ['interim'], historyId: '300' };
+  };
+  const history = randomUUID();
+  const first = await f.execute(f.envelope('advanceSync', { executionId: history, mode: 'history' }));
+  assert.equal(first.sync.cutoffAt, '2026-11-10T10:00:00.000Z');
+  assert.equal(first.sync.state, 'running');
+  const interim = gmailMessage('interim'); interim.internalDate = String(Date.parse('2026-11-10T10:05:00.000Z'));
+  f.messages.set('interim', interim);
+  const getMessage = f.gmail.getMessage;
+  let fail = true;
+  f.gmail.getMessage = async (id) => {
+    if (id === 'batch-5' && fail) throw new MailError('MAIL_UPSTREAM_TIMEOUT', 504);
+    return getMessage(id);
+  };
+  time = Date.parse('2026-11-10T10:15:00.000Z');
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: history })), { code: 'MAIL_UPSTREAM_TIMEOUT' });
+  const failed = await f.store.getSyncState();
+  assert.equal(failed.cutoffAt, first.sync.cutoffAt); assert.equal(failed.initialHistoryId, '200');
+  const profilesBeforeResume = profileCalls;
+  time = Date.parse('2026-11-10T10:20:00.000Z'); fail = false; snapshotHistoryId = '300';
+  const completed = await f.execute(f.envelope('advanceSync', { executionId: history, resume: true }));
+  assert.equal(profileCalls, profilesBeforeResume);
+  assert.equal(completed.sync.cutoffAt, first.sync.cutoffAt);
+  assert.equal(completed.sync.lastSuccessAt, '2026-11-10T10:20:00.000Z');
+  assert.equal((await f.store.getSyncState()).historyId, '200');
+  assert.equal(await f.store.getMessage('interim'), null);
+  const next = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.equal(next.sync.cutoffAt, '2026-11-10T10:20:00.000Z');
+  assert.deepEqual(starts, ['100', '200']);
+  assert.equal((await f.store.getMessage('interim')).messageId, 'interim');
+  assert.equal((await f.store.getSyncState()).historyId, '300');
+});
+
+test('history cannot complete below its initial snapshot watermark even after resume', async () => {
+  const f = fixture();
+  const full = randomUUID();
+  await f.execute(f.envelope('advanceSync', { executionId: full, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: full }));
+  f.gmail.getProfile = async () => ({ emailAddress: 'customer@speed-ad.com', historyId: '300' });
+  f.gmail.listHistory = async () => ({ messageIds: [], historyId: '200' });
+  const history = randomUUID();
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: history, mode: 'history' })), { code: 'MAIL_INVALID_UPSTREAM' });
+  const failed = await f.store.getSyncState();
+  assert.equal(failed.state, 'failed'); assert.equal(failed.historyId, '100'); assert.equal(failed.initialHistoryId, '300');
+  f.gmail.getProfile = async () => { throw new Error('resume must retain the original snapshot'); };
+  f.gmail.listHistory = async () => ({ messageIds: [], historyId: '300' });
+  const resumed = await f.execute(f.envelope('advanceSync', { executionId: history, resume: true }));
+  assert.equal(resumed.sync.state, 'complete'); assert.equal(resumed.sync.cutoffAt, failed.cutoffAt);
+  assert.equal((await f.store.getSyncState()).initialHistoryId, '300');
+  assert.equal((await f.store.getSyncState()).historyId, '300');
 });
 
 test('failed sync requires explicit resume and keeps the failing target', async () => {
