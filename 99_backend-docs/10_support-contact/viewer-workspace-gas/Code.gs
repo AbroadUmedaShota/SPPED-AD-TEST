@@ -60,7 +60,9 @@ function listContactSubmissions(options, authProof) {
   options = options || {};
   var statusFilter = String(options.status || '').trim();
   var query = String(options.query || '').toLowerCase().trim();
-  var limit = Math.min(Math.max(Number(options.limit || 100), 1), 200);
+  var requestedSize = Number(options.pageSize == null ? (options.limit || 100) : options.pageSize);
+  var limit = Number.isFinite(requestedSize) ? Math.min(Math.max(Math.floor(requestedSize), 1), 200) : 50;
+  var cursor = parseSubmissionPageToken_(options.pageToken, statusFilter, query);
   var sheet = getSheet_();
   var headers = ensureHeaders_(sheet);
   var values = sheet.getDataRange().getValues();
@@ -76,6 +78,7 @@ function listContactSubmissions(options, authProof) {
 
   for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
     var record = rowToRecord_(headers, values[rowIndex], rowIndex + 1);
+    if (!String(record.submission_id || '').trim()) continue;
     record.handled_status = normalizeHandledStatus_(record.handled_status);
     counts.total += 1;
     if (isActiveStatus_(record.handled_status)) {
@@ -99,17 +102,73 @@ function listContactSubmissions(options, authProof) {
     records.push(toSummary_(record));
   }
 
-  records.sort(function (a, b) {
-    return String(b.submitted_at).localeCompare(String(a.submitted_at));
-  });
+  records.sort(compareSubmissionOrder_);
+  var selectedId = String(options.selectedId || '').trim();
+  var selectedMatches = selectedId ? records.some(function (record) { return record.submission_id === selectedId; }) : null;
+  if (selectedId && !selectedMatches) cursor = null;
+  var start = 0;
+  var end = records.length;
+  if (cursor) {
+    if (cursor.direction === 'after') {
+      start = records.findIndex(function (record) { return compareSubmissionOrder_(record, cursor) > 0; });
+      if (start === -1) start = records.length;
+    } else {
+      end = records.findIndex(function (record) { return compareSubmissionOrder_(record, cursor) >= 0; });
+      if (end === -1) end = records.length;
+      start = Math.max(0, end - limit);
+    }
+  }
+  if (records.length && start >= records.length) start = Math.max(0, records.length - limit);
+  if (records.length && end === 0) end = Math.min(limit, records.length);
+  var pageRecords = records.slice(start, Math.min(start + limit, end));
+  var pageEnd = start + pageRecords.length;
 
   return {
     ok: true,
     viewerEmail: context.email,
     statuses: VIEWER_STATUSES,
     counts: counts,
-    submissions: records.slice(0, limit)
+    selectedMatches: selectedMatches,
+    submissions: pageRecords,
+    page: {
+      size: limit,
+      total: records.length,
+      from: pageRecords.length ? start + 1 : 0,
+      to: pageEnd,
+      previousPageToken: start > 0 ? makeSubmissionPageToken_(pageRecords[0] || cursor, 'before', statusFilter, query) : '',
+      nextPageToken: pageEnd < records.length && pageRecords.length ? makeSubmissionPageToken_(pageRecords[pageRecords.length - 1], 'after', statusFilter, query) : ''
+    }
   };
+}
+
+function compareSubmissionOrder_(a, b) {
+  var dateA = String(a.submitted_at || '');
+  var dateB = String(b.submitted_at || '');
+  if (dateA !== dateB) return dateA < dateB ? 1 : -1;
+  var idA = String(a.submission_id || '');
+  var idB = String(b.submission_id || '');
+  return idA === idB ? 0 : (idA < idB ? 1 : -1);
+}
+
+function makeSubmissionPageToken_(record, direction, status, query) {
+  return Utilities.base64EncodeWebSafe(JSON.stringify({
+    version: 1, direction: direction, status: status, query: query,
+    submitted_at: String(record.submitted_at || ''), submission_id: String(record.submission_id || '')
+  }), Utilities.Charset.UTF_8);
+}
+
+function parseSubmissionPageToken_(token, status, query) {
+  if (!token) return null;
+  try {
+    if (typeof token !== 'string' || token.length > 8192) throw new Error('invalid');
+    var cursor = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(token)).getDataAsString());
+    if (cursor.version !== 1 || ['after', 'before'].indexOf(cursor.direction) === -1 ||
+        cursor.status !== status || cursor.query !== query || typeof cursor.submitted_at !== 'string' ||
+        typeof cursor.submission_id !== 'string' || !cursor.submission_id) throw new Error('invalid');
+    return cursor;
+  } catch (_error) {
+    throw new Error('一覧のページ情報が無効です。先頭から読み込み直してください。');
+  }
 }
 
 function getContactSubmission(submissionId, authProof) {

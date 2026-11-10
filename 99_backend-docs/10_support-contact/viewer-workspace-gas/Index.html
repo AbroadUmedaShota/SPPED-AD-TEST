@@ -77,7 +77,7 @@
     }
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 140px;
+      grid-template-columns: 1fr;
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -102,12 +102,22 @@
       color: var(--text);
       font-size: 13px;
     }
-    .summary-chip button {
-      padding: 0;
-      border: 0;
-      background: transparent;
+    .summary-chip[aria-selected="true"] {
+      border-color: var(--primary);
+      background: #edf3ff;
       color: var(--primary);
-      border-radius: 0;
+    }
+    .page-navigation, .case-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .page-navigation span, .case-navigation span {
+      font-size: 12px;
+      color: var(--muted);
     }
     input, select, textarea {
       width: 100%;
@@ -360,10 +370,11 @@
 
   <main class="app" id="appView" hidden>
     <section class="list-pane" aria-label="問い合わせ一覧">
-      <div class="status-summary" id="statusSummary"></div>
+      <div class="status-summary" id="statusSummary" role="tablist" aria-label="対応ステータス"></div>
+      <div id="submissionPanel" role="tabpanel">
       <div class="toolbar">
         <input id="searchInput" type="search" placeholder="検索">
-        <select id="statusFilter">
+        <select id="statusFilter" hidden aria-hidden="true" tabindex="-1">
           <option value="active" selected>対応が必要</option>
           <option value="all">すべて</option>
           <option value="未対応">未対応</option>
@@ -382,9 +393,20 @@
         </thead>
         <tbody id="submissionRows"></tbody>
       </table>
+      <nav class="page-navigation" aria-label="一覧のページ送り">
+        <button type="button" class="ghost" id="pagePrev">前の50件</button>
+        <span id="pagePosition" aria-live="polite"></span>
+        <button type="button" class="ghost" id="pageNext">次の50件</button>
+      </nav>
+      </div>
     </section>
 
     <section class="detail-pane" aria-label="問い合わせ詳細">
+      <nav class="case-navigation" aria-label="問い合わせの前後移動">
+        <button type="button" class="ghost" id="casePrev">← 前の問い合わせ</button>
+        <span id="casePosition" aria-live="polite"></span>
+        <button type="button" class="ghost" id="caseNext">次の問い合わせ →</button>
+      </nav>
       <div class="detail" id="detailView">
         <div class="section">
           <p class="muted">一覧から問い合わせを選択してください。</p>
@@ -595,6 +617,17 @@
       submissions: [],
       counts: { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 },
       loading: false,
+      saving: false,
+      page: { total: 0, from: 0, to: 0, previousPageToken: '', nextPageToken: '' },
+      currentPageToken: '',
+      appliedStatus: 'active',
+      appliedQuery: '',
+      listRequestSerial: 0,
+      detailRequestSerial: 0,
+      saveRequestSerial: 0,
+      listError: false,
+      listState: 'unobserved',
+      savedOutsideFilter: false,
       detail: null,
       detailSnapshot: { handled_status: '', internal_note: '' },
       dirty: false,
@@ -613,6 +646,13 @@
     const submissionRows = document.getElementById('submissionRows');
     const detailView = document.getElementById('detailView');
     const statusSummary = document.getElementById('statusSummary');
+    const submissionPanel = document.getElementById('submissionPanel');
+    const pagePrev = document.getElementById('pagePrev');
+    const pageNext = document.getElementById('pageNext');
+    const pagePosition = document.getElementById('pagePosition');
+    const casePrev = document.getElementById('casePrev');
+    const caseNext = document.getElementById('caseNext');
+    const casePosition = document.getElementById('casePosition');
     const attachmentModal = document.getElementById('attachmentModal');
     const attachmentModalImage = document.getElementById('attachmentModalImage');
     const attachmentModalCaption = document.getElementById('attachmentModalCaption');
@@ -675,7 +715,20 @@
 
     function setBusy(isBusy) {
       state.loading = isBusy;
-      refreshButton.disabled = isBusy;
+      refreshButton.disabled = isBusy || state.saving;
+      submissionPanel.setAttribute('aria-busy', String(isBusy));
+      setDetailInteractionDisabled(isBusy || state.saving);
+      renderNavigation();
+    }
+
+    function setDetailInteractionDisabled(disabled) {
+      detailView.querySelectorAll('button, input, select, textarea').forEach((control) => { control.disabled = disabled; });
+      ['statusSelect', 'internalNote', 'saveStatusButton'].forEach((id) => {
+        const control = document.getElementById(id);
+        if (control) control.disabled = disabled;
+      });
+      searchInput.disabled = state.saving;
+      statusSummary.querySelectorAll('[role="tab"]').forEach((tab) => { tab.disabled = state.saving; });
     }
 
     function setAttachmentModalVisibility(isVisible) {
@@ -690,19 +743,75 @@
 
     function renderStatusSummary() {
       const chips = [
-        { label: '全件', value: state.counts.total || 0 },
-        { label: '対応が必要', value: state.counts.active || 0 },
-        { label: '未対応', value: state.counts['未対応'] || 0 },
-        { label: '対応中', value: state.counts['対応中'] || 0 },
-        { label: '保留', value: state.counts['保留'] || 0 },
-        { label: '対応済み', value: state.counts['対応済み'] || 0 },
+        { status: 'all', label: '全件', value: state.counts.total || 0 },
+        { status: 'active', label: '対応が必要', value: state.counts.active || 0 },
+        { status: '未対応', label: '未対応', value: state.counts['未対応'] || 0 },
+        { status: '対応中', label: '対応中', value: state.counts['対応中'] || 0 },
+        { status: '保留', label: '保留', value: state.counts['保留'] || 0 },
+        { status: '対応済み', label: '対応済み', value: state.counts['対応済み'] || 0 },
       ];
-      statusSummary.innerHTML = chips.map((chip) => `
-        <span class="summary-chip">
+      statusSummary.innerHTML = chips.map((chip, index) => `
+        <button type="button" class="summary-chip" role="tab" data-status="${chip.status}" id="status-tab-${index}" aria-controls="submissionPanel" aria-selected="${chip.status === statusFilter.value}" tabindex="${chip.status === statusFilter.value ? 0 : -1}">
           <strong>${escapeHtml(chip.value)}</strong>
           ${escapeHtml(chip.label)}
-        </span>
+        </button>
       `).join('');
+      submissionPanel.setAttribute('aria-labelledby', `status-tab-${chips.findIndex((chip) => chip.status === statusFilter.value)}`);
+      const tabs = Array.from(statusSummary.querySelectorAll('[role="tab"]'));
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => changeStatusTab(tab.dataset.status));
+        tab.addEventListener('keydown', (event) => {
+          let nextIndex = index;
+          if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+          else if (event.key === 'ArrowLeft') nextIndex = (index + tabs.length - 1) % tabs.length;
+          else if (event.key === 'Home') nextIndex = 0;
+          else if (event.key === 'End') nextIndex = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          tabs[nextIndex].focus();
+          changeStatusTab(tabs[nextIndex].dataset.status);
+        });
+      });
+    }
+
+    async function changeStatusTab(status) {
+      if (state.saving || !confirmDiscardChanges()) return;
+      statusFilter.value = status;
+      state.dirty = false;
+      await loadList();
+      const selectedTab = Array.from(statusSummary.querySelectorAll('[role="tab"]')).find((tab) => tab.dataset.status === statusFilter.value);
+      if (selectedTab) selectedTab.focus();
+    }
+
+    function renderNavigation() {
+      const index = state.submissions.findIndex((item) => item.submission_id === state.selectedId);
+      const busy = state.loading || state.saving || state.listError;
+      pagePrev.disabled = busy || !state.page.previousPageToken;
+      pageNext.disabled = busy || !state.page.nextPageToken;
+      pagePosition.textContent = state.listState === 'loading' ? '読み込み中...' :
+        (state.listState === 'failed' ? '一覧を取得できません' :
+          (state.listState === 'unobserved' ? '一覧未取得' : (state.page.total ? `${state.page.from}–${state.page.to} / ${state.page.total}件` : '0件')));
+      casePrev.disabled = busy || index < 0 || (index === 0 && !state.page.previousPageToken);
+      caseNext.disabled = busy || !state.submissions.length || (index === state.submissions.length - 1 && !state.page.nextPageToken);
+      casePosition.textContent = index >= 0 ? `${state.page.from + index} / ${state.page.total}件` : (state.detail ? (state.savedOutsideFilter ? '保存済み・現在のタブの対象外' : '表示中の一覧外') : '');
+      caseNext.textContent = index < 0 && state.submissions.length ? '一覧の先頭へ →' : '次の問い合わせ →';
+    }
+
+    async function moveCase(delta) {
+      if (state.loading || state.saving || !confirmDiscardChanges()) return;
+      const index = state.submissions.findIndex((item) => item.submission_id === state.selectedId);
+      state.dirty = false;
+      if (index < 0) {
+        await loadList({ selectEdge: 'first' });
+        return;
+      }
+      const nextIndex = index + delta;
+      if (nextIndex >= 0 && nextIndex < state.submissions.length) {
+        await selectSubmission(state.submissions[nextIndex].submission_id);
+      } else {
+        const pageToken = delta < 0 ? state.page.previousPageToken : state.page.nextPageToken;
+        if (pageToken) await loadList({ pageToken, selectEdge: delta < 0 ? 'last' : 'first' });
+      }
     }
 
     function getStatusFilterLabel(value) {
@@ -715,7 +824,7 @@
     }
 
     function markDirty() {
-      if (!state.detail) return;
+      if (!state.detail || state.loading || state.saving) return;
       const statusSelect = document.getElementById('statusSelect');
       const internalNote = document.getElementById('internalNote');
       state.dirty = Boolean(
@@ -768,6 +877,7 @@
       submissionRows.querySelectorAll('tr[data-id]').forEach((row) => {
         row.addEventListener('click', () => selectSubmission(row.dataset.id));
       });
+      renderNavigation();
     }
 
     function renderDetailEmpty(message) {
@@ -848,6 +958,7 @@
         button.addEventListener('click', () => openAttachmentViewer(Number(button.dataset.attachmentIndex || 0)));
       });
       attachments.forEach((attachment, index) => loadAttachmentPreview(attachment, index));
+      setDetailInteractionDisabled(state.loading || state.saving);
       setDetailSnapshot(submission);
       markDirty();
       syncAttachmentModalControls();
@@ -892,61 +1003,124 @@
       statusFilter.title = getStatusFilterLabel(statusFilter.value);
     }
 
-    async function loadList() {
+    function validateListResponse(result, selectedId) {
+      const invalid = () => { throw new Error('一覧の応答を確認できません。更新してください。'); };
+      if (!result || result.ok !== true || !Array.isArray(result.submissions) || !result.page || !result.counts) invalid();
+      const page = result.page;
+      const isCount = (value) => Number.isInteger(value) && value >= 0;
+      if (!Number.isInteger(page.size) || page.size !== 50 || !isCount(page.total) || !isCount(page.from) || !isCount(page.to) ||
+          typeof page.previousPageToken !== 'string' || typeof page.nextPageToken !== 'string' ||
+          page.previousPageToken.length > 8192 || page.nextPageToken.length > 8192 ||
+          result.submissions.length > page.size || (selectedId && typeof result.selectedMatches !== 'boolean')) invalid();
+      const countKeys = ['total', 'active', '未対応', '対応中', '保留', '対応済み'];
+      if (countKeys.some((key) => !isCount(result.counts[key]) || result.counts[key] > result.counts.total) ||
+          result.counts.active !== result.counts['未対応'] + result.counts['対応中'] || page.total > result.counts.total) invalid();
+      const ids = result.submissions.map((record) => record && record.submission_id);
+      if (ids.some((id) => typeof id !== 'string' || !id.trim()) || new Set(ids).size !== ids.length) invalid();
+      if (selectedId && result.selectedMatches === false && (ids.includes(selectedId) || page.from > 1)) invalid();
+      if (!page.total) {
+        if (ids.length || page.from || page.to || page.previousPageToken || page.nextPageToken) invalid();
+      } else if (!ids.length || page.from < 1 || page.to !== page.from + ids.length - 1 || page.to > page.total ||
+          Boolean(page.previousPageToken) !== (page.from > 1) || Boolean(page.nextPageToken) !== (page.to < page.total)) invalid();
+      return result;
+    }
+
+    async function loadList(options = {}) {
+      if (state.saving) return;
       if (isDirty() && !confirmDiscardChanges()) {
+        searchInput.value = state.appliedQuery;
+        statusFilter.value = state.appliedStatus;
+        renderStatusSummary();
         return;
       }
+      state.dirty = false;
+      const requestSerial = ++state.listRequestSerial;
+      ++state.detailRequestSerial;
+      const query = searchInput.value;
+      const status = statusFilter.value;
+      const pageToken = options.pageToken || '';
+      const selectedId = options.preserveDetail && state.detail ? state.selectedId : '';
+      state.listState = 'loading';
       setBusy(true);
       try {
         const result = await callServer('listContactSubmissions', {
-          query: searchInput.value,
-          status: statusFilter.value,
-          limit: 100,
+          query,
+          status,
+          pageSize: 50,
+          pageToken,
+          selectedId,
         });
+        if (requestSerial !== state.listRequestSerial) return;
+        validateListResponse(result, selectedId);
         state.submissions = result.submissions || [];
+        state.listError = false;
+        state.listState = 'loaded';
         state.counts = result.counts || state.counts;
+        state.page = result.page;
+        state.currentPageToken = result.selectedMatches === false ? '' : pageToken;
+        state.appliedQuery = query;
+        state.appliedStatus = status;
         renderStatusSummary();
         renderStatusFilterLabel();
         renderList();
-        if (state.initialDetailPending) {
+        if (options.preserveDetail && state.detail) {
+          state.savedOutsideFilter = !result.selectedMatches;
+          renderNavigation();
+        } else if (state.initialDetailPending) {
           state.initialDetailPending = false;
-          await selectSubmission(state.selectedId);
+          await selectSubmission(state.selectedId, true);
+        } else if (options.selectEdge && state.submissions.length) {
+          await selectSubmission(state.submissions[options.selectEdge === 'last' ? state.submissions.length - 1 : 0].submission_id, true);
         } else if (state.selectedId && state.submissions.some((item) => item.submission_id === state.selectedId)) {
-          await selectSubmission(state.selectedId);
+          await selectSubmission(state.selectedId, true);
         } else if (state.submissions.length) {
-          await selectSubmission(state.submissions[0].submission_id);
+          await selectSubmission(state.submissions[0].submission_id, true);
         } else {
           state.selectedId = '';
           state.detail = null;
           renderDetailEmpty('一致するお問い合わせがありません。');
         }
       } catch (error) {
+        if (requestSerial !== state.listRequestSerial) return;
+        state.listError = true;
+        state.listState = 'failed';
+        state.submissions = [];
+        renderList();
         resetAttachmentModalState();
-        renderDetailEmpty(String(error.message || error));
+        if (!options.preserveDetail || !state.detail) renderDetailEmpty(String(error.message || error));
       } finally {
-        setBusy(false);
+        if (requestSerial === state.listRequestSerial) setBusy(false);
       }
     }
 
-    async function selectSubmission(id) {
+    async function selectSubmission(id, fromList = false) {
+      if (state.saving || (state.loading && !fromList)) return;
       if (id !== state.selectedId && isDirty() && !confirmDiscardChanges()) {
         return;
       }
+      const requestSerial = ++state.detailRequestSerial;
+      state.savedOutsideFilter = false;
       state.selectedId = id;
       renderList();
       renderDetailEmpty('読み込み中...');
       try {
         const result = await callServer('getContactSubmission', id);
+        if (requestSerial !== state.detailRequestSerial) return;
         state.detail = result.submission;
         renderDetail(state.detail);
         setDetailSnapshot(state.detail);
+        renderNavigation();
       } catch (error) {
+        if (requestSerial !== state.detailRequestSerial) return;
         resetAttachmentModalState();
         renderDetailEmpty(String(error.message || error));
       }
     }
 
     async function saveStatus(nextStatus) {
+      if (state.saving || state.loading) return;
+      const saveRequestSerial = ++state.saveRequestSerial;
+      const submissionId = state.selectedId;
       const statusSelect = document.getElementById('statusSelect');
       if (nextStatus) {
         statusSelect.value = nextStatus;
@@ -955,15 +1129,24 @@
       const note = document.getElementById('internalNote').value;
       const button = document.getElementById('saveStatusButton');
       const message = document.getElementById('statusSaveMessage');
+      const requestSerial = ++state.detailRequestSerial;
+      state.saving = true;
+      refreshButton.disabled = true;
+      setDetailInteractionDisabled(true);
+      renderNavigation();
       button.disabled = true;
       message.textContent = '保存中...';
       message.classList.remove('error', 'success');
       try {
-        const result = await callServer('updateContactSubmissionStatus', state.selectedId, status, note);
+        const result = await callServer('updateContactSubmissionStatus', submissionId, status, note);
+        if (saveRequestSerial !== state.saveRequestSerial || requestSerial !== state.detailRequestSerial || state.selectedId !== submissionId) return;
         state.detail = result.submission;
         renderDetail(state.detail);
         setDetailSnapshot(state.detail);
-        await loadList();
+        state.saving = false;
+        await loadList({ pageToken: state.currentPageToken, preserveDetail: true });
+        if (saveRequestSerial !== state.saveRequestSerial || state.selectedId !== submissionId || state.loading ||
+            !state.detail || state.detail.submission_id !== submissionId) return;
         const successMessage = document.getElementById('statusSaveMessage');
         if (successMessage) {
           successMessage.textContent = '保存しました。';
@@ -971,10 +1154,17 @@
           successMessage.classList.add('success');
         }
       } catch (error) {
+        if (saveRequestSerial !== state.saveRequestSerial || state.selectedId !== submissionId) return;
         message.textContent = String(error.message || error);
         message.classList.add('error');
       } finally {
-        button.disabled = false;
+        if (saveRequestSerial === state.saveRequestSerial) {
+          state.saving = false;
+          refreshButton.disabled = state.loading;
+          setDetailInteractionDisabled(state.loading);
+          renderNavigation();
+          button.disabled = false;
+        }
       }
     }
 
@@ -1110,11 +1300,23 @@
     let viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
 
     function showDenied(message) {
+      ++state.listRequestSerial;
+      ++state.detailRequestSerial;
+      ++state.saveRequestSerial;
       state.submissions = [];
       state.detail = null;
       state.dirty = false;
+      state.loading = false;
+      state.saving = false;
+      state.listState = 'unobserved';
+      state.counts = { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 };
+      state.page = { total: 0, from: 0, to: 0, previousPageToken: '', nextPageToken: '' };
+      state.currentPageToken = '';
       submissionRows.innerHTML = '';
       detailView.innerHTML = '';
+      statusSummary.innerHTML = '';
+      pagePosition.textContent = '';
+      casePosition.textContent = '';
       resetAttachmentModalState();
       viewerContext = {};
       viewerEmail.textContent = '';
@@ -1130,6 +1332,10 @@
       deniedView.hidden = true;
       appView.hidden = false;
       refreshButton.addEventListener('click', loadList);
+      pagePrev.addEventListener('click', () => loadList({ pageToken: state.page.previousPageToken, selectEdge: 'first' }));
+      pageNext.addEventListener('click', () => loadList({ pageToken: state.page.nextPageToken, selectEdge: 'first' }));
+      casePrev.addEventListener('click', () => moveCase(-1));
+      caseNext.addEventListener('click', () => moveCase(1));
       searchInput.addEventListener('input', () => {
         window.clearTimeout(searchInput._timer);
         searchInput._timer = window.setTimeout(loadList, 250);

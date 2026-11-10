@@ -10,7 +10,7 @@ const oauthSource = existsSync(new URL('OAuth.gs', root)) ? readFileSync(new URL
 const html = readFileSync(new URL('Index.html', root), 'utf8');
 const publicNames = ['doGet', 'getViewerContext', 'listContactSubmissions', 'getContactSubmission', 'getAttachmentPreview', 'updateContactSubmissionStatus', 'beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'];
 
-function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp', oauth = false } = {}) {
+function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp', oauth = false, records: fixtureRecords } = {}) {
   const accesses = [];
   const writes = [];
   const templates = [];
@@ -31,7 +31,7 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
     remove(key) { assert.equal(locked, true, 'one-time state consumed under lock'); cacheEntries.delete(key); },
   };
   const headers = ['submission_id', 'submitted_at', 'contact_type', 'name', 'email', 'subject', 'message', 'attachment_count', 'attachment_refs', 'source_url', 'user_agent', 'storage_status', 'mail_status', 'handled_status', 'handled_by', 'handled_at', 'internal_note'].filter((key) => key !== missingHeader);
-  const records = [
+  const records = fixtureRecords || [
     { submission_id: 'case-a', submitted_at: '2026-11-10T00:00:00Z', subject: '<img src=x onerror=alert(1)>', message: '</div><script>bad()</script>', email: 'customer@example.com', attachment_count: '3', attachment_refs: 'file-a:https://drive.google.com/file/d/file-a/view,file-out:javascript:bad(),file-swapped:javascript:bad()', handled_status: '未対応' },
     { submission_id: 'case-b', submitted_at: '2026-11-09T00:00:00Z', subject: 'other case', attachment_count: '1', attachment_refs: 'file-b:https://drive.google.com/file/d/file-b/view', handled_status: '対応済み' },
   ];
@@ -315,7 +315,10 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
         return new Proxy({}, { get(_target, key) {
           return (...args) => {
             calls.push([key, ...args]);
-            try { success(env.api[key](...args)); } catch (error) { failure(error); }
+            let deliver;
+            try { const value = env.api[key](...args); deliver = () => success(value); } catch (error) { deliver = () => failure(error); }
+            if (env.rpcQueue) env.rpcQueue.push({ name: key, deliver });
+            else deliver();
           };
         } });
       } };
@@ -338,8 +341,395 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
   vm.createContext(context);
   const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][1][1];
   vm.runInContext(script.replace('    bootstrapViewer();', ''), context, { filename: 'Index.html' });
-  return { ui: context, elements, calls, env };
+  return { ui: context, elements, calls, env, state: vm.runInContext('state', context) };
 }
+
+function paginationRecords() {
+  const statuses = ['未対応', '対応中', '保留', '対応済み'];
+  return Array.from({ length: 253 }, (_, index) => ({
+    submission_id: `case-${String(index).padStart(3, '0')}`,
+    submitted_at: '2026-11-10T00:00:00Z',
+    subject: `問い合わせ ${index}`,
+    message: `受付本文 ${index}`,
+    email: `person-${index}@example.com`,
+    handled_status: statuses[index % statuses.length],
+  }));
+}
+
+test('keyset pages reach every matching case beyond 200 in both directions with equal timestamps', () => {
+  const records = paginationRecords();
+  const env = runtime('reader@abroad-o.com', { records });
+  for (const status of ['all', 'active', '未対応', '対応中', '保留', '対応済み']) {
+    const expected = records.filter((record) => status === 'all' || (status === 'active' ? ['未対応', '対応中'].includes(record.handled_status) : record.handled_status === status)).map((record) => record.submission_id).reverse();
+    const pages = [];
+    let pageToken = '';
+    do {
+      const page = env.api.listContactSubmissions({ status, pageSize: 50, pageToken });
+      assert.equal(page.counts.total, 253);
+      assert.equal(page.page.total, expected.length);
+      assert.ok(page.submissions.length <= 50);
+      pages.push(page);
+      pageToken = page.page.nextPageToken;
+    } while (pageToken);
+    assert.deepEqual(pages.flatMap((page) => Array.from(page.submissions, (record) => record.submission_id)), expected);
+    let page = pages.at(-1);
+    for (let index = pages.length - 2; index >= 0; index--) {
+      page = env.api.listContactSubmissions({ status, pageSize: 50, pageToken: page.page.previousPageToken });
+      assert.deepEqual(Array.from(page.submissions, (record) => record.submission_id), Array.from(pages[index].submissions, (record) => record.submission_id));
+    }
+    assert.equal(page.page.previousPageToken, '');
+  }
+  const search = env.api.listContactSubmissions({ status: 'all', query: 'person-25', pageSize: 50 });
+  assert.equal(search.page.total, 4);
+  assert.equal(search.counts.total, 253, 'status counts remain global while searching');
+  assert.equal(env.api.listContactSubmissions({ status: 'all', limit: 200 }).submissions.length, 200, 'legacy limit remains supported');
+});
+
+test('page tokens are scoped to filters and retain position after cursor row removal or newer insertion', () => {
+  const env = runtime('reader@abroad-o.com', { records: paginationRecords() });
+  const first = env.api.listContactSubmissions({ status: 'all', pageSize: 50 });
+  assert.throws(() => env.api.listContactSubmissions({ status: 'active', pageToken: first.page.nextPageToken }), /ページ情報/);
+  assert.throws(() => env.api.listContactSubmissions({ status: 'all', query: 'changed', pageToken: first.page.nextPageToken }), /ページ情報/);
+  assert.throws(() => env.api.listContactSubmissions({ status: 'all', pageToken: 'bad-json' }), /ページ情報/);
+  const lastId = first.submissions.at(-1).submission_id;
+  env.rows.splice(env.rows.findIndex((row) => row[0] === lastId), 1);
+  env.rows.push(env.headers.map((header) => ({ submission_id: 'newer', submitted_at: '2026-11-11T00:00:00Z', handled_status: '未対応' })[header] || ''));
+  const next = env.api.listContactSubmissions({ status: 'all', pageSize: 50, pageToken: first.page.nextPageToken });
+  assert.equal(next.submissions[0].submission_id, 'case-202');
+  assert.ok(!next.submissions.some((record) => first.submissions.some((previous) => previous.submission_id === record.submission_id)));
+  env.rows.push(env.headers.map(() => ''));
+  assert.equal(env.api.listContactSubmissions({ status: 'all' }).counts.total, 253, 'empty rows are not cases');
+});
+
+test('status tabs and sequential case navigation cross pages in the current filter', async () => {
+  const fixture = paginationRecords();
+  const app = uiRuntime(runtime('reader@abroad-o.com', { records: fixture }));
+  await app.ui.changeStatusTab('all');
+  assert.equal(app.calls.find(([name]) => name === 'listContactSubmissions')[1].pageSize, 50);
+  assert.match(app.elements.get('statusSummary').innerHTML, /role="tab" data-status="all"[^>]*aria-selected="true"/);
+  const visited = [app.state.selectedId];
+  for (let index = 1; index < fixture.length; index++) {
+    await app.ui.moveCase(1);
+    visited.push(app.state.selectedId);
+  }
+  assert.deepEqual(visited, fixture.map((record) => record.submission_id).reverse());
+  assert.equal(app.elements.get('caseNext').disabled, true);
+  for (let index = fixture.length - 2; index >= 0; index--) {
+    await app.ui.moveCase(-1);
+    assert.equal(app.state.selectedId, visited[index]);
+  }
+  assert.equal(app.elements.get('casePrev').disabled, true);
+  app.elements.get('searchInput').value = 'person-25';
+  await app.ui.changeStatusTab('未対応');
+  assert.equal(app.state.page.total, 1);
+  assert.equal(app.state.selectedId, 'case-252');
+  assert.equal(app.elements.get('searchInput').value, 'person-25');
+});
+
+test('unsaved changes stop tab, search and page-boundary case navigation; saved out-of-filter detail remains visible', async () => {
+  const app = uiRuntime(runtime('reader@abroad-o.com', { records: paginationRecords() }));
+  await app.ui.loadList();
+  for (let index = 0; index < 49; index++) await app.ui.moveCase(1);
+  const selected = app.state.selectedId;
+  app.elements.get('statusSelect').value = app.state.detail.handled_status;
+  app.elements.get('internalNote').value = 'unsaved memo';
+  app.ui.markDirty();
+  app.ui.window.confirm = () => false;
+  const calls = app.calls.length;
+  await app.ui.moveCase(1);
+  await app.ui.changeStatusTab('all');
+  app.elements.get('searchInput').value = 'changed';
+  await app.ui.loadList();
+  assert.equal(app.calls.length, calls);
+  assert.equal(app.state.selectedId, selected);
+  assert.equal(app.elements.get('statusFilter').value, 'active');
+  assert.equal(app.elements.get('searchInput').value, '');
+  app.ui.window.confirm = () => true;
+  await app.ui.moveCase(1);
+  assert.notEqual(app.state.selectedId, selected);
+  app.elements.get('statusSelect').value = '対応済み';
+  app.elements.get('internalNote').value = 'saved memo';
+  const savedId = app.state.selectedId;
+  await app.ui.saveStatus();
+  assert.equal(app.state.selectedId, savedId);
+  assert.equal(app.state.detail.internal_note, 'saved memo');
+  assert.equal(app.state.detail.handled_status, '対応済み');
+  assert.equal(app.elements.get('casePosition').textContent, '保存済み・現在のタブの対象外');
+  await app.ui.moveCase(1);
+  assert.notEqual(app.state.selectedId, savedId);
+});
+
+test('late list and detail responses cannot overwrite a newer query or authentication loss', async () => {
+  const env = runtime();
+  env.rpcQueue = [];
+  const app = uiRuntime(env);
+  const oldList = app.ui.loadList();
+  app.elements.get('searchInput').value = 'other';
+  app.elements.get('statusFilter').value = 'all';
+  const newList = app.ui.loadList();
+  env.rpcQueue.splice(1, 1)[0].deliver();
+  await Promise.resolve();
+  env.rpcQueue.splice(1, 1)[0].deliver();
+  await newList;
+  env.rpcQueue.shift().deliver();
+  await oldList;
+  assert.equal(app.state.selectedId, 'case-b');
+  assert.match(app.elements.get('detailView').innerHTML, /other case/);
+  const oldDetail = app.ui.selectSubmission('case-a');
+  const newDetail = app.ui.selectSubmission('case-b');
+  env.rpcQueue.splice(1, 1)[0].deliver();
+  await newDetail;
+  env.rpcQueue.shift().deliver();
+  await oldDetail;
+  assert.equal(app.state.detail.submission_id, 'case-b');
+  const pending = app.ui.loadList();
+  env.setEmail('outsider@example.com');
+  const denied = app.ui.bootstrapViewer();
+  env.rpcQueue.splice(1, 1)[0].deliver();
+  await denied;
+  env.rpcQueue.shift().deliver();
+  await pending;
+  assert.equal(app.elements.get('appView').hidden, true);
+  assert.equal(app.elements.get('detailView').innerHTML, '');
+  assert.equal(app.state.submissions.length, 0);
+});
+
+test('date order precedes ID tie-break and failed reads never appear as a valid zero result', async () => {
+  const env = runtime('reader@abroad-o.com', { records: [
+    { submission_id: 'z-old', submitted_at: '2026-11-09T00:00:00Z', handled_status: '未対応' },
+    { submission_id: 'a-new', submitted_at: '2026-11-11T00:00:00Z', handled_status: '未対応' },
+    { submission_id: 'z-same', submitted_at: '2026-11-10T00:00:00Z', handled_status: '未対応' },
+    { submission_id: 'a-same', submitted_at: '2026-11-10T00:00:00Z', handled_status: '未対応' },
+  ] });
+  assert.deepEqual(Array.from(env.api.listContactSubmissions({ status: 'all' }).submissions, (record) => record.submission_id), ['a-new', 'z-same', 'a-same', 'z-old']);
+  const app = uiRuntime(env);
+  await app.ui.loadList();
+  env.api.listContactSubmissions = () => { throw new Error('一覧の通信に失敗しました。'); };
+  await app.ui.loadList();
+  assert.equal(app.elements.get('pagePosition').textContent, '一覧を取得できません');
+  assert.equal(app.state.submissions.length, 0);
+  assert.match(app.elements.get('detailView').innerHTML, /一覧の通信に失敗/);
+  assert.equal(app.elements.get('caseNext').disabled, true);
+});
+
+test('a saved response arriving after authentication loss cannot restore protected detail', async () => {
+  const app = uiRuntime();
+  await app.ui.loadList();
+  app.env.rpcQueue = [];
+  app.elements.get('statusSelect').value = '対応中';
+  app.elements.get('internalNote').value = 'save in progress';
+  const saving = app.ui.saveStatus();
+  app.ui.showDenied('認証が失効しました。');
+  app.env.rpcQueue.shift().deliver();
+  await saving;
+  assert.equal(app.state.detail, null);
+  assert.equal(app.elements.get('detailView').innerHTML, '');
+  assert.equal(app.elements.get('statusSummary').innerHTML, '');
+});
+
+test('successful status save keeps its read-back detail when the following list refresh fails', async () => {
+  const app = uiRuntime();
+  await app.ui.loadList();
+  app.elements.get('statusSelect').value = '対応中';
+  app.elements.get('internalNote').value = 'saved before list outage';
+  app.env.api.listContactSubmissions = () => { throw new Error('一覧の更新に失敗'); };
+  await app.ui.saveStatus();
+  assert.equal(app.state.detail.internal_note, 'saved before list outage');
+  assert.equal(app.state.detail.handled_status, '対応中');
+  assert.equal(app.elements.get('statusSaveMessage').textContent, '保存しました。');
+  assert.equal(app.elements.get('pagePosition').textContent, '一覧を取得できません');
+});
+
+test('saving memo or in-filter status on a later page preserves its page and adjacent next case', async () => {
+  for (const tab of ['all', 'active']) {
+    const app = uiRuntime(runtime('reader@abroad-o.com', { records: paginationRecords() }));
+    await app.ui.changeStatusTab(tab);
+    const pageToken = app.state.page.nextPageToken;
+    await app.ui.loadList({ pageToken, selectEdge: 'first' });
+    await app.ui.moveCase(1);
+    const selectedId = app.state.selectedId;
+    const nextId = app.state.submissions[2].submission_id;
+    const from = app.state.page.from;
+    app.elements.get('statusSelect').value = tab === 'active' ? (app.state.detail.handled_status === '未対応' ? '対応中' : '未対応') : app.state.detail.handled_status;
+    app.elements.get('internalNote').value = 'later-page memo';
+    await app.ui.saveStatus();
+    assert.equal(app.state.currentPageToken, pageToken);
+    assert.equal(app.state.page.from, from);
+    assert.equal(app.state.selectedId, selectedId);
+    assert.equal(app.state.savedOutsideFilter, false);
+    await app.ui.moveCase(1);
+    assert.equal(app.state.selectedId, nextId);
+  }
+});
+
+test('saved selection uses server search membership and returns to the first page when excluded', async () => {
+  const app = uiRuntime(runtime('reader@abroad-o.com', { records: paginationRecords() }));
+  app.elements.get('searchInput').value = 'person-';
+  await app.ui.changeStatusTab('all');
+  await app.ui.loadList({ pageToken: app.state.page.nextPageToken, selectEdge: 'first' });
+  const selectedId = app.state.selectedId;
+  const update = app.env.api.updateContactSubmissionStatus;
+  app.env.api.updateContactSubmissionStatus = (...args) => {
+    const result = update(...args);
+    const row = app.env.rows.find((entry) => entry[0] === selectedId);
+    row[app.env.headers.indexOf('email')] = 'changed@example.net';
+    return result;
+  };
+  app.elements.get('statusSelect').value = app.state.detail.handled_status;
+  app.elements.get('internalNote').value = 'saved while source changed';
+  await app.ui.saveStatus();
+  assert.equal(app.state.currentPageToken, '');
+  assert.equal(app.state.page.from, 1);
+  assert.equal(app.state.savedOutsideFilter, true);
+  assert.equal(app.state.selectedId, selectedId);
+  assert.equal(app.elements.get('casePosition').textContent, '保存済み・現在のタブの対象外');
+});
+
+test('a saved case shifted outside its current page has an explicit return to list start', async () => {
+  const app = uiRuntime(runtime('reader@abroad-o.com', { records: paginationRecords() }));
+  await app.ui.changeStatusTab('all');
+  await app.ui.loadList({ pageToken: app.state.page.nextPageToken, selectEdge: 'first' });
+  await app.ui.selectSubmission(app.state.submissions[5].submission_id);
+  const selectedId = app.state.selectedId;
+  const update = app.env.api.updateContactSubmissionStatus;
+  app.env.api.updateContactSubmissionStatus = (...args) => {
+    const result = update(...args);
+    for (let index = 0; index < 60; index++) {
+      const record = { submission_id: `case-201-extra-${String(index).padStart(3, '0')}`, submitted_at: '2026-11-10T00:00:00Z', handled_status: '未対応' };
+      app.env.rows.push(app.env.headers.map((header) => record[header] || ''));
+    }
+    return result;
+  };
+  app.elements.get('statusSelect').value = app.state.detail.handled_status;
+  app.elements.get('internalNote').value = 'saved before incoming cases';
+  await app.ui.saveStatus();
+  assert.equal(app.state.selectedId, selectedId);
+  assert.equal(app.state.savedOutsideFilter, false);
+  assert.equal(app.elements.get('casePosition').textContent, '表示中の一覧外');
+  assert.equal(app.elements.get('caseNext').textContent, '一覧の先頭へ →');
+  await app.ui.moveCase(1);
+  assert.equal(app.state.page.from, 1);
+  assert.equal(app.state.selectedId, 'case-252');
+});
+
+test('list and save waits suspend old detail edits and selections until the accepted response', async () => {
+  const app = uiRuntime();
+  await app.ui.loadList();
+  app.env.rpcQueue = [];
+  const loading = app.ui.loadList();
+  assert.equal(app.elements.get('internalNote').disabled, true);
+  assert.equal(app.elements.get('statusSelect').disabled, true);
+  const count = app.calls.length;
+  await app.ui.selectSubmission('case-b');
+  app.ui.markDirty();
+  assert.equal(app.calls.length, count);
+  assert.equal(app.state.dirty, false);
+  app.env.rpcQueue.shift().deliver();
+  await Promise.resolve();
+  app.env.rpcQueue.shift().deliver();
+  await loading;
+  assert.equal(app.elements.get('internalNote').disabled, false);
+  app.elements.get('statusSelect').value = '対応中';
+  app.elements.get('internalNote').value = 'captured memo';
+  const saving = app.ui.saveStatus();
+  assert.equal(app.elements.get('internalNote').disabled, true);
+  assert.equal(app.elements.get('saveStatusButton').disabled, true);
+  assert.equal(app.elements.get('searchInput').disabled, true);
+  const savingCount = app.calls.length;
+  await app.ui.selectSubmission('case-b');
+  await app.ui.changeStatusTab('all');
+  assert.equal(app.calls.length, savingCount);
+  app.env.rpcQueue.shift().deliver();
+  await Promise.resolve();
+  app.env.rpcQueue.shift().deliver();
+  await saving;
+  assert.equal(app.state.detail.internal_note, 'captured memo');
+  assert.equal(app.elements.get('internalNote').disabled, false);
+  assert.equal(app.elements.get('searchInput').disabled, false);
+});
+
+test('an older save list response cannot announce or unlock a newer case save', async () => {
+  const app = uiRuntime();
+  await app.ui.loadList();
+  app.env.rpcQueue = [];
+  app.elements.get('statusSelect').value = '対応中';
+  app.elements.get('internalNote').value = 'case A saved';
+  const saveA = app.ui.saveStatus();
+  app.env.rpcQueue.shift().deliver();
+  await Promise.resolve();
+  assert.equal(app.env.rpcQueue[0].name, 'listContactSubmissions', 'A list refresh waits');
+  app.elements.get('statusFilter').value = 'all';
+  app.elements.get('searchInput').value = 'other';
+  const listB = app.ui.loadList();
+  app.env.rpcQueue.splice(1, 1)[0].deliver();
+  await Promise.resolve();
+  app.env.rpcQueue.splice(1, 1)[0].deliver();
+  await listB;
+  assert.equal(app.state.selectedId, 'case-b');
+  app.elements.get('statusSelect').value = '対応中';
+  app.elements.get('internalNote').value = 'case B saved';
+  const saveB = app.ui.saveStatus();
+  assert.equal(app.state.saving, true);
+  app.env.rpcQueue.shift().deliver();
+  await saveA;
+  assert.equal(app.state.selectedId, 'case-b');
+  assert.equal(app.state.saving, true, 'A completion does not unlock B');
+  assert.equal(app.elements.get('internalNote').disabled, true);
+  assert.equal(app.elements.get('statusSelect').disabled, true);
+  assert.equal(app.elements.get('statusSaveMessage').textContent, '保存中...');
+  app.env.rpcQueue.shift().deliver();
+  await Promise.resolve();
+  assert.equal(app.elements.get('internalNote').disabled, true, 'B list read-back still locks detail');
+  app.env.rpcQueue.shift().deliver();
+  await saveB;
+  assert.equal(app.state.detail.submission_id, 'case-b');
+  assert.equal(app.state.detail.internal_note, 'case B saved');
+  assert.equal(app.elements.get('statusSaveMessage').textContent, '保存しました。');
+  assert.equal(app.elements.get('internalNote').disabled, false);
+});
+
+test('initial list shows loading and only a validated empty response can display zero', async () => {
+  const env = runtime('reader@abroad-o.com', { records: [] });
+  env.rpcQueue = [];
+  const app = uiRuntime(env);
+  app.ui.renderNavigation();
+  assert.equal(app.elements.get('pagePosition').textContent, '一覧未取得');
+  const pending = app.ui.loadList();
+  assert.equal(app.elements.get('pagePosition').textContent, '読み込み中...');
+  assert.doesNotMatch(app.elements.get('pagePosition').textContent, /0件/);
+  env.rpcQueue.shift().deliver();
+  await pending;
+  assert.equal(app.elements.get('pagePosition').textContent, '0件');
+  assert.equal(app.state.listState, 'loaded');
+});
+
+test('malformed page metadata fails closed instead of displaying zero or accepting partial rows', async () => {
+  const mutations = [
+    (result) => { delete result.page; },
+    (result) => { result.page.size = '50'; },
+    (result) => { result.page.total = -1; },
+    (result) => { result.page.from = 0; },
+    (result) => { result.page.to = 2; },
+    (result) => { result.page.nextPageToken = null; },
+    (result) => { result.page.previousPageToken = 'unexpected'; },
+    (result) => { result.page.total = 2; },
+    (result) => { result.submissions = []; },
+    (result) => { result.submissions.push(result.submissions[0]); },
+    (result) => { result.counts.active = '1'; },
+  ];
+  for (const mutate of mutations) {
+    const env = runtime();
+    const response = env.api.listContactSubmissions({ status: 'active', pageSize: 50 });
+    mutate(response);
+    env.api.listContactSubmissions = () => response;
+    const app = uiRuntime(env);
+    await app.ui.loadList();
+    assert.equal(app.state.listState, 'failed');
+    assert.equal(app.state.submissions.length, 0);
+    assert.equal(app.elements.get('pagePosition').textContent, '一覧を取得できません');
+    assert.doesNotMatch(app.elements.get('detailView').innerHTML, /一致するお問い合わせがありません/);
+  }
+});
 
 test('UI opens initial id outside active list and safely renders stored content', async () => {
   const { ui, elements, calls } = uiRuntime(runtime(), 'case-b');

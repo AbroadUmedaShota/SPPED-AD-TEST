@@ -3,6 +3,8 @@
 社員のSession認証と、外部例外1件の専用Google OAuthログインを備えた独立viewerです。
 仕様は [社内確認アプリ仕様](../../../docs/画面設計/仕様/24_support_contact_workspace_viewer_requirements.md) を参照してください。
 
+第1段階では件数をクリックできるステータスタブ、50件ごとの一覧ページ送り、ページを越える問い合わせの前後移動を提供します。既存Sheet・Driveの受付本文、フォーム添付、対応状態、内部メモを連続確認できます。送受信メールとメール添付の全件確認は第2段階の別受入です。
+
 ## 配備・設定（本変更では実行しない）
 
 1. 配備者は `s-umeda@abroad-o.com`。新viewerの `Code.gs`、`OAuth.gs`、`Index.html`、`Login.html`、`appsscript.json` を会社アカウントの独立プロジェクトへ配置する。旧viewer・旧 `.clasp.json` は流用しない。
@@ -39,6 +41,8 @@ node --test tests/support-contact-workspace-viewer.test.mjs
 ```
 
 実際のCode.gs/OAuth.gsとUIをVMで動かし、Google通信・Session・Cache・Lock・Sheet/Drive境界だけを代替する。合成ID tokenによるテスト合格はGoogleログイン成功の証拠ではない。
+
+一覧・連続確認の試験は253件の合成受付を使い、同一日時の全IDについて前後ページ、各状態タブ、検索、案件の前後移動を確認します。未保存メモの移動取消、後続ページの保存後位置、保存後の検索・状態条件外/一覧外表示、取得・保存待ちの入力停止、未取得/読込中/0件/不正応答、古い一覧・詳細応答と認証失効も含みます。実保存先の全件表示・保存後読戻し、フォーム添付、Chrome / Firefox / Edgeの操作は配備後の受入として別に記録してください。追加のGmail認可・Cloud請求設定は第1段階に不要です。
 
 **ライブ確認前はcustomer利用可能と判定しない。** 特に、Sessionメールが空になる外部利用時の一時キーが、認可開始・callback・通常URL・RPCで安定し、別のGoogle利用者とは分離されることを確認する。一時キーが同一でも、別ブラウザ/タブの異なるproofからgrantを利用できないことも負の試験で確認する。既知メールなしの別アカウントから同じURLを開く負の試験が必須。分離されなければ専用ログインの受入を止め、本人確認の代替や共有変更で回避しない。
 
