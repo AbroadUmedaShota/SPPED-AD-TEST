@@ -15,6 +15,9 @@ test('normal runtime rejects missing, old and altered consent before constructin
   assert.match(disclosure, /管理者が開始日を明示設定した対象期間/);
   assert.doesNotMatch(disclosure, /受付データから決まる対象期間/);
   assert.match(disclosure, /同期・再照合の対象判定では、対象期間外・下書きを含む候補メールのID・ラベル・内部日時だけを先に一時取得/);
+  assert.match(disclosure, /開始日前に検出したメールの元ID・内部日時・検出日時/);
+  assert.match(disclosure, /未解消の観測記録としてFirestoreに保存/);
+  assert.match(disclosure, /原本が途中で消えた場合も取得不能の残件として保持/);
   let clients = 0;
   const create = (consentReceipt, overrides = {}) => createRuntimeGmailAdapter({
     secretVersion: 'projects/test-project/secrets/mail/versions/1', now: () => now,
@@ -31,6 +34,7 @@ test('normal runtime rejects missing, old and altered consent before constructin
     { ...receipt, disclosureVersion: '2026-11-11.5' },
     { ...receipt, disclosureVersion: '2026-11-11.7' },
     { ...receipt, disclosureVersion: '2026-11-11.9' },
+    { ...receipt, disclosureVersion: '2026-11-11.10' },
     { ...receipt, verifiedMailbox: 'other@example.com' }, { ...receipt, acceptedAt: undefined },
     { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, acceptedAt: '2026-11-11T01:05:00.001Z' },
     { ...receipt, disclosureParameters: undefined },

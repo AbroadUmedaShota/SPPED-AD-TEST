@@ -103,6 +103,8 @@ test('PKCE offline consent atomically stores verified credentials and the exact 
   assert.match(calls.disclosure, /原本不在と削除履歴の処理済みを確認した後に最小hashを整理/);
   assert.match(calls.disclosure, /未完了ページに含まれる候補メールの元IDは、再開用の同期位置としてFirestoreに保存/);
   assert.match(calls.disclosure, /中断・失敗中も再開用に残り、ページ完了の保存または新しい同期計画への明示的な切替で消去/);
+  assert.match(calls.disclosure, /開始日前に検出したメールの元ID・内部日時・検出日時/);
+  assert.match(calls.disclosure, /原本が途中で消えた場合も取得不能の残件として保持/);
   assert.match(calls.disclosure, /既存の監査・確認記録を保持し、案件との紐付けを外した取得不能の照合待ち/);
   assert.match(calls.disclosure, /期間外メールの本文・添付は取得しません/);
   assert.match(calls.disclosure, /関連が未確定のメールも本文を取得して照合/);
