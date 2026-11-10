@@ -74,3 +74,13 @@ Gmail adapterは添付取得応答を固定窓口・message ID・attachment ID�
 画面は一覧・残件・再照合を含む全入口で同期状態の完全な形式と残件/達成条件を検証してから採用する。同期実行・レシート照会の待機中に別応答から新しい状態を観測した場合、遅い応答は表示へ戻さず、元の不変要求を保持して明示的な再確認を待つ。
 
 新しい同期状態を観測済みでも、要求ID・実行IDが一致するGAS確定未送信結果は元要求へ反映する。未送信要求を結果不明に変えず、新しい期間・件数表示を保持して同じ要求の明示送信または受付ID計画の作り直しを案内する。送信後のtimeoutや認証失敗には適用しない。
+
+## Case closure catalog and retention residuals
+
+`uploadCaseCatalog` requires `cases` (up to 200) instead of an ID-only `caseIds` payload. Each entry has exactly `{caseId, handledStatus, closedAt}`: a lower-case UUID, one of 未対応/対応中/対応済み/保留, and canonical UTC ISO or null. Non-completed entries cannot have a closure timestamp; future or malformed dates fail closed. The digest covers sorted JSON tuples `[caseId, handledStatus, closedAt]` joined by newline. Firestore verifies the complete snapshot count/digest on read and returns both full `cases` and derived `caseIds`. Legacy ID-only pages must be re-uploaded; no dates are inferred.
+
+`caseRetention.mjs` exports `normalizeCatalogCases`, `retentionExpiresAt`, and `catalogRetention`. Expiry is the UTC calendar anniversary plus three years, clamping Feb 29 to Feb 28. `catalogRetention` accepts optional `suppressedCaseIds` as attestation from the separate purge store: snapshot metadata stays intact, but these cases are excluded from outstanding retention residuals.
+
+Sync status includes `unknownClosureCaseCount` and `expiredCaseCount` (null only when no complete catalog exists). Both must be zero for `acceptanceReady`. `listMailIssues` adds `unknownClosure` and `expiredRetention`, returning paged case targets. Expired case list/body/attachment/review/manual match operations return `MAIL_RETENTION_EXPIRED`. Indexing checks the pinned and latest catalogs before storing a new matching message and fails without storing its metadata if expired-case evidence is present. Existing data is not erased by this module; purge attestation and cleanup require separate integration/acceptance.
+
+Record mutation and index writes carry `expectedCatalogDigest`; Firestore reads activeCatalog inside the same transaction and rejects a changed digest before replaying a receipt or writing metadata. This prevents a closure-only catalog change between service preflight and commit from applying a stale decision.

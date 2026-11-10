@@ -1368,6 +1368,7 @@
         MAIL_REQUEST_CONFLICT: '操作内容が競合しました。更新して確認してください。',
         MAIL_CATALOG_INVALID: '受付IDの照合を確認できません。同期を最初からやり直してください。',
         MAIL_CATALOG_INCOMPLETE: '受付IDの照合が未完了です。',
+        MAIL_RETENTION_EXPIRED: 'メール記録の保存期間が終了しています。管理者による削除処理を確認してください。',
         MAIL_PERIOD_REQUIRED: '同期対象期間を決められません。正本の受付日時を確認してから同期してください。',
         MAIL_CATALOG_CHANGED: '受付データが変わりました。同期を最初からやり直してください。',
         MAIL_FULL_SYNC_REQUIRED: '全件同期が必要です。',
@@ -1522,7 +1523,7 @@
       const count = (key) => Number.isInteger(sync[key]) ? sync[key] : '不明';
       const coverage = Number.isInteger(sync.coverageUnverifiedCaseCount) ? `${sync.coverageUnverifiedCaseCount}件` : '未取得';
       const period = sync.state === 'not_started' ? '対象期間は同期開始時に確認' : `対象期間: ${sync.startAt ? `${formatDate(sync.startAt)}以降` : '開始日未確定・同期停止'} / 基準日時: ${formatDate(sync.cutoffAt)}`;
-      return `${labels[sync.state] || '同期状態不明'} / ${period} / 最終成功: ${formatDate(sync.lastSuccessAt)} / 照合待ち ${pending}件・取得失敗 ${failed}件・取得不能 ${unavailable}件 / 本文未検証 ${count('bodyUnverifiedCount')}件・本文取得不能 ${count('bodyUnavailableCount')}件 / 添付未検証 ${count('attachmentUnverifiedCount')}件・添付取得不能 ${count('attachmentUnavailableCount')}件 / 関連メールの有無が未確認の案件 ${coverage}${Number.isInteger(sync.unobservedDeletedCount) ? ` / 取得前に削除され種類未確認 ${sync.unobservedDeletedCount}件` : ''}${sync.remainingPages ? ' / 未取得のページあり' : ''}${sync.acceptanceReady === true ? ' / 同期・照合・取得の技術残件は0件です。実受入は別途確認してください。' : ' / 全件確認に必要な処理が残っています。'} 対象は「全件確認の残件」から確認できます。関連メールがない案件は受入時の照合記録で確認してください。`;
+      return `${labels[sync.state] || '同期状態不明'} / ${period} / 最終成功: ${formatDate(sync.lastSuccessAt)} / 照合待ち ${pending}件・取得失敗 ${failed}件・取得不能 ${unavailable}件 / 本文未検証 ${count('bodyUnverifiedCount')}件・本文取得不能 ${count('bodyUnavailableCount')}件 / 添付未検証 ${count('attachmentUnverifiedCount')}件・添付取得不能 ${count('attachmentUnavailableCount')}件 / 終了日未確認 ${count('unknownClosureCaseCount')}件・保存期限到来 ${count('expiredCaseCount')}件 / 関連メールの有無が未確認の案件 ${coverage}${Number.isInteger(sync.unobservedDeletedCount) ? ` / 取得前に削除され種類未確認 ${sync.unobservedDeletedCount}件` : ''}${sync.remainingPages ? ' / 未取得のページあり' : ''}${sync.acceptanceReady === true ? ' / 同期・照合・取得の技術残件は0件です。実受入は別途確認してください。' : ' / 全件確認に必要な処理が残っています。'} 対象は「全件確認の残件」から確認できます。関連メールがない案件は受入時の照合記録で確認してください。`;
     }
 
     async function loadContactMailSyncStatus() {
@@ -1618,6 +1619,10 @@
            (previous.cutoffAt && sync.cutoffAt !== previous.cutoffAt) || (previous.mode && sync.mode !== previous.mode) ||
            (Object.prototype.hasOwnProperty.call(previous, 'startAt') && sync.startAt !== previous.startAt) ||
            (previous.phase === 'finalize' && sync.phase !== 'finalize'))) invalid();
+      for (const key of ['unknownClosureCaseCount', 'expiredCaseCount']) {
+        if (sync[key] !== null && (!Number.isSafeInteger(sync[key]) || sync[key] < 0)) invalid();
+      }
+      if (sync.acceptanceReady && (sync.unknownClosureCaseCount !== 0 || sync.expiredCaseCount !== 0)) invalid();
       if (sync.acceptanceReady && (sync.state !== 'complete' || sync.coverageUnverifiedCaseCount !== 0 || counts.some((key) => key !== 'processedCount' && sync[key] !== 0))) invalid();
     }
 
@@ -1734,6 +1739,7 @@
     }
 
     const contactMailIssueLabels = {
+      unknownClosure: '終了日未確認の案件', expiredRetention: '保存期限到来の案件',
       pending: '照合待ち', unreviewed: '未確認メール', unavailable: 'メール取得不能', bodyUnverified: '本文未検証',
       bodyUnavailable: '本文取得不能', attachmentUnverified: '添付未検証', attachmentUnavailable: '添付取得不能',
       failed: '同期取得失敗', coverage: '関連メールの有無が未確認の案件', deleted: '取得前に削除され種類未確認',

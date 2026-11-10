@@ -3,6 +3,7 @@ import { assertMail, MailError } from './errors.mjs';
 import { validateActor } from './auth.mjs';
 import { mixedThreadDemotions } from './mixedThread.mjs';
 import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObservation.mjs';
+import { normalizeCatalogCases, catalogRetention } from './caseRetention.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
@@ -22,8 +23,8 @@ export function digest(value) {
   return createHash('sha256').update(typeof value === 'string' ? value : canonicalJson(value)).digest('hex');
 }
 
-export function catalogDigest(ids) {
-  return digest([...ids].sort().join('\n'));
+export function catalogDigest(cases) {
+  return digest(normalizeCatalogCases(cases).map((item) => JSON.stringify([item.caseId, item.handledStatus, item.closedAt])).join('\n'));
 }
 
 export function summary(record) {
@@ -90,6 +91,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     };
     const unobservedDeletedCount = startAt ? await store.countUnobservedDeletions() : null;
     const catalog = await store.getCatalog();
+    const retention = catalog.complete ? catalogRetention(catalog, now()) : null;
     const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt }) : []);
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id));
     const enumerationComplete = Boolean(startAt) && state?.state === 'complete';
@@ -104,12 +106,20 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       failedMessageIds: startAt ? state?.failedMessageIds || [] : [],
       unobservedDeletedCount,
       executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(startAt && state?.historyId),
-      enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0,
+      enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0 && retention.unknownClosureCaseIds.length === 0 && retention.expiredCaseIds.length === 0,
       coverageUnverifiedCaseCount: catalog.complete && startAt ? coverageUnverified.length : null,
       coverageUnverifiedCaseIds: startAt ? coverageUnverified.slice(0, 50) : [],
+      unknownClosureCaseCount: retention ? retention.unknownClosureCaseIds.length : null,
+      expiredCaseCount: retention ? retention.expiredCaseIds.length : null,
       bodyUnverifiedCount: counts.bodyUnverified, bodyUnavailableCount: counts.bodyUnavailable,
       attachmentUnverifiedCount: counts.attachmentUnverified, attachmentUnavailableCount: counts.attachmentUnavailable
     };
+  }
+
+  async function assertCaseRetention(id) {
+    const catalog = await store.getCatalog();
+    assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    assertMail(!catalogRetention(catalog, now()).expiredCaseIds.includes(id), 'MAIL_RETENTION_EXPIRED', 410);
   }
 
   async function activeStartAt() {
@@ -123,6 +133,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     assertMail(record, 'MAIL_NOT_FOUND', 404);
     assertMail(withinPeriod(record, await activeStartAt()), 'MAIL_NOT_FOUND', 404);
     assertScope(record, payload);
+    if (record.caseId) await assertCaseRetention(record.caseId);
     if (!allowUnavailable) assertMail(!record.unavailable, 'MAIL_CONTENT_UNAVAILABLE', 410);
     return record;
   }
@@ -150,6 +161,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       const catalog = await store.getCatalog();
       assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
       assertMail(catalog.caseIds.includes(targetCaseId), 'MAIL_CASE_NOT_FOUND', 404);
+      await assertCaseRetention(targetCaseId);
     }
     const scopeKey = `${mode}:${targetCaseId || ''}:${startAt}`;
     const cursor = parseCursor(payload.pageToken, scopeKey);
@@ -200,7 +212,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function listIssues(payload) {
     const startAt = await activeStartAt();
-    const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted'];
+    const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted', 'unknownClosure', 'expiredRetention'];
     const kind = payload.kind;
     assertMail(kinds.includes(kind));
     const scopeKey = `issues:${kind}:${startAt}`;
@@ -221,20 +233,21 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       targets = pageRows.map((item) => ({ type: 'deleted', messageId: item.messageId, detectedAt: item.detectedAt }));
       if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).detectedAt });
       scannedCount = pageRows.length;
-    } else if (kind === 'coverage' || kind === 'failed') {
+    } else if (['coverage', 'failed', 'unknownClosure', 'expiredRetention'].includes(kind)) {
       const state = await store.getSyncState();
       let ids;
-      if (kind === 'coverage') {
+      if (kind !== 'failed') {
         const catalog = await store.getCatalog();
         assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
         const covered = new Set(await store.getCoveredCaseIds({ startAt }));
-        ids = catalog.caseIds.filter((id) => !covered.has(id)).sort();
+        const retention = catalogRetention(catalog, now());
+        ids = kind === 'unknownClosure' ? retention.unknownClosureCaseIds : kind === 'expiredRetention' ? retention.expiredCaseIds : catalog.caseIds.filter((id) => !covered.has(id)).sort();
       } else ids = [...new Set(state?.failedMessageIds || [])].sort();
       const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });
       const offset = cursor?.offset || 0;
       assertMail(Number.isSafeInteger(offset) && offset >= 0 && (!cursor || cursor.snapshot === snapshot), 'MAIL_MAPPING_CHANGED', 409);
       const pageIds = ids.slice(offset, offset + PAGE_SIZE);
-      targets = await Promise.all(pageIds.map(async (id) => kind === 'coverage' ? { type: 'case', caseId: id } :
+      targets = await Promise.all(pageIds.map(async (id) => kind !== 'failed' ? { type: 'case', caseId: id } :
         { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => withinPeriod(item, startAt) && ['matched', 'pending'].includes(item.matchState) ? summary(item) : null) }));
       if (kind === 'failed' && !ids.length && state?.state === 'failed') targets = [{ type: 'sync', errorCode: state.errorCode || 'MAIL_SYNC_FAILED' }];
       if (offset + PAGE_SIZE < ids.length) nextPageToken = token({ offset: offset + PAGE_SIZE, snapshot });
@@ -290,12 +303,18 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const id = messageId(payload.messageId);
     const startAt = await activeStartAt();
     assertMail(withinPeriod(await store.getMessage(id), startAt), 'MAIL_NOT_FOUND', 404);
+    const current = await store.getMessage(id);
+    if (current?.caseId) await assertCaseRetention(current.caseId);
     assertMail(Number.isSafeInteger(payload.expectedVersion) && payload.expectedVersion >= 1);
     const fingerprint = digest({ operation, payload, actor, startAt });
-    const catalog = operation === 'resolvePending' ? await store.getCatalog() : null;
+    const catalog = await store.getCatalog();
+    assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    const expiredCaseIds = catalogRetention(catalog, now()).expiredCaseIds;
+    if (current?.caseId) assertMail(!expiredCaseIds.includes(current.caseId), 'MAIL_RETENTION_EXPIRED', 410);
     return store.mutate(requestId, fingerprint, async (transaction) => {
       const record = await transaction.getMessage(id);
       assertMail(record, 'MAIL_NOT_FOUND', 404);
+      if (record.caseId) assertMail(!expiredCaseIds.includes(record.caseId), 'MAIL_RETENTION_EXPIRED', 410);
       assertMail(withinPeriod(record, periodStart((await transaction.getSyncState())?.startAt)), 'MAIL_NOT_FOUND', 404);
       let transition;
       if (operation === 'markReviewed') {
@@ -314,6 +333,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         if (targetCase) {
           assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
           assertMail(catalog.caseIds.includes(targetCase), 'MAIL_CASE_NOT_FOUND', 404);
+          await assertCaseRetention(targetCase);
         }
         transition = core.classifyManually(record, {
           matchState: payload.action === 'match' ? 'matched' : 'excluded', caseId: targetCase,
@@ -329,17 +349,17 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         transaction.addEvent({ ...demotion.event, requestId });
       }
       return { message: summary(demotions.find((item) => item.record.messageId === id)?.record || transition.record) };
-    }, startAt);
+    }, startAt, catalog.digest);
   }
 
   async function uploadCatalog(payload) {
     assertMail(ID.test(payload.snapshotId || '') && Number.isInteger(payload.pageIndex) && payload.pageIndex >= 0 &&
       Number.isInteger(payload.pageCount) && payload.pageCount >= 1 && payload.pageCount <= 500 &&
       payload.pageIndex < payload.pageCount && Number.isInteger(payload.total) && payload.total >= 0 && payload.total <= 100000 &&
-      /^[a-f0-9]{64}$/.test(payload.digest || '') && Array.isArray(payload.caseIds) && payload.caseIds.length <= 200);
-    const ids = payload.caseIds.map(caseId);
-    assertMail(new Set(ids).size === ids.length);
-    return { catalog: await store.uploadCatalogPage({ ...payload, caseIds: ids }, catalogDigest) };
+      /^[a-f0-9]{64}$/.test(payload.digest || '') && Array.isArray(payload.cases) && payload.cases.length <= 200);
+    const cases = normalizeCatalogCases(payload.cases);
+    assertMail(cases.every((item) => !item.closedAt || Date.parse(item.closedAt) <= now().getTime()), 'MAIL_CATALOG_INVALID', 409);
+    return { catalog: await store.uploadCatalogPage({ ...payload, cases }, catalogDigest) };
   }
 
   async function indexMessage(id, catalog, scope = {}) {
@@ -370,6 +390,10 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const classification = bodyAvailability === 'verified' && referenceIds.length <= 100 ? core.classifyMessage({ bodyText, headers: message.payload?.headers || [],
       trustedAnchor: trustedAnchor(message) === true }, catalog.caseIds, referenceMatches, threadMatches.filter((item) => item.messageId !== id)) :
       { matchState: 'pending', caseId: null, reason: bodyAvailability === 'verified' ? 'evidence_limit' : 'body_unavailable', evidence: { bodyCaseIds: [], currentCaseIds: [], parentMessageIds: [] } };
+    const latestCatalog = await store.getCatalog();
+    assertMail(latestCatalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+    const expiredIds = [...new Set([...catalogRetention(catalog, now()).expiredCaseIds, ...catalogRetention(latestCatalog, now()).expiredCaseIds])];
+    assertMail(!expiredIds.includes(classification.caseId) && !classification.evidence.currentCaseIds.some((id) => expiredIds.includes(id)), 'MAIL_RETENTION_EXPIRED', 410);
     for (const key of ['bodyCaseIds', 'currentCaseIds', 'parentMessageIds']) {
       if (classification.evidence[key].length > 100) {
         classification.evidence[key] = classification.evidence[key].slice(0, 100);
@@ -391,7 +415,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       bodyAvailability, bodyCheckedAt: now().toISOString(),
       unverifiedAttachmentCount: parsed.attachments.length, unavailableAttachmentCount: 0,
       ...classification, version: 1, firstReview: null, indexedAt: now().toISOString(),
-      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) });
+      ...(scope.generation ? { indexedGeneration: scope.generation } : {}) }, latestCatalog.digest);
   }
 
   async function reconcilePending(payload, requestId, actor) {

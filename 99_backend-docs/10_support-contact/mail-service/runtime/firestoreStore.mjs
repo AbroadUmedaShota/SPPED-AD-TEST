@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { AggregateField, FieldValue } from '@google-cloud/firestore';
 import { assertMail } from './errors.mjs';
-import { canonicalJson } from './service.mjs';
+import { canonicalJson, catalogDigest } from './service.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from './mixedThread.mjs';
 import { observeAttachment } from './attachmentObservation.mjs';
+import { normalizeCatalogCases } from './caseRetention.mjs';
 
 export function createFirestoreStore(db) {
   const mailbox = db.collection('contactMailboxes').doc('customer-speed-ad');
@@ -26,10 +27,12 @@ export function createFirestoreStore(db) {
 
   async function getCatalog(snapshotId) {
     const active = snapshotId ? { ...data(await snapshots.doc(snapshotId).get()), snapshotId } : data(await activeRef.get());
-    if (!active) return { complete: false, caseIds: [] };
-    if (snapshotId && !active.complete) return { complete: false, caseIds: [] };
+    if (!active) return { complete: false, caseIds: [], cases: [] };
+    if (snapshotId && !active.complete) return { complete: false, caseIds: [], cases: [] };
     const pages = await snapshots.doc(active.snapshotId).collection('pages').orderBy('pageIndex').get();
-    return { complete: true, snapshotId: active.snapshotId, digest: active.digest, caseIds: pages.docs.flatMap((page) => page.data().caseIds) };
+    const cases = normalizeCatalogCases(pages.docs.flatMap((page) => { assertMail(Array.isArray(page.data().cases), 'MAIL_CATALOG_INVALID', 409); return page.data().cases; }));
+    assertMail(cases.length === active.total && catalogDigest(cases) === active.digest, 'MAIL_CATALOG_INVALID', 409);
+    return { complete: true, snapshotId: active.snapshotId, digest: active.digest, cases, caseIds: cases.map((item) => item.caseId) };
   }
 
   return {
@@ -46,21 +49,21 @@ export function createFirestoreStore(db) {
         const existing = data(await transaction.get(ref));
         const existingPage = data(await transaction.get(pageRef));
         if (existing) assertMail(existing.pageCount === page.pageCount && existing.total === page.total && existing.digest === page.digest, 'MAIL_REQUEST_CONFLICT', 409);
-        if (existingPage) assertMail(canonicalJson(existingPage.caseIds) === canonicalJson(page.caseIds), 'MAIL_REQUEST_CONFLICT', 409);
+        if (existingPage) assertMail(canonicalJson(existingPage.cases) === canonicalJson(page.cases), 'MAIL_REQUEST_CONFLICT', 409);
         if (!existing) transaction.set(ref, { pageCount: page.pageCount, total: page.total, digest: page.digest, createdAt: new Date().toISOString() });
-        if (!existingPage) transaction.set(pageRef, { pageIndex: page.pageIndex, caseIds: page.caseIds });
+        if (!existingPage) transaction.set(pageRef, { pageIndex: page.pageIndex, cases: page.cases });
       });
       const pages = await ref.collection('pages').orderBy('pageIndex').get();
       if (pages.size !== page.pageCount) return { complete: false, snapshotId: page.snapshotId, receivedPages: pages.size };
-      const ids = pages.docs.flatMap((item) => item.data().caseIds);
-      assertMail(ids.length === page.total && new Set(ids).size === ids.length && makeDigest(ids) === page.digest, 'MAIL_CATALOG_INVALID', 409);
+      const cases = normalizeCatalogCases(pages.docs.flatMap((item) => item.data().cases));
+      assertMail(cases.length === page.total && makeDigest(cases) === page.digest, 'MAIL_CATALOG_INVALID', 409);
       await db.runTransaction(async (transaction) => {
         const snapshot = data(await transaction.get(ref));
         const active = data(await transaction.get(activeRef));
-        if (!active || active.createdAt <= snapshot.createdAt) transaction.set(activeRef, { snapshotId: page.snapshotId, createdAt: snapshot.createdAt, total: ids.length, digest: page.digest });
+        if (!active || active.createdAt <= snapshot.createdAt) transaction.set(activeRef, { snapshotId: page.snapshotId, createdAt: snapshot.createdAt, total: cases.length, digest: page.digest });
         transaction.update(ref, { complete: true });
       });
-      return { complete: true, snapshotId: page.snapshotId, total: ids.length };
+      return { complete: true, snapshotId: page.snapshotId, total: cases.length };
     },
     async getMessage(id) { return data(await messages.doc(id).get()); },
     async recordUnobservedDeletion(id, at) {
@@ -129,10 +132,12 @@ export function createFirestoreStore(db) {
       }
       return [...results.values()];
     },
-    async mutate(requestId, fingerprint, operation, expectedStartAt) {
+    async mutate(requestId, fingerprint, operation, expectedStartAt, expectedCatalogDigest) {
       const receiptRef = mailbox.collection('receipts').doc(requestId);
       return db.runTransaction(async (transaction) => {
         const state = data(await transaction.get(syncRef));
+        const catalog = data(await transaction.get(activeRef));
+        if (expectedCatalogDigest) assertMail(catalog?.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
         if (expectedStartAt) assertMail(state?.startAt === expectedStartAt, 'MAIL_MAPPING_CHANGED', 409);
         const receipt = data(await transaction.get(receiptRef));
         if (receipt) {
@@ -178,9 +183,11 @@ export function createFirestoreStore(db) {
       if (cursor) query = query.startAfter(cursor.at, cursor.id);
       return (await query.limit(limit).get()).docs.map((item) => item.data());
     },
-    async upsertIndexedMessage(incoming) {
+    async upsertIndexedMessage(incoming, expectedCatalogDigest) {
       const ref = messages.doc(incoming.messageId);
       await db.runTransaction(async (transaction) => {
+        const catalog = data(await transaction.get(activeRef));
+        if (expectedCatalogDigest) assertMail(catalog?.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
         const existing = data(await transaction.get(ref));
         const threadRecords = incoming.threadId ? (await transaction.get(messages.where('threadId', '==', incoming.threadId))).docs.map((item) => item.data()) : [];
         const merged = mergeIndexedMessage(existing, incoming);

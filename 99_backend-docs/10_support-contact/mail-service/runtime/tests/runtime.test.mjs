@@ -16,6 +16,7 @@ const modules = await Promise.all(['classification', 'mime', 'review', 'safeMail
 const core = Object.assign({}, ...modules);
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
+const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const NOW = '2026-11-10T09:00:00.000Z';
 const START = '2026-01-01T00:00:00.000Z';
 const actor = { email: 'staff@abroad-o.com', authMode: 'domain' };
@@ -214,12 +215,13 @@ test('catalog activates only after all immutable pages and digest match', async 
   const f = fixture([B]);
   const ids = Array.from({ length: 201 }, (_, index) => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`);
   const snapshotId = randomUUID();
-  const common = { snapshotId, pageCount: 2, total: ids.length, digest: catalogDigest(ids) };
-  const first = await f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 0, caseIds: ids.slice(0, 200) }));
+  const cases = caseEntries(ids).map((item, index) => index % 2 ? { ...item, handledStatus: '対応済み', closedAt: '2026-11-09T00:00:00.000Z' } : item);
+  const common = { snapshotId, pageCount: 2, total: ids.length, digest: catalogDigest(cases) };
+  const first = await f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 0, cases: cases.slice(0, 200) }));
   assert.equal(first.catalog.complete, false); assert.deepEqual((await f.store.getCatalog()).caseIds, [B]);
-  const last = await f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 1, caseIds: ids.slice(200) }));
-  assert.equal(last.catalog.complete, true); assert.equal((await f.store.getCatalog()).caseIds.length, 201);
-  await assert.rejects(() => f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 1, caseIds: [A] })), { code: 'MAIL_REQUEST_CONFLICT' });
+  const last = await f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 1, cases: cases.slice(200) }));
+  assert.equal(last.catalog.complete, true); assert.equal((await f.store.getCatalog()).caseIds.length, 201); assert.deepEqual((await f.store.getCatalog()).cases, cases);
+  await assert.rejects(() => f.execute(f.envelope('uploadCaseCatalog', { ...common, pageIndex: 1, cases: caseEntries([A]) })), { code: 'MAIL_REQUEST_CONFLICT' });
 });
 
 test('full sync advances one page, replays same request, finalizes stale records, and keeps initial history', async () => {
@@ -909,4 +911,97 @@ test('temporary attachment busy does not record unavailable or allow review', as
   await assert.rejects(() => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'busy', partId: '0.1', offset: 0 })), { code: 'MAIL_ATTACHMENT_BUSY' });
   assert.equal((await f.store.getMessage('busy')).attachments[0].availability, 'unverified');
   await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'busy', expectedVersion: 1 })), { code: 'MAIL_CONTENT_UNAVAILABLE' });
+});
+
+
+test('closure metadata changes the immutable catalog and unknown or expired cases remain residuals', async () => {
+  const f = fixture([A, B]);
+  const cases = [{ caseId: A, handledStatus: '対応済み', closedAt: null }, { caseId: B, handledStatus: '対応済み', closedAt: '2023-11-10T09:00:00.000Z' }];
+  assert.notEqual(catalogDigest(cases), catalogDigest(caseEntries([A, B])));
+  const snapshotId = randomUUID();
+  const page = { snapshotId, pageIndex: 0, pageCount: 1, total: 2, digest: catalogDigest(cases), cases };
+  await f.execute(f.envelope('uploadCaseCatalog', page));
+  assert.deepEqual((await f.store.getCatalog()).cases, cases);
+  await assert.rejects(() => f.execute(f.envelope('uploadCaseCatalog', { ...page, cases: caseEntries([A, B]) })), { code: 'MAIL_REQUEST_CONFLICT' });
+  const status = (await f.execute(f.envelope('getSyncStatus'))).sync;
+  assert.equal(status.unknownClosureCaseCount, 1); assert.equal(status.expiredCaseCount, 1); assert.equal(status.acceptanceReady, false);
+  const unknown = await f.execute(f.envelope('listMailIssues', { kind: 'unknownClosure' }));
+  const expired = await f.execute(f.envelope('listMailIssues', { kind: 'expiredRetention' }));
+  assert.deepEqual(unknown.targets, [{ type: 'case', caseId: A }]);
+  assert.deepEqual(expired.targets, [{ type: 'case', caseId: B }]);
+  await assert.rejects(() => f.execute(f.envelope('listCaseMail', { caseId: B })), { code: 'MAIL_RETENTION_EXPIRED' });
+  await assert.rejects(() => f.execute(f.envelope('uploadCaseCatalog', { ...page, cases: undefined, caseIds: [A, B] })), { code: 'MAIL_INVALID_REQUEST' });
+});
+
+test('expired case mail is never newly indexed or manually confirmed and old direct content is blocked', async () => {
+  const f = fixture([A]);
+  f.store.setCatalog({ complete: true, caseIds: [A], cases: [{ caseId: A, handledStatus: '対応済み', closedAt: '2023-01-01T00:00:00.000Z' }] });
+  f.messages.set('expired', gmailMessage('expired'));
+  const execute = createMailService({ store: f.store, gmail: f.gmail, core, now: () => new Date(NOW), trustedAnchor: () => true });
+  await assert.rejects(() => execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' })), { code: 'MAIL_RETENTION_EXPIRED' });
+  assert.equal((await execute(f.envelope('getSyncStatus'))).sync.state, 'failed');
+  assert.equal(f.store.records.has('expired'), false);
+  f.store.seed(record('old')); f.messages.set('old', gmailMessage('old'));
+  for (const operation of ['getMail', 'getAttachmentChunk', 'markReviewed']) {
+    await assert.rejects(() => execute(f.envelope(operation, { scope: 'case', caseId: A, messageId: 'old', partId: '0.1', expectedVersion: 1 })), { code: 'MAIL_RETENTION_EXPIRED' });
+  }
+  f.store.seed(record('pending', { matchState: 'pending', caseId: null }));
+  await assert.rejects(() => execute(f.envelope('resolvePending', { messageId: 'pending', action: 'match', caseId: A, expectedVersion: 1, reason: 'confirmed' })), { code: 'MAIL_RETENTION_EXPIRED' });
+  assert.equal(f.store.events.length, 0);
+});
+
+
+test('Firestore catalog read requires complete closure metadata and verifies its immutable digest', async () => {
+  const cases = caseEntries([A, B]);
+  let page = { cases };
+  const metadata = { snapshotId: 'snapshot', total: 2, digest: catalogDigest(cases) };
+  const node = (path = '') => ({
+    collection(name) { return node(`${path}/${name}`); }, doc(name) { return node(`${path}/${name}`); }, orderBy() { return this; },
+    async get() { return path.endsWith('/pages') ? { docs: [{ data: () => page }] } : { exists: true, data: () => metadata }; }
+  });
+  const store = createFirestoreStore(node());
+  assert.deepEqual((await store.getCatalog()).cases, cases);
+  page = { caseIds: [A, B] };
+  await assert.rejects(() => store.getCatalog(), { code: 'MAIL_CATALOG_INVALID' });
+  page = { cases: [{ ...cases[0], handledStatus: '対応済み', closedAt: null }, cases[1]] };
+  await assert.rejects(() => store.getCatalog(), { code: 'MAIL_CATALOG_INVALID' });
+});
+
+
+test('catalog changes between preflight and commit reject review and indexing atomically', async () => {
+  const f = fixture([A]);
+  const first = { complete: true, cases: caseEntries([A]), caseIds: [A], digest: 'a'.repeat(64) };
+  f.store.setCatalog(first); f.store.seed(record('review'));
+  const mutate = f.store.mutate;
+  f.store.mutate = (...args) => { f.store.setCatalog({ ...first, digest: 'b'.repeat(64) }); return mutate(...args); };
+  await assert.rejects(() => f.execute(f.envelope('markReviewed', { messageId: 'review', scope: 'case', caseId: A, expectedVersion: 1 })), { code: 'MAIL_CATALOG_CHANGED' });
+  assert.equal(f.store.records.get('review').firstReview, null); assert.equal(f.store.receipts.size, 0);
+  f.store.setCatalog(first); f.messages.set('indexed', gmailMessage('indexed'));
+  const upsert = f.store.upsertIndexedMessage;
+  f.store.upsertIndexedMessage = (...args) => { f.store.setCatalog({ ...first, digest: 'c'.repeat(64) }); return upsert(...args); };
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' })), { code: 'MAIL_CATALOG_CHANGED' });
+  assert.equal(f.store.records.has('indexed'), false);
+});
+
+test('Firestore transactions reject stale catalog digest before any record write', async () => {
+  const node = (path = '') => ({ path, collection(name) { return node(`${path}/${name}`); }, doc(name) { return node(`${path}/${name}`); } });
+  let writes = 0;
+  const db = { ...node(), async runTransaction(fn) { return fn({
+    async get(ref) { return { exists: true, data: () => ref.path.endsWith('/activeCatalog') ? { digest: 'new' } : { startAt: START } }; },
+    set() { writes++; }, update() { writes++; }, delete() { writes++; }
+  }); } };
+  const store = createFirestoreStore(db);
+  await assert.rejects(() => store.mutate('request', 'fingerprint', () => { throw new Error('must not run'); }, START, 'old'), { code: 'MAIL_CATALOG_CHANGED' });
+  await assert.rejects(() => store.upsertIndexedMessage(record('new'), 'old'), { code: 'MAIL_CATALOG_CHANGED' });
+  assert.equal(writes, 0);
+});
+
+
+test('review rechecks expiry in the exact catalog pinned for its transaction', async () => {
+  const f = fixture([A]); f.store.seed(record('review'));
+  const original = await f.store.getCatalog(); let reads = 0;
+  f.store.getCatalog = async () => ++reads === 1 ? original : { complete: true, caseIds: [A], digest: 'changed',
+    cases: [{ caseId: A, handledStatus: '対応済み', closedAt: '2020-01-01T00:00:00.000Z' }] };
+  await assert.rejects(() => f.execute(f.envelope('markReviewed', { messageId: 'review', scope: 'case', caseId: A, expectedVersion: 1 })), { code: 'MAIL_RETENTION_EXPIRED' });
+  assert.equal(f.store.records.get('review').firstReview, null); assert.equal(f.store.receipts.size, 0);
 });

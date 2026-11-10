@@ -14,7 +14,7 @@ test('mail service exposes only the authenticated business RPC surface', () => {
   assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
-function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, url = 'https://contact-mail-example.a.run.app' } = {}) {
+function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, statuses, closedDates, url = 'https://contact-mail-example.a.run.app' } = {}) {
   const calls = [];
   const reads = [];
   const sourceDates = () => dates === undefined ? ids.map(() => '2026-11-10T00:00:00.000Z') : dates;
@@ -23,8 +23,8 @@ function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'doma
     requireViewer_() { if (!actor) throw new Error('権限がありません'); return actor; },
     findSubmission_(id) { reads.push(id); return ids.includes(id) ? { record: { submission_id: id } } : null; },
     getProperty_: () => url,
-    getSheet_: () => ({ getDataRange: () => ({ getValues: () => { const values = sourceDates(); return [values ? ['submission_id', 'submitted_at'] : ['submission_id'], ...ids.map((id, index) => values ? [id, values[index]] : [id])]; } }) }),
-    ensureHeaders_: () => sourceDates() ? ['submission_id', 'submitted_at'] : ['submission_id'],
+    getSheet_: () => ({ getDataRange: () => ({ getValues: () => { const values = sourceDates(); return [values ? ['submission_id', 'submitted_at', 'handled_status', 'closed_at'] : ['submission_id', 'handled_status', 'closed_at'], ...ids.map((id, index) => values ? [id, values[index], statuses?.[index] || '未対応', closedDates?.[index] || ''] : [id, statuses?.[index] || '未対応', closedDates?.[index] || ''])]; } }) }),
+    ensureHeaders_: () => sourceDates() ? ['submission_id', 'submitted_at', 'handled_status', 'closed_at'] : ['submission_id', 'handled_status', 'closed_at'],
     ScriptApp: { getIdentityToken: () => 'server-only-google-identity-token' },
     Utilities: { getUuid: randomUUID, Charset: { UTF_8: 'UTF-8' }, DigestAlgorithm: { SHA_256: 'SHA-256' }, computeDigest: (_kind, text) => [...createHash('sha256').update(text).digest()] },
     UrlFetchApp: { fetch(target, options) {
@@ -99,7 +99,7 @@ test('review and classification retain request identity and never accept caller 
   app.api.resolveContactMailPending({ messageId: 'mail1', action: 'match', caseId, expectedVersion: 3, reason: '本文の受付IDを確認', requestId: randomUUID() });
   assert.equal(app.calls[1].envelope.payload.reason, '本文の受付IDを確認');
   assert.equal(app.calls[1].envelope.operation, 'resolvePending');
-  assert.doesNotMatch(bridge, /setValue|handled_status|handled_by|handled_at|internal_note/);
+  assert.doesNotMatch(bridge, /setValue|handled_by|handled_at|internal_note/);
 });
 
 test('service errors expose fixed codes without upstream bodies or secrets', () => {
@@ -143,12 +143,12 @@ test('catalog is authoritative, stable and bounded beyond 200 cases', () => {
   assert.equal(first.catalog.complete, false);
   assert.equal(first.catalog.nextPageIndex, 5);
   assert.equal(app.calls.length, 5);
-  assert.ok(app.calls.every((call) => call.envelope.payload.caseIds.length === 200));
+  assert.ok(app.calls.every((call) => call.envelope.payload.cases.length === 200));
   const second = app.api.advanceContactMailSync({ catalog: first.catalog });
   assert.equal(second.catalog.complete, true);
   assert.equal(app.calls.length, 7);
-  assert.deepEqual(app.calls.flatMap((call) => call.envelope.payload.caseIds), ids);
-  assert.equal(first.catalog.digest, createHash('sha256').update(ids.join('\n')).digest('hex'));
+  assert.deepEqual(app.calls.flatMap((call) => call.envelope.payload.cases.map((item) => item.caseId)), ids);
+  assert.equal(first.catalog.digest, createHash('sha256').update(ids.map((id) => JSON.stringify([id, '未対応', null])).join('\n')).digest('hex'));
   assert.doesNotMatch(JSON.stringify(first), /caseIds|untrusted/);
   assert.ok(app.calls.every((call) => call.envelope.payload.snapshotId === first.catalog.snapshotId));
   const count = app.calls.length;
@@ -266,7 +266,7 @@ test('GAS advance pre-dispatch config and identity failures carry exact not-sent
 
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
-const sync = { executionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: '2026-11-01T00:00:00.000Z', historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
+const sync = { unknownClosureCaseCount: 0, expiredCaseCount: 0, executionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: '2026-11-01T00:00:00.000Z', historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
 const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', ...extra } });
 const syncCallResponse = (options, state = 'running', extra = {}) => {
   const result = syncResponse(options.executionId, state, extra);
@@ -1260,4 +1260,29 @@ test('definite catalog non-dispatch clears an obsolete plan without replacing a 
     assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
     assert.equal(app.calls.filter((call) => call.name === 'advanceContactMailSync').length, 1);
   }
+});
+
+
+test('authoritative closure metadata is paged and changing only closure invalidates an upload plan', () => {
+  const statuses = ['対応済み']; const closedDates = [''];
+  const app = bridgeRuntime({ statuses, closedDates });
+  app.respond(() => ({ ok: true, catalog: { complete: true } }));
+  const plan = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  app.api.advanceContactMailSync({ catalog: plan });
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[0].envelope.payload.cases)), [{ caseId, handledStatus: '対応済み', closedAt: null }]);
+  closedDates[0] = '2023-11-10T00:00:00.000Z';
+  assert.equal(app.api.advanceContactMailSync({ catalog: plan }).error.code, 'CONFLICT');
+  const revised = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+  assert.notEqual(revised.digest, plan.digest);
+  statuses[0] = '未対応';
+  assert.throws(() => app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }), /MAIL_CATALOG_INVALID/);
+});
+
+test('retention residual counts are visible and can never accompany technical readiness', () => {
+  const app = uiRuntime();
+  const value = { ...sync, unknownClosureCaseCount: 2, expiredCaseCount: 3 };
+  app.ui.validateContactMailSync(value);
+  assert.match(app.ui.renderContactMailSync(value), /終了日未確認 2件・保存期限到来 3件/);
+  assert.throws(() => app.ui.validateContactMailSync({ ...value, acceptanceReady: true }), /MAIL_INVALID_RESPONSE/);
+  assert.throws(() => app.ui.validateContactMailSync({ ...sync, unknownClosureCaseCount: undefined }), /MAIL_INVALID_RESPONSE/);
 });

@@ -9,7 +9,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
   'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
-  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED'
+  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_RETENTION_EXPIRED'
 ];
 
 function listContactMail(options, authProof) {
@@ -68,7 +68,7 @@ function getContactMailSyncStatus(authProof) {
 function listContactMailIssues(options, authProof) {
   var context = requireViewer_(authProof);
   var kind = String(options && options.kind || '');
-  if (['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted'].indexOf(kind) === -1) throw new Error('残件の表示対象が不正です。');
+  if (['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted', 'unknownClosure', 'expiredRetention'].indexOf(kind) === -1) throw new Error('残件の表示対象が不正です。');
   return callMailService_('listMailIssues', { kind: kind, pageToken: mailString_(options && options.pageToken, 2048, true) }, context);
 }
 
@@ -125,7 +125,7 @@ function advanceContactMailSync(options, authProof) {
   for (; pageIndex < end; pageIndex++) {
     lastResult = callMailService_('uploadCaseCatalog', {
       snapshotId: snapshotId, pageIndex: pageIndex, pageCount: pageCount, total: ids.length,
-      digest: digest, caseIds: ids.slice(pageIndex * 200, (pageIndex + 1) * 200)
+      digest: digest, cases: source.cases.slice(pageIndex * 200, (pageIndex + 1) * 200)
     }, context);
     if (!lastResult.ok) return lastResult;
   }
@@ -138,6 +138,10 @@ function mailCatalogSource_() {
   var idColumn = headers.indexOf('submission_id');
   var dateColumn = headers.indexOf('submitted_at');
   var ids = [];
+  var cases = [];
+  var statusColumn = headers.indexOf('handled_status');
+  var closedColumn = headers.indexOf('closed_at');
+  if (statusColumn < 0 || closedColumn < 0) throw new Error('MAIL_CATALOG_INVALID');
   var seen = {};
   var earliest = Infinity;
   var invalidDate = dateColumn < 0;
@@ -148,19 +152,30 @@ function mailCatalogSource_() {
     if (seen[id]) throw new Error('受付IDが重複しているためメール同期を開始できません。');
     seen[id] = true;
     ids.push(id);
+    var status = String(row[statusColumn] || '').trim() || '未対応';
+    if (['未対応', '対応中', '対応済み', '保留'].indexOf(status) === -1) throw new Error('MAIL_CATALOG_INVALID');
+    var rawClosed = row[closedColumn];
+    var closedAt = null;
+    if (rawClosed !== '' && rawClosed != null) {
+      var closedMillis = mailSubmittedAtMillis_(rawClosed);
+      if (status !== '対応済み' || !isFinite(closedMillis) || closedMillis > Date.now()) throw new Error('MAIL_CATALOG_INVALID');
+      closedAt = new Date(closedMillis).toISOString();
+    }
+    cases.push({ caseId: id, handledStatus: status, closedAt: closedAt });
     var value = dateColumn < 0 ? null : row[dateColumn];
     var time = mailSubmittedAtMillis_(value);
     if (!isFinite(time)) invalidDate = true;
     else earliest = Math.min(earliest, time);
   });
   ids.sort();
+  cases.sort(function (a, b) { return a.caseId < b.caseId ? -1 : a.caseId > b.caseId ? 1 : 0; });
   if (invalidDate || !isFinite(earliest)) throw new Error('MAIL_PERIOD_REQUIRED');
-  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, ids.join('\n'), Utilities.Charset.UTF_8).map(function (byte) {
+  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, cases.map(function (item) { return JSON.stringify([item.caseId, item.handledStatus, item.closedAt]); }).join('\n'), Utilities.Charset.UTF_8).map(function (byte) {
     return ('0' + ((byte + 256) % 256).toString(16)).slice(-2);
   }).join('');
   var day = 86400000;
   var startAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
-  return { ids: ids, digest: digest, startAt: startAt };
+  return { ids: ids, cases: cases, digest: digest, startAt: startAt };
 }
 
 function mailSubmittedAtMillis_(value) {

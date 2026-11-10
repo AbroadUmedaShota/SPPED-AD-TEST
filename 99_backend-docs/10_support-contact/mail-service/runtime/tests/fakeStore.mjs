@@ -2,6 +2,7 @@ import { assertMail } from '../errors.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
 import { observeAttachment } from '../attachmentObservation.mjs';
 
+const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const clone = (value) => structuredClone(value);
 const order = (a, b) => b.internalDate.localeCompare(a.internalDate) || b.messageId.localeCompare(a.messageId);
 
@@ -11,7 +12,7 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const pages = new Map();
   const events = [];
   const deletionDiagnostics = new Map();
-  let catalog = { complete: true, caseIds };
+  let catalog = { complete: true, caseIds, cases: caseEntries(caseIds) };
   let sync = clone(initialSync);
   let lease = null;
   let queue = Promise.resolve();
@@ -26,13 +27,14 @@ export function fakeStore(caseIds = [], initialSync = null) {
       const snapshot = pages.get(page.snapshotId) || { ...page, pages: new Map() };
       assertMail(snapshot.digest === page.digest && snapshot.total === page.total && snapshot.pageCount === page.pageCount, 'MAIL_REQUEST_CONFLICT', 409);
       const old = snapshot.pages.get(page.pageIndex);
-      if (old) assertMail(JSON.stringify(old) === JSON.stringify(page.caseIds), 'MAIL_REQUEST_CONFLICT', 409);
-      snapshot.pages.set(page.pageIndex, page.caseIds);
+      if (old) assertMail(JSON.stringify(old) === JSON.stringify(page.cases), 'MAIL_REQUEST_CONFLICT', 409);
+      snapshot.pages.set(page.pageIndex, page.cases);
       pages.set(page.snapshotId, snapshot);
       if (snapshot.pages.size < page.pageCount) return { complete: false, snapshotId: page.snapshotId, receivedPages: snapshot.pages.size };
-      const ids = [...snapshot.pages].sort(([a], [b]) => a - b).flatMap(([, value]) => value);
-      assertMail(ids.length === page.total && new Set(ids).size === ids.length && digest(ids) === page.digest, 'MAIL_CATALOG_INVALID', 409);
-      catalog = { complete: true, caseIds: ids };
+      const cases = [...snapshot.pages].sort(([a], [b]) => a - b).flatMap(([, value]) => value);
+      const ids = cases.map((item) => item.caseId);
+      assertMail(ids.length === page.total && new Set(ids).size === ids.length && digest(cases) === page.digest, 'MAIL_CATALOG_INVALID', 409);
+      catalog = { complete: true, caseIds: ids, cases, digest: page.digest, snapshotId: page.snapshotId };
       return { complete: true, snapshotId: page.snapshotId, total: ids.length };
     },
     async getMessage(id) { return clone(records.get(id) || null); },
@@ -92,8 +94,9 @@ export function fakeStore(caseIds = [], initialSync = null) {
       if (old) assertMail(old.fingerprint === fingerprint, 'MAIL_REQUEST_CONFLICT', 409);
       else receipts.set(id, { fingerprint, result: clone(result) });
     },
-    async mutate(id, fingerprint, fn, expectedStartAt) {
+    async mutate(id, fingerprint, fn, expectedStartAt, expectedCatalogDigest) {
       return serial(async () => {
+        if (expectedCatalogDigest) assertMail(catalog.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
         if (expectedStartAt) assertMail(sync?.startAt === expectedStartAt, 'MAIL_MAPPING_CHANGED', 409);
         const old = await store.getReceipt(id, fingerprint);
         if (old) return old;
@@ -102,12 +105,14 @@ export function fakeStore(caseIds = [], initialSync = null) {
           setMessage(record) { writes.push(() => store.seed(record)); },
           addEvent(event) { writes.push(() => events.push(clone(event))); }
         });
+        if (expectedCatalogDigest) assertMail(catalog.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
         writes.forEach((fn) => fn());
         await store.saveReceipt(id, fingerprint, result);
         return clone(result);
       });
     },
-    async upsertIndexedMessage(incoming) {
+    async upsertIndexedMessage(incoming, expectedCatalogDigest) {
+      if (expectedCatalogDigest) assertMail(catalog.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
       deletionDiagnostics.delete(incoming.messageId);
       const before = records.get(incoming.messageId);
       const merged = mergeIndexedMessage(before, incoming);
