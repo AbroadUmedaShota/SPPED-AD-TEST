@@ -71,6 +71,34 @@ test('rejects unsupported actor, operation, stale envelope and customer sync', a
     { actor: { email: 'customer@speed-ad.com', authMode: 'customer-oauth' } })), { code: 'MAIL_FORBIDDEN' });
 });
 
+test('sync request confirmation is read-only, actor-bound and returns historical receipt plus current status', async () => {
+  const f = fixture([A]);
+  for (let index = 0; index < 12; index++) f.messages.set(`lookup-${index}`, gmailMessage(`lookup-${index}`));
+  const original = f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full', startAt: '2026-01-01T00:00:00.000Z' });
+  const first = await f.execute(original);
+  assert.equal(first.sync.processedCount, 5);
+  const later = await f.execute(f.envelope('advanceSync', { executionId: original.payload.executionId }, { actor: { email: 'other@abroad-o.com', authMode: 'domain' } }));
+  assert.equal(later.sync.processedCount, 10);
+  const calls = f.calls.length;
+  const before = await f.store.getSyncState();
+  const payload = { requestId: original.requestId, requestPayload: original.payload };
+  const result = await f.execute(f.envelope('getSyncRequestResult', payload));
+  assert.equal(result.found, true);
+  assert.equal(result.receipt.sync.processedCount, 5);
+  assert.equal(result.sync.processedCount, 10);
+  assert.equal(f.calls.length, calls);
+  assert.deepEqual(await f.store.getSyncState(), before);
+  await assert.rejects(() => f.execute(f.envelope('getSyncRequestResult', payload, { actor: { email: 'other@abroad-o.com', authMode: 'domain' } })), { code: 'MAIL_REQUEST_CONFLICT' });
+  await assert.rejects(() => f.execute(f.envelope('getSyncRequestResult', payload, { actor: { email: 'customer@speed-ad.com', authMode: 'customer-oauth' } })), { code: 'MAIL_FORBIDDEN' });
+  await assert.rejects(() => f.execute(f.envelope('getSyncRequestResult', { ...payload, requestPayload: { ...original.payload, executionId: randomUUID() } })), { code: 'MAIL_REQUEST_CONFLICT' });
+  const missing = await f.execute(f.envelope('getSyncRequestResult', { ...payload, requestId: randomUUID() }));
+  assert.equal(missing.found, false);
+  assert.equal(missing.receipt, null);
+  assert.equal(missing.sync.processedCount, 10);
+  assert.equal(f.calls.length, calls);
+  assert.deepEqual(await f.store.getSyncState(), before);
+});
+
 test('stable pagination reaches 253 equal-date messages and previous page', async () => {
   const f = fixture([A]);
   for (let i = 0; i < 253; i++) f.store.seed(record(`mail-${String(i).padStart(4, '0')}`));

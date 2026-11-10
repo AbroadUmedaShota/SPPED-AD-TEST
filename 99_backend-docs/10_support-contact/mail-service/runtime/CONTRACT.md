@@ -21,12 +21,15 @@ Cloud RunはIAM認証必須とし、Apps ScriptのOAuth client IDをcustom audie
 | markReviewed | getMailと同じscope、messageId、expectedVersion |
 | resolvePending | messageId、action:match/exclude、match時caseId、expectedVersion、理由reason（1〜1000文字） |
 | getSyncStatus | 空object |
+| getSyncRequestResult | requestId、元のadvanceSync requestPayload。読取り専用で同じactor・内容の保存済みレシートと現在の同期状態を返す |
 | listMailIssues | kind:pending/unreviewed/unavailable/bodyUnverified/bodyUnavailable/attachmentUnverified/attachmentUnavailable/failed/coverage/deleted、任意pageToken |
 | uploadCaseCatalog | snapshotId、pageIndex、pageCount、total、digest、caseIds（200件以下） |
 | advanceSync | executionId、開始時mode:full/history、任意startAt、catalogSnapshotId/catalogDigest。失敗した同じ実行の明示再開だけresume:true |
 | reconcilePending | 任意pageToken |
 
 catalog・同期・再照合は社員操作だけに限定する。catalog digestは、重複のない小文字UUIDを昇順に並べ、改行で結合したUTF-8文字列のSHA-256。全ページ・件数・digestが一致するまでは新catalogを有効化しない。同期は開始時の不変catalog snapshotを使用する。
+
+同期要求が応答不明になった場合、GASは元の受付ID計画と開始日を保持し、正本Sheetの現在値で要求を作り直さず`getSyncRequestResult`で確認する。この操作もdomain認証必須で、`advanceSync`・元payload（実行IDを含む）・実利用者actorのfingerprintが一致するレシートだけを返す。レシート内の同期メタ情報と現在の同期状態以外は返さず、同期・Gmail取得・状態更新は実行しない。未作成レシートは`found:false`とし、自動再送しない。別利用者が同じ実行を進めた場合、古いレシートは元要求の成立確認に使い、画面の新しい進捗を戻さない。
 
 残件一覧は種類を選び、保存済みメールを日時・messageId降順に50件ずつ走査する。該当0件のページにも次ページが残る場合がある。同期失敗で未登録のメールID、案件別の関連メール有無が未確認の受付ID、取得前削除で種類未確認のIDも50件ずつ列挙する。受付ID一覧・失敗ID一覧の対象集合が変化したcursorは拒否し、更新して先頭から確認する。取得不能のメールは保存済みメタ情報と添付descriptorを表示し、本文取得不能でも添付確認経路を維持する。
 

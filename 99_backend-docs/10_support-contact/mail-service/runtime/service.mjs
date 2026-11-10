@@ -7,7 +7,7 @@ import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObserv
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
 const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'getMail',
-  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
+  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'getSyncRequestResult', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
 const CHUNK_SIZE = ATTACHMENT_CHUNK_SIZE;
@@ -521,7 +521,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       typeof envelope.payload === 'object' && !Array.isArray(envelope.payload));
     const actor = validateActor(envelope.actor);
     const { operation, payload, requestId } = envelope;
-    if (['uploadCaseCatalog', 'advanceSync', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
+    if (['uploadCaseCatalog', 'advanceSync', 'getSyncRequestResult', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
     let result;
     if (operation === 'listMailIssues') result = await listIssues(payload);
     else if (operation.startsWith('list')) result = await list(operation, payload);
@@ -529,6 +529,13 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     else if (operation === 'getAttachmentChunk') result = await attachment(payload);
     else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);
     else if (operation === 'getSyncStatus') result = { sync: await syncStatus() };
+    else if (operation === 'getSyncRequestResult') {
+      const original = payload.requestPayload;
+      assertMail(ID.test(payload.requestId || '') && original && typeof original === 'object' && !Array.isArray(original) &&
+        ID.test(original.executionId || '') && Object.keys(original).every((key) => ['executionId', 'mode', 'catalogSnapshotId', 'catalogDigest', 'startAt', 'resume'].includes(key)));
+      const receipt = await store.getReceipt(payload.requestId, digest({ operation: 'advanceSync', payload: original, actor }));
+      result = { found: Boolean(receipt), receipt: receipt ? { sync: receipt.sync } : null, sync: await syncStatus() };
+    }
     else if (operation === 'uploadCaseCatalog') result = await uploadCatalog(payload);
     else if (operation === 'advanceSync') result = await advanceSync(payload, requestId, actor);
     else if (operation === 'reconcilePending') result = await reconcilePending(payload, requestId, actor);

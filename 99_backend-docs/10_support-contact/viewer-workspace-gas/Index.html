@@ -1502,6 +1502,7 @@
             progress.started = true;
             progress.requestId = '';
             progress.requestPayload = null;
+            progress.requestPending = false;
           } else if (['complete', 'needs_full_sync'].includes(result.sync.state)) contactMailState.syncProgress = null;
         }
         element.textContent = renderContactMailSync(result.sync);
@@ -1540,7 +1541,7 @@
       });
     }
 
-    function validateContactMailSync(sync, executionId) {
+    function validateContactMailSync(sync, executionId, historical = false) {
       const invalid = () => { throw new Error('MAIL_INVALID_RESPONSE'); };
       if (!sync || !['not_started', 'running', 'complete', 'needs_full_sync', 'failed'].includes(sync.state) ||
           (executionId && sync.executionId !== executionId) ||
@@ -1558,7 +1559,7 @@
           (sync.startAt !== null && (!validDate(sync.startAt) || Date.parse(sync.startAt) > Date.parse(sync.cutoffAt)))) invalid();
       if (sync.mode === 'history' && sync.phase !== 'enumerate') invalid();
       const previous = contactMailState.sync;
-      if (previous && previous.executionId === sync.executionId &&
+      if (!historical && previous && previous.executionId === sync.executionId &&
           ((Number.isSafeInteger(previous.processedCount) && sync.processedCount < previous.processedCount) ||
            (previous.cutoffAt && sync.cutoffAt !== previous.cutoffAt) || (previous.mode && sync.mode !== previous.mode) ||
            (Object.prototype.hasOwnProperty.call(previous, 'startAt') && sync.startAt !== previous.startAt) ||
@@ -1616,19 +1617,32 @@
           progress.requestId = progress.requestId || window.crypto.randomUUID();
           progress.requestPayload = progress.requestPayload || {
             executionId: progress.executionId,
-            ...(!progress.started ? { mode: progress.mode, catalogSnapshotId: progress.catalog.snapshotId, catalogDigest: progress.catalog.digest } : {}), ...((contactMailState.sync || {}).state === 'failed' ? { resume: true } : {}),
+            ...(!progress.started ? { mode: progress.mode, catalogSnapshotId: progress.catalog.snapshotId, catalogDigest: progress.catalog.digest, catalogStartAt: progress.catalog.startAt } : {}), ...((contactMailState.sync || {}).state === 'failed' ? { resume: true } : {}),
           };
+          const confirming = progress.requestPending === true;
+          progress.requestPending = true;
           const result = contactMailResult(await callContactMailSync({
-            ...progress.requestPayload, requestId: progress.requestId,
+            ...progress.requestPayload, requestId: progress.requestId, ...(confirming ? { confirmOnly: true } : {}),
           }));
           if (serial !== contactMailState.syncSerial) return;
-          validateContactMailSync(result.sync, progress.executionId);
+          if (confirming) {
+            if (typeof result.found !== 'boolean' || (result.found ? !result.receipt : result.receipt !== null)) throw new Error('MAIL_INVALID_RESPONSE');
+            validateContactMailSync(result.sync);
+            if (!result.found) {
+              contactMailState.sync = result.sync;
+              element.textContent = `${renderContactMailSync(result.sync)} この要求の保存結果はまだ確認できません。自動では再送せず、要求IDを保持しています。同期状態を確認してください。`;
+              break;
+            }
+            validateContactMailSync(result.receipt.sync, progress.executionId, true);
+          } else validateContactMailSync(result.sync, progress.executionId);
           progress.started = true;
           progress.requestId = '';
           progress.requestPayload = null;
+          progress.requestPending = false;
           contactMailState.sync = result.sync;
           element.textContent = `${progress.periodText || ''} ${renderContactMailSync(result.sync)} この操作: ${batch}/20回。`;
           renderContactMailSyncButton();
+          if (result.sync.executionId !== progress.executionId) { contactMailState.syncProgress = null; element.textContent += ' 元の要求の成立を確認しました。現在は別の同期実行があるため、続行を停止しました。'; break; }
           if (['complete', 'needs_full_sync'].includes(result.sync.state)) { contactMailState.syncProgress = null; break; }
           if (result.sync.state !== 'running') break;
           if (contactMailState.syncStopRequested) {
@@ -1639,7 +1653,7 @@
         }
       } catch (error) {
         if (serial !== contactMailState.syncSerial) return;
-        if (['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
+        if (!progress.requestPending && ['CONFLICT', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT'].includes(error.message)) contactMailState.syncProgress = null;
         element.textContent = `${contactMailErrorText(error.message)} 自動では再試行しません。送信済みの処理が終了したとは限りません。同期状態を更新するか、続行ボタンから明示的に再確認できます。`;
       } finally {
         if (serial === contactMailState.syncSerial) { contactMailState.syncBusy = false; renderContactMailSyncButton(); }

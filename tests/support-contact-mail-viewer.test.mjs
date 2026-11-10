@@ -185,7 +185,7 @@ test('only domain users can upload catalog or advance a bounded sync', () => {
   const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
   app.calls.length = 0;
   const executionId = randomUUID();
-  app.api.advanceContactMailSync({ executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, requestId: randomUUID() });
+  app.api.advanceContactMailSync({ executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt, requestId: randomUUID() });
   assert.deepEqual(app.calls[0].envelope.payload, { executionId, mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest });
 });
 
@@ -195,8 +195,30 @@ test('full sync period comes from earliest authoritative date with whole-mailbox
     app.respond(() => ({ ok: true, catalog: { complete: true } }));
     const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
     assert.equal(catalog.startAt, expected);
-    app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, startAt: '2099-01-01T00:00:00Z' });
+    app.api.advanceContactMailSync({ executionId: randomUUID(), mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt, startAt: '2099-01-01T00:00:00Z' });
     assert.equal(app.calls.at(-1).envelope.payload.startAt || null, expected);
+  }
+});
+
+test('unknown first-sync confirmation preserves the original plan after Sheet dates or IDs change', () => {
+  for (const change of ['date', 'new-case']) {
+    const ids = [caseId];
+    const dates = ['2026-11-10T04:00:00Z'];
+    const app = bridgeRuntime({ ids, dates });
+    const catalog = app.api.advanceContactMailSync({ prepareCatalog: true, catalog: { snapshotId: randomUUID() } }).catalog;
+    const options = { executionId: randomUUID(), mode: 'full', catalogSnapshotId: catalog.snapshotId, catalogDigest: catalog.digest, catalogStartAt: catalog.startAt, requestId: randomUUID() };
+    app.api.advanceContactMailSync(options);
+    const original = JSON.parse(JSON.stringify(app.calls.at(-1).envelope.payload));
+    if (change === 'date') dates[0] = '2026-10-01T04:00:00Z';
+    else ids.push('22222222-2222-4222-8222-222222222222');
+    app.api.advanceContactMailSync({ ...options, confirmOnly: true });
+    const confirmation = app.calls.at(-1).envelope;
+    assert.equal(confirmation.operation, 'getSyncRequestResult');
+    assert.equal(confirmation.payload.requestId, options.requestId);
+    assert.deepEqual(confirmation.payload.requestPayload, original);
+    const count = app.calls.length;
+    assert.equal(app.api.advanceContactMailSync(options).error.code, 'MAIL_CATALOG_CHANGED');
+    assert.equal(app.calls.length, count);
   }
 });
 
@@ -204,6 +226,10 @@ const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'th
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
 const sync = { state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: null, historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
 const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', ...extra } });
+const syncCallResponse = (options, state = 'running', extra = {}) => {
+  const result = syncResponse(options.executionId, state, extra);
+  return options.confirmOnly ? { ...result, found: true, receipt: { sync: result.sync } } : result;
+};
 const catalogResponse = (options, total = 1) => {
   const catalog = { ...options.catalog, digest: 'a'.repeat(64), pageCount: Math.max(1, Math.ceil(total / 200)), total, startAt: null };
   catalog.nextPageIndex = options.prepareCatalog ? 0 : Math.min(catalog.nextPageIndex + 5, catalog.pageCount);
@@ -374,7 +400,7 @@ test('foreground sync continues successful batches and retains unknown-result re
     if (!options.executionId) return catalogResponse(options);
     advances++;
     if (advances === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
-    return syncResponse(options.executionId, advances === 2 ? 'running' : 'complete');
+    return syncCallResponse(options, advances === 2 ? 'running' : 'complete');
   } });
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(advances, 1);
@@ -383,6 +409,7 @@ test('foreground sync continues successful batches and retains unknown-result re
   assert.equal(advances, 3);
   const requests = app.calls.filter((call) => call.name === 'advanceContactMailSync' && call.args[0].executionId);
   assert.equal(requests[0].args[0].requestId, requests[1].args[0].requestId);
+  assert.equal(requests[1].args[0].confirmOnly, true);
   assert.notEqual(requests[1].args[0].requestId, requests[2].args[0].requestId);
   assert.equal(app.mail.syncProgress, null);
   assert.equal(app.calls.filter((call) => call.name === 'advanceContactMailSync' && !call.args[0].executionId).length, 2);
@@ -451,10 +478,10 @@ test('sync observation timeout stops without retry and ignores late response', a
   await new Promise(setImmediate);
   assert.equal(app.mail.sync.state, 'running');
   assert.equal(app.mail.syncProgress.requestId, requestId);
-  handlers.advanceContactMailSync = (options) => syncResponse(options.executionId, 'complete');
+  handlers.advanceContactMailSync = (options) => syncCallResponse(options, 'complete');
   await app.ui.advanceContactMailSyncFromUi();
   assert.equal(app.calls[1].args[0].requestId, requestId);
-  assert.deepEqual(app.calls[1].args[0], app.calls[0].args[0]);
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[1].args[0])), { ...JSON.parse(JSON.stringify(app.calls[0].args[0])), confirmOnly: true });
   assert.equal(app.mail.syncProgress, null);
 });
 
@@ -515,12 +542,13 @@ test('auth loss invalidates in-flight sync results and clears continuation contr
   assert.equal(app.element('mailSyncSummary').textContent, '');
 });
 
-test('busy response after an unknown outcome retains the exact pending request for manual retry', async () => {
+test('busy or source-change response after unknown outcome retains the exact pending request for confirmation', async () => {
+  for (const code of ['MAIL_SYNC_BUSY', 'MAIL_CATALOG_CHANGED']) {
   let attempts = 0;
   const app = uiRuntime({ advanceContactMailSync: (options) => {
     attempts++;
-    if (attempts < 3) return { ok: false, error: { code: attempts === 1 ? 'MAIL_UPSTREAM_TIMEOUT' : 'MAIL_SYNC_BUSY' } };
-    return syncResponse(options.executionId, 'complete');
+    if (attempts < 3) return { ok: false, error: { code: attempts === 1 ? 'MAIL_UPSTREAM_TIMEOUT' : code } };
+    return syncCallResponse(options, 'complete');
   } });
   app.mail.sync = syncResponse(randomUUID()).sync;
   await app.ui.advanceContactMailSyncFromUi();
@@ -530,8 +558,50 @@ test('busy response after an unknown outcome retains the exact pending request f
   assert.equal(app.mail.syncProgress.requestId, original.requestId);
   assert.deepEqual(JSON.parse(JSON.stringify(app.mail.syncProgress.requestPayload)), { executionId: original.executionId });
   await app.ui.advanceContactMailSyncFromUi();
-  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[2].args[0])), original);
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls[2].args[0])), { ...original, confirmOnly: true });
   assert.equal(app.mail.syncProgress, null);
+  }
+});
+
+test('historical sync receipt confirms pending request without regressing a newer observed execution', async () => {
+  const executionId = randomUUID();
+  let actualAdvances = 0;
+  let app;
+  app = uiRuntime({
+    advanceContactMailSync: (options) => {
+      if (options.confirmOnly) return { ok: true, found: true, receipt: { sync: syncResponse(executionId, 'running', { processedCount: 5 }).sync }, sync: syncResponse(executionId, 'running', { processedCount: 10 }).sync };
+      actualAdvances++;
+      if (actualAdvances === 1) return { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } };
+      assert.equal(app.mail.sync.processedCount, 10);
+      return syncResponse(executionId, 'complete', { processedCount: 15 });
+    },
+    getContactMailSyncStatus: () => syncResponse(executionId, 'running', { processedCount: 10 }),
+  });
+  app.mail.sync = syncResponse(executionId).sync;
+  await app.ui.advanceContactMailSyncFromUi();
+  const pendingId = app.mail.syncProgress.requestId;
+  await app.ui.loadContactMailSyncStatus();
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(app.calls[2].args[0].confirmOnly, true);
+  assert.equal(app.calls[2].args[0].requestId, pendingId);
+  assert.notEqual(app.calls[3].args[0].requestId, pendingId);
+  assert.equal(app.mail.sync.processedCount, 15);
+  assert.equal(app.mail.syncProgress, null);
+});
+
+test('missing or malformed sync receipt stays unresolved without performing another advance', async () => {
+  for (const receipt of [null, { sync: { state: 'running' } }]) {
+    const executionId = randomUUID();
+    const app = uiRuntime({ advanceContactMailSync: (options) => options.confirmOnly ? { ...syncResponse(executionId), found: receipt !== null, receipt } : { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } });
+    app.mail.sync = syncResponse(executionId).sync;
+    await app.ui.advanceContactMailSyncFromUi();
+    const pendingId = app.mail.syncProgress.requestId;
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(app.calls.length, 2);
+    assert.equal(app.calls[1].args[0].confirmOnly, true);
+    assert.equal(app.mail.syncProgress.requestId, pendingId);
+    assert.equal(app.mail.syncProgress.requestPending, true);
+  }
 });
 
 test('first catalog preparation has a client snapshot and retries unknown upload with identical plan', async () => {

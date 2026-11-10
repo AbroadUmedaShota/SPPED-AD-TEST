@@ -88,14 +88,22 @@ function advanceContactMailSync(options, authProof) {
     if (options.mode != null) {
       if (['full', 'history'].indexOf(options.mode) === -1) throw new Error('メール同期の指定が不正です。');
       payload.mode = options.mode;
-      var source = mailCatalogSource_();
       if (!/^[a-f0-9]{64}$/.test(String(options.catalogDigest || ''))) throw new Error('受付ID照合のダイジェストが不正です。');
-      if (options.catalogDigest !== source.digest) return mailError_('MAIL_CATALOG_CHANGED');
       payload.catalogSnapshotId = mailUuid_(options.catalogSnapshotId);
-      payload.catalogDigest = source.digest;
-      if (options.mode === 'full' && source.startAt) payload.startAt = source.startAt;
+      payload.catalogDigest = options.catalogDigest;
+      var plannedStartAt = options.catalogStartAt;
+      if (plannedStartAt !== null && (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt)) throw new Error('同期対象期間が不正です。');
+      if (options.confirmOnly !== true) {
+        var source = mailCatalogSource_();
+        if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return mailError_('MAIL_CATALOG_CHANGED');
+      }
+      if (options.mode === 'full' && plannedStartAt) payload.startAt = plannedStartAt;
     }
     if (options.resume === true) payload.resume = true;
+    if (options.confirmOnly === true) {
+      if (!options.requestId) throw new Error('確認する同期要求の識別子が必要です。');
+      return callMailService_('getSyncRequestResult', { requestId: mailRequestId_(options.requestId), requestPayload: payload }, context);
+    }
     return callMailService_('advanceSync', payload, context, mailRequestId_(options.requestId));
   }
   var source = mailCatalogSource_();
