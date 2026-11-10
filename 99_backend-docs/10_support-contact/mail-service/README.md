@@ -26,13 +26,15 @@
 4. Cloud Runは`allUsers`を許可せず、GAS配備者だけにinvokerを付ける。Apps ScriptのOAuth client IDをcustom audienceに設定し、サービス内でもaudienceと配備者subject/emailを固定値で検証する。設定値は`MAIL_SCRIPT_AUDIENCE`、`MAIL_DEPLOYER_EMAIL`、`MAIL_DEPLOYER_SUBJECT`、`MAILBOX_OAUTH_SECRET_VERSION`、必要なら`FIRESTORE_DATABASE_ID`。GAS側は新しい`openid`認可とScript Property `MAIL_SERVICE_URL` が必要。実値をrepoへ保存しない。
 5. 画面とAPIの認証、Firestore複合index、初回全件同期、後続履歴同期、照合待ち、添付の到達、別利用者の確認者・日時読戻しを実環境で検証する。対象期間・同期基準日時を記録し、正本Sheet全受付IDと窓口の対象送受信メールを照合する。
 
+2026-11-10時点の準備では、Gmail読取用OAuthを `speed-ad.com` 組織内の `spd-contact-mail-oauth-261110`（番号 `47432854912`）へ分け、Gmail APIの有効化、Internal audience、`gmail.readonly`だけの宣言を設定した。Desktop clientの作成・資格情報の登録・窓口本人のGmail同意は未確認である。Cloud Run・Firestore・Secret Managerは `abroad-o.com` 組織内の `spd-contact-viewer-20261110` に置き、同projectの請求先と月額3,000円の予算通知は設定済み。OAuth clientのprojectと資格情報を保存するSecretのprojectをそれぞれ照合し、初回Gmail読取後にOAuth側のquotaと費用を確認する。既存の予算通知はOAuth側projectを含まない。実行時の状態と受入結果は切替記録で再確認する。
+
 GASの第1段階version 7は単独で受入済み。第2段階が未配備または未設定の場合、メール欄は明示的な利用不可状態とする。第2段階の合成試験や同期の技術残件0だけで「シートやメールボックスを探さず全件確認できる」と判定しない。実環境での第2段階受入まで、現行メールボックス確認は必要。
 
 ## データの管理・削除
 
 [データ管理・削除の案内](../../../docs/ハンドブック/運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に、読取り・共有・保存先、Google側のアクセス取消し、アプリ側データの削除申請と現状の制約を記載する。
 
-認可補助ツールは「Gmail由来の照合・確認記録を案件終了後3年間保存する」方針を表示する。その実施説明 `MAIL_DATA_RETENTION_NOTICE` と削除申請先メール `MAIL_DATA_DELETION_CONTACT` が必須で、既定値は設けない。現実装には不変の案件終了日時と自動期限削除がないため、起算日と実行手段を先に用意する。対話端末で説明を読み「同意します」と入力した直後にだけGoogle同意画面を開く。非対話実行やフラグだけで同意を代行しない。
+認可補助ツールは「Gmail由来の照合・確認記録を案件終了後3年間保存する」方針を表示する。その実施説明 `MAIL_DATA_RETENTION_NOTICE` と削除申請先メール `MAIL_DATA_DELETION_CONTACT` が必須で、既定値は設けない。正本Sheetの `closed_at` と案件カタログから起算日・期限残件を扱い、期限到来分は下記の手動削除CLIで処理する。終了日時が不明の対応済み案件は残件として表示し、推定しない。自動期限削除は用意していないため、期限確認と手動削除の実施担当・頻度を運用で定める。対話端末で説明を読み「同意します」と入力した直後にだけGoogle同意画面を開く。非対話実行やフラグだけで同意を代行しない。
 
 補助ツールのCloud実行者には対象Secretだけの `secretmanager.secrets.get` と `secretmanager.versions.add` が必要。Secret値（資格情報）は読み取らず、指定したSecretのメタデータからproject IDを正式なproject number名へ解決し、その同じ親名へ保存する。返されたversionが別project・別Secretなら成功扱いにしない。保存応答不明時に自動再登録しない。
 

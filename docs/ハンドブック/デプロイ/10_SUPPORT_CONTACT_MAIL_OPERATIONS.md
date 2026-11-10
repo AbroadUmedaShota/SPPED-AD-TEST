@@ -1,6 +1,6 @@
 ---
 owner: shared-docs
-status: prepared-not-executed
+status: infrastructure-prepared-not-deployed
 last_reviewed: 2026-11-10
 ---
 
@@ -10,7 +10,14 @@ last_reviewed: 2026-11-10
 
 対象値を入力して段階ごとに実行するCLIと読戻しは[配備コマンド](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md)を参照してください。変更コマンドは既定で計画表示だけを行い、対象・操作・費用条件を照合してから実行します。
 
-この文書は準備した手順であり、実行成功の記録ではありません。2026-11-10の読取り時点では専用Cloudプロジェクトに請求先がなく、第2段階のAPI・Cloud資源は未準備でした。実行直前に状態を再照合し、対象project、region、Git SHA、GAS配備version、image digest、設定・検証結果を既存の切替・受入記録へ残します。秘密値や実メール本文は記録へ貼りません。
+この文書は配備と受入の手順です。2026-11-10時点で実行基盤の請求先・予算通知・API・Cloud資源は準備済みですが、Cloud Run配備、窓口Gmail同意、実メールの全件照合は完了していません。実行直前に状態を再照合し、対象project、region、Git SHA、GAS配備version、image digest、設定・検証結果を既存の切替・受入記録へ残します。秘密値や実メール本文は記録へ貼りません。
+
+| 用途 | 準備済みのprojectと設定 | 残る確認 |
+| --- | --- | --- |
+| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、Internal audience、宣言scopeは `gmail.readonly` のみ。請求先は紐付けていない。 | Desktop client、本人のGmail同意、適用される審査・評価または除外根拠、初回読取後のquotaと費用。 |
+| Cloud Run・Firestore・Secret Manager | `abroad-o.com` 組織の `spd-contact-viewer-20261110`。承認済み請求先、同project限定の月額3,000円予算通知、必要API、東京の保存先と専用サービスアカウントを準備済み。 | imageとCloud Run配備、数値固定のSecret version、GAS連携と実環境受入。 |
+
+OAuth clientの所属projectとSecret保存先のprojectは別に照合します。実行基盤側の予算通知はOAuth側projectを含みません。この準備状況は本番受入の完了を示さず、以後の変更と読戻しは切替記録を正本にします。
 
 ## 1. 接続前に確定すること
 
