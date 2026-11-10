@@ -15,7 +15,7 @@
 
 専用画面で「Sheet前」または「Sheet後」を選び、4欄へ入力して「JSONを取得」を押します。画面は既存の `getViewerContext` でdomain経路を確認し、`exportContactMailSheetAcceptance(options, '')` を呼びます。成功時は `{manifest,receipt}` だけを `speed-ad-sheet-before.json` または `speed-ad-sheet-after.json` としてBlobから端末へ保存し、行データを画面へ展開しません。順番の選択は固定の保存名を決めるだけで、GASへの入力には追加しません。Sheet前・後で取得したファイルはアクセス制限された一時フォルダへ分けて置き、照合後に削除します。関数は認証、入力検査の順に処理し、Cloud Run/Gmail/Driveを呼びません。
 
-入力値をURLへ付けず、一時キーをbrowser storage・console・ログへ保存しません。成功・入力不備・取得失敗のいずれでも一時キー欄を消すため、再取得時は同じ実行キーを再入力します。任意の例外文を表示せず、固定の失敗案内だけを示します。ダウンロード後のファイルは社内の管理対象として扱い、端末の不要コピーを残さない運用にします。
+入力値をURLへ付けず、一時キーをbrowser storage・console・ログへ保存しません。成功・入力不備・取得失敗のいずれでも一時キー欄を消すため、再取得時は同じ実行キーを再入力します。任意の例外文を表示せず、固定の失敗案内だけを示します。ブラウザの保存先設定によっては標準のダウンロードフォルダに置かれるため、実際の保存先を確認し、アクセス制限された一時フォルダへ移して元の不要コピーを削除します。
 
 結果は `{ok:true, manifest, receipt}` です。`manifest` はschemaVersion、source、runId、hashKeyId、startAt、cutoffAt、capturedAt、sourceComplete、errors、pages、rowsを持ちます。各行は `{caseHash, submittedAt, handledStatus, closedAt}` です。caseHashはHMAC-SHA256の `case + NUL + 受付ID`、hashKeyIdはキー自体のSHA-256です。`receipt` は既存カタログと同じ `catalogDigest`、件数 `total`、読取り回数 `readCount:2` を持ちます。
 

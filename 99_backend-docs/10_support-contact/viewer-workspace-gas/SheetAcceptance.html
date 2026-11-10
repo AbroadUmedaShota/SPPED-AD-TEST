@@ -21,7 +21,7 @@
 <body>
 <main>
   <h1>受入用Sheet取得</h1>
-  <p>正本の受付ID・受付日時・対応状態・終了日時を照合用JSONにします。Sheet前 → Gmail → App → Sheet後の順で取得してください。一時キーは取得のたびに入力し、JSONはアクセス制限された一時フォルダへ保存して照合後に削除してください。</p>
+  <p>正本の受付ID・受付日時・対応状態・終了日時を照合用JSONにします。Sheet前 → Gmail → App → Sheet後の順で取得してください。一時キーは取得のたびに入力してください。ダウンロード先を確認し、JSONをアクセス制限された一時フォルダで扱って照合後に削除してください。</p>
   <form id="capture-form" method="post" autocomplete="off" novalidate>
     <label>取得の順番<select id="capture-phase"><option value="before">Sheet前（Gmail/App取得の前）</option><option value="after">Sheet後（Gmail/App取得の後）</option></select></label>
     <label>実行ID<input id="run-id" type="text" maxlength="80" autocomplete="off" spellcheck="false" required></label>
