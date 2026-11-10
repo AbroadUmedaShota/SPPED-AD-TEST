@@ -18,6 +18,8 @@
 
 「全件確認の残件」から種類別に対象を送り、未登録の失敗メールID、関連メールの有無が未確認の受付ID、取得不能の本文・添付を特定できる。[添付取得不能の画面](evidence/phase2-residual-attachment-synthetic-chrome.png)と[未登録の失敗IDの画面](evidence/phase2-residual-failed-synthetic-chrome.png)は合成データによるChrome確認例。
 
+正本Sheet・独立したGmail列挙・app記録の照合は[独立照合CLIとmanifest契約](tools/ACCEPTANCE.md)を使う。IDをhash化した入力の完全性と双方向一致を検査し、本文・添付・確認記録の残件を返す。合成試験済みの照合器と、本番source採取・業務受入の実施を区別する。
+
 ## 公開前に必要な設定と判断
 
 1. 公式窓口本人による読取同意と、対象期間の受信・送信メールがそのメールボックスに保存されていることの確認。過去分は受付IDだけで自動確定せず、照合待ちから利用者が確定・除外する。
