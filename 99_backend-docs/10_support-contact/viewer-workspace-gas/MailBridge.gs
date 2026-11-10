@@ -65,6 +65,13 @@ function getContactMailSyncStatus(authProof) {
   return callMailService_('getSyncStatus', {}, requireViewer_(authProof));
 }
 
+function listContactMailIssues(options, authProof) {
+  var context = requireViewer_(authProof);
+  var kind = String(options && options.kind || '');
+  if (['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted'].indexOf(kind) === -1) throw new Error('残件の表示対象が不正です。');
+  return callMailService_('listMailIssues', { kind: kind, pageToken: mailString_(options && options.pageToken, 2048, true) }, context);
+}
+
 function reconcileContactMailPending(options, authProof) {
   var context = requireViewer_(authProof);
   if (context.authMode !== 'domain') throw new Error('メール再照合を実行する権限がありません。');
@@ -162,7 +169,7 @@ function mailUuid_(value) {
 
 function mailScopePayload_(options) {
   var scope = String(options && options.scope || '');
-  if (['case', 'unreviewed', 'pending'].indexOf(scope) === -1) throw new Error('メール表示対象が不正です。');
+  if (['case', 'unreviewed', 'pending', 'issues'].indexOf(scope) === -1) throw new Error('メール表示対象が不正です。');
   var payload = { scope: scope };
   if (scope === 'case') payload.caseId = mailCaseId_(options && options.caseId);
   return payload;
@@ -221,11 +228,10 @@ function callMailService_(operation, payload, context, requestId) {
       muteHttpExceptions: true, followRedirects: false, validateHttpsCertificates: true
     });
     var status = response.getResponseCode();
-    if (status === 401 || status === 403) return mailError_('MAIL_SERVICE_AUTH');
-    if (status < 200 || status >= 500) return mailError_('MAIL_SERVICE_UNAVAILABLE');
     var body = response.getContentText();
     if (body.length > 2097152) return mailError_('MAIL_INVALID_RESPONSE');
-    var result = JSON.parse(body);
+    var result;
+    try { result = JSON.parse(body); } catch (_parseError) { return mailError_(status === 401 || status === 403 ? 'MAIL_SERVICE_AUTH' : 'MAIL_SERVICE_UNAVAILABLE'); }
     if (!result || typeof result !== 'object' || typeof result.ok !== 'boolean') return mailError_('MAIL_INVALID_RESPONSE');
     if (!result.ok) return mailError_(result.error && result.error.code);
     if (status !== 200) return mailError_('MAIL_INVALID_RESPONSE');

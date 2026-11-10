@@ -6,7 +6,7 @@ import { mixedThreadDemotions } from './mixedThread.mjs';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
 const OPERATIONS = new Set(['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'getMail',
-  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending']);
+  'getAttachmentChunk', 'markReviewed', 'resolvePending', 'getSyncStatus', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending', 'listMailIssues']);
 const PAGE_SIZE = 50;
 const WORK_SIZE = 5;
 const CHUNK_SIZE = 512 * 1024;
@@ -62,7 +62,8 @@ function parseCursor(token, scopeKey) {
 
 function assertScope(record, payload) {
   const scope = payload.scope || (payload.caseId ? 'case' : 'unreviewed');
-  assertMail(['case', 'pending', 'unreviewed'].includes(scope));
+  assertMail(['case', 'pending', 'unreviewed', 'issues'].includes(scope));
+  if (scope === 'issues') assertMail(['matched', 'pending'].includes(record.matchState), 'MAIL_MAPPING_CHANGED', 409);
   if (scope === 'case') assertMail(record.matchState === 'matched' && record.caseId === caseId(payload.caseId), 'MAIL_MAPPING_CHANGED', 409);
   if (scope === 'pending') assertMail(record.matchState === 'pending', 'MAIL_MAPPING_CHANGED', 409);
   if (scope === 'unreviewed') assertMail(record.matchState === 'matched', 'MAIL_MAPPING_CHANGED', 409);
@@ -149,8 +150,17 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   }
 
   async function getMail(payload) {
-    const record = await requireRecord(payload);
-    const message = await fetchMessage(record.messageId);
+    const record = await store.getMessage(messageId(payload.messageId));
+    assertMail(record, 'MAIL_NOT_FOUND', 404);
+    assertScope(record, payload);
+    const metadataOnly = (item) => ({ message: { ...summary(item), bodyText: '', bodyAvailability: 'unavailable',
+      attachments: (item.attachments || []).map(({ partId, name, mimeType, size, availability }) => ({ partId, name, mimeType, size, availability })) } });
+    if (record.unavailable) return metadataOnly(record);
+    let message;
+    try { message = await fetchMessage(record.messageId); } catch (error) {
+      if (error.code === 'MAIL_CONTENT_UNAVAILABLE') return metadataOnly(await store.getMessage(record.messageId));
+      throw error;
+    }
     const parsed = core.inspectMime(message);
     let bodyText;
     try {
@@ -158,12 +168,71 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       await store.recordBodyObservation(record.messageId, 'verified', now().toISOString());
     } catch {
       await store.recordBodyObservation(record.messageId, 'unavailable', now().toISOString());
-      throw new MailError('MAIL_CONTENT_UNAVAILABLE', 410);
+      bodyText = '';
     }
     const latest = await requireRecord(payload);
-    return { message: { ...summary(latest), bodyText, attachments: parsed.attachments.map((item) => ({
-      partId: item.partId, name: item.name, mimeType: item.mimeType, size: item.size, inline: item.inline
+    return { message: { ...summary(latest), bodyText, bodyAvailability: latest.bodyAvailability, attachments: parsed.attachments.map((item) => ({
+      partId: item.partId, name: item.name, mimeType: item.mimeType, size: item.size, inline: item.inline,
+      availability: latest.attachments?.find((stored) => stored.partId === item.partId)?.availability || 'unverified'
     })) } };
+  }
+
+  async function listIssues(payload) {
+    const kinds = ['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted'];
+    const kind = payload.kind;
+    assertMail(kinds.includes(kind));
+    const scopeKey = `issues:${kind}`;
+    let cursor = null;
+    if (payload.pageToken) {
+      assertMail(typeof payload.pageToken === 'string' && /^[A-Za-z0-9_-]{1,2048}$/.test(payload.pageToken));
+      try { cursor = JSON.parse(Buffer.from(payload.pageToken, 'base64url').toString('utf8')); } catch { throw new MailError('MAIL_INVALID_REQUEST'); }
+      assertMail(cursor && cursor.scopeKey === scopeKey);
+    }
+    const token = (value) => Buffer.from(JSON.stringify({ scopeKey, ...value })).toString('base64url');
+    let targets;
+    let nextPageToken = '';
+    let scannedCount;
+    if (kind === 'deleted') {
+      if (cursor) assertMail(ID.test(cursor.id) && Number.isFinite(Date.parse(cursor.at)));
+      const rows = await store.listUnobservedDeletions({ cursor, limit: PAGE_SIZE + 1 });
+      const pageRows = rows.slice(0, PAGE_SIZE);
+      targets = pageRows.map((item) => ({ type: 'deleted', messageId: item.messageId, detectedAt: item.detectedAt }));
+      if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).detectedAt });
+      scannedCount = pageRows.length;
+    } else if (kind === 'coverage' || kind === 'failed') {
+      const state = await store.getSyncState();
+      let ids;
+      if (kind === 'coverage') {
+        const catalog = await store.getCatalog();
+        assertMail(catalog.complete, 'MAIL_CATALOG_INCOMPLETE', 409);
+        const covered = new Set(await store.getCoveredCaseIds());
+        ids = catalog.caseIds.filter((id) => !covered.has(id)).sort();
+      } else ids = [...new Set(state?.failedMessageIds || [])].sort();
+      const snapshot = digest({ ids, executionId: kind === 'failed' ? state?.executionId || '' : '' });
+      const offset = cursor?.offset || 0;
+      assertMail(Number.isSafeInteger(offset) && offset >= 0 && (!cursor || cursor.snapshot === snapshot), 'MAIL_MAPPING_CHANGED', 409);
+      const pageIds = ids.slice(offset, offset + PAGE_SIZE);
+      targets = await Promise.all(pageIds.map(async (id) => kind === 'coverage' ? { type: 'case', caseId: id } :
+        { type: 'message', messageId: id, message: await store.getMessage(id).then((item) => item && ['matched', 'pending'].includes(item.matchState) ? summary(item) : null) }));
+      if (kind === 'failed' && !ids.length && state?.state === 'failed') targets = [{ type: 'sync', errorCode: state.errorCode || 'MAIL_SYNC_FAILED' }];
+      if (offset + PAGE_SIZE < ids.length) nextPageToken = token({ offset: offset + PAGE_SIZE, snapshot });
+      scannedCount = pageIds.length;
+    } else {
+      if (cursor) assertMail(ID.test(cursor.id) && Number.isFinite(Date.parse(cursor.at)));
+      const rows = await store.listIndexedScope({ cutoffAt: '9999-12-31T23:59:59.999Z', cursor, limit: PAGE_SIZE + 1 });
+      const pageRows = rows.slice(0, PAGE_SIZE);
+      const filters = {
+        pending: (item) => item.matchState === 'pending', unreviewed: (item) => item.matchState === 'matched' && !item.firstReview,
+        unavailable: (item) => item.unavailable, bodyUnverified: (item) => item.bodyAvailability === 'unverified',
+        bodyUnavailable: (item) => item.bodyAvailability === 'unavailable',
+        attachmentUnverified: (item) => item.unverifiedAttachmentCount > 0, attachmentUnavailable: (item) => item.unavailableAttachmentCount > 0
+      };
+      targets = pageRows.filter((item) => ['matched', 'pending'].includes(item.matchState) && filters[kind](item))
+        .map((item) => ({ type: 'message', messageId: item.messageId, message: summary(item) }));
+      if (rows.length > PAGE_SIZE) nextPageToken = token({ id: pageRows.at(-1).messageId, at: pageRows.at(-1).internalDate });
+      scannedCount = pageRows.length;
+    }
+    return { kind, targets, scannedCount, page: { nextPageToken, pageSize: PAGE_SIZE }, sync: await syncStatus() };
   }
 
   async function attachment(payload) {
@@ -448,7 +517,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const { operation, payload, requestId } = envelope;
     if (['uploadCaseCatalog', 'advanceSync', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
     let result;
-    if (operation.startsWith('list')) result = await list(operation, payload);
+    if (operation === 'listMailIssues') result = await listIssues(payload);
+    else if (operation.startsWith('list')) result = await list(operation, payload);
     else if (operation === 'getMail') result = await getMail(payload);
     else if (operation === 'getAttachmentChunk') result = await attachment(payload);
     else if (operation === 'markReviewed' || operation === 'resolvePending') result = await write(operation, payload, actor, requestId);

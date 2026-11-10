@@ -391,6 +391,7 @@
         <button type="button" id="pendingMailButton">照合待ち</button>
         <button type="button" id="syncMailButton" hidden>メール同期</button>
         <button type="button" id="mailSyncStatusButton">同期状態を更新</button>
+        <button type="button" id="mailIssuesButton">全件確認の残件</button>
         <p class="mail-sync" id="mailSyncSummary" aria-live="polite">メール連携の状態は未取得です。</p>
       </div>
       <div class="status-summary" id="statusSummary" role="tablist" aria-label="対応ステータス"></div>
@@ -1333,6 +1334,7 @@
     const contactMailState = {
       case: { scope: 'case', serial: 0, detailSerial: 0, attachmentSerial: 0, urls: [] },
       queue: { scope: 'unreviewed', serial: 0, detailSerial: 0, attachmentSerial: 0, urls: [] },
+      issues: { serial: 0, kind: 'pending', pageToken: '', history: [], result: null },
       syncSerial: 0,
       sync: null,
       syncProgress: null,
@@ -1384,7 +1386,7 @@
     }
 
     function contactMailMatchReason(reason) {
-      return ({ trusted_current_case_id: '本文の受付IDを確認', verified_reply_ancestry: '返信元メールとの関係を確認', manual: '利用者が照合して確定', unknown_case_id: '保存先にない受付IDを含みます', unresolved_reply_parent: '返信元メールの案件が未確定です', multiple_cases: '複数の受付IDを含みます', conflicting_reply_case: '本文と返信元の案件が一致しません', quoted_case_id_only: '引用文の受付IDだけでは確定できません', untrusted_case_anchor: '本文の受付IDを自動確定できません', no_proven_case: '案件を確定する根拠がありません' })[reason] || '自動照合では確定できません';
+      return ({ trusted_current_case_id: '本文の受付IDを確認', verified_reply_ancestry: '返信元メールとの関係を確認', manual: '利用者が照合して確定', unknown_case_id: '保存先にない受付IDを含みます', unresolved_reply_parent: '返信元メールの案件が未確定です', multiple_cases: '複数の受付IDを含みます', mixed_thread: '同じスレッドに複数案件があるため照合待ちです', conflicting_reply_case: '本文と返信元の案件が一致しません', quoted_case_id_only: '引用文の受付IDだけでは確定できません', untrusted_case_anchor: '本文の受付IDを自動確定できません', no_proven_case: '案件を確定する根拠がありません' })[reason] || '自動照合では確定できません';
     }
 
     function validContactMailSummary(message) {
@@ -1394,6 +1396,18 @@
         typeof message.to === 'string' && ['sent', 'received', 'unknown'].includes(message.direction) &&
         Number.isInteger(message.attachmentCount) && message.attachmentCount >= 0 &&
         (message.firstReview == null || (typeof message.firstReview.email === 'string' && typeof message.firstReview.at === 'string'));
+    }
+
+    function validateContactMailIssues(result, kind) {
+      if (!result || result.ok !== true || result.kind !== kind || !Array.isArray(result.targets) || !result.page ||
+        result.page.pageSize !== 50 || typeof result.page.nextPageToken !== 'string' || result.targets.length > 50 ||
+        !Number.isInteger(result.scannedCount) || result.scannedCount < 0 || result.scannedCount > 50 ||
+        result.targets.some((target) => !target || !['case', 'message', 'sync', 'deleted'].includes(target.type) ||
+          (target.type === 'case' ? !/^[a-f0-9-]{36}$/.test(target.caseId) :
+            target.type === 'sync' ? typeof target.errorCode !== 'string' :
+              !/^[A-Za-z0-9_-]{1,128}$/.test(target.messageId) || (target.type === 'message' && target.message != null &&
+                (!validContactMailSummary(target.message) || target.message.messageId !== target.messageId))))) throw new Error('MAIL_INVALID_RESPONSE');
+      return result;
     }
 
     function validateContactMailList(result, scope, caseId) {
@@ -1438,6 +1452,7 @@
 
     function clearContactMailView(view) {
       const current = contactMailState[view];
+      if (view === 'queue') { ++contactMailState.issues.serial; contactMailState.issues.result = null; }
       ++current.serial;
       ++current.detailSerial;
       (current.urls || []).forEach((url) => URL.revokeObjectURL(url));
@@ -1465,7 +1480,7 @@
       const count = (key) => Number.isInteger(sync[key]) ? sync[key] : '不明';
       const coverage = Number.isInteger(sync.coverageUnverifiedCaseCount) ? `${sync.coverageUnverifiedCaseCount}件` : '未取得';
       const period = sync.state === 'not_started' ? '対象期間は同期開始時に確認' : `対象期間: ${sync.startAt ? `${formatDate(sync.startAt)}以降` : '公式窓口の全保存メール'} / 基準日時: ${formatDate(sync.cutoffAt)}`;
-      return `${labels[sync.state] || '同期状態不明'} / ${period} / 最終成功: ${formatDate(sync.lastSuccessAt)} / 照合待ち ${pending}件・取得失敗 ${failed}件・取得不能 ${unavailable}件 / 本文未検証 ${count('bodyUnverifiedCount')}件・本文取得不能 ${count('bodyUnavailableCount')}件 / 添付未検証 ${count('attachmentUnverifiedCount')}件・添付取得不能 ${count('attachmentUnavailableCount')}件 / 関連メールの有無が未確認の案件 ${coverage}${sync.remainingPages ? ' / 未取得のページあり' : ''}${sync.acceptanceReady === true ? ' / 同期・照合・取得の技術残件は0件です。実受入は別途確認してください。' : ' / 全件確認に必要な処理が残っています。'} 関連メールがない案件は受入時の照合記録で確認してください。`;
+      return `${labels[sync.state] || '同期状態不明'} / ${period} / 最終成功: ${formatDate(sync.lastSuccessAt)} / 照合待ち ${pending}件・取得失敗 ${failed}件・取得不能 ${unavailable}件 / 本文未検証 ${count('bodyUnverifiedCount')}件・本文取得不能 ${count('bodyUnavailableCount')}件 / 添付未検証 ${count('attachmentUnverifiedCount')}件・添付取得不能 ${count('attachmentUnavailableCount')}件 / 関連メールの有無が未確認の案件 ${coverage}${Number.isInteger(sync.unobservedDeletedCount) ? ` / 取得前に削除され種類未確認 ${sync.unobservedDeletedCount}件` : ''}${sync.remainingPages ? ' / 未取得のページあり' : ''}${sync.acceptanceReady === true ? ' / 同期・照合・取得の技術残件は0件です。実受入は別途確認してください。' : ' / 全件確認に必要な処理が残っています。'} 対象は「全件確認の残件」から確認できます。関連メールがない案件は受入時の照合記録で確認してください。`;
     }
 
     async function loadContactMailSyncStatus() {
@@ -1535,6 +1550,69 @@
       } finally {
         if (serial === contactMailState.syncSerial) { contactMailState.syncBusy = false; renderContactMailSyncButton(); }
       }
+    }
+
+    const contactMailIssueLabels = {
+      pending: '照合待ち', unreviewed: '未確認メール', unavailable: 'メール取得不能', bodyUnverified: '本文未検証',
+      bodyUnavailable: '本文取得不能', attachmentUnverified: '添付未検証', attachmentUnavailable: '添付取得不能',
+      failed: '同期取得失敗', coverage: '関連メールの有無が未確認の案件', deleted: '取得前に削除され種類未確認',
+    };
+
+    function openContactMailIssues(reset = true) {
+      if (document.getElementById('mailQueueModal').hidden) contactMailState.returnFocus = document.activeElement;
+      clearContactMailView('queue');
+      if (reset) Object.assign(contactMailState.issues, { pageToken: '', history: [], result: null });
+      document.getElementById('mailQueueTitle').textContent = '全件確認の残件';
+      document.getElementById('mailQueueModal').hidden = false;
+      appView.inert = true;
+      document.getElementById('mailQueueClose').focus();
+      loadContactMailIssues();
+    }
+
+    async function loadContactMailIssues() {
+      const current = contactMailState.issues;
+      const serial = ++current.serial;
+      current.result = null;
+      renderContactMailIssues('対象を確認中...');
+      try {
+        const result = contactMailResult(await callServer('listContactMailIssues', { kind: current.kind, pageToken: current.pageToken }));
+        if (serial !== current.serial) return;
+        current.result = validateContactMailIssues(result, current.kind);
+        renderContactMailIssues();
+      } catch (error) {
+        if (serial !== current.serial) return;
+        renderContactMailIssues(contactMailErrorText(error.message));
+      }
+    }
+
+    function renderContactMailIssues(message = '') {
+      const current = contactMailState.issues;
+      const result = current.result;
+      const root = contactMailRoot('queue');
+      root.innerHTML = `<label>残件の種類 <select data-mail-issue-kind>${Object.entries(contactMailIssueLabels).map(([key, label]) => `<option value="${key}" ${current.kind === key ? 'selected' : ''}>${escapeHtml(label)}</option>`).join('')}</select></label>
+        <p class="mail-sync">${escapeHtml(result ? renderContactMailSync(result.sync) : message)}</p>
+        <p>メールの残件は保存済みメールを50件ずつ調べます。このページに該当がなくても、次のページが残っている場合があります。</p>
+        <nav class="mail-navigation"><button type="button" data-mail-issue-prev ${!result || !current.history.length ? 'disabled' : ''}>前のページ</button><button type="button" data-mail-issue-next ${!result || !result.page.nextPageToken ? 'disabled' : ''}>次のページ</button><button type="button" data-mail-issue-reload>更新</button></nav>
+        ${!result ? '' : `<p role="status">このページの対象 ${result.targets.length}件（${result.scannedCount}件を照合）</p>${!result.targets.length ? '<p>このページの対象は0件です。</p>' : `<ul>${result.targets.map((target, index) => `<li>${target.type === 'case' ? `受付ID: ${escapeHtml(target.caseId)} <button type="button" data-mail-issue-case="${index}">案件を開く</button>` : target.type === 'sync' ? `同期全体: ${escapeHtml(contactMailErrorText(target.errorCode))}` : `メールID: ${escapeHtml(target.messageId)}${target.message ? ` / ${escapeHtml(contactMailText(target.message.subject || '（件名なし）'))}${target.message.caseId ? ` / 受付ID: ${escapeHtml(target.message.caseId)}` : ''} <button type="button" data-mail-issue-open="${index}">メール・該当添付を開く</button>` : `<p>${target.type === 'deleted' ? '取得前に削除されたため、メールの種類と関連案件を確認できません。' : '本文取得前に同期が失敗しました。同期の再開後にメールを確認してください。'}</p>`}`}</li>`).join('')}</ul>`}`}`;
+      root.querySelector('[data-mail-issue-kind]').addEventListener('change', (event) => {
+        Object.assign(current, { kind: event.target.value, pageToken: '', history: [] });
+        loadContactMailIssues();
+      });
+      root.querySelector('[data-mail-issue-reload]').addEventListener('click', loadContactMailIssues);
+      root.querySelector('[data-mail-issue-prev]').addEventListener('click', () => { current.pageToken = current.history.pop() || ''; loadContactMailIssues(); });
+      root.querySelector('[data-mail-issue-next]').addEventListener('click', () => { current.history.push(current.pageToken); current.pageToken = result.page.nextPageToken; loadContactMailIssues(); });
+      root.querySelectorAll('[data-mail-issue-case]').forEach((button) => button.addEventListener('click', () => {
+        const target = result.targets[Number(button.dataset.mailIssueCase)];
+        closeContactMailQueue();
+        selectSubmission(target.caseId);
+      }));
+      root.querySelectorAll('[data-mail-issue-open]').forEach((button) => button.addEventListener('click', () => {
+        const target = result.targets[Number(button.dataset.mailIssueOpen)];
+        clearContactMailView('queue');
+        Object.assign(contactMailState.queue, { scope: 'issues', messages: [target.message], sync: result.sync, page: { previousPageToken: '', nextPageToken: '' }, status: 'loaded' });
+        document.getElementById('mailQueueTitle').textContent = contactMailIssueLabels[current.kind];
+        selectContactMail('queue', 0);
+      }));
     }
 
     function openContactMailQueue(scope) {
@@ -1633,7 +1711,7 @@
       if (current.status === 'loading') { root.innerHTML = `${heading}<p class="muted" role="status">メールを読み込み中...</p>`; return; }
       if (current.status === 'failed') {
         root.innerHTML = `${heading}<p class="error" role="status">${escapeHtml(current.error)}</p><button type="button" data-mail-reload>更新</button>`;
-        root.querySelector('[data-mail-reload]').addEventListener('click', () => loadContactMailList(view));
+        root.querySelector('[data-mail-reload]').addEventListener('click', () => current.scope === 'issues' ? selectContactMail(view, current.selectedIndex) : loadContactMailList(view));
         return;
       }
       if (current.status !== 'loaded') return;
@@ -1641,6 +1719,7 @@
       const previousDisabled = current.writing || (current.selectedIndex <= 0 && !current.page.previousPageToken);
       const nextDisabled = current.writing || (current.selectedIndex >= current.messages.length - 1 && !current.page.nextPageToken);
       root.innerHTML = `${heading}
+        ${current.scope === 'issues' ? '<p><button type="button" data-mail-issues-back>残件一覧に戻る</button></p>' : ''}
         <p class="mail-sync">${escapeHtml(renderContactMailSync(current.sync))}</p>
         ${current.scope === 'pending' && viewerContext.authMode === 'domain' ? `<p><button type="button" data-mail-reconcile ${current.writing ? 'disabled' : ''}>${current.reconcilePageToken ? '照合待ちの再照合を続行' : '照合待ちを再照合'}</button> <span role="status">${escapeHtml(current.reconcileMessage || '')}</span></p>` : ''}
         <div class="mail-navigation"><button type="button" data-mail-prev ${previousDisabled ? 'disabled' : ''}>← 前のメール</button>
@@ -1652,12 +1731,14 @@
           <div class="mail-review"><span>${message.firstReview ? `最初の確認: ${escapeHtml(message.firstReview.email)} / ${escapeHtml(formatDate(message.firstReview.at))}` : '未確認'}</span>${message.matchState === 'matched' && !message.firstReview && !message.unavailable ? `<button type="button" data-mail-review ${current.writing ? 'disabled' : ''}>このメールを確認済みにする</button>` : ''}</div>
           ${message.matchState === 'pending' ? `<div class="mail-resolve"><input data-mail-case-id aria-label="紐付ける受付ID" placeholder="紐付ける受付ID" value="${escapeHtml(current.resolveCaseId || '')}" ${current.writing ? 'disabled' : ''}><input data-mail-reason aria-label="照合の理由" placeholder="照合・対象外の理由（必須）" maxlength="1000" value="${escapeHtml(current.resolveReason || '')}" ${current.writing ? 'disabled' : ''}><button type="button" data-mail-match ${current.writing ? 'disabled' : ''}>紐付けを確定</button><button type="button" data-mail-exclude ${current.writing ? 'disabled' : ''}>対象外にする</button></div>` : ''}
           <p class="error" data-mail-write-error role="status">${escapeHtml(current.writeError || '')}</p>
-          ${message.unavailable ? '<p class="error">このメールは取得不能です。全件確認の達成対象には含められません。</p>' : `<div class="mail-body">${escapeHtml(contactMailText(message.bodyText || '（本文なし）'))}</div>`}
-          ${message.attachments.map((attachment) => `<div class="mail-attachment" data-mail-part="${escapeHtml(attachment.partId)}"><strong>${escapeHtml(contactMailText(attachment.name || '添付ファイル'))}</strong> <span class="muted">${escapeHtml(attachment.mimeType)} / ${attachment.size} bytes</span><br><button type="button" data-mail-attachment="${escapeHtml(attachment.partId)}">添付を確認・取得</button><div data-mail-attachment-preview></div></div>`).join('')}`}`;
+          ${message.unavailable || message.bodyAvailability === 'unavailable' ? '<p class="error">このメールの本文は取得不能です。全件確認の達成対象には含められません。</p>' : `<div class="mail-body">${escapeHtml(contactMailText(message.bodyText || '（本文なし）'))}</div>`}
+          ${message.attachments.map((attachment) => `<div class="mail-attachment" data-mail-part="${escapeHtml(attachment.partId)}"><strong>${escapeHtml(contactMailText(attachment.name || '添付ファイル'))}</strong> <span class="muted">${escapeHtml(attachment.mimeType)} / ${attachment.size} bytes / part ${escapeHtml(attachment.partId)} / ${{ verified: '取得確認済み', unavailable: '取得不能', unverified: '未検証' }[attachment.availability] || '未検証'}</span><br><button type="button" data-mail-attachment="${escapeHtml(attachment.partId)}" ${message.unavailable ? 'disabled' : ''}>添付を確認・取得</button><div data-mail-attachment-preview></div></div>`).join('')}`}`;
+      const issuesBack = root.querySelector('[data-mail-issues-back]');
+      if (issuesBack) issuesBack.addEventListener('click', () => openContactMailIssues(false));
       root.querySelector('[data-mail-prev]').addEventListener('click', () => moveContactMail(view, -1));
       root.querySelector('[data-mail-next]').addEventListener('click', () => moveContactMail(view, 1));
       root.querySelector('[data-mail-select]').addEventListener('change', (event) => selectContactMail(view, Number(event.target.value)));
-      root.querySelector('[data-mail-reload]').addEventListener('click', () => loadContactMailList(view, { pageToken: current.pageToken }));
+      root.querySelector('[data-mail-reload]').addEventListener('click', () => current.scope === 'issues' ? selectContactMail(view, current.selectedIndex) : loadContactMailList(view, { pageToken: current.pageToken }));
       const review = root.querySelector('[data-mail-review]');
       const reconcile = root.querySelector('[data-mail-reconcile]');
       if (reconcile) reconcile.addEventListener('click', reconcileContactMailPendingFromUi);
@@ -1722,7 +1803,8 @@
         if (!validContactMailSummary(result.message) || result.message.messageId !== message.messageId) throw new Error('MAIL_INVALID_RESPONSE');
         current.writing = false;
         current.pendingWrite = null;
-        if (current.scope !== 'case') await loadContactMailList(view, { pageToken: current.pageToken });
+        if (current.scope === 'issues') openContactMailIssues(false);
+        else if (current.scope !== 'case') await loadContactMailList(view, { pageToken: current.pageToken });
         else {
           current.message = { ...message, ...result.message };
           current.messages[current.selectedIndex] = result.message;
@@ -1790,6 +1872,7 @@
       contactMailState.sync = null;
       contactMailState.syncProgress = null;
       contactMailState.syncBusy = false;
+      Object.assign(contactMailState.issues, { pageToken: '', history: [], result: null });
       clearContactMailView('case');
       closeContactMailQueue();
       document.getElementById('mailSyncSummary').textContent = '';
@@ -1842,6 +1925,7 @@
       document.getElementById('mailSyncStatusButton').addEventListener('click', loadContactMailSyncStatus);
       document.getElementById('unreviewedMailButton').addEventListener('click', () => openContactMailQueue('unreviewed'));
       document.getElementById('pendingMailButton').addEventListener('click', () => openContactMailQueue('pending'));
+      document.getElementById('mailIssuesButton').addEventListener('click', () => openContactMailIssues());
       document.getElementById('mailQueueClose').addEventListener('click', closeContactMailQueue);
     }
 

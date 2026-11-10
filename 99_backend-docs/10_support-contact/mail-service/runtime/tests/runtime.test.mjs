@@ -425,7 +425,6 @@ test('HTTP authenticates before dispatch and never echoes arbitrary failures', a
   assert.ok(!JSON.stringify(logs).includes('Gmail body')); assert.ok(!JSON.stringify(logs).includes('Bearer'));
 });
 
-
 test('later manual conflicts withdraw inherited links in either case order and preserve explicit decisions', async () => {
   for (const [firstCase, secondCase] of [[A, B], [B, A]]) {
     const f = fixture();
@@ -478,4 +477,57 @@ test('new indexed case evidence withdraws older auto links and reindex preserves
     assert.equal((await f.store.getMessage('excluded')).matchState, 'excluded');
     assert.ok(f.store.events.some((event) => event.messageId === 'reply' && event.next.matchState === 'pending'));
   }
+});
+
+test('residual list pages identify unindexed failures, unavailable attachments and uncovered cases', async () => {
+  const f = fixture(Array.from({ length: 121 }, (_, i) => `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`));
+  for (let i = 0; i < 123; i++) f.store.seed(record(`issue-${String(i).padStart(4, '0')}`, {
+    matchState: 'pending', caseId: null, unavailable: i % 2 === 0, bodyAvailability: 'unavailable',
+    unavailableAttachmentCount: 1, attachmentCount: 1,
+    attachments: [{ partId: '0.1', name: 'missing.pdf', mimeType: 'application/pdf', size: 12, availability: 'unavailable' }]
+  }));
+  const failedIds = Array.from({ length: 121 }, (_, i) => `unindexed-${i}`);
+  const lease = await f.store.acquireSyncLease('test');
+  await f.store.setSyncState({ state: 'failed', executionId: 'run', failedMessageIds: failedIds, failedCount: failedIds.length }, lease);
+  await f.store.releaseSyncLease(lease);
+  for (const [kind, expected] of [['pending', 123], ['unavailable', 62], ['bodyUnavailable', 123], ['attachmentUnavailable', 123], ['failed', 121], ['coverage', 121]]) {
+    const targets = []; let pageToken = ''; let pages = 0;
+    do {
+      const result = await f.execute(f.envelope('listMailIssues', { kind, pageToken }));
+      assert.ok(result.scannedCount <= 50 && result.targets.length <= 50);
+      targets.push(...result.targets); pageToken = result.page.nextPageToken; pages++;
+    } while (pageToken);
+    assert.equal(targets.length, expected, kind);
+    assert.equal(new Set(targets.map((item) => item.messageId || item.caseId)).size, expected, kind);
+    assert.equal(pages, 3, kind);
+    if (kind === 'failed') assert.ok(targets.every((item) => item.message === null));
+  }
+  const first = await f.execute(f.envelope('listMailIssues', { kind: 'pending' }));
+  await assert.rejects(() => f.execute(f.envelope('listMailIssues', { kind: 'failed', pageToken: first.page.nextPageToken })), { code: 'MAIL_INVALID_REQUEST' });
+});
+
+test('residual deletion diagnostics are reachable beyond the first 50 IDs', async () => {
+  const f = fixture();
+  const rows = Array.from({ length: 111 }, (_, i) => ({ messageId: `deleted-${String(i).padStart(3, '0')}`, detectedAt: NOW })).reverse();
+  f.store.listUnobservedDeletions = async ({ cursor, limit }) => rows.filter((row) => !cursor || row.messageId < cursor.id).slice(0, limit);
+  let pageToken = ''; const ids = [];
+  do {
+    const result = await f.execute(f.envelope('listMailIssues', { kind: 'deleted', pageToken }));
+    ids.push(...result.targets.map((item) => item.messageId)); pageToken = result.page.nextPageToken;
+  } while (pageToken);
+  assert.equal(ids.length, 111); assert.equal(new Set(ids).size, 111);
+});
+
+test('unavailable mail retains safe metadata and attachment targets in issue detail', async () => {
+  const f = fixture();
+  f.store.seed(record('gone', { unavailable: true, attachments: [{ partId: '0.2', name: 'missing.pdf', mimeType: 'application/pdf', size: 25, availability: 'unavailable' }] }));
+  const gone = await f.execute(f.envelope('getMail', { scope: 'issues', messageId: 'gone' }));
+  assert.equal(gone.message.bodyAvailability, 'unavailable');
+  assert.equal(gone.message.attachments[0].partId, '0.2');
+  assert.equal(gone.message.attachments[0].availability, 'unavailable');
+  assert.equal(f.calls.length, 0);
+  const broken = gmailMessage('broken'); broken.payload.parts[0].body.data = '!invalid';
+  f.messages.set('broken', broken); f.store.seed(record('broken'));
+  const detail = await f.execute(f.envelope('getMail', { scope: 'issues', messageId: 'broken' }));
+  assert.equal(detail.message.bodyAvailability, 'unavailable'); assert.equal(detail.message.bodyText, '');
 });

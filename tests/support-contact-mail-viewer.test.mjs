@@ -11,7 +11,7 @@ const caseId = '11111111-1111-4111-8111-111111111111';
 
 test('mail service exposes only the authenticated business RPC surface', () => {
   const actual = [...bridge.matchAll(/^function ([a-zA-Z0-9_]+)\(/gm)].map((match) => match[1]).filter((name) => !name.endsWith('_')).sort();
-  assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync'].sort());
+  assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
 function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, url = 'https://contact-mail-example.a.run.app' } = {}) {
@@ -45,7 +45,7 @@ test('every mail RPC authorizes before Sheet or service access', () => {
     ['getContactMailAttachmentChunk', [{ scope: 'case', caseId, messageId: 'mail1', partId: '0.1', offset: 0 }]],
     ['markContactMailReviewed', [{ scope: 'case', caseId, messageId: 'mail1', expectedVersion: 1 }]],
     ['resolveContactMailPending', [{ messageId: 'mail1', action: 'match', caseId, expectedVersion: 1, reason: '受付IDを確認' }]],
-    ['getContactMailSyncStatus', []], ['advanceContactMailSync', [{}]], ['reconcileContactMailPending', [{}]],
+    ['getContactMailSyncStatus', []], ['advanceContactMailSync', [{}]], ['reconcileContactMailPending', [{}]], ['listContactMailIssues', [{ kind: 'failed' }]],
   ]) assert.throws(() => app.api[name](...args), /権限/);
   assert.equal(app.calls.length, 0);
   assert.equal(app.reads.length, 0);
@@ -111,6 +111,25 @@ test('service errors expose fixed codes without upstream bodies or secrets', () 
   assert.equal(app.api.getContactMailSyncStatus().error.code, 'MAIL_SERVICE_UNAVAILABLE');
   app.respond(() => ({ body: { ok: false, error: { code: 'token=secret' } } }));
   assert.equal(app.api.getContactMailSyncStatus().error.code, 'MAIL_SERVICE_UNAVAILABLE');
+});
+
+test('mail bridge retains allowlisted runtime 403 errors but hides IAM response bodies', () => {
+  const app = bridgeRuntime();
+  for (const code of ['MAIL_SCOPE_MISMATCH', 'MAIL_MAILBOX_MISMATCH', 'MAIL_FORBIDDEN']) {
+    app.respond(() => ({ status: 403, body: { ok: false, error: { code, message: 'token=private' } } }));
+    assert.deepEqual(JSON.parse(JSON.stringify(app.api.getContactMailSyncStatus())), { ok: false, error: { code } });
+  }
+  app.respond(() => ({ status: 403, raw: '<html>private IAM explanation</html>' }));
+  assert.equal(app.api.getContactMailSyncStatus().error.code, 'MAIL_SERVICE_AUTH');
+});
+
+test('residual RPC validates kind and uses only verified actor', () => {
+  const app = bridgeRuntime();
+  app.api.listContactMailIssues({ kind: 'attachmentUnavailable', pageToken: 'next', actor: 'spoof' });
+  assert.equal(app.calls[0].envelope.operation, 'listMailIssues');
+  assert.deepEqual(app.calls[0].envelope.payload, { kind: 'attachmentUnavailable', pageToken: 'next' });
+  assert.equal(app.calls[0].envelope.actor.email, 'reader@abroad-o.com');
+  assert.throws(() => app.api.listContactMailIssues({ kind: 'allSecretData' }), /表示対象/);
 });
 
 test('catalog is authoritative, stable and bounded beyond 200 cases', () => {
@@ -344,4 +363,41 @@ test('pending re-evaluation is explicit, bounded and domain-only', async () => {
   assert.match(app.mail.queue.reconcileMessage, /50件/);
   const bridgeApp = bridgeRuntime({ actor: { email: 'customer@speed-ad.com', authMode: 'google-oauth' } });
   assert.throws(() => bridgeApp.api.reconcileContactMailPending({}), /権限/);
+});
+
+test('residual UI pages empty scans and identifies unindexed failures without leaking markup', async () => {
+  const app = uiRuntime({ listContactMailIssues: (options) => ({ ok: true, kind: options.kind,
+    targets: options.pageToken ? [{ type: 'message', messageId: 'before-index', message: null }] : [],
+    scannedCount: 50, page: { pageSize: 50, nextPageToken: options.pageToken ? '' : 'next' }, sync }) });
+  app.mail.issues.kind = 'failed';
+  await app.ui.loadContactMailIssues();
+  assert.match(app.element('mailQueueContent').innerHTML, /このページの対象は0件/);
+  app.element('mailQueueContent:[data-mail-issue-next]').listeners.get('click')();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.match(app.element('mailQueueContent').innerHTML, /before-index/);
+  assert.match(app.element('mailQueueContent').innerHTML, /本文取得前に同期が失敗/);
+  assert.deepEqual(Array.from(app.mail.issues.history), ['']);
+  app.element('mailQueueContent:[data-mail-issue-prev]').listeners.get('click')();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(app.mail.issues.pageToken, '');
+  assert.throws(() => app.ui.validateContactMailIssues({ ok: true, kind: 'failed', targets: [{ type: 'message', messageId: '<script>' }], scannedCount: 1, page: { pageSize: 50, nextPageToken: '' } }, 'failed'), /MAIL_INVALID_RESPONSE/);
+});
+
+test('residual detail identifies unavailable attachment parts and auth loss invalidates late residuals', async () => {
+  const app = uiRuntime({ getContactMailMessage: () => ({ ok: true, message: detail('missing', {
+    unavailable: true, bodyAvailability: 'unavailable', attachments: [{ partId: '0.2', name: '<bad>.pdf', mimeType: 'application/pdf', size: 20, availability: 'unavailable' }]
+  }) }) });
+  Object.assign(app.mail.queue, { scope: 'issues', messages: [summary('missing')], page: { previousPageToken: '', nextPageToken: '' }, status: 'loaded' });
+  await app.ui.selectContactMail('queue', 0);
+  assert.match(app.element('mailQueueContent').innerHTML, /part 0.2 \/ 取得不能/);
+  assert.match(app.element('mailQueueContent').innerHTML, /&lt;bad&gt;.pdf/);
+  assert.match(app.element('mailQueueContent').innerHTML, /残件一覧に戻る/);
+  assert.match(app.element('mailQueueContent').innerHTML, /data-mail-attachment="0.2" disabled/);
+  let release;
+  const late = uiRuntime({ listContactMailIssues: () => new Promise((resolve) => { release = resolve; }) });
+  const waiting = late.ui.loadContactMailIssues(); await Promise.resolve();
+  late.ui.showDenied('認証失効');
+  release({ ok: true, kind: 'pending', targets: [{ type: 'message', messageId: 'private', message: summary('private') }], scannedCount: 1, page: { pageSize: 50, nextPageToken: '' }, sync });
+  await waiting;
+  assert.equal(late.element('mailQueueContent').innerHTML, '');
 });
