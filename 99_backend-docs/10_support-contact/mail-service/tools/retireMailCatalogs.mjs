@@ -39,17 +39,19 @@ export async function runCatalogRetirementCli(args, { createDatabase, createPage
   }
 }
 
+export async function createCatalogRetirementPager(projectId, databaseId) {
+  const { default: firestore } = await import('@google-cloud/firestore');
+  const client = new firestore.v1.FirestoreClient();
+  return { listCatalogPage: createCatalogDocumentPager({ client, projectId, databaseId }), close: () => client.close() };
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   runCatalogRetirementCli(process.argv.slice(2), {
     createDatabase: async (projectId, databaseId) => {
       const { Firestore } = await import('@google-cloud/firestore');
       return new Firestore({ projectId, databaseId, ignoreUndefinedProperties: true });
     },
-    createPager: async (projectId, databaseId) => {
-      const { v1 } = await import('@google-cloud/firestore');
-      const client = new v1.FirestoreClient();
-      return { listCatalogPage: createCatalogDocumentPager({ client, projectId, databaseId }), close: () => client.close() };
-    }
+    createPager: createCatalogRetirementPager
   }).catch((error) => {
     const code = /^MAIL_[A-Z_]+$/.test(error?.code || error?.message || '') ? error.code || error.message : 'MAIL_CATALOG_RETIRE_FAILED';
     process.stderr.write(`${code}\n`);

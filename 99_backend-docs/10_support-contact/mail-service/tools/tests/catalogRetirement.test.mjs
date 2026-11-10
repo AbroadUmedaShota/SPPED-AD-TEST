@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createCatalogRetirement, createCatalogDocumentPager } from '../catalogRetirement.mjs';
-import { parseCatalogRetirementArguments, runCatalogRetirementCli } from '../retireMailCatalogs.mjs';
+import { createCatalogRetirementPager, parseCatalogRetirementArguments, runCatalogRetirementCli } from '../retireMailCatalogs.mjs';
 import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
 import { createPurgeGate, suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createFirestoreStore } from '../../runtime/firestoreStore.mjs';
@@ -12,6 +12,16 @@ const ROOT = 'contactMailboxes/customer-speed-ad';
 const path = (id) => `${ROOT}/catalogSnapshots/${id}`;
 const NOW = '2026-11-11T00:00:00.000Z';
 const row = { caseId: '00000000-0000-0000-0000-000000000001', handledStatus: '未対応', closedAt: null };
+
+test('production pager constructs and closes the installed Firestore v1 client without connecting', async () => {
+  const pager = await createCatalogRetirementPager('test-project', '(default)');
+  try {
+    assert.equal(typeof pager.listCatalogPage, 'function');
+  } finally {
+    await pager.close();
+  }
+});
+
 function fixture(extra = {}) {
   const digest = catalogDigest([row]);
   const db = memoryFirestore({
