@@ -85,6 +85,18 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
       'MAIL_INVALID_UPSTREAM', 502);
       return { messageIds: (result.messages || []).map((item) => item.id), nextPageToken: result.nextPageToken ?? null };
     },
+    async getMessageMetadata(id) {
+      // The field mask omits headers, snippet, payload and raw data. Unlike the
+      // metadata format, full supports the internalDate needed for scope checks.
+      const result = await read(`messages/${encodeURIComponent(id)}`, { format: 'full', fields: 'id,labelIds,internalDate' });
+      assertMail(result && typeof result === 'object' && !Array.isArray(result) && result.id === id &&
+        Object.keys(result).every((key) => ['id', 'labelIds', 'internalDate'].includes(key)) &&
+        (result.labelIds === undefined || Array.isArray(result.labelIds) && result.labelIds.every((label) => typeof label === 'string')) &&
+        typeof result.internalDate === 'string' && /^\d+$/.test(result.internalDate) &&
+        Number.isSafeInteger(Number(result.internalDate)) && Number.isFinite(new Date(Number(result.internalDate)).getTime()),
+      'MAIL_INVALID_UPSTREAM', 502);
+      return result;
+    },
     async getMessage(id) { return read(`messages/${encodeURIComponent(id)}`, { format: 'full' }); },
     async getAttachment(id, attachmentId, { cache = true } = {}) {
       if (!cache) return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`);

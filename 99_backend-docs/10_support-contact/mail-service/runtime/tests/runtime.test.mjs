@@ -12,6 +12,7 @@ import { createFirestoreStore } from '../firestoreStore.mjs';
 import { fakeStore } from './fakeStore.mjs';
 import { memoryFirestore } from './memoryFirestore.mjs';
 import { retentionPolicy } from '../caseRetention.mjs';
+import { suppressionKey } from '../purgeGate.mjs';
 
 const coreRoot = process.env.MAIL_CORE_DIR ? pathToFileURL(`${resolve(process.env.MAIL_CORE_DIR)}/`) : new URL('../../', import.meta.url);
 const modules = await Promise.all(['classification', 'mime', 'review', 'safeMail'].map((name) => import(new URL(`${name}.mjs`, coreRoot))));
@@ -41,8 +42,15 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   const store = fakeStore(ids, { state: 'not_started', startAt: START });
   const messages = new Map();
   const calls = [];
+  const metadataCalls = [];
   const gmail = {
     async getProfile() { return { emailAddress: 'customer@speed-ad.com', historyId: '100' }; },
+    async getMessageMetadata(id) {
+      metadataCalls.push(id);
+      if (!messages.has(id)) throw new MailError('MAIL_CONTENT_UNAVAILABLE', 410);
+      const { internalDate, labelIds } = messages.get(id);
+      return structuredClone({ id, internalDate, labelIds });
+    },
     async getMessage(id) { calls.push(id); if (!messages.has(id)) throw new MailError('MAIL_CONTENT_UNAVAILABLE', 410); return structuredClone(messages.get(id)); },
     async getAttachment() { throw new Error('unexpected external attachment'); },
     async listMessages() { return { messageIds: [...messages.keys()] }; },
@@ -52,7 +60,7 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation,
     requestId: randomUUID(), issuedAt: now().toISOString(), actor,
     payload: operation === 'advanceSync' && payload.mode ? { startAt: START, ...payload } : payload, ...changes });
-  return { store, messages, calls, gmail, execute, envelope };
+  return { store, messages, calls, metadataCalls, gmail, execute, envelope };
 }
 
 test('suppressed original Gmail IDs are never fetched or restored by full or history sync', async () => {
@@ -471,6 +479,50 @@ test('history retains the original period and direction comes from Gmail SENT la
   assert.equal((await f.store.getMessage('spoofed')).direction, 'received');
 });
 
+test('history filters old label changes and draft edits before requesting body or attachment data', async () => {
+  const f = fixture([A]);
+  const run = randomUUID();
+  await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  const file = { name: 'private.txt', bytes: Buffer.from('private attachment') };
+  const old = gmailMessage('old-label-change', 'private old body', [], file);
+  old.internalDate = String(Date.parse(START) - 1); old.labelIds = ['STARRED'];
+  const draft = gmailMessage('draft-edit', 'private unsent body', [], file); draft.labelIds = ['DRAFT'];
+  const eligible = gmailMessage('eligible', `受付ID: ${A}`);
+  f.messages.set(old.id, old); f.messages.set(draft.id, draft); f.messages.set(eligible.id, eligible);
+  let attachmentCalls = 0;
+  f.gmail.getAttachment = async () => { attachmentCalls++; throw new Error('unexpected attachment fetch'); };
+  f.gmail.listHistory = async () => ({ messageIds: [old.id, draft.id, eligible.id], historyId: '200' });
+  const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.equal(result.sync.state, 'complete');
+  assert.deepEqual(f.metadataCalls, [old.id, draft.id, eligible.id]);
+  assert.deepEqual(f.calls, [eligible.id]);
+  assert.equal(attachmentCalls, 0);
+  assert.equal(await f.store.getMessage(old.id), null);
+  assert.equal(await f.store.getMessage(draft.id), null);
+  assert.deepEqual(f.store.suppressedMessages.get(suppressionKey('message', draft.id)), { version: 1 });
+  assert.equal(f.store.records.has(draft.id), false);
+  assert.equal((await f.store.getMessage(eligible.id)).bodyAvailability, 'verified');
+});
+
+test('full sync filters period boundaries and rejects invalid metadata before full-message retrieval', async () => {
+  const f = fixture([A]);
+  const old = gmailMessage('before-start'); old.internalDate = String(Date.parse(START) - 1);
+  const future = gmailMessage('after-cutoff'); future.internalDate = String(Date.parse(NOW) + 1);
+  const boundary = gmailMessage('at-start'); boundary.internalDate = String(Date.parse(START));
+  f.messages.set(old.id, old); f.messages.set(future.id, future); f.messages.set(boundary.id, boundary);
+  await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' }));
+  assert.deepEqual(f.calls, [boundary.id]);
+  const state = await f.store.getSyncState();
+  await f.execute(f.envelope('advanceSync', { executionId: state.executionId }));
+  const metadata = f.gmail.getMessageMetadata.bind(f.gmail);
+  f.gmail.getMessageMetadata = async (id) => ({ ...(await metadata(id)), internalDate: undefined });
+  const before = f.calls.length;
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' })), { code: 'MAIL_INVALID_UPSTREAM' });
+  assert.equal(f.calls.length, before);
+  assert.equal((await f.store.getSyncState()).state, 'failed');
+});
+
 test('history cutoff survives delayed processing and resume while the next run captures interim arrivals', async () => {
   let time = Date.parse(NOW);
   const f = fixture([A], () => new Date(time));
@@ -554,12 +606,40 @@ test('failed sync requires explicit resume and keeps the failing target', async 
   const executionId = randomUUID();
   await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, mode: 'full' })), { code: 'MAIL_UPSTREAM_TIMEOUT' });
   const status = await f.execute(f.envelope('getSyncStatus'));
-  assert.equal(status.sync.state, 'failed'); assert.deepEqual(status.sync.failedMessageIds, ['m1']);
+  assert.equal(status.sync.state, 'failed'); assert.equal(status.sync.failedCount, 1);
+  assert.equal(Object.hasOwn(status.sync, 'failedMessageIds'), false);
+  assert.equal((await f.execute(f.envelope('listMailIssues', { kind: 'failed' }))).targets[0].messageId, 'm1');
   await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId })), { code: 'MAIL_FULL_SYNC_REQUIRED' });
   fail = false;
   await f.execute(f.envelope('advanceSync', { executionId, resume: true }));
   const result = await f.execute(f.envelope('advanceSync', { executionId }));
   assert.equal(result.sync.enumerationComplete, true);
+});
+
+test('a draft failure target is not copied into reconciliation receipts and disappears after resume', async () => {
+  const f = fixture([A]);
+  const id = 'draft-before-classification';
+  const draft = gmailMessage(id, 'private unsent'); draft.labelIds = ['DRAFT']; f.messages.set(id, draft);
+  const metadata = f.gmail.getMessageMetadata;
+  f.gmail.getMessageMetadata = async () => { throw new MailError('MAIL_UPSTREAM_TIMEOUT', 504); };
+  const executionId = randomUUID();
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, mode: 'full' })), { code: 'MAIL_UPSTREAM_TIMEOUT' });
+  assert.deepEqual((await f.store.getSyncState()).failedMessageIds, [id]);
+  const reconciliation = f.envelope('reconcilePending');
+  const result = await f.execute(reconciliation);
+  assert.equal(result.sync.failedCount, 1);
+  assert.equal(Object.hasOwn(result.sync, 'failedMessageIds'), false);
+  assert.equal(JSON.stringify([...f.store.receipts]).includes(id), false);
+  f.gmail.getMessageMetadata = metadata;
+  await f.execute(f.envelope('advanceSync', { executionId, resume: true }));
+  await f.execute(f.envelope('advanceSync', { executionId }));
+  const state = await f.store.getSyncState();
+  assert.equal(state.state, 'complete'); assert.equal(state.inFlightPage, null);
+  assert.deepEqual(state.failedMessageIds, []);
+  const persisted = { records: [...f.store.records], receipts: [...f.store.receipts], events: f.store.events,
+    markers: [...f.store.suppressedMessages], state, deletions: await f.store.listUnobservedDeletions({ limit: 50 }) };
+  assert.equal(JSON.stringify(persisted).includes(id), false);
+  assert.equal(f.calls.length, 0);
 });
 
 test('body failure cannot inherit a matched parent and incomplete history stays incomplete', async () => {
@@ -585,6 +665,7 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
     createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
       async getTokenInfo() { return { scopes: ['https://www.googleapis.com/auth/gmail.readonly'] }; } }),
     fetchImpl: async (url, options) => { calls.push({ url: String(url), options }); return { ok: true, async json() {
+      if (new URL(url).searchParams.has('fields')) return { id: 'a', labelIds: [], internalDate: String(Date.parse(NOW)) };
       return String(url).endsWith('/profile') ? { emailAddress: 'customer@speed-ad.com', historyId: '3' } : { messages: [{ id: 'a' }], nextPageToken: 'next' };
     } }; }
   });
@@ -595,6 +676,33 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
   assert.equal(calls.length, 2); assert.ok(calls[1].url.includes('includeSpamTrash=true'));
   assert.ok(new URL(calls[1].url).searchParams.get('q').includes('-in:drafts'));
   assert.ok(calls[1].url.includes('pageToken=page2')); assert.equal(calls[1].options.redirect, 'error');
+  const metadata = await adapter.getMessageMetadata('a');
+  assert.deepEqual(metadata, { id: 'a', labelIds: [], internalDate: String(Date.parse(NOW)) });
+  const metadataUrl = new URL(calls[2].url);
+  assert.equal(metadataUrl.searchParams.get('format'), 'full');
+  assert.equal(metadataUrl.searchParams.get('fields'), 'id,labelIds,internalDate');
+  assert.deepEqual([...metadataUrl.searchParams.keys()].sort(), ['fields', 'format']);
+});
+
+test('Gmail scope prefilter rejects malformed or overbroad partial responses', async () => {
+  const valid = { id: 'm1', labelIds: ['INBOX'], internalDate: String(Date.parse(NOW)) };
+  let response = valid;
+  const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
+    secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
+    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
+      async getTokenInfo() { return { scopes: ['https://www.googleapis.com/auth/gmail.readonly'] }; } }),
+    fetchImpl: async (url) => ({ ok: true, async json() {
+      return String(url).endsWith('/profile') ? { emailAddress: 'customer@speed-ad.com' } : response;
+    } })
+  });
+  for (const invalid of [null, [], { ...valid, id: 'other' }, { ...valid, labelIds: 'DRAFT' },
+    { ...valid, internalDate: undefined }, { ...valid, internalDate: 'invalid' },
+    { ...valid, payload: {} }, { ...valid, snippet: 'private content' }]) {
+    response = invalid;
+    await assert.rejects(() => adapter.getMessageMetadata('m1'), { code: 'MAIL_INVALID_UPSTREAM' });
+  }
+  response = valid;
+  assert.deepEqual(await adapter.getMessageMetadata('m1'), valid);
 });
 
 test('drafts stay outside mail queues through full sync, edit, delete and send history', async () => {
@@ -606,35 +714,86 @@ test('drafts stay outside mail queues through full sync, edit, delete and send h
   const run = randomUUID();
   await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
   await f.execute(f.envelope('advanceSync', { executionId: run }));
-  assert.equal((await f.store.getMessage('draft-1')).sourceKind, 'draft');
-  assert.equal((await f.store.getMessage('draft-1')).matchState, 'excluded');
+  assert.equal(await f.store.getMessage('draft-1'), null);
+  assert.deepEqual(f.store.suppressedMessages.get(suppressionKey('message', 'draft-1')), { version: 1 });
   assert.equal((await f.execute(f.envelope('listCaseMail', { caseId: A }))).messages.some((item) => item.messageId === 'draft-1'), false);
   const edit = gmailMessage('draft-2', 'edited reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]);
   edit.labelIds = ['DRAFT']; f.messages.delete('draft-1'); f.messages.set('draft-2', edit);
-  f.gmail.listHistory = async () => ({ messageIds: ['draft-2'], deletedIds: ['draft-1'], historyId: '201' });
-  let result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  f.gmail.listHistory = async ({ pageToken }) => pageToken ?
+    { messageIds: ['sent-1'], deletedIds: ['draft-2'], historyId: '202' } :
+    { messageIds: ['draft-2'], deletedIds: ['draft-1'], nextPageToken: 'draft-page-2', historyId: '201' };
+  const historyRun = randomUUID();
+  const firstPage = f.envelope('advanceSync', { executionId: historyRun, mode: 'history' });
+  let result = await f.execute(firstPage);
+  assert.equal(result.sync.state, 'running');
+  assert.deepEqual(await f.execute(firstPage), result);
   assert.equal(result.sync.unobservedDeletedCount, 0);
-  assert.equal((await f.store.getMessage('draft-1')).unavailable, false);
+  assert.equal(await f.store.getMessage('draft-1'), null);
   f.messages.delete('draft-2');
   const sent = gmailMessage('sent-1', 'sent reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]);
   sent.labelIds = ['SENT']; f.messages.set('sent-1', sent);
-  f.gmail.listHistory = async () => ({ messageIds: ['sent-1', 'sent-1'], deletedIds: ['draft-2'], historyId: '202' });
-  result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  result = await f.execute(f.envelope('advanceSync', { executionId: historyRun }));
   assert.equal(result.sync.unavailableCount, 0);
   assert.equal(result.sync.unobservedDeletedCount, 0);
   assert.equal((await f.store.getMessage('sent-1')).direction, 'sent');
   assert.equal(f.calls.filter((id) => id === 'sent-1').length, 1);
-  assert.equal((await f.store.getMessage('draft-2')).unavailable, false);
+  assert.equal(await f.store.getMessage('draft-2'), null);
+  assert.equal(f.store.records.has('draft-1'), false);
+  assert.equal(f.store.records.has('draft-2'), false);
+  assert.deepEqual([...f.store.suppressedMessages.values()], [{ version: 1 }, { version: 1 }]);
+  assert.equal(f.calls.some((id) => id.startsWith('draft-')), false);
   assert.equal((await f.execute(f.envelope('listUnreviewedMail'))).messages.filter((item) => item.messageId === 'sent-1').length, 1);
 });
 
 test('draft guard clears stale mapped rows and never exposes draft bodies or attachments', async () => {
   const f = fixture([A]); const draft = gmailMessage('old-draft', 'private unsent text'); draft.labelIds = ['DRAFT'];
-  f.messages.set('old-draft', draft); f.store.seed(record('old-draft'));
+  const firstReview = { email: actor.email, at: NOW };
+  f.messages.set('old-draft', draft); f.store.seed(record('old-draft', { firstReview }));
   await assert.rejects(() => f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'old-draft' })), { code: 'MAIL_MAPPING_CHANGED' });
-  assert.equal((await f.store.getMessage('old-draft')).matchState, 'excluded');
+  const saved = await f.store.getMessage('old-draft');
+  assert.equal(saved.matchState, 'pending');
+  assert.equal(saved.caseId, null); assert.equal(saved.reason, 'current_draft_conflict');
+  assert.deepEqual(saved.firstReview, firstReview);
+  assert.equal(f.calls.length, 0);
+  assert.equal((await f.store.getCoveredCaseIds()).length, 0);
+  assert.equal(f.store.events.at(-1).reason, 'current_draft_conflict');
   assert.equal((await f.store.countMessages()).unreviewed, 0);
-  assert.equal((await f.store.countMessages()).unavailable, 0);
+  assert.equal((await f.store.countMessages()).unavailable, 1);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  assert.equal((await f.store.getMessage('old-draft')).reason, 'current_draft_conflict');
+  assert.equal(f.calls.length, 0);
+});
+
+test('a manual exclusion of a draft conflict keeps its retention anchor and audit through later draft observations', async () => {
+  const f = fixture([A]); const id = 'excluded-draft-conflict';
+  const draft = gmailMessage(id, 'unsent'); draft.labelIds = ['DRAFT']; f.messages.set(id, draft);
+  const firstReview = { email: actor.email, at: NOW };
+  f.store.seed(record(id, { firstReview }));
+  await assert.rejects(() => f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: id })), { code: 'MAIL_MAPPING_CHANGED' });
+  const conflict = await f.store.getMessage(id);
+  await f.execute(f.envelope('resolvePending', { messageId: id, expectedVersion: conflict.version,
+    action: 'exclude', reason: '下書きと確認したため対象外' }));
+  const excluded = await f.store.getMessage(id);
+  assert.equal(excluded.matchState, 'excluded'); assert.equal(excluded.excludedAt, NOW);
+  assert.equal(excluded.manualClassification, true); assert.deepEqual(excluded.firstReview, firstReview);
+  const events = structuredClone(f.store.events);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  f.gmail.listHistory = async () => ({ messageIds: [id], draftIds: [id], historyId: '201' });
+  await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.deepEqual(await f.store.getMessage(id), excluded);
+  assert.deepEqual(f.store.events, events);
+  assert.equal(await f.store.isMessageSuppressed(id), false);
+  assert.equal(f.calls.length, 0);
+
+  const root = 'contactMailboxes/customer-speed-ad';
+  const db = memoryFirestore({ [`${root}/messages/${id}`]: excluded });
+  const store = createFirestoreStore(db);
+  await store.excludeDraft(id, NOW);
+  await store.excludeDraft(id, NOW, { current: false });
+  assert.deepEqual(db.records.get(`${root}/messages/${id}`), excluded);
+  assert.equal([...db.records.keys()].some((path) => path.startsWith(`${root}/events/`)), false);
+  assert.equal([...db.records.keys()].some((path) => path.startsWith(`${root}/suppressedMessages/`)), false);
 });
 
 test('historical draft evidence never erases a current sent message classification', async () => {
@@ -649,6 +808,61 @@ test('historical draft evidence never erases a current sent message classificati
   const saved = await f.store.getMessage('sent');
   assert.equal(saved.matchState, 'matched'); assert.equal(saved.caseId, A); assert.equal(saved.version, 4);
   assert.deepEqual(saved.firstReview, firstReview); assert.equal(saved.direction, 'sent');
+});
+
+test('discarded drafts leave only a hash and never become unknown deletion diagnostics', async () => {
+  const f = fixture([A]);
+  const draft = gmailMessage('discarded-draft', 'never sent'); draft.labelIds = ['DRAFT'];
+  f.messages.set(draft.id, draft);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  f.messages.delete(draft.id);
+  f.gmail.listHistory = async () => ({ messageIds: [], deletedIds: [draft.id], draftIds: [draft.id], historyId: '201' });
+  const request = f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' });
+  const result = await f.execute(request);
+  await f.execute(request);
+  assert.equal(result.sync.unobservedDeletedCount, 0);
+  assert.equal(f.store.records.has(draft.id), false);
+  assert.deepEqual([...f.store.suppressedMessages], [[suppressionKey('message', draft.id), { version: 1 }]]);
+  assert.equal(f.calls.length, 0);
+});
+
+test('legacy pure draft records migrate to hashes while prior mail evidence remains a pending conflict', async () => {
+  const f = fixture([A]);
+  f.store.seed({ messageId: 'legacy-pure', sourceKind: 'draft', version: 1, matchState: 'excluded',
+    caseId: null, internalDate: NOW, threadId: '', subject: '', from: '', to: '', attachmentCount: 0, firstReview: null });
+  f.gmail.listMessages = async () => ({ messageIds: [] });
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  assert.equal(f.store.records.has('legacy-pure'), false);
+  assert.equal(await f.store.isMessageSuppressed('legacy-pure'), true);
+
+  const root = 'contactMailboxes/customer-speed-ad';
+  const prior = record('prior-mail', { firstReview: { email: actor.email, at: NOW } });
+  const db = memoryFirestore({
+    [`${root}/messages/legacy-pure`]: { messageId: 'legacy-pure', sourceKind: 'draft', version: 1, matchState: 'excluded', caseId: null },
+    [`${root}/deletionDiagnostics/legacy-pure`]: { messageId: 'legacy-pure', detectedAt: NOW },
+    [`${root}/messages/prior-mail`]: prior,
+    [`${root}/receipts/kept-request`]: { result: { message: prior } }
+  });
+  const store = createFirestoreStore(db);
+  await store.excludeDraft('legacy-pure', NOW, { current: false });
+  assert.equal(db.records.has(`${root}/messages/legacy-pure`), false);
+  assert.equal(db.records.has(`${root}/deletionDiagnostics/legacy-pure`), false);
+  assert.deepEqual(db.records.get(`${root}/suppressedMessages/${suppressionKey('message', 'legacy-pure')}`), { version: 1 });
+  await store.excludeDraft('prior-mail', NOW, { current: false });
+  assert.deepEqual(db.records.get(`${root}/messages/prior-mail`), prior);
+  await store.excludeDraft('prior-mail', NOW);
+  const conflict = db.records.get(`${root}/messages/prior-mail`);
+  assert.equal(conflict.matchState, 'pending'); assert.equal(conflict.caseId, null);
+  assert.equal(conflict.reason, 'current_draft_conflict'); assert.equal(conflict.unavailable, true);
+  assert.deepEqual(conflict.firstReview, prior.firstReview);
+  assert.deepEqual(db.records.get(`${root}/receipts/kept-request`), { result: { message: prior } });
+  assert.equal(db.records.has(`${root}/suppressedMessages/${suppressionKey('message', 'prior-mail')}`), false);
+  assert.equal(db.records.get(`${root}/events/generated`).previous.caseId, A);
+  assert(db.records.has(`${root}/caseCoverage/${A}`));
+  await store.upsertIndexedMessage({ ...prior, sourceKind: 'mail', indexedAt: NOW, reason: 'body_id' });
+  assert.deepEqual(db.records.get(`${root}/messages/prior-mail`), conflict);
 });
 
 test('unavailable sent mail with older draft evidence remains a mail residual', async () => {
@@ -674,7 +888,8 @@ test('unknown deleted history IDs remain diagnostics without phantom received ma
   assert.equal(await f.store.getMessage('unknown'), null);
   assert.equal(result.sync.unobservedDeletedCount, 1); assert.equal(result.sync.acceptanceReady, false);
   assert.equal(result.sync.unavailableCount, 1); assert.equal((await f.store.getMessage('known')).unavailable, true);
-  assert.equal((await f.store.getMessage('proven-draft')).sourceKind, 'draft');
+  assert.equal(await f.store.getMessage('proven-draft'), null);
+  assert.equal(await f.store.isMessageSuppressed('proven-draft'), true);
   assert.deepEqual(await f.store.listUnobservedDeletions({ limit: 50 }), [{ messageId: 'unknown', detectedAt: NOW }]);
   for (let index = 0; index < 73; index++) await f.store.recordUnobservedDeletion(`unknown-${String(index).padStart(2, '0')}`, NOW);
   const first = await f.store.listUnobservedDeletions({ limit: 50 });

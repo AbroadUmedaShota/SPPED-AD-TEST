@@ -102,19 +102,36 @@ export function createFirestoreStore(db) {
       if (cursor) query = query.startAfter(cursor.at, cursor.id);
       return (await query.limit(limit).get()).docs.map((item) => item.data());
     },
-    async excludeDraft(id, at) {
+    async excludeDraft(id, at, { current = true } = {}) {
       const ref = messages.doc(id);
       await runTransaction(async (transaction) => {
-        if ((await transaction.get(suppressedMessages.doc(suppressionKey('message', id)))).exists) return;
+        const marker = suppressedMessages.doc(suppressionKey('message', id));
+        if ((await transaction.get(marker)).exists) return;
         const existing = data(await transaction.get(ref));
-        const record = { ...(existing || { messageId: id, threadId: '', internalDate: at,
-          subject: '', from: '', to: '', direction: 'unknown', attachmentCount: 0, firstReview: null,
-          bodyAvailability: 'unverified', attachments: [], unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0 }),
-        sourceKind: 'draft', matchState: 'excluded', caseId: null, reason: 'unsent_draft',
-        version: (existing?.version || 0) + (existing?.sourceKind === 'draft' ? 0 : 1), unavailable: false };
+        if (existing?.matchState === 'excluded' && (existing.manualClassification === true || existing.reason === 'manual')) return;
+        const historicalMail = existing && (existing.sourceKind !== 'draft' || existing.version > 1 ||
+          existing.firstReview || existing.threadId || existing.subject || existing.from || existing.to ||
+          existing.rfcMessageId || existing.attachmentCount || existing.evidence);
+        if (historicalMail && !current && existing.sourceKind !== 'draft') return;
+        if (!historicalMail) {
+          transaction.set(marker, { version: 1 });
+          transaction.delete(ref);
+          transaction.delete(deletionDiagnostics.doc(id));
+          return;
+        }
+        // A previously observed mail must retain its review and audit evidence.
+        const changed = existing.reason !== 'current_draft_conflict' || existing.matchState !== 'pending' || existing.caseId !== null;
+        const record = { ...existing, sourceKind: 'mail', matchState: 'pending', caseId: null,
+          reason: 'current_draft_conflict', unavailable: true, bodyAvailability: 'unavailable',
+          version: existing.version + (changed ? 1 : 0) };
         transaction.set(ref, record);
         transaction.delete(deletionDiagnostics.doc(id));
         updateCoverage(transaction, existing, record);
+        if (changed) transaction.set(mailbox.collection('events').doc(), {
+          type: 'mail.auto_match_withdrawn', messageId: id, at, version: record.version,
+          reason: record.reason, previous: { matchState: existing.matchState, caseId: existing.caseId },
+          next: { matchState: 'pending', caseId: null }
+        });
       });
     },
     async listMessages({ mode, caseId, startAt, cursor, limit }) {
@@ -220,6 +237,7 @@ export function createFirestoreStore(db) {
           incoming = { ...incoming, matchState: 'pending', caseId: null, reason: 'suppressed_case' };
         }
         const existing = data(await transaction.get(ref));
+        if (existing?.reason === 'current_draft_conflict') return;
         const threadRecords = incoming.threadId ? (await transaction.get(messages.where('threadId', '==', incoming.threadId))).docs.map((item) => item.data()) : [];
         if (retentionPolicy && existing) assertRetainedRecord(existing, retentionPolicy);
         const merged = mergeIndexedMessage(existing, incoming);

@@ -352,6 +352,7 @@
       .toolbar { grid-template-columns: 1fr; }
     }
     .mail-queues { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .mail-data-notice { width: 100%; margin: 0; }
     .mail-sync { width: 100%; margin: 0; font-size: 12px; color: var(--muted); }
     .mail-navigation { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .mail-navigation select { flex: 1; min-width: 180px; }
@@ -387,6 +388,7 @@
   <main class="app" id="appView" hidden>
     <section class="list-pane" aria-label="問い合わせ一覧">
       <div class="mail-queues">
+        <p class="mail-data-notice">メールの取得範囲・閲覧者・保存期間は、<a href="https://support.speed-ad.com/privacy/#contact-review-data" target="_blank" rel="noopener noreferrer">メールデータの取扱い（別タブ）</a>で確認できます。</p>
         <button type="button" id="unreviewedMailButton">未確認メール</button>
         <button type="button" id="pendingMailButton">照合待ち</button>
         <button type="button" id="syncMailButton" hidden>メール同期</button>

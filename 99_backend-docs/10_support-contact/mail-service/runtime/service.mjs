@@ -103,7 +103,6 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       unavailableCount: counts.unavailable, remainingPages: Boolean(startAt && state?.state === 'running'),
       startAt: startAt || null, cutoffAt: state?.cutoffAt || null, errorCode: !startAt && state ? 'MAIL_PERIOD_REQUIRED' : state?.errorCode || null,
       processedCount: state?.processedCount || 0, phase: state?.phase || 'enumerate',
-      failedMessageIds: startAt ? state?.failedMessageIds || [] : [],
       unobservedDeletedCount,
       executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(startAt && state?.historyId),
       enumerationComplete, acceptanceReady: Boolean(startAt) && enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0 && retention.unknownClosureCaseIds.length === 0 && retention.expiredCaseIds.length === 0,
@@ -138,10 +137,25 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     return record;
   }
 
+  async function messageMetadata(id) {
+    const metadata = await gmail.getMessageMetadata(id);
+    assertMail(metadata?.id === id &&
+      (metadata.labelIds === undefined || Array.isArray(metadata.labelIds) && metadata.labelIds.every((label) => typeof label === 'string')) &&
+      typeof metadata.internalDate === 'string' && /^\d+$/.test(metadata.internalDate) &&
+      Number.isSafeInteger(Number(metadata.internalDate)) && Number.isFinite(new Date(Number(metadata.internalDate)).getTime()),
+    'MAIL_INVALID_UPSTREAM', 502);
+    return metadata;
+  }
+
   async function fetchMessage(id, includeDraft = false) {
     try {
+      const metadata = await messageMetadata(id);
+      if (!includeDraft && metadata.labelIds?.includes('DRAFT')) {
+        await store.excludeDraft(id, now().toISOString());
+        throw new MailError('MAIL_MAPPING_CHANGED', 409);
+      }
       const message = await gmail.getMessage(id);
-      assertMail(message?.id === id, 'MAIL_INVALID_UPSTREAM', 502);
+      assertMail(message?.id === id && message.internalDate === metadata.internalDate, 'MAIL_INVALID_UPSTREAM', 502);
       if (!includeDraft && message.labelIds?.includes('DRAFT')) {
         await store.excludeDraft(id, now().toISOString());
         throw new MailError('MAIL_MAPPING_CHANGED', 409);
@@ -372,11 +386,31 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function indexMessage(id, catalog, scope = {}) {
     if (await store.isMessageSuppressed?.(id)) return;
+    const previous = await store.getMessage(id);
+    if (previous?.sourceKind === 'draft') {
+      await store.excludeDraft(id, now().toISOString(), { current: false });
+      return;
+    }
+    if (previous?.reason === 'current_draft_conflict') return;
     let message;
-    try { message = await fetchMessage(id, true); } catch (error) {
+    let internalDate;
+    try {
+      // History includes changes to drafts and old messages. Filter their minimal
+      // metadata before requesting any headers, body or inline attachment data.
+      const metadata = await messageMetadata(id);
+      if (metadata.labelIds?.includes('DRAFT')) {
+        await store.excludeDraft(id, now().toISOString());
+        return;
+      }
+      internalDate = new Date(Number(metadata.internalDate)).toISOString();
+      if ((scope.startAt && internalDate < scope.startAt) || (scope.cutoffAt && internalDate > scope.cutoffAt)) return;
+      message = await gmail.getMessage(id);
+      assertMail(message?.id === id && message.internalDate === metadata.internalDate, 'MAIL_INVALID_UPSTREAM', 502);
+    } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') {
+        await store.markUnavailable(id, now().toISOString());
         const existing = await store.getMessage(id);
-        if (scope.draftEvidence && existing?.sourceKind !== 'mail') await store.excludeDraft(id, now().toISOString());
+        if (scope.draftEvidence && existing?.sourceKind !== 'mail') await store.excludeDraft(id, now().toISOString(), { current: false });
         else if (!existing) await store.recordUnobservedDeletion(id, now().toISOString());
         return;
       }
@@ -386,8 +420,6 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       await store.excludeDraft(id, now().toISOString());
       return;
     }
-    const internalDate = new Date(Number(message.internalDate)).toISOString();
-    if ((scope.startAt && internalDate < scope.startAt) || (scope.cutoffAt && internalDate > scope.cutoffAt)) return;
     const parsed = core.inspectMime(message);
     let bodyText = '';
     let bodyAvailability = 'verified';
@@ -496,7 +528,10 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (state.phase === 'finalize') {
         const records = await store.listIndexedScope({ startAt: state.startAt, cutoffAt: state.cutoffAt, cursor: state.finalizeCursor, limit: PAGE_SIZE + 1 });
         const batch = records.slice(0, PAGE_SIZE);
-        for (const record of batch) if (record.indexedGeneration !== state.executionId) await store.markUnavailable(record.messageId, now().toISOString());
+        for (const record of batch) {
+          if (record.sourceKind === 'draft') await store.excludeDraft(record.messageId, now().toISOString(), { current: false });
+          else if (record.indexedGeneration !== state.executionId) await store.markUnavailable(record.messageId, now().toISOString());
+        }
         const more = records.length > PAGE_SIZE;
         state = { ...state, finalizeCursor: more ? { at: batch.at(-1).internalDate, id: batch.at(-1).messageId } : null,
           state: more ? 'running' : 'complete' };
@@ -533,7 +568,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       if (!state.inFlightPage) {
         page = { ...page, messageIds: [...new Set(page.messageIds)].map(messageId), deletedIds: [...new Set(page.deletedIds || [])].map(messageId),
           draftIds: [...new Set(page.draftIds || [])].map(messageId) };
-        for (const id of page.draftIds) if (!page.messageIds.includes(id)) await store.excludeDraft(id, now().toISOString());
+        for (const id of page.draftIds) if (!page.messageIds.includes(id)) await store.excludeDraft(id, now().toISOString(), { current: false });
         state.inFlightPage = { page, index: 0 };
         await store.setSyncState(state, lease);
       }

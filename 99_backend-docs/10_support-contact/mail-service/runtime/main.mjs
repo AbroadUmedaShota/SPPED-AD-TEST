@@ -7,7 +7,7 @@ import * as review from '../review.mjs';
 import * as safeMail from '../safeMail.mjs';
 import { createGoogleVerifier } from './auth.mjs';
 import { createFirestoreStore } from './firestoreStore.mjs';
-import { createGmailAdapter } from './googleAdapters.mjs';
+import { createRuntimeGmailAdapter } from './mailboxConsent.mjs';
 import { createMailHttpServer } from './http.mjs';
 import { createMailService } from './service.mjs';
 
@@ -16,7 +16,7 @@ async function main() {
     deployerEmail: process.env.MAIL_DEPLOYER_EMAIL, deployerSubject: process.env.MAIL_DEPLOYER_SUBJECT });
   const db = new Firestore({ ignoreUndefinedProperties: true,
     ...(process.env.FIRESTORE_DATABASE_ID ? { databaseId: process.env.FIRESTORE_DATABASE_ID } : {}) });
-  const gmail = await createGmailAdapter({ secretManager: new SecretManagerServiceClient(),
+  const gmail = await createRuntimeGmailAdapter({ secretManager: new SecretManagerServiceClient(),
     secretVersion: process.env.MAILBOX_OAUTH_SECRET_VERSION,
     createOAuthClient: (clientId, clientSecret) => new OAuth2Client(clientId, clientSecret) });
   const execute = createMailService({ store: createFirestoreStore(db), gmail,

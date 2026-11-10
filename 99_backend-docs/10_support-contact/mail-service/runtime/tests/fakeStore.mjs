@@ -2,6 +2,7 @@ import { assertMail } from '../errors.mjs';
 import { indexedClassificationEvent, mergeIndexedMessage, mixedThreadDemotions } from '../mixedThread.mjs';
 import { assertRetainedRecord, isRetainedRecord } from '../caseRetention.mjs';
 import { observeAttachment } from '../attachmentObservation.mjs';
+import { suppressionKey } from '../purgeGate.mjs';
 
 const caseEntries = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応', closedAt: null }));
 const clone = (value) => structuredClone(value);
@@ -13,13 +14,14 @@ export function fakeStore(caseIds = [], initialSync = null) {
   const pages = new Map();
   const events = [];
   const deletionDiagnostics = new Map();
+  const suppressedMessages = new Map();
   let catalog = { complete: true, caseIds, cases: caseEntries(caseIds) };
   let sync = clone(initialSync);
   let lease = null;
   let queue = Promise.resolve();
   const serial = (fn) => { const task = queue.then(fn); queue = task.catch(() => {}); return task; };
   const store = {
-    records, receipts, events,
+    records, receipts, events, suppressedMessages,
     withAccess: (operation) => operation(),
     seed(record) { records.set(record.messageId, clone(record)); },
     setCatalog(value) { catalog = value; },
@@ -39,20 +41,36 @@ export function fakeStore(caseIds = [], initialSync = null) {
       catalog = { complete: true, caseIds: ids, cases, digest: page.digest, snapshotId: page.snapshotId };
       return { complete: true, snapshotId: page.snapshotId, total: ids.length };
     },
-    async getMessage(id) { return clone(records.get(id) || null); },
-    async recordUnobservedDeletion(id, at) { if (!records.has(id) && !deletionDiagnostics.has(id)) deletionDiagnostics.set(id, { messageId: id, detectedAt: at }); },
+    async isMessageSuppressed(id) { return suppressedMessages.has(suppressionKey('message', id)); },
+    async getMessage(id) { return suppressedMessages.has(suppressionKey('message', id)) ? null : clone(records.get(id) || null); },
+    async recordUnobservedDeletion(id, at) { if (!suppressedMessages.has(suppressionKey('message', id)) && !records.has(id) && !deletionDiagnostics.has(id)) deletionDiagnostics.set(id, { messageId: id, detectedAt: at }); },
     async countUnobservedDeletions() { return deletionDiagnostics.size; },
     async listUnobservedDeletions({ cursor, limit }) {
       let items = [...deletionDiagnostics.values()].sort((a, b) => b.detectedAt.localeCompare(a.detectedAt) || b.messageId.localeCompare(a.messageId));
       if (cursor) items = items.filter((item) => item.detectedAt < cursor.at || (item.detectedAt === cursor.at && item.messageId < cursor.id));
       return clone(items.slice(0, limit));
     },
-    async excludeDraft(id, at) {
+    async excludeDraft(id, at, { current = true } = {}) {
+      const key = suppressionKey('message', id);
+      if (suppressedMessages.has(key)) return;
       const old = records.get(id);
-      store.seed({ ...(old || { messageId: id, threadId: '', internalDate: at, direction: 'unknown',
-        attachments: [], unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0 }),
-      sourceKind: 'draft', matchState: 'excluded', caseId: null, reason: 'unsent_draft', unavailable: false,
-      version: (old?.version || 0) + (old?.sourceKind === 'draft' ? 0 : 1) });
+      if (old?.matchState === 'excluded' && (old.manualClassification === true || old.reason === 'manual')) return;
+      const historicalMail = old && (old.sourceKind !== 'draft' || old.version > 1 || old.firstReview ||
+        old.threadId || old.subject || old.from || old.to || old.rfcMessageId || old.attachmentCount || old.evidence);
+      if (historicalMail && !current && old.sourceKind !== 'draft') return;
+      if (!historicalMail) {
+        suppressedMessages.set(key, { version: 1 });
+        records.delete(id);
+        deletionDiagnostics.delete(id);
+        return;
+      }
+      const changed = old.reason !== 'current_draft_conflict' || old.matchState !== 'pending' || old.caseId !== null;
+      const next = { ...old, sourceKind: 'mail', matchState: 'pending', caseId: null,
+        reason: 'current_draft_conflict', unavailable: true, bodyAvailability: 'unavailable',
+        version: old.version + (changed ? 1 : 0) };
+      store.seed(next);
+      if (changed) events.push({ type: 'mail.auto_match_withdrawn', messageId: id, at, version: next.version,
+        reason: next.reason, previous: { matchState: old.matchState, caseId: old.caseId }, next: { matchState: 'pending', caseId: null } });
       deletionDiagnostics.delete(id);
     },
     async listMessages({ mode, caseId, startAt, cursor, limit }) {
@@ -114,8 +132,10 @@ export function fakeStore(caseIds = [], initialSync = null) {
       });
     },
     async upsertIndexedMessage(incoming, expectedCatalogDigest, policy) {
+      if (suppressedMessages.has(suppressionKey('message', incoming.messageId))) return;
       if (expectedCatalogDigest) assertMail(catalog.digest === expectedCatalogDigest, 'MAIL_CATALOG_CHANGED', 409);
       const before = records.get(incoming.messageId);
+      if (before?.reason === 'current_draft_conflict') return;
       if (policy && before) assertRetainedRecord(before, policy);
       const merged = mergeIndexedMessage(before, incoming);
       const threadRecords = [...records.values()].filter((record) => record.threadId === incoming.threadId && record.messageId !== incoming.messageId);

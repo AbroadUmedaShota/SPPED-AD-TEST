@@ -216,6 +216,9 @@ test('marker cleanup rejects old or altered mailbox consent before creating an O
   });
   const omittedClause = disclosure.replace(MAILBOX_MARKER_DISCLOSURE, '');
   for (const old of [undefined, { ...receipt, disclosureVersion: '2026-11-10.1' },
+    { ...receipt, disclosureVersion: '2026-11-11.1' },
+    { ...receipt, disclosureVersion: '2026-11-11.3' },
+    { ...receipt, disclosureVersion: '2026-11-11.4' },
     { ...receipt, disclosure: 'altered' }, { ...receipt, acceptedAt: undefined },
     { ...receipt, acceptedAt: 'not-a-date' }, { ...receipt, verifiedMailbox: 'wrong@example.com' },
     { ...receipt, disclosure: omittedClause,
