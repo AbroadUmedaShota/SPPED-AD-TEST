@@ -17,7 +17,7 @@ const cases = (ids) => ids.map((caseId) => ({ caseId, handledStatus: '未対応'
 function fixture(ids = [A]) {
   const catalog = { complete: true, snapshotId: 'catalog-1', cases: cases(ids), caseIds: ids, digest: catalogDigest(cases(ids)) };
   const state = { state: 'complete', startAt: START, cutoffAt: END, catalogSnapshotId: 'catalog-1', executionId: 'sync-1',
-    mode: 'full', failedCount: 0, historyId: '123', lastSuccessAt: END };
+    catalogDigest: catalog.digest, mode: 'full', failedCount: 0, historyId: '123', lastSuccessAt: END };
   const store = fakeStore(ids, state); store.setCatalog(catalog);
   const execute = createMailService({ store, gmail: {}, core: {}, now: () => new Date(NOW) });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation, payload,
@@ -101,7 +101,43 @@ test('sync, catalog and unrelated classification changes invalidate old absence 
     else f.store.seed({ messageId: 'excluded', internalDate: END, matchState: 'excluded', caseId: null });
     const current = await f.execute(f.envelope('listCaseMail', { caseId: A }));
     assert.equal(current.noMail.confirmation, null); assert.equal(current.noMail.stale, true);
+    if (kind === 'catalog') assert.equal(current.noMail.eligible, false);
     await assert.rejects(f.execute(request), { code: 'MAIL_MAPPING_CHANGED' });
+  }
+});
+
+test('same-content catalog replacement keeps history while case, status and closure changes force full sync', async () => {
+  for (const kind of ['same', 'legacy-same', 'case', 'status', 'closure']) {
+    const f = fixture();
+    if (kind === 'legacy-same') {
+      const old = { ...f.state }; delete old.catalogDigest;
+      const lease = await f.store.acquireSyncLease('legacy'); await f.store.setSyncState(old, lease); await f.store.releaseSyncLease(lease);
+      const getCatalog = f.store.getCatalog.bind(f.store);
+      f.store.getCatalog = async (id) => id === f.catalog.snapshotId ? structuredClone(f.catalog) : getCatalog(id);
+    }
+    const entries = cases(kind === 'case' ? [A, '22222222-2222-4222-8222-222222222222'] : [A]);
+    if (kind === 'status') entries[0].handledStatus = '対応中';
+    if (kind === 'closure') Object.assign(entries[0], { handledStatus: '対応済み', closedAt: END });
+    const digest = catalogDigest(entries); const snapshotId = randomUUID();
+    await f.execute(f.envelope('uploadCaseCatalog', { snapshotId, pageIndex: 0, pageCount: 1, total: entries.length, digest, cases: entries }));
+    const same = kind === 'same' || kind === 'legacy-same';
+    const status = (await f.execute(f.envelope('getSyncStatus'))).sync;
+    assert.equal(status.state, same ? 'complete' : 'needs_full_sync');
+    assert.equal(status.historyAvailable, same);
+    assert.equal(status.acceptanceReady, false);
+    let fullCalls = 0; let historyCalls = 0;
+    const execute = createMailService({ store: f.store, gmail: {
+      async getProfile() { return { emailAddress: 'customer@speed-ad.com', historyId: '456' }; },
+      async listMessages() { fullCalls++; return { messageIds: [] }; },
+      async listHistory() { historyCalls++; return { messageIds: [], historyId: '456' }; }
+    }, core: {}, now: () => new Date(NOW) });
+    const executionId = randomUUID();
+    let result = await execute(f.envelope('advanceSync', { executionId, mode: 'history', startAt: START,
+      catalogSnapshotId: snapshotId, catalogDigest: digest }));
+    while (result.sync.state === 'running') result = await execute(f.envelope('advanceSync', { executionId }));
+    assert.equal(result.sync.mode, same ? 'history' : 'full');
+    assert.equal(historyCalls, same ? 1 : 0); assert.equal(fullCalls, same ? 0 : 1);
+    assert.equal((await f.store.getSyncState()).catalogDigest, digest);
   }
 });
 

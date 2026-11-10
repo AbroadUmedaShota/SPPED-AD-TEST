@@ -2117,11 +2117,20 @@
         if (serial !== current.serial) return;
         validateContactMailSync(result.sync);
         const noMail = validateContactCaseNoMail(result.noMail, result.sync);
-        if (!noMail.confirmation || noMail.stale) throw new Error('MAIL_INVALID_RESPONSE');
         if (observationSerial !== contactMailState.syncObservationSerial &&
           !sameContactMailSyncObservation(result.sync, contactMailState.sync)) {
           current.writing = false;
           current.noMailError = 'メール同期の状態が変わりました。更新して現在の確認状態を読み直してください。';
+          renderContactMailView(view);
+          return;
+        }
+        if (!noMail.confirmation || noMail.stale) {
+          if (!noMail.stale && result.sync.state === 'complete') throw new Error('MAIL_INVALID_RESPONSE');
+          if (observeContactMailSync(result.sync)) return;
+          current.sync = result.sync;
+          current.noMail = { ...noMail, eligible: false };
+          current.writing = false;
+          current.noMailError = '確認の対象条件が変わりました。元の操作結果は未確認のため、要求IDを保持しています。更新して現在の確認状態を読み直してください。';
           renderContactMailView(view);
           return;
         }

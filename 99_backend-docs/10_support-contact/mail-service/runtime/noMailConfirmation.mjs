@@ -18,7 +18,8 @@ export function mappingRevisionToken(value) {
 
 export function noMailContext(catalog, sync, revision = null, purgeGeneration = 0) {
   if (!catalog?.complete || !ID.test(catalog.snapshotId || '') || !HASH.test(catalog.digest || '') ||
-      sync?.state !== 'complete' || sync.catalogSnapshotId !== catalog.snapshotId || !iso(sync.startAt) || !iso(sync.cutoffAt) ||
+      sync?.state !== 'complete' || sync.catalogSnapshotId !== catalog.snapshotId ||
+      (sync.catalogDigest !== undefined && sync.catalogDigest !== catalog.digest) || !iso(sync.startAt) || !iso(sync.cutoffAt) ||
       sync.startAt > sync.cutoffAt || !ID.test(sync.executionId || '') || !/^\d+$/.test(sync.historyId || '') ||
       !['full', 'history'].includes(sync.mode) || !iso(sync.lastSuccessAt) || sync.lastSuccessAt < sync.cutoffAt ||
       sync.failedCount !== 0 || sync.errorCode || sync.pageToken || sync.inFlightPage || sync.finalizeCursor ||

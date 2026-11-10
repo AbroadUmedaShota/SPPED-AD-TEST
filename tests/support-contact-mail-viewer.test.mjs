@@ -500,6 +500,39 @@ test('a source change during an absence action invalidates its returned old-cata
   assert.equal(result.noMail.stale, true);
 });
 
+test('GAS projected absence invalidation reaches UI and retains the original unresolved request identity', async () => {
+  const startAt = '2026-11-08T15:00:00.000Z';
+  const statuses = ['未対応']; const bridgeApp = bridgeRuntime({ statuses, historyStartAt: startAt });
+  const currentSync = { ...sync, startAt, bodyUnverifiedCount: 0, acceptanceReady: false };
+  let savedRequestId; let writes = 0;
+  bridgeApp.respond((envelope) => {
+    assert.equal(envelope.operation, 'listCaseMail');
+    return { ...list([]), sync: currentSync, noMail: noMail({ eligible: true }) };
+  });
+  const app = uiRuntime({
+    listContactMail: (options) => bridgeApp.api.listContactMail(options),
+    confirmContactCaseNoMail: (options) => {
+      savedRequestId = options.requestId; writes++; statuses[0] = '対応中';
+      // A valid already-saved response may arrive even when a later transport guard rejects new races.
+      return bridgeApp.api.mailCurrentPeriodResult_({ ok: true, sync: { ...currentSync, acceptanceReady: true },
+        noMail: noMail({ eligible: true, confirmation: { ...noMailConfirmation, startAt } }) });
+    }
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.equal(app.mail.case.noMail.eligible, true);
+  await app.ui.confirmContactCaseNoMailFromUi('case');
+  assert.ok(savedRequestId);
+  assert.equal(app.mail.case.pendingNoMail.requestId, savedRequestId);
+  assert.equal(app.mail.noMailRequests[caseId].requestId, savedRequestId);
+  assert.equal(app.mail.sync.state, 'needs_full_sync');
+  assert.equal(app.mail.sync.acceptanceReady, false);
+  assert.equal(app.mail.case.noMail.eligible, false);
+  assert.equal(app.mail.case.noMail.confirmation, null);
+  assert.equal(app.mail.case.noMail.stale, true);
+  assert.match(app.mail.case.noMailError, /要求IDを保持/);
+  assert.equal(writes, 1);
+});
+
 test('changed period preserves old running batches across reload and permits a new full sync after completion', async () => {
   for (const reload of [false, true]) {
     const oldStartAt = '2026-11-08T15:00:00.000Z';

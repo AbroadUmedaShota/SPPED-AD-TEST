@@ -144,6 +144,14 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     return { noMail, sync };
   }
 
+  async function executionCatalogDigest(state, activeCatalog) {
+    if (!state?.catalogSnapshotId) return null;
+    if (/^[a-f0-9]{64}$/.test(state.catalogDigest || '')) return state.catalogDigest;
+    if (state.catalogDigest != null) return null;
+    const pinned = state.catalogSnapshotId === activeCatalog.snapshotId ? activeCatalog : await store.getCatalog(state.catalogSnapshotId);
+    return pinned.complete && /^[a-f0-9]{64}$/.test(pinned.digest || '') ? pinned.digest : null;
+  }
+
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
     const startAt = periodStart(state?.startAt);
@@ -154,14 +162,16 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     };
     const unobservedDeletedCount = startAt ? await store.countUnobservedDeletions() : null;
     const catalog = await store.getCatalog();
+    const activeCatalogDigest = catalog.complete && /^[a-f0-9]{64}$/.test(catalog.digest || '') ? catalog.digest : null;
+    const executedCatalogDigest = await executionCatalogDigest(state, catalog);
     const catalogCurrent = catalog.complete && /^[a-f0-9]{64}$/.test(catalog.digest || '') &&
-      typeof catalog.snapshotId === 'string' && state?.catalogSnapshotId === catalog.snapshotId;
+      typeof catalog.snapshotId === 'string' && state?.catalogSnapshotId === catalog.snapshotId && executedCatalogDigest === activeCatalogDigest;
     const retention = catalog.complete ? catalogRetention(catalog, now()) : null;
     const covered = new Set(startAt ? await store.getCoveredCaseIds({ startAt, cutoffAt }) : []);
     const confirmationScope = startAt ? await availableConfirmationContext(catalog, state, counts, unobservedDeletedCount) : null;
     const confirmed = new Set(confirmationScope && store.getConfirmedNoMailCaseIds ? await store.getConfirmedNoMailCaseIds(confirmationScope, now().toISOString()) : []);
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id) && !confirmed.has(id));
-    const catalogChanged = Boolean(state?.catalogSnapshotId && catalog.snapshotId && state.catalogSnapshotId !== catalog.snapshotId);
+    const catalogChanged = Boolean(state?.executionId && executedCatalogDigest !== activeCatalogDigest);
     const enumerationComplete = Boolean(startAt && cutoffAt && startAt <= cutoffAt) && state?.state === 'complete' && !catalogChanged;
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
       counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
@@ -614,8 +624,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
           assertMail(prePeriodObservation && payload.mode === 'full' && startAt <= prePeriodObservation.internalDate, 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
         }
         assertMail(!state?.executionId || !periodStart(state.startAt) || startAt <= periodStart(state.startAt), 'MAIL_PERIOD_NARROWING', 409);
-        const mode = payload.mode === 'history' && (startAt !== periodStart(state?.startAt) ||
-          (state?.catalogSnapshotId || null) !== (catalog.snapshotId || null)) ? 'full' : payload.mode;
+        const previousCatalogDigest = await executionCatalogDigest(state, catalog);
+        const currentCatalogDigest = /^[a-f0-9]{64}$/.test(catalog.digest || '') ? catalog.digest : null;
+        const mode = payload.mode === 'history' && (startAt !== periodStart(state?.startAt) || previousCatalogDigest !== currentCatalogDigest) ? 'full' : payload.mode;
         const startedAt = now().toISOString();
         assertMail(startAt <= startedAt, 'MAIL_INVALID_REQUEST');
         const profile = await gmail.getProfile();
@@ -627,6 +638,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
           initialHistoryId: String(profile.historyId || ''), failedCount: prePeriodObservation ? 1 : 0, processedCount: 0,
           prePeriodObservation, failedMessageIds: prePeriodObservation ? [prePeriodObservation.messageId] : [],
           catalogSnapshotId: catalog.snapshotId || null,
+          catalogDigest: currentCatalogDigest,
           lastSuccessAt: state?.lastSuccessAt || null, errorCode: null };
         assertMail(/^\d+$/.test(state.initialHistoryId), 'MAIL_INVALID_UPSTREAM', 502);
         await store.setSyncState(state, lease);
