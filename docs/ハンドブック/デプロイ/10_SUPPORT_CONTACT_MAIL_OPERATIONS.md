@@ -39,9 +39,10 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 | 5 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
 | 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [データ管理・削除の案内](../運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に従い、案件終了後3年間の保存方針を実施する手段と削除申請先を先に確認する。[認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)へ実施説明と申請先メールを渡し、本人が説明へ対話的に同意する。code/tokenを端末ファイル・ログへ出さず、登録先Secretとversionを確認する。 |
 | 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
-| 8 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、GASの実ID tokenのaudienceをcustom audienceへ登録する。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
-| 9 | GASへメール連携コードと`openid` scopeを反映し、固定`MAIL_SERVICE_URL`を設定して必要な再認可を行う。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
-| 10 | 社員と窓口の利用経路、IAM拒否、メール読取、実Firestore更新とindexを実環境で確認する。 | 確認者が配備者へ置き換わらず、実利用者として記録される。認証失敗時は業務データが消える。 |
+| 8 | GAS開発版へメール連携コードと`openid` scopeをpushし、配備者本人が再認可してID tokenの必要claimsだけを確認する。 | 公開配備ID・versionは保全値のまま。tokenを表示せず、実GASのaudience・配備者subject/emailを取得する。窓口ログイン用clientから推定しない。 |
+| 9 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、手順8で確認したaudienceをcustom audienceへ登録する。特定の正規Secret versionとbuild/Registryで一致したimage digestを使う。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
+| 10 | GASの固定`MAIL_SERVICE_URL`を設定し、一時claims関数を除いた採用コードから最終versionを作成して公開配備する。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
+| 11 | 社員と窓口の利用経路、IAM拒否、メール読取、実Firestore更新とindexを実環境で確認する。 | 確認者が配備者へ置き換わらず、実利用者として記録される。認証失敗時は業務データが消える。 |
 
 Cloud Runの設定は次の対応で照合します。値はrepoへ保存せず、実tokenをログへ出して取得しないでください。
 
@@ -49,7 +50,7 @@ Cloud Runの設定は次の対応で照合します。値はrepoへ保存せず�
 | --- | --- |
 | `MAIL_SCRIPT_AUDIENCE` | `ScriptApp.getIdentityToken()`で使われるGAS自身のOAuth client ID。窓口ログイン用client IDから推定しない。 |
 | `MAIL_DEPLOYER_EMAIL` / `MAIL_DEPLOYER_SUBJECT` | 検証済みGAS配備者のemailとsubject。 |
-| `MAILBOX_OAUTH_SECRET_VERSION` | 窓口資格情報を持つSecretの特定version。 |
+| `MAILBOX_OAUTH_SECRET_VERSION` | Project IDとproject numberを照合して観測したSecretの正規名に属する、数値で固定した特定version。認可前・登録後・Cloud Runで同じ対象を照合する。 |
 | `FIRESTORE_DATABASE_ID` | default以外を使う場合のdatabase ID。 |
 
 2026-11-10の確認時点で作業PCにはDockerがなく、imageビルドは未実施です。Dockerが利用できる環境では、採用するGit SHAの`99_backend-docs/10_support-contact/mail-service/`を作業ディレクトリにして下記を実行します。`IMAGE_REFERENCE`は承認済み保存先とSHAに対応するタグへ置き換えます。

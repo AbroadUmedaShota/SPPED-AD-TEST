@@ -12,7 +12,7 @@ last_reviewed: 2026-11-10
 
 ## 1. 対象値と実行ガード
 
-値は承認記録から入力し、この文書やrepoへ実値を保存しません。`GasDeployerSubject`と`GasAudience`は実GAS ID tokenについて検証済みの値を使い、token自体を表示しません。Firestoreの配置場所とCloud Runの配置場所はそれぞれ確定します。最初のCPU・メモリ・timeout・同時実行数・最大instance数も費用と添付実測を踏まえて採用する値です。
+値は承認記録から入力し、この文書やrepoへ実値を保存しません。`GasDeployerSubject`と`GasAudience`は手順5で開発版へ`openid`を反映・再認可した後に実GAS ID tokenのclaimsから取得します。最初の入力条件にはせず、Cloud Run配備前に必須とします。token自体を表示しません。Firestoreの配置場所とCloud Runの配置場所はそれぞれ確定します。最初のCPU・メモリ・timeout・同時実行数・最大instance数も費用と添付実測を踏まえて採用する値です。
 
 ```powershell
 $ErrorActionPreference = 'Stop'
@@ -27,9 +27,7 @@ $RuntimeAccountId = '<approved-runtime-account-id>'
 $BuildAccountId = '<approved-build-account-id>'
 $SourceBucket = '<approved-globally-unique-build-source-bucket>'
 $SecretId = '<approved-mailbox-secret-id>'
-$GasAudience = '<verified-gas-oauth-client-id>'
 $GasDeployerEmail = '<verified-gas-deployer-email>'
-$GasDeployerSubject = '<verified-gas-deployer-subject>'
 $GitSha = '<adopted-40-character-git-sha>'
 $Cpu = '<approved-cpu>'
 $Memory = '<approved-memory-e.g.-1Gi>'
@@ -40,8 +38,8 @@ $ApplyChanges = $false
 
 $required = @($ProjectId, $ApprovedProjectId, $Region, $FirestoreLocation,
   $DatabaseId, $Repository, $Service, $RuntimeAccountId, $BuildAccountId,
-  $SourceBucket, $SecretId, $GasAudience, $GasDeployerEmail,
-  $GasDeployerSubject, $GitSha, $Cpu, $Memory, $Timeout, $Concurrency, $MaxInstances)
+  $SourceBucket, $SecretId, $GasDeployerEmail,
+  $GitSha, $Cpu, $Memory, $Timeout, $Concurrency, $MaxInstances)
 if ($required.Where({ [string]::IsNullOrWhiteSpace($_) -or $_ -match '[<>\r\n,]' }).Count) {
   throw 'Replace every placeholder with the approved value.'
 }
@@ -113,6 +111,8 @@ Invoke-ApprovedChange gcloud @('storage', 'buckets', 'add-iam-policy-binding', "
 
 API一覧、`gcloud iam service-accounts describe EMAIL`、`gcloud firestore databases describe --database=$DatabaseId`、`gcloud artifacts repositories describe $Repository --location=$Region`、`gcloud secrets describe $SecretId`と各`get-iam-policy`を、同じ`--project=$ProjectId`で読み戻します。runtimeは専用projectのFirestore操作と対象Secretの読取り、builderは対象repositoryへのpush・source読取り・build log書込みを照合します。既存の想定外grantがあれば停止し、必要性を判断します。
 
+Compute Engine既定SA（`PROJECT_NUMBER-compute@developer.gserviceaccount.com`）に`roles/editor`があっても、その存在だけで削除しません。まずproject IAMと、実際に有効なCompute/Run/Functions/Build等の実行・buildアカウントを読み戻し、依存資源・代替権限・影響確認の記録を残します。API未有効・取得失敗・一部regionだけの空一覧を「依存なし」と扱いません。Cloud Buildの既定SAと、`service-PROJECT_NUMBER@compute-system.iam.gserviceaccount.com`等のGoogle管理service agentも区別します。対象の依存確認と役割削除の承認が揃った場合だけ、そのprincipalのEditor bindingを別操作として変更し、前後のIAM・依存機能を再確認します。この手順はEditorを一括削除しません。[既定SAと役割](https://docs.cloud.google.com/compute/docs/access/service-accounts)
+
 ## 3. Firestore indexと窓口認可
 
 採用SHAの`mail-service`ディレクトリから、**その版のindex定義全体**を使います。既存indexをlistし、fieldsの順序・queryScope・databaseまで一致するものは作成しません。次のloopは新規databaseの初回用です。既存databaseでは不足分だけを選び、不要indexを削除しません。
@@ -134,7 +134,32 @@ gcloud firestore indexes composite list --database=$DatabaseId --project=$Projec
 
 全定義が`READY`になるまで次へ進みません。作成応答だけで集計成功と判定せず、配備後の一覧・残件集計で実クエリを確認します。[index作成CLI](https://docs.cloud.google.com/sdk/gcloud/reference/firestore/indexes/composite/create)
 
-窓口認可は[既存の認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)で、承認済みDesktop client・本人同意・正確な`gmail.readonly` scopeを確認して実行します。このコマンドガイドへclient secretやrefresh tokenを貼りません。返された特定versionを`$SecretVersion`へ手入力し、`projects/$ProjectId/secrets/$SecretId/versions/数字`と一致すること、versionが`ENABLED`であることを`gcloud secrets versions describe VERSION --secret=$SecretId --project=$ProjectId`で確認します。`versions access`は使いません。
+窓口認可の前に、Project IDから観測したproject numberとSecretの正規名を照合します。Secret Managerの応答はProject IDをproject numberへ正規化するため、文字列をProject IDのまま組み立てて比較しません。
+
+```powershell
+$projectMetadata = gcloud projects describe $ProjectId --project=$ProjectId --format=json | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $projectMetadata.projectId -cne $ProjectId -or
+    $projectMetadata.projectNumber -notmatch '^[0-9]+$') { throw 'Project metadata mismatch.' }
+$secretMetadata = gcloud secrets describe $SecretId --project=$ProjectId --format=json | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0) { throw 'Secret metadata readback failed.' }
+$CanonicalSecretName = $secretMetadata.name
+$ExpectedSecretName = "projects/$($projectMetadata.projectNumber)/secrets/$SecretId"
+if ($CanonicalSecretName -cne $ExpectedSecretName) { throw 'Canonical Secret target mismatch.' }
+```
+
+[既存の認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)の`--secret`には、上で観測した`$CanonicalSecretName`を渡します。承認済みDesktop client・本人同意・正確な`gmail.readonly` scopeを確認して実行し、このガイドへclient secretやrefresh tokenを貼りません。ツールが返した正規名付きの特定versionを`$SecretVersion`へ入力して次を確認します。
+
+```powershell
+$SecretVersion = '<observed-canonical-secret-version>'
+$versionPattern = '^' + [regex]::Escape($CanonicalSecretName) + '/versions/([1-9][0-9]*)$'
+if ($SecretVersion -notmatch $versionPattern) { throw 'Canonical numeric Secret version required.' }
+$VersionNumber = $Matches[1]
+$versionMetadata = gcloud secrets versions describe $VersionNumber --secret=$CanonicalSecretName --project=$ProjectId --format=json | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $versionMetadata.name -cne $SecretVersion -or
+    $versionMetadata.state -cne 'ENABLED') { throw 'Secret version readback mismatch.' }
+```
+
+この同じ`$SecretVersion`をCloud Runまで保持します。`versions access`は使いません。
 
 ## 4. imageビルドとdigest固定
 
@@ -150,16 +175,88 @@ Invoke-ApprovedChange gcloud @('builds', 'submit', '.', '--project', $ProjectId,
 gcloud artifacts docker images describe $ImageTag --project=$ProjectId --format=json
 ```
 
-[build定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/cloudbuild.yaml)は`runtime/Dockerfile`を使い、同じbuildでArtifact Registryへpushします。返されたbuild IDを指定して`gcloud builds describe BUILD_ID --region=$Region --project=$ProjectId --format=json`を読み、`SUCCESS`とimageの`image_summary.digest`を照合して`$ImageDigest = 'sha256:...'`へ入力します。`$ImageTag`のタグ名だけを配備根拠にしません。source bucketの保持期間・image保持と費用は運用記録に定めます。[Cloud Build CLI](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit)・[独自buildアカウント](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts)
+[build定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/cloudbuild.yaml)は`runtime/Dockerfile`を使い、同じbuildでArtifact Registryへpushします。返されたbuild IDを入力し、**そのbuildの`results.images[]`で採用タグに一致するdigest**をArtifact Registryと比較します。
 
-## 5. Cloud Runの配備・読戻し
+```powershell
+$BuildId = '<observed-build-id>'
+if ($BuildId -match '[<>\r\n]' -or [string]::IsNullOrWhiteSpace($BuildId)) { throw 'Observed build ID required.' }
+$buildMetadata = gcloud builds describe $BuildId --region=$Region --project=$ProjectId --format=json | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $buildMetadata.status -cne 'SUCCESS') { throw 'Build not successful.' }
+$builtImages = @($buildMetadata.results.images | Where-Object { $_.name -ceq $ImageTag })
+if ($builtImages.Count -ne 1 -or $builtImages[0].digest -notmatch '^sha256:[a-f0-9]{64}$') {
+  throw 'Adopted tag missing or ambiguous in this build result.'
+}
+$registryMetadata = gcloud artifacts docker images describe $ImageTag --project=$ProjectId --format=json | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $registryMetadata.image_summary.digest -cne $builtImages[0].digest) {
+  throw 'Build and registry image digests differ.'
+}
+$ImageDigest = $builtImages[0].digest
+```
+
+タグが別buildで付け替わっていれば停止します。source bucketの保持期間・image保持と費用は運用記録に定めます。[Cloud Build CLI](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit)・[独自buildアカウント](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts)
+
+## 5. GAS開発版の準備とclaims確認
+
+`ScriptApp.getIdentityToken()`にはmanifestの`openid`と配備者の再認可が必要です。Cloud Runのaudience/subjectを先に推定しません。現行配備ID・version、コード・manifest・設定名・Sheet/Drive参照先を保全し、以下では**開発版だけ**をpushします。公開済みversionは更新しません。
+
+採用SHAのviewerを`rootDir`にした既存のprivate `.clasp.json`を使います。設定・認証ファイルはrepoへ追加しません。clasp 3.3系のコマンド名は実行環境の`clasp --version`と各`--help`でも照合します。
+
+```powershell
+$ClaspUser = '<existing-approved-clasp-user>'
+$ClaspProjectFile = '<absolute-private-clasp-json>'
+$GasScriptId = '<existing-approved-script-id>'
+$GasDeploymentId = '<existing-approved-deployment-id>'
+if (@($ClaspUser, $ClaspProjectFile, $GasScriptId, $GasDeploymentId).Where({
+    [string]::IsNullOrWhiteSpace($_) -or $_ -match '[<>\r\n]'
+  }).Count -or -not [IO.Path]::IsPathFullyQualified($ClaspProjectFile)) {
+  throw 'Exact existing GAS target and absolute private config path required.'
+}
+$claspTarget = Get-Content -Raw -LiteralPath $ClaspProjectFile | ConvertFrom-Json
+if ($claspTarget.scriptId -cne $GasScriptId) { throw 'GAS script target mismatch.' }
+clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
+clasp -u $ClaspUser -P $ClaspProjectFile show-file-status
+Invoke-ApprovedChange clasp @('-u', $ClaspUser, '-P', $ClaspProjectFile, 'push')
+clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
+```
+
+対象は`Code.gs`・`OAuth.gs`・`MailBridge.gs`・`Index.html`・`Login.html`・`appsscript.json`です。manifestの`openid`と既存scopeを照合します。push後も公開配備ID/versionが保全値のままであることを確認します。
+
+配備者本人がGAS editorで新scopeを再認可し、次の一時関数を開発版で実行します。`expectedEmail`を承認済み配備者へ置き換えます。出力は必要なclaimsだけです。token全体・payload全体・例外詳細を表示しません。
+
+```javascript
+function inspectMailBridgeIdentityForDeployment_() {
+  try {
+    const expectedEmail = '<approved-gas-deployer-email>';
+    const token = ScriptApp.getIdentityToken();
+    const parts = typeof token === 'string' ? token.split('.') : [];
+    if (parts.length !== 3) throw new Error();
+    const claims = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[1])).getDataAsString());
+    if (!['accounts.google.com', 'https://accounts.google.com'].includes(claims.iss) ||
+        typeof claims.aud !== 'string' || !claims.aud.endsWith('.apps.googleusercontent.com') ||
+        typeof claims.sub !== 'string' || !/^[\x21-\x7e]{1,255}$/.test(claims.sub) ||
+        claims.email !== expectedEmail || claims.email_verified !== true ||
+        (claims.azp !== undefined && claims.azp !== claims.aud)) throw new Error();
+    console.log(JSON.stringify({ iss: claims.iss, aud: claims.aud, sub: claims.sub,
+      email: claims.email, email_verified: claims.email_verified }));
+  } catch (_) {
+    throw new Error('MAIL_IDENTITY_READBACK_FAILED');
+  }
+}
+```
+
+観測した`aud`を`$GasAudience`、`sub`を`$GasDeployerSubject`へ入力し、emailが`$GasDeployerEmail`と一致することを確認します。一時関数は確認後に削除し、最終versionへ含めません。これは窓口ログイン用clientのaudienceではありません。[ID tokenと必要scope](https://developers.google.com/apps-script/reference/script/script-app#getIdentityToken())
+
+## 6. Cloud Runの配備・読戻し
 
 `$SecretVersion`と`$ImageDigest`が前段の読戻しと一致しなければ停止します。以下は本サービス専用の環境変数一式です。既存serviceへ適用する場合は先に現設定とrevisionを保全します。
 
 ```powershell
 if ($ImageDigest -notmatch '^sha256:[a-f0-9]{64}$' -or
-    $SecretVersion -notmatch "^projects/$([regex]::Escape($ProjectId))/secrets/$([regex]::Escape($SecretId))/versions/[1-9][0-9]*$") {
-  throw 'Verified image digest and numeric Secret version are required.'
+    $SecretVersion -cne $versionMetadata.name -or $versionMetadata.state -cne 'ENABLED' -or
+    $SecretVersion -notmatch ('^' + [regex]::Escape($CanonicalSecretName) + '/versions/[1-9][0-9]*$') -or
+    $GasAudience -notmatch '^[a-zA-Z0-9.-]+\.apps\.googleusercontent\.com$' -or
+    $GasDeployerSubject -notmatch '^[\x21-\x7e]{1,255}$' -or $GasDeployerSubject -match '[<>,]') {
+  throw 'Observed image digest, canonical Secret version and GAS identity are required.'
 }
 $ImageByDigest = "$Region-docker.pkg.dev/$ProjectId/$Repository/contact-mail@$ImageDigest"
 $RuntimeEnvironment = "MAIL_SCRIPT_AUDIENCE=$GasAudience,MAIL_DEPLOYER_EMAIL=$GasDeployerEmail,MAIL_DEPLOYER_SUBJECT=$GasDeployerSubject,MAILBOX_OAUTH_SECRET_VERSION=$SecretVersion,FIRESTORE_DATABASE_ID=$DatabaseId"
@@ -180,32 +277,19 @@ gcloud run revisions list --service=$Service --region=$Region --project=$Project
 
 service URL、ready revision、image digest、実行SA、custom audience、5環境変数、resource上限とtraffic先を照合します。`allUsers`・`allAuthenticatedUsers`のinvokerがないこと、IAM検査が無効化されていないことを確認します。GASの外部HTTPS呼出しを受けるためingressは`all`ですが、IAMとサービス内の配備者ID検証を両方維持します。Secretの**名前/version参照**を環境変数で渡す実装なので、`--set-secrets`で資格情報を展開しません。[配備CLI](https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy)・[custom audience](https://docs.cloud.google.com/run/docs/configuring/custom-audiences)
 
-## 6. GASの反映・読戻し
+## 7. GASの最終version・公開配備
 
-現行の配備ID・version、manifest、コード、設定名、Sheet/Drive参照先を先に保全します。採用SHAのviewerを`rootDir`にした既存のprivate `.clasp.json`を使い、`scriptId`が対象と一致することを確認します。設定ファイル・認証ファイルはrepoへ追加しません。下記は検証済みのclasp 3.3系コマンド名です。実行環境の`clasp --version`と各`--help`も照合します。
+Cloud Runの読戻し後、GAS editorの対象project設定でScript Property **`MAIL_SERVICE_URL`だけ**を読戻し済みの`https://...run.app`へ設定し、保存後の同じ欄で再確認します。全propertiesの出力や置換をしません。claspにはScript Propertiesを直接設定する標準コマンドがないため、この手順を架空のCLIで置き換えません。[Propertiesの設定](https://developers.google.com/apps-script/guides/properties#manage_script_properties_manually)
+
+採用SHAのコードを再pushし、一時claims関数がないこととmanifest・Sheet/Drive参照先を読み戻します。ここで初めて最終versionを作成します。
 
 ```powershell
-$ClaspUser = '<existing-approved-clasp-user>'
-$ClaspProjectFile = '<absolute-private-clasp-json>'
-$GasScriptId = '<existing-approved-script-id>'
-$GasDeploymentId = '<existing-approved-deployment-id>'
-if (@($ClaspUser, $ClaspProjectFile, $GasScriptId, $GasDeploymentId).Where({
-    [string]::IsNullOrWhiteSpace($_) -or $_ -match '[<>\r\n]'
-  }).Count -or -not [IO.Path]::IsPathFullyQualified($ClaspProjectFile)) {
-  throw 'Exact existing GAS target and absolute private config path required.'
-}
-$claspTarget = Get-Content -Raw -LiteralPath $ClaspProjectFile | ConvertFrom-Json
-if ($claspTarget.scriptId -cne $GasScriptId) { throw 'GAS script target mismatch.' }
-clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
-clasp -u $ClaspUser -P $ClaspProjectFile show-file-status
 Invoke-ApprovedChange clasp @('-u', $ClaspUser, '-P', $ClaspProjectFile, 'push')
 Invoke-ApprovedChange clasp @('-u', $ClaspUser, '-P', $ClaspProjectFile,
   'create-version', "contact-mail $GitSha")
 ```
 
-push前の対象は`Code.gs`・`OAuth.gs`・`MailBridge.gs`・`Index.html`・`Login.html`・`appsscript.json`です。manifestの`openid`と既存scope、Sheet/Drive保存先を照合します。version作成結果の整数を`$GasVersion`へ入力します。GAS editorの対象project設定でScript Property **`MAIL_SERVICE_URL`だけ**を読戻し済みの`https://...run.app`へ設定し、保存後の同じ欄で再確認します。全propertiesの出力や置換をしません。claspにはScript Propertiesを直接設定する標準コマンドがないため、この手順を架空のCLIで置き換えません。[Propertiesの設定](https://developers.google.com/apps-script/guides/properties#manage_script_properties_manually)
-
-配備者本人が新scopeを必要に応じて再認可した後、既存配備を更新します。
+作成結果の整数を`$GasVersion`へ入力し、別の空のprivate作業フォルダで`clasp -u $ClaspUser clone-script $GasScriptId $GasVersion`を実行して採用コード・manifestを比較してから、既存公開配備を更新します。
 
 ```powershell
 if ($GasVersion -notmatch '^[1-9][0-9]*$' -or $GasDeploymentId -match '[<>\r\n]') { throw 'Verified GAS version and deployment ID required.' }
@@ -215,9 +299,9 @@ Invoke-ApprovedChange clasp @('-u', $ClaspUser, '-P', $ClaspProjectFile,
 clasp -u $ClaspUser -P $ClaspProjectFile list-deployments
 ```
 
-別の空のprivate作業フォルダで`clasp -u $ClaspUser clone-script $GasScriptId $GasVersion`を実行し、採用コード・manifestを比較します。通常URLで社員と窓口本人の認証、IAM拒否、実利用者の初回確認者・日時、実Firestoreのindex・集計、実メール・添付を確認し、[本番受入](10_SUPPORT_CONTACT_MAIL_OPERATIONS.md#6-本番の受入)へ進みます。実配備のChrome確認を行い、Edge・Firefoxは省略として記録します。[clasp公式コマンド](https://github.com/google/clasp#deploy)
+通常URLで社員と窓口本人の認証、IAM拒否、実利用者の初回確認者・日時、実Firestoreのindex・集計、実メール・添付を確認し、[本番受入](10_SUPPORT_CONTACT_MAIL_OPERATIONS.md#6-本番の受入)へ進みます。実配備のChrome確認を行い、Edge・Firefoxは省略として記録します。[clasp公式コマンド](https://github.com/google/clasp#deploy)
 
-## 7. 巻戻しコマンド
+## 8. 巻戻しコマンド
 
 保全済みの受入済みGAS versionを`$PreviousGasVersion`に指定し、同じ配備IDへ`create-deployment --versionNumber $PreviousGasVersion`を適用して読戻します。Cloud Runに受入済みrevisionがある場合だけ、次を実行します。
 
