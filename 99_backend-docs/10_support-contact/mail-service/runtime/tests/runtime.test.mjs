@@ -106,6 +106,33 @@ test('mail and attachment enforce mapping and scrub notification secrets', async
   await assert.rejects(() => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'm1', partId: '0.8', offset: 0 })), { code: 'MAIL_ATTACHMENT_NOT_FOUND' });
 });
 
+test('mail body observation includes independent HTML beside plain text', async () => {
+  const f = fixture([A]);
+  const mail = gmailMessage('mixed', 'plain introduction');
+  const html = '<span>independent inquiry</span>';
+  mail.payload.parts.push({ mimeType: 'text/html', body: { size: Buffer.byteLength(html), data: encode(html) } });
+  f.messages.set('mixed', mail);
+  f.store.seed(record('mixed', { bodyAvailability: 'unverified' }));
+  const detail = await f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'mixed' }));
+  assert.equal(detail.message.bodyText, 'plain introduction\nindependent inquiry');
+  assert.equal(detail.message.bodyAvailability, 'verified');
+});
+
+test('forwarded attachment child content cannot be acknowledged as an empty transfer', async () => {
+  const f = fixture([A]);
+  const mail = gmailMessage('forwarded', 'current body');
+  mail.payload.parts.push({ mimeType: 'message/rfc822', filename: 'forward.eml', body: { size: 0 }, parts: [plainPart('forwarded content')] });
+  f.messages.set('forwarded', mail);
+  f.store.seed(record('forwarded', { attachmentCount: 1, unverifiedAttachmentCount: 1,
+    attachments: [{ partId: '0.1', name: 'forward.eml', mimeType: 'message/rfc822', size: 0, availability: 'unverified' }] }));
+  const detail = await f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'forwarded' }));
+  assert.equal(detail.message.bodyText, 'current body');
+  assert.equal(detail.message.reviewReady, false);
+  await assert.rejects(() => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'forwarded', partId: '0.1', offset: 0 })), { code: 'MAIL_ATTACHMENT_UNAVAILABLE' });
+  assert.equal((await f.store.getMessage('forwarded')).attachments[0].availability, 'unavailable');
+  await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'forwarded', expectedVersion: 1 })), { code: 'MAIL_CONTENT_UNAVAILABLE' });
+});
+
 test('encoded secret links never reach stored metadata, body RPC or text attachment bytes', async () => {
   const raw = 'https://script.google.com/macros/s/test/exec#token=TEST_ENCODED_SECRET';
   const variants = [encodeURIComponent(raw), encodeURIComponent(encodeURIComponent(raw)),

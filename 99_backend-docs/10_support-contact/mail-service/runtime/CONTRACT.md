@@ -30,9 +30,9 @@ catalog・同期・再照合は社員操作だけに限定する。catalog diges
 
 残件一覧は種類を選び、保存済みメールを日時・messageId降順に50件ずつ走査する。該当0件のページにも次ページが残る場合がある。同期失敗で未登録のメールID、案件別の関連メール有無が未確認の受付ID、取得前削除で種類未確認のIDも50件ずつ列挙する。受付ID一覧・失敗ID一覧の対象集合が変化したcursorは拒否し、更新して先頭から確認する。取得不能のメールは保存済みメタ情報と添付descriptorを表示し、本文取得不能でも添付確認経路を維持する。
 
-一覧は日時・messageId降順の50件。返却は`{ok:true,messages,page:{nextPageToken,previousPageToken,pageSize},sync}`。詳細は`message.bodyText`と添付descriptorを返す。MIME partIdはrootを`0`、子を`0.1`のように表す。本文は安全なテキストとし、HTML・remote画像を実行しない。旧秘密付きURLを表示・ログ前に除去する。
+一覧は日時・messageId降順の50件。返却は`{ok:true,messages,page:{nextPageToken,previousPageToken,pageSize},sync}`。詳細は`message.bodyText`と添付descriptorを返す。MIME partIdはrootを`0`、子を`0.1`のように表す。本文は安全なテキストとし、HTML・remote画像を実行しない。同じ`multipart/alternative`内だけプレーンテキスト優先で1表現を選び、独立した本文partは順に連結する。旧秘密付きURLを表示・ログ前に除去する。
 
-添付はmessage内の所有partを再検証し、512KiB以下のbase64 chunkを返す。返却は`{attachment:{partId,name,mimeType,size,previewKind},offset,nextOffset,totalSize,dataBase64,done}`。画像・PDFはsignature確認、テキストは安全なUTF-8プレビュー、それ以外はoctet-stream取得。テキスト添付の表示用データも秘密URLを除去する。実装は各chunkでGmail添付全体を読んで切り出すため、大容量添付の実測による待ち時間・API読取回数・費用判断が本番接続前に必要。
+添付はmessage内の所有partを再検証し、512KiB以下のbase64 chunkを返す。返却は`{attachment:{partId,name,mimeType,size,previewKind},offset,nextOffset,totalSize,dataBase64,done}`。画像・PDFはsignature確認、テキストは安全なUTF-8プレビュー、それ以外はoctet-stream取得。転送メール添付などで元のバイト列が取得できず子MIME partだけが存在する場合は、空ファイルに置き換えず取得不能とする。テキスト添付の表示用データも秘密URLを除去する。実装は各chunkでGmail添付全体を読んで切り出すため、大容量添付の実測による待ち時間・API読取回数・費用判断が本番接続前に必要。
 
 初回確認者・日時はCloud Run側の時刻と、GASで確認した実利用者をtransactionで一度だけ保存する。同一requestId・同内容は同じreceiptを返し、内容相違は409。分類変更はversion照合と理由付きeventを残す。
 

@@ -71,17 +71,33 @@ async function readPart(message, descriptor, fetchAttachment, maxBytes) {
     const result = await fetchAttachment(String(message.id), descriptor.attachmentId);
     data = result?.data;
   }
-  if (data == null && descriptor.size === 0) data = '';
+  if (data == null) {
+    if (descriptor.size !== 0 || part.parts?.length) throw new Error('MAIL_CONTENT_UNAVAILABLE');
+    data = '';
+  }
   const bytes = decodeData(data, maxBytes);
+  if (bytes.length === 0 && part.parts?.length) throw new Error('MAIL_CONTENT_UNAVAILABLE');
   if (descriptor.size !== bytes.length) throw new Error('MIME_SIZE_MISMATCH');
   return { bytes, part };
+}
+
+function selectBodyParts(message, bodyParts) {
+  const byPath = new Map(bodyParts.map((part) => [part.partId, part]));
+  function select(part, path) {
+    const children = (part.parts || []).map((child, index) => select(child, `${path}.${index}`));
+    const mimeType = String(part.mimeType || '').toLowerCase().split(';')[0].trim();
+    if (mimeType === 'multipart/alternative') {
+      return children.find((parts) => parts.some((item) => item.mimeType === 'text/plain')) || children.find((parts) => parts.length) || [];
+    }
+    return [...(byPath.has(path) ? [byPath.get(path)] : []), ...children.flat()];
+  }
+  return select(message.payload, '0');
 }
 
 export async function readMessageText(message, fetchAttachment, options = {}) {
   const limits = { ...defaultLimits, ...options };
   const { bodyParts } = inspectMime(message, limits);
-  const plain = bodyParts.filter((part) => part.mimeType === 'text/plain');
-  const selected = plain.length ? plain : bodyParts.filter((part) => part.mimeType === 'text/html');
+  const selected = selectBodyParts(message, bodyParts);
   let total = 0;
   const values = [];
   for (const descriptor of selected) {

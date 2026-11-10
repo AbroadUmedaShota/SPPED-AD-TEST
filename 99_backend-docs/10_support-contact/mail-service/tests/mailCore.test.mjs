@@ -69,6 +69,14 @@ test('nested multipart resolves plain body and image attachment ownership', asyn
   await assert.rejects(readMailAttachment(mail, '0.0.1'), /MAIL_ATTACHMENT_NOT_FOUND/);
 });
 
+test('independent mixed bodies remain in order while alternatives use one representation', async () => {
+  const mail = message({ mimeType: 'multipart/mixed', parts: [part('introduction'), part('<span>independent HTML</span>', 'text/html'),
+    { mimeType: 'multipart/alternative', parts: [part('<span>duplicate HTML</span>', 'text/html'), part('plain alternative')] },
+    { mimeType: 'multipart/alternative', parts: [part('<span>HTML alternative</span>', 'text/html'), part('<span>duplicate second HTML</span>', 'text/html')] },
+    part('ending')] });
+  assert.equal(await readMessageText(mail), 'introduction\nindependent HTML\nplain alternative\nHTML alternative\nending');
+});
+
 test('body stored behind attachmentId is fetched but is not a form attachment', async () => {
   const mail = message({ mimeType: 'text/plain', body: { attachmentId: 'body1', size: 4 } });
   assert.equal(inspectMime(mail).attachments.length, 0);
@@ -80,6 +88,20 @@ test('an attached forwarded message never becomes the current message body', asy
   const mail = message({ mimeType: 'multipart/mixed', parts: [part('current'), { mimeType: 'message/rfc822', filename: 'forward.eml', body: { size: 0 }, parts: [part('quoted attachment body')] }] });
   assert.equal(await readMessageText(mail), 'current');
   assert.equal(inspectMime(mail).attachments.length, 1);
+});
+
+test('a forwarded MIME tree without serialized attachment content is unavailable rather than empty', async () => {
+  for (const body of [{ size: 0 }, { size: 0, data: '' }]) {
+    const mail = message({ mimeType: 'message/rfc822', filename: 'forward.eml', body, parts: [part('forwarded content')] });
+    await assert.rejects(readMailAttachment(mail, '0'), /MAIL_CONTENT_UNAVAILABLE/);
+  }
+  const bytes = Buffer.from('Subject: forwarded\r\n\r\nforwarded content');
+  const mail = message({ mimeType: 'message/rfc822', filename: 'forward.eml',
+    body: { size: bytes.length, attachmentId: 'forwarded1' }, parts: [part('forwarded content')] });
+  const attachment = await readMailAttachment(mail, '0', async () => ({ data: bytes.toString('base64url') }));
+  assert.deepEqual(attachment.bytes, bytes);
+  const empty = await readMailAttachment(message({ mimeType: 'message/rfc822', filename: 'empty.eml', body: { size: 0 } }), '0');
+  assert.equal(empty.bytes.length, 0);
 });
 
 test('HTML is rendered as inert text and secret links are removed', async () => {
