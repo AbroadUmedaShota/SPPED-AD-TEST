@@ -48,7 +48,24 @@ function stripHtml(value) {
       index += 1;
       continue;
     }
-    if (!activeTag && textStart < index) output.push(value.slice(textStart, index));
+    if (activeTag) {
+      const nameEnd = index + 2 + activeTag.length;
+      if (value[index + 1] === '/' && value.slice(index + 2, nameEnd).toLowerCase() === activeTag) {
+        let end = nameEnd;
+        while (end < value.length && /\s/.test(value[end])) end += 1;
+        if (value[end] === '>') {
+          activeTag = null;
+          index = end + 1;
+          textStart = index;
+          continue;
+        }
+      }
+      // Active content may contain comparison operators or incomplete inner tags.
+      // Only its matching end tag can resume visible text.
+      index += 1;
+      continue;
+    }
+    if (textStart < index) output.push(value.slice(textStart, index));
     if (value.startsWith('<!--', index)) {
       const end = value.indexOf('-->', index + 4);
       if (end < 0) break;
@@ -62,7 +79,6 @@ function stripHtml(value) {
     const nameStart = cursor;
     while (cursor < value.length && /[a-z0-9:-]/i.test(value[cursor])) cursor += 1;
     const name = value.slice(nameStart, cursor).toLowerCase();
-    const nameEnd = cursor;
     let quote = null;
     while (cursor < value.length) {
       const char = value[cursor];
@@ -74,9 +90,7 @@ function stripHtml(value) {
     }
     // Consume each tag once; unfinished markup and active blocks never become visible text.
     if (cursor === value.length) break;
-    if (activeTag) {
-      if (closing && name === activeTag && /^\s*$/.test(value.slice(nameEnd, cursor))) activeTag = null;
-    } else if (!closing && activeHtmlTags.has(name)) {
+    if (!closing && activeHtmlTags.has(name)) {
       let endContent = cursor - 1;
       while (endContent > index && /\s/.test(value[endContent])) endContent -= 1;
       if (name !== 'svg' || value[endContent] !== '/') activeTag = name;
