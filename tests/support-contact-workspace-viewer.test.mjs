@@ -249,6 +249,7 @@ test('manifest requires Google sign-in, deployer execution and minimum used serv
   const manifest = JSON.parse(readFileSync(new URL('appsscript.json', root), 'utf8'));
   assert.deepEqual(manifest.webapp, { executeAs: 'USER_DEPLOYING', access: 'ANYONE' });
   assert.deepEqual(manifest.oauthScopes.slice().sort(), [
+    'openid',
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive.readonly',
     'https://www.googleapis.com/auth/userinfo.email',
@@ -305,6 +306,7 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
       addEventListener(type, listener) { this.listeners.set(type, listener); },
       removeAttribute() {}, setAttribute() {},
       querySelectorAll: () => [],
+      querySelector: (selector) => element(`${id}:${selector}`),
     });
     return elements.get(id);
   };
@@ -314,6 +316,8 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
       return { withFailureHandler(failure) {
         return new Proxy({}, { get(_target, key) {
           return (...args) => {
+            // Phase 1 queue/race scenarios isolate the optional mail service, covered separately.
+            if (['listContactMail', 'getContactMailSyncStatus'].includes(key)) { success({ ok: false, error: { code: 'MAIL_NOT_CONFIGURED' } }); return; }
             calls.push([key, ...args]);
             let deliver;
             try { const value = env.api[key](...args); deliver = () => success(value); } catch (error) { deliver = () => failure(error); }
