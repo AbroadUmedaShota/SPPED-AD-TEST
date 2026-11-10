@@ -63,6 +63,9 @@ test('mail bridge sends only server-verified actor to a fixed TLS endpoint', () 
   const call = app.calls[0];
   assert.equal(call.target, 'https://contact-mail-example.a.run.app/rpc');
   assert.equal(call.envelope.operation, 'listCaseMail');
+  assert.match(call.envelope.requestId, /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
+  const createdAt = Number.parseInt(call.envelope.requestId.slice(0, 8) + call.envelope.requestId.slice(9, 13), 16);
+  assert.ok(Math.abs(Date.parse(call.envelope.issuedAt) - createdAt) < 1000);
   assert.deepEqual(call.envelope.actor, { email: 'reader@abroad-o.com', authMode: 'domain' });
   assert.deepEqual(call.envelope.payload, { scope: 'case', caseId, pageToken: '' });
   assert.equal(call.options.followRedirects, false);
@@ -540,6 +543,31 @@ test('explicit review retries preserve request ID and never mutate case status',
   assert.equal(app.state.detail.handled_status, '対応済み');
   assert.equal(app.state.detail.internal_note, '保持');
   assert.ok(!app.calls.some((call) => call.name === 'updateContactSubmissionStatus'));
+});
+
+test('expired review and no-mail requests retain identity and require saved-state reconciliation', async () => {
+  const app = uiRuntime({
+    listContactMail: () => list([summary()]), getContactMailMessage: () => ({ ok: true, message: detail() }),
+    markContactMailReviewed: () => ({ ok: false, error: { code: 'MAIL_REQUEST_EXPIRED' } }),
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  await app.ui.writeContactMail('case', 'review');
+  const id = app.mail.case.pendingWrite.requestId;
+  assert.match(id, /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
+  assert.match(app.mail.case.writeError, /7日.*自動では再送しません/);
+  await app.ui.writeContactMail('case', 'review');
+  assert.equal(app.calls.filter((call) => call.name === 'markContactMailReviewed')[1].args[0].requestId, id);
+  assert.equal(app.mail.case.message.firstReview, null);
+
+  const absent = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ eligible: true }) }),
+    confirmContactCaseNoMail: () => ({ ok: false, error: { code: 'MAIL_REQUEST_EXPIRED' } }) });
+  await absent.ui.loadContactMailList('case', { caseId });
+  await absent.ui.confirmContactCaseNoMailFromUi('case');
+  const pending = absent.mail.case.pendingNoMail.requestId;
+  await absent.ui.confirmContactCaseNoMailFromUi('case');
+  assert.equal(absent.mail.case.pendingNoMail.requestId, pending);
+  assert.match(absent.mail.case.noMailError, /7日.*自動では再送しません/);
+  assert.equal(absent.mail.case.noMail.confirmation, null);
 });
 
 test('pending classification sends explicit reason, case and expected version', async () => {

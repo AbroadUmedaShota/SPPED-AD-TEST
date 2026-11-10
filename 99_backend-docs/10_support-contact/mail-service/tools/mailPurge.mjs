@@ -3,6 +3,7 @@ import { assertMail } from '../runtime/errors.mjs';
 import { suppressionKey } from '../runtime/purgeGate.mjs';
 import { createFirestoreStore } from '../runtime/firestoreStore.mjs';
 import { retentionExpiresAt } from '../runtime/caseRetention.mjs';
+import { requestExpiresAt } from '../runtime/requestIdentity.mjs';
 
 const MAILBOX = 'contactMailboxes/customer-speed-ad';
 const CASE_ID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -222,7 +223,11 @@ export function createMailPurge({ db, projectId, databaseId = '(default)', now =
         transaction.set(mailbox.collection('suppressedMessages').doc(suppressionKey('message', id)), { version: 1 });
       }
       for (const id of job.receiptIds) if (group.some((item) => item.path === `${MAILBOX}/receipts/${id}`)) {
-        transaction.set(mailbox.collection('suppressedRequests').doc(suppressionKey('request', id)), { version: 1 });
+        const expiresAt = requestExpiresAt(id);
+        if (!expiresAt || Date.parse(expiresAt) > now().getTime()) {
+          transaction.set(mailbox.collection('suppressedRequests').doc(suppressionKey('request', id)),
+            expiresAt ? { version: 2, expiresAt } : { version: 1 });
+        }
       }
       transaction.set(controlRef, { generation, active: { ...current.active, nextOffset: offset + group.length } });
       return true;

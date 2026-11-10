@@ -5,6 +5,7 @@ import { mixedThreadDemotions } from './mixedThread.mjs';
 import { ATTACHMENT_CHUNK_SIZE, attachmentReviewReady } from './attachmentObservation.mjs';
 import { normalizeCatalogCases, catalogRetention, retentionPolicy, isRetainedRecord, assertRetainedRecord } from './caseRetention.mjs';
 import { noMailContext, noMailContextToken, validNoMailConfirmation, noMailConfirmationSummary } from './noMailConfirmation.mjs';
+import { assertCurrentRequestId } from './requestIdentity.mjs';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ID = /^[A-Za-z0-9_-]{1,200}$/;
@@ -706,8 +707,13 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       typeof envelope.payload === 'object' && !Array.isArray(envelope.payload));
     const actor = validateActor(envelope.actor);
     const { operation, payload, requestId } = envelope;
+    const mutation = ['markReviewed', 'resolvePending', 'confirmCaseNoMail', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending'].includes(operation);
+    if (mutation) assertCurrentRequestId(requestId, now());
     if (['uploadCaseCatalog', 'advanceSync', 'getSyncRequestResult', 'reconcilePending'].includes(operation)) assertMail(actor.authMode === 'domain', 'MAIL_FORBIDDEN', 403);
     return store.withAccess(async () => {
+      // Recheck after acquiring the purge generation. Cleanup either precedes this
+      // check or invalidates the generation of every subsequent transaction.
+      if (mutation) assertCurrentRequestId(requestId, now());
       let result;
       if (operation === 'listMailIssues') result = await listIssues(payload);
       else if (operation.startsWith('list')) result = await list(operation, payload);

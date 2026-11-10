@@ -51,7 +51,7 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 | 4 | Cloud Run専用実行サービスアカウント、Firestore database、Secret、image保存先を作成する。 | 実行アカウントにはFirestore操作と対象Secretの読取りに必要な権限だけを付ける。ブラウザや一般利用者へFirestore/Secretを直接共有しない。 |
 | 5 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
 | 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [データ管理・削除の案内](../運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に従い、案件終了後3年間の保存方針を実施する手段と削除申請先を先に確認する。[認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)へ実施説明と申請先メールを渡し、本人が説明へ対話的に同意する。code/tokenを端末ファイル・ログへ出さず、登録先Secretとversionを確認する。 |
-| 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | [配備コマンドの送信元確認](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md#4-imageビルドとdigest固定)で採用SHAの`mail-service`だけを列挙し、送信ファイル25件の完全一致を確認する。Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
+| 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | [配備コマンドの送信元確認](11_SUPPORT_CONTACT_MAIL_DEPLOY_COMMANDS.md#4-imageビルドとdigest固定)で採用SHAの`mail-service`だけを列挙し、送信ファイル26件の完全一致を確認する。Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
 | 8 | GAS開発版へメール連携コードと`openid` scopeをpushし、配備者本人が再認可してID tokenの必要claimsだけを確認する。 | 公開配備ID・versionは保全値のまま。tokenを表示せず、実GASのaudience・配備者subject/emailを取得する。窓口ログイン用clientから推定しない。 |
 | 9 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、手順8で確認したaudienceをcustom audienceへ登録する。特定の正規Secret versionとbuild/Registryで一致したimage digestを使う。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
 | 10 | GASの固定`MAIL_SERVICE_URL`を設定し、一時claims関数を除いた採用コードから最終versionを作成して公開配備する。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |
@@ -129,6 +129,19 @@ base64応答は64MiBの約4/3に膨らみ、デコード・安全化・digest計
 
 本番採用前に、利用が認められた小容量・代表容量・最大想定容量の画像/PDF/テキスト/その他形式で、全量到達、所要時間、timeout、Gmail API読取り回数、Cloud費用を実測します。合格に必要な待ち時間・最大想定容量と再取得手順を記録し、満たせなければ実装・配備設定を修正します。途中のchunkや末尾だけの取得で確認済みにできないことも確認します。0byte添付も明示取得の対象です。
 
+### 操作要求IDの期限と削除後マーカー
+
+メールの明示更新要求は発行から7日以内だけ再実行できます。同じ操作の再確認は同じIDを保持し、通信時刻を新しくしても期限は延長しません。`MAIL_REQUEST_EXPIRED` の場合は現在の保存状態を読み戻して照合し、新しい操作が必要か判断します。結果不明の要求を自動で新しいIDへ置き換えて再送しません。同期の読取り専用レシート照会は古いIDの保存済み結果も確認できます。
+
+削除対象のレシートが新形式なら、要求ID由来hashと固定の7日期限だけを残し、期限済みならマーカーを作りません。管理者は `mail-service` の作業場所で次を明示実行します。project・参照番号・plan hashは対象の管理記録から設定し、dry-runの件数・期限・`legacyCount` を確認してからapplyします。
+
+```powershell
+node tools/cleanupRequestMarkers.mjs --project $RuntimeProject --confirm-project $RuntimeProject --database '(default)' --request-reference $CleanupReference --operation plan
+node tools/cleanupRequestMarkers.mjs --project $RuntimeProject --confirm-project $RuntimeProject --database '(default)' --request-reference $CleanupReference --operation apply --plan-hash $PlanHash
+```
+
+1ページ最大250件を検査し、期限後の新形式だけを1トランザクションで消去します。`nextMarker` があれば、その値を次ページのplan/apply双方へ `--after-marker` として渡します。plan変更・同期中・保守中・不正記録では停止し、Gmailには接続しません。旧形式の期限不明マーカーは残すため、`legacyCount` を削除済み扱いにしません。案件ID由来hashと旧カタログの整理はこの操作の対象外です。
+
 ## 6. 本番の受入
 
 受入対象期間、同期基準日時、採用Git SHA・GAS version・Cloud Run revision/image digestを固定して、既存記録へ次を残します。
@@ -147,7 +160,7 @@ ID照合は[独立照合CLIとmanifest契約](../../../99_backend-docs/10_suppor
 
 1. 不具合の範囲、採用版と残件を記録し、必要な新規操作を止めます。対象不明の保存操作を繰り返しません。`closed_at`を更新しない旧版へ戻す場合は、先に期限削除を停止し、停止を確認します。
 2. GASを保全した第1段階の受入済みversionへ戻し、通常URLから受付本文・フォーム添付・状態・メモが利用できることを確認します。メール欄を残す場合は`MAIL_SERVICE_URL`を外して利用不可を明示します。
-3. Cloud Runに前の受入済みrevisionがあれば、そのrevisionへtrafficを戻してimage digest・IAM・環境変数を読戻します。初回配備で復旧先がなければ、GASのメール呼出しを止めた状態を復旧先とします。
+3. Cloud Runに前の受入済みrevisionがあれば、そのrevisionへtrafficを戻してimage digest・IAM・環境変数を読戻します。初回配備で復旧先がなければ、GASのメール呼出しを止めた状態を復旧先とします。要求IDマーカー整理後に、固定の要求期限を検証しない旧メールサービスへ戻すと過去の要求が再実行され得るため、その版への巻戻し前にはメール更新を停止します。
 4. Sheet/DriveとFirestoreの確認・照合・監査記録は消去しません。Secretの失効・version変更やCloud資源の削除は別途必要性を判断します。
 5. 巻戻し中の状態更新は、対象ID・変更前後の状態・操作時刻を管理記録で全件追跡します。旧版は再開・再完了しても古い`closed_at`を残すため、現行版へ戻すだけでは信頼を回復できません。復旧後は影響した全案件の終了日時を根拠から再確認するか空へ戻し、空は終了日未確認として期限削除から除外します。追跡漏れがあれば全終了日時を未確認として扱い、照合完了まで期限削除を再開しません。メモ保存でも`handled_at`が変わるため、日時の大小だけで自動判定しません。
 5. 第2段階の利用不可と確認範囲を記録し、必要なメールボックス確認へ戻します。原因修正後は影響を受けた同期・全件照合・確認記録読戻しをやり直して受入します。

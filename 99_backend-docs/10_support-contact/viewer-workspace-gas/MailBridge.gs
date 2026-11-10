@@ -7,7 +7,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_INVALID_RESPONSE', 'INVALID_REQUEST', 'NOT_FOUND', 'CONFLICT',
   'MAIL_UNAVAILABLE', 'ATTACHMENT_UNAVAILABLE', 'SYNC_INCOMPLETE',
   'AUTH_REQUIRED', 'FORBIDDEN', 'HISTORY_EXPIRED', 'MAIL_AUTH_REQUIRED', 'MAIL_FORBIDDEN',
-  'MAIL_INVALID_REQUEST', 'MAIL_ATTACHMENT_NOT_FOUND', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT',
+  'MAIL_INVALID_REQUEST', 'MAIL_ATTACHMENT_NOT_FOUND', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT', 'MAIL_REQUEST_EXPIRED',
   'MAIL_SYNC_BUSY', 'MAIL_CONTENT_UNAVAILABLE', 'MAIL_HISTORY_EXPIRED', 'MAIL_INVALID_UPSTREAM',
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
   'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
@@ -235,7 +235,11 @@ function mailVersion_(value) {
 }
 
 function mailRequestId_(value) {
-  if (!value) return Utilities.getUuid();
+  if (!value) {
+    var stamp = new Date().getTime().toString(16);
+    while (stamp.length < 12) stamp = '0' + stamp;
+    return stamp.slice(0, 8) + '-' + stamp.slice(8) + '-7' + Utilities.getUuid().slice(15);
+  }
   var id = String(value);
   if (!/^[a-zA-Z0-9-]{16,80}$/.test(id)) throw new Error('メール操作の識別子が不正です。');
   return id;
@@ -258,7 +262,7 @@ function callMailService_(operation, payload, context, requestId) {
   var envelope = {
     contractVersion: 1,
     operation: operation,
-    requestId: requestId || Utilities.getUuid(),
+    requestId: requestId || mailRequestId_(),
     issuedAt: new Date().toISOString(),
     actor: { email: context.email, authMode: context.authMode === 'google-oauth' ? 'customer-oauth' : 'domain' },
     payload: payload

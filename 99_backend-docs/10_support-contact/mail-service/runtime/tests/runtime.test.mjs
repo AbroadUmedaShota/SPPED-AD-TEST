@@ -1,3 +1,4 @@
+import { createRequestId } from '../requestIdentity.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -58,7 +59,7 @@ function fixture(ids = [A, B], now = () => new Date(NOW)) {
   };
   const execute = createMailService({ store, gmail, core, now });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation,
-    requestId: randomUUID(), issuedAt: now().toISOString(), actor,
+    requestId: createRequestId(now()), issuedAt: now().toISOString(), actor,
     payload: operation === 'advanceSync' && payload.mode ? { startAt: START, ...payload } : payload, ...changes });
   return { store, messages, calls, metadataCalls, gmail, execute, envelope };
 }
@@ -111,6 +112,24 @@ test('rejects unsupported actor, operation, stale envelope and customer sync', a
   await assert.rejects(() => f.execute(f.envelope('getSyncStatus', {}, { issuedAt: '2020-01-01T00:00:00Z' })), { code: 'MAIL_INVALID_REQUEST' });
   await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'full' },
     { actor: { email: 'customer@speed-ad.com', authMode: 'customer-oauth' } })), { code: 'MAIL_FORBIDDEN' });
+});
+
+test('expired mutation IDs fail before storage even when the envelope timestamp is renewed', async () => {
+  const f = fixture();
+  let accesses = 0;
+  f.store.withAccess = async () => { accesses++; throw new Error('storage must not be reached'); };
+  const requestId = createRequestId(new Date('2026-11-03T09:00:00.000Z'));
+  for (const operation of ['markReviewed', 'resolvePending', 'confirmCaseNoMail', 'uploadCaseCatalog', 'advanceSync', 'reconcilePending']) {
+    await assert.rejects(f.execute(f.envelope(operation, {}, { requestId })), { code: 'MAIL_REQUEST_EXPIRED' });
+  }
+  assert.equal(accesses, 0);
+  const read = fixture();
+  assert.equal((await read.execute(read.envelope('getSyncStatus', {}, { requestId }))).ok, true);
+  let at = new Date('2026-11-10T08:59:59.999Z');
+  const delayed = fixture([A], () => at);
+  delayed.store.withAccess = async (operation) => { at = new Date(NOW); return operation(); };
+  await assert.rejects(delayed.execute(delayed.envelope('markReviewed', {},
+    { requestId: createRequestId(new Date('2026-11-03T09:00:00.000Z')) })), { code: 'MAIL_REQUEST_EXPIRED' });
 });
 
 test('sync request confirmation is read-only, actor-bound and returns historical receipt plus current status', async () => {

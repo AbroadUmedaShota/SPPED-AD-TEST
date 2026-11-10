@@ -1,3 +1,4 @@
+import { createRequestId } from '../requestIdentity.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -20,7 +21,7 @@ function fixture(ids = [A]) {
   const store = fakeStore(ids, state); store.setCatalog(catalog);
   const execute = createMailService({ store, gmail: {}, core: {}, now: () => new Date(NOW) });
   const envelope = (operation, payload = {}, changes = {}) => ({ contractVersion: 1, operation, payload,
-    requestId: randomUUID(), issuedAt: NOW, actor, ...changes });
+    requestId: createRequestId(new Date(NOW)), issuedAt: NOW, actor, ...changes });
   return { store, catalog, state, execute, envelope };
 }
 
@@ -167,7 +168,7 @@ test('revoked or inconsistent stored absence is hidden and a fresh action record
     store.countMessages = async () => ({ pending: 0, unreviewed: 0, unavailable: 0, bodyUnverified: 0, bodyUnavailable: 0, attachmentUnverified: 0, attachmentUnavailable: 0 });
     store.countUnobservedDeletions = async () => 0;
     const execute = createMailService({ store, gmail: {}, core: {}, now: () => new Date(NOW) });
-    const envelope = (operation, payload) => ({ contractVersion: 1, operation, payload, actor, issuedAt: NOW, requestId: randomUUID() });
+    const envelope = (operation, payload) => ({ contractVersion: 1, operation, payload, actor, issuedAt: NOW, requestId: createRequestId(new Date(NOW)) });
     const before = await execute(envelope('listCaseMail', { caseId: A }));
     assert.equal(before.noMail.confirmation, null, invalid);
     const result = await execute(envelope('confirmCaseNoMail', { caseId: A, contextToken: before.noMail.contextToken }));

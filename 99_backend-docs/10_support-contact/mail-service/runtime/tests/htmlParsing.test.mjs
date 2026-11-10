@@ -1,3 +1,4 @@
+import { createRequestId } from '../requestIdentity.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -26,7 +27,7 @@ for (const [kind, html] of [
     async getMessage() { return { id: 'complex', threadId: 'thread', internalDate: String(Date.parse(at)),
       payload: { mimeType: 'text/html', body: { size: bytes.length, data: bytes.toString('base64url') } } }; } };
   const execute = createMailService({ store, gmail, core: { ...classification, ...mime, ...review, ...safeMail }, now: () => new Date(at) });
-  const envelope = (operation, payload = {}) => ({ contractVersion: 1, operation, requestId: randomUUID(), issuedAt: at,
+  const envelope = (operation, payload = {}) => ({ contractVersion: 1, operation, requestId: createRequestId(new Date(at)), issuedAt: at,
     actor: { email: 'staff@abroad-o.com', authMode: 'domain' }, payload });
   const target = { scope: 'case', caseId, messageId: 'complex' };
   const detail = await execute(envelope('getMail', target));

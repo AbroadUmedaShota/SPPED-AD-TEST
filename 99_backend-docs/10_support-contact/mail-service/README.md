@@ -26,7 +26,7 @@ HTMLの構文解釈には [parse5](https://github.com/inikulin/parse5) `8.1.1`�
 
 正本Sheet・独立したGmail列挙・app記録の照合は[独立照合CLIとmanifest契約](tools/ACCEPTANCE.md)を使う。IDをhash化した入力の完全性と双方向一致を検査し、本文・添付・確認記録の残件を返す。合成試験済みの照合器と、本番source採取・業務受入の実施を区別する。
 
-Gmailのsource採取は `tools/captureGmailAcceptanceCli.mjs` を使う。計画表示を既定とし、明示実行・同じprojectの数値固定Secret version・窓口・受入期間・private保存先を必要とする。関連メールなしの案件確認を含む説明version `2026-11-11.8` を通常サービスとマーカー整理でも検証し、旧同意記録では接続しない。登録ツールと実行時が共有する正本から説明全文を再構成し、保存方法・削除窓口を含むパラメータ、全文・hash・窓口・UTC同意日時を照合する。5分を超える未来日時、説明の省略・改変、固定数値以外のSecret versionはOAuthクライアント生成前に拒否する。Google審査・人による閲覧条件・本人同意を解決した後にだけ実採取する。
+Gmailのsource採取は `tools/captureGmailAcceptanceCli.mjs` を使う。計画表示を既定とし、明示実行・同じprojectの数値固定Secret version・窓口・受入期間・private保存先を必要とする。関連メールなしの案件確認を含む説明version `2026-11-11.9` を通常サービスとマーカー整理でも検証し、旧同意記録では接続しない。登録ツールと実行時が共有する正本から説明全文を再構成し、保存方法・削除窓口を含むパラメータ、全文・hash・窓口・UTC同意日時を照合する。5分を超える未来日時、説明の省略・改変、固定数値以外のSecret versionはOAuthクライアント生成前に拒否する。Google審査・人による閲覧条件・本人同意を解決した後にだけ実採取する。
 
 ## 公開前に必要な設定と判断
 
@@ -57,3 +57,6 @@ GASの第1段階version 7は単独で受入済み。第2段階が未配備また
 ## メール記録の手動削除
 
 管理者用CLI `node tools/purgeMailMetadata.mjs` はdry-runを既定とし、対象project/database、確認済み依頼番号、同じ計画hashの明示適用を必要とします。[削除手順](../../../docs/ハンドブック/運用/10_SUPPORT_CONTACT_MAIL_PURGE.md)に、保守状態、途中失敗からの再開、最小hashマーカーと期限削除の残る統合条件を記載しています。
+
+
+操作要求IDは発行時刻を固定した新形式を使い、明示更新の再実行期限は発行から7日です。期限後は結果を読み戻して照合し、応答不明の要求を自動で新しいIDへ置き換えません。削除済みレシートの要求ID hashはこの期限までだけ必要で、`tools/cleanupRequestMarkers.mjs` のdry-run/明示applyにより期限済みの新形式を最大250件ずつ整理できます。旧形式の期限不明hashは残し、案件ID hashや旧カタログの整理とは分けます。契約と実行手順はruntime/CONTRACT.mdと本番運用手順を参照してください。

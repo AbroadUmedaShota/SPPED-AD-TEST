@@ -10,6 +10,7 @@ import { createPurgeGate, suppressionKey } from '../../runtime/purgeGate.mjs';
 import { createGmailAdapter } from '../../runtime/googleAdapters.mjs';
 import { createFirestoreStore } from '../../runtime/firestoreStore.mjs';
 import { createMailService } from '../../runtime/service.mjs';
+import { createRequestId } from '../../runtime/requestIdentity.mjs';
 import { fakeStore } from '../../runtime/tests/fakeStore.mjs';
 
 const root = 'contactMailboxes/customer-speed-ad';
@@ -342,7 +343,7 @@ test('pending source-deletion history must be consumed under the marker before c
   };
   const at = '2026-11-10T09:00:00.000Z';
   const execute = createMailService({ store, gmail: f.gmail, core: {}, now: () => new Date(at) });
-  const sync = () => execute({ contractVersion: 1, operation: 'advanceSync', requestId: randomUUID(), issuedAt: at,
+  const sync = () => execute({ contractVersion: 1, operation: 'advanceSync', requestId: createRequestId(new Date(at)), issuedAt: at,
     actor: { email: 'staff@abroad-o.com', authMode: 'domain' },
     payload: { executionId: randomUUID(), mode: 'history', startAt: '2026-01-01T00:00:00.000Z' } });
   await sync();

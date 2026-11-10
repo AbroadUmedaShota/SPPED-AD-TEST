@@ -1353,6 +1353,11 @@
     };
 
     /* CONTACT_MAIL_TEST_HELPERS_START */
+    function contactMailRequestId() {
+      const stamp = Date.now().toString(16).padStart(12, '0');
+      return `${stamp.slice(0, 8)}-${stamp.slice(8)}-7${window.crypto.randomUUID().slice(15)}`;
+    }
+
     function contactMailErrorText(code) {
       const messages = {
         MAIL_NOT_CONFIGURED: 'メール連携は未設定です。受付データのみ確認できます。',
@@ -1370,6 +1375,7 @@
         MAIL_ATTACHMENT_NOT_FOUND: 'このメール添付が見つかりません。',
         MAIL_MAPPING_CHANGED: '別の操作で照合状態が変わりました。更新して確認してください。',
         MAIL_REQUEST_CONFLICT: '操作内容が競合しました。更新して確認してください。',
+        MAIL_REQUEST_EXPIRED: '操作の再確認期限（発行から7日）を過ぎました。自動では再送しません。更新して保存状態を照合してください。',
         MAIL_CATALOG_INVALID: '受付IDの照合を確認できません。同期を最初からやり直してください。',
         MAIL_CATALOG_INCOMPLETE: '受付IDの照合が未完了です。',
         MAIL_RECORDS_DELETED: 'この案件のメール記録は削除済みです。新しいメールは照合待ちから確認してください。',
@@ -1745,7 +1751,7 @@
             break;
           }
           if (!viewerContext.allowed || viewerContext.authMode !== 'domain') return;
-          progress.requestId = progress.requestId || window.crypto.randomUUID();
+          progress.requestId = progress.requestId || contactMailRequestId();
           progress.requestPayload = progress.requestPayload || {
             executionId: progress.executionId,
             ...(!progress.started ? { mode: progress.mode, catalogSnapshotId: progress.catalog.snapshotId, catalogDigest: progress.catalog.digest, catalogStartAt: progress.catalog.startAt } : {}), ...((contactMailState.sync || {}).state === 'failed' ? { resume: true } : {}),
@@ -2049,7 +2055,7 @@
       const serial = current.serial;
       const observationSerial = contactMailState.syncObservationSerial;
       current.writing = true;
-      current.reconcileRequestId = current.reconcileRequestId || window.crypto.randomUUID();
+      current.reconcileRequestId = current.reconcileRequestId || contactMailRequestId();
       current.reconcileMessage = '照合待ちを再照合中...';
       renderContactMailView('queue');
       try {
@@ -2083,7 +2089,7 @@
       if (current.scope !== 'case' || current.status !== 'loaded' || current.writing || current.messages.some((message) => contactMailInAcceptancePeriod(message, current.sync)) || !current.noMail) return;
       if (!current.pendingNoMail) {
         if (!current.noMail.eligible || current.noMail.confirmation || !window.confirm('表示中の対象期間について、この案件に関連するメールがないことを確認しましたか？')) return;
-        current.pendingNoMail = { caseId: current.caseId, contextToken: current.noMail.contextToken, requestId: window.crypto.randomUUID() };
+        current.pendingNoMail = { caseId: current.caseId, contextToken: current.noMail.contextToken, requestId: contactMailRequestId() };
         contactMailState.noMailRequests[current.caseId] = current.pendingNoMail;
       }
       const serial = current.serial;
@@ -2120,7 +2126,7 @@
           current.pendingNoMail = null;
           current.noMail = { eligible: false, contextToken: null, confirmation: null, stale: true };
           current.noMailError = `${contactMailErrorText(error.message)} 更新して現在の確認状態を読み直してください。`;
-        } else current.noMailError = '確認結果は未確認です。「前の確認操作を再確認」または「更新」で確認してください。';
+        } else current.noMailError = error.message === 'MAIL_REQUEST_EXPIRED' ? contactMailErrorText(error.message) : '確認結果は未確認です。「前の確認操作を再確認」または「更新」で確認してください。';
         renderContactMailView(view);
       }
     }
@@ -2139,7 +2145,7 @@
       if (action !== 'review' && (!reason || reason.length > 1000)) { current.writeError = '照合・対象外の理由を1000文字以内で入力してください。'; renderContactMailView(view); return; }
       if (action === 'exclude' && !window.confirm('このメールを問い合わせの対象外にしますか？')) return;
       const signature = JSON.stringify({ action, caseId, reason, messageId: message.messageId, version: message.version });
-      if (!current.pendingWrite || current.pendingWrite.signature !== signature) current.pendingWrite = { signature, requestId: window.crypto.randomUUID() };
+      if (!current.pendingWrite || current.pendingWrite.signature !== signature) current.pendingWrite = { signature, requestId: contactMailRequestId() };
       const requestId = current.pendingWrite.requestId;
       current.writing = true;
       current.writeError = '';

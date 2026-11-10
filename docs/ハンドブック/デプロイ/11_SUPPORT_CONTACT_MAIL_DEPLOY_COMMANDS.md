@@ -184,7 +184,7 @@ version読戻しのCLIには短い`SecretId`と明示`ProjectId`を渡します�
 
 ## 4. imageビルドとdigest固定
 
-採用SHAの`mail-service`で既存の`npm ci --ignore-scripts`と`npm test`を通します。`Assert-MailServiceSource`は作業場所・SHA・cleanなworktreeを照合し、`gcloud meta list-files-for-upload`の結果が下記25ファイルと完全一致した場合だけビルドへ進みます。[`.gcloudignore`](../../../99_backend-docs/10_support-contact/mail-service/.gcloudignore)はruntimeコードとlockfile等だけを許可し、認可補助ツール・合成データ・node_modules・ローカル資格情報を送信しません。採用版でファイル構成を変えた場合は、その変更をレビューして期待リストも更新します。
+採用SHAの`mail-service`で既存の`npm ci --ignore-scripts`と`npm test`を通します。`Assert-MailServiceSource`は作業場所・SHA・cleanなworktreeを照合し、`gcloud meta list-files-for-upload`の結果が下記26ファイルと完全一致した場合だけビルドへ進みます。[`.gcloudignore`](../../../99_backend-docs/10_support-contact/mail-service/.gcloudignore)はruntimeコードとlockfile等だけを許可し、認可補助ツール・合成データ・node_modules・ローカル資格情報を送信しません。採用版でファイル構成を変えた場合は、その変更をレビューして期待リストも更新します。
 
 ```powershell
 Assert-MailServiceSource
@@ -197,7 +197,7 @@ $expectedUploadFiles = @(
   'runtime/googleAdapters.mjs', 'runtime/http.mjs', 'runtime/mailboxConsent.mjs',
   'runtime/mailboxDisclosure.mjs', 'runtime/main.mjs', 'runtime/mixedThread.mjs',
   'runtime/noMailConfirmation.mjs',
-  'runtime/purgeGate.mjs', 'runtime/service.mjs'
+  'runtime/purgeGate.mjs', 'runtime/requestIdentity.mjs', 'runtime/service.mjs'
 )
 $uploadFiles = @(gcloud meta list-files-for-upload | ForEach-Object {
   $_.Trim().Replace('\', '/')

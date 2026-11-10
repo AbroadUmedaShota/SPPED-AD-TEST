@@ -6,6 +6,7 @@ import { memoryFirestore } from '../../runtime/tests/memoryFirestore.mjs';
 import { catalogDigest } from '../../runtime/service.mjs';
 import { createFirestoreStore } from '../../runtime/firestoreStore.mjs';
 import { suppressionKey } from '../../runtime/purgeGate.mjs';
+import { createRequestId } from '../../runtime/requestIdentity.mjs';
 
 const root = 'contactMailboxes/customer-speed-ad';
 const target = '11111111-1111-4111-8111-111111111111';
@@ -46,6 +47,21 @@ test('case purge is dry-run first, deletes all linked records and persists only 
   const catalog = await createFirestoreStore(db).getCatalog();
   assert.deepEqual(catalog.caseIds, [other]);
   assert.deepEqual(catalog.suppressedCaseIds, [target]);
+});
+
+test('purged recent request IDs keep only their fixed expiry while expired IDs need no tombstone', async () => {
+  const recent = createRequestId(new Date('2026-11-10T00:00:00.000Z'));
+  const expired = createRequestId(new Date('2026-11-01T00:00:00.000Z'));
+  const { db } = fixture({
+    [`${root}/receipts/${recent}`]: { result: { caseId: target } },
+    [`${root}/receipts/${expired}`]: { result: { caseId: target } }
+  });
+  const purge = createMailPurge({ db, projectId: 'test-project', now: () => new Date('2026-11-11T00:00:00.000Z') });
+  const plan = await purge.plan(target, 'finite-request-markers');
+  await purge.apply(target, 'finite-request-markers', plan.planHash);
+  assert.deepEqual(db.records.get(`${root}/suppressedRequests/${suppressionKey('request', recent)}`),
+    { version: 2, expiresAt: '2026-11-17T00:00:00.000Z' });
+  assert.equal(db.records.has(`${root}/suppressedRequests/${suppressionKey('request', expired)}`), false);
 });
 
 test('case purge removes no-mail confirmation actor, event and receipt from the existing coverage scope', async () => {
