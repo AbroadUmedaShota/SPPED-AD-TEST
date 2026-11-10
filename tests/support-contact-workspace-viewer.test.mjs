@@ -10,9 +10,11 @@ const oauthSource = existsSync(new URL('OAuth.gs', root)) ? readFileSync(new URL
 const html = readFileSync(new URL('Index.html', root), 'utf8');
 const publicNames = ['doGet', 'getViewerContext', 'listContactSubmissions', 'getContactSubmission', 'getAttachmentPreview', 'updateContactSubmissionStatus', 'beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'];
 
-function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp', oauth = false, records: fixtureRecords } = {}) {
+function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missingProperty = '', missingHeader = '', trashed = false, mimeType = 'image/webp', oauth = false, records: fixtureRecords, headerOrder, writeThrows = false } = {}) {
   const accesses = [];
   const writes = [];
+  const writeBatches = [];
+  const saveEvents = [];
   const templates = [];
   const cacheEntries = new Map();
   const network = [];
@@ -30,7 +32,7 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
     put(key, value, ttl) { cacheEntries.set(key, { value, until: now + ttl * 1000, ttl }); },
     remove(key) { assert.equal(locked, true, 'one-time state consumed under lock'); cacheEntries.delete(key); },
   };
-  const headers = ['submission_id', 'submitted_at', 'contact_type', 'name', 'email', 'subject', 'message', 'attachment_count', 'attachment_refs', 'source_url', 'user_agent', 'storage_status', 'mail_status', 'handled_status', 'handled_by', 'handled_at', 'internal_note'].filter((key) => key !== missingHeader);
+  const headers = (headerOrder || ['submission_id', 'submitted_at', 'contact_type', 'name', 'email', 'subject', 'message', 'attachment_count', 'attachment_refs', 'source_url', 'user_agent', 'storage_status', 'mail_status', 'handled_status', 'handled_by', 'handled_at', 'internal_note', 'closed_at']).filter((key) => key !== missingHeader);
   const records = fixtureRecords || [
     { submission_id: 'case-a', submitted_at: '2026-11-10T00:00:00Z', subject: '<img src=x onerror=alert(1)>', message: '</div><script>bad()</script>', email: 'customer@example.com', attachment_count: '3', attachment_refs: 'file-a:https://drive.google.com/file/d/file-a/view,file-out:javascript:bad(),file-swapped:javascript:bad()', handled_status: '未対応' },
     { submission_id: 'case-b', submitted_at: '2026-11-09T00:00:00Z', subject: 'other case', attachment_count: '1', attachment_refs: 'file-b:https://drive.google.com/file/d/file-b/view', handled_status: '対応済み' },
@@ -38,7 +40,7 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
   const rows = [headers.slice(), ...records.map((record) => headers.map((key) => record[key] || ''))];
   const sheet = {
     getLastColumn: () => headers.length,
-    getDataRange: () => ({ getValues: () => rows.map((row) => row.slice()) }),
+    getDataRange: () => ({ getValues: () => { if (locked) saveEvents.push('read'); return rows.map((row) => row.slice()); } }),
     getRange(row, col, height = 1, width = 1) {
       return {
         getValues: () => Array.from({ length: height }, (_, offset) => Array.from({ length: width }, (_, index) => rows[row - 1 + offset]?.[col - 1 + index] || '')),
@@ -46,7 +48,21 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
           writes.push({ row, col, value });
           rows[row - 1][col - 1] = typeof value === 'string' && value.startsWith("'") ? value.slice(1) : value;
         },
-        setValues() { throw new Error('Unexpected schema mutation'); },
+        setValues(values) {
+          assert.notEqual(row, 1, 'schema must never change during reads or saves');
+          assert.equal(locked, true, 'status and closure save must hold the script lock');
+          if (writeThrows) throw new Error('Write failed');
+          assert.equal(values.length, height);
+          writeBatches.push({ row, col, height, width });
+          saveEvents.push('write');
+          values.forEach((cells, rowOffset) => {
+            assert.equal(cells.length, width);
+            cells.forEach((value, index) => {
+              writes.push({ row: row + rowOffset, col: col + index, value });
+              rows[row - 1 + rowOffset][col - 1 + index] = typeof value === 'string' && value.startsWith("'") ? value.slice(1) : value;
+            });
+          });
+        },
       };
     },
   };
@@ -58,11 +74,11 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
   });
   delete properties[missingProperty];
   const sandbox = {
-    Date: class extends Date { static now() { return now; } },
+    Date: class extends Date { constructor(...args) { super(...(args.length ? args : [now])); } static now() { return now; } },
     CacheService: { getScriptCache: () => cache },
     LockService: { getScriptLock: () => ({
-      waitLock() { assert.equal(locked, false); locked = true; },
-      releaseLock() { assert.equal(locked, true); locked = false; },
+      waitLock() { assert.equal(locked, false); locked = true; saveEvents.push('lock'); },
+      releaseLock() { assert.equal(locked, true); locked = false; saveEvents.push('release'); },
     }) },
     UrlFetchApp: { fetch(url, options) {
       assert.equal(locked, false, 'network must run after consume lock is released');
@@ -79,7 +95,7 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
       getEffectiveUser() { throw new Error('Effective user must never be used'); },
     },
     PropertiesService: { getScriptProperties: () => ({ getProperty(key) { accesses.push(`property:${key}`); return properties[key] ?? null; } }) },
-    SpreadsheetApp: { openById(id) {
+    SpreadsheetApp: { flush() { assert.equal(locked, true); saveEvents.push('flush'); }, openById(id) {
       accesses.push(`sheet:${id}`);
       assert.equal(id, 'configured-sheet');
       return { getSheetByName(name) { assert.equal(name, 'contact_submissions'); return sheet; } };
@@ -121,7 +137,7 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
   vm.createContext(sandbox);
   vm.runInContext(source, sandbox, { filename: 'Code.gs' });
   vm.runInContext(oauthSource, sandbox, { filename: 'OAuth.gs' });
-  return { api: sandbox, accesses, writes, templates, rows, headers, setEmail(value) { email = value; },
+  return { api: sandbox, accesses, writes, writeBatches, saveEvents, templates, rows, headers, isLocked: () => locked, setEmail(value) { email = value; },
     proof: 'a'.repeat(64),
     cacheEntries, cacheReads, network, properties,
     setTempKey(value) { temporaryKey = value; },
@@ -198,7 +214,7 @@ test('status and nonexistent row guards prevent writes; only handling fields are
   assert.throws(() => api.updateContactSubmissionStatus('', '対応中', 'memo'), /見つかりません/);
   assert.deepEqual(writes, []);
   api.updateContactSubmissionStatus('case-a', '保留', '=IMPORTXML("https://example.com","//x")');
-  assert.deepEqual(writes.map(({ col }) => headers[col - 1]).sort(), ['handled_at', 'handled_by', 'handled_status', 'internal_note']);
+  assert.deepEqual(writes.map(({ col }) => headers[col - 1]).sort(), ['closed_at', 'handled_at', 'handled_by', 'handled_status', 'internal_note']);
   assert.ok(writes.find(({ col }) => headers[col - 1] === 'internal_note').value.startsWith("'="), 'memo must be stored as text');
 });
 
@@ -206,6 +222,90 @@ test('missing schema fails closed without silently creating columns', () => {
   const { api, writes } = runtime('reader@abroad-o.com', { missingHeader: 'handled_by' });
   assert.throws(() => api.updateContactSubmissionStatus('case-a', '対応中', 'memo'), /列/);
   assert.deepEqual(writes, []);
+});
+
+test('closure timestamp follows completion transitions and survives completed memo edits', () => {
+  const env = runtime();
+  const first = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'completed').submission;
+  assert.equal(first.closed_at, first.handled_at);
+  assert.ok(Number.isFinite(Date.parse(first.closed_at)));
+  env.advance(60);
+  const edited = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'later memo').submission;
+  assert.equal(edited.closed_at, first.closed_at);
+  assert.notEqual(edited.handled_at, first.handled_at);
+  assert.equal(env.api.listContactSubmissions({ status: 'all' }).submissions.find((row) => row.submission_id === 'case-a').closed_at, first.closed_at);
+  const reopened = env.api.updateContactSubmissionStatus('case-a', '対応中', 'reopened').submission;
+  assert.equal(reopened.closed_at, '');
+  env.advance(60);
+  const closedAgain = env.api.updateContactSubmissionStatus('case-a', '対応済み', '').submission;
+  assert.equal(closedAgain.closed_at, closedAgain.handled_at);
+  assert.notEqual(closedAgain.closed_at, first.closed_at);
+  assert.ok(env.writeBatches.every((batch) => batch.row === 2 && batch.col === 14 && batch.height === 1 && batch.width === 5));
+  assert.deepEqual(env.saveEvents.slice(0, 5), ['lock', 'read', 'write', 'flush', 'release']);
+  assert.equal(env.isLocked(), false);
+});
+
+test('legacy completed cases keep unknown closure until reopened and completed again', () => {
+  const env = runtime();
+  const saved = env.api.updateContactSubmissionStatus('case-b', '対応済み', 'legacy memo').submission;
+  assert.equal(saved.closed_at, '');
+  assert.ok(saved.handled_at);
+  const existing = runtime('reader@abroad-o.com', { records: [{ submission_id: 'case-a', handled_status: '対応済み', closed_at: '2026-01-02T03:04:05.000Z' }] });
+  assert.equal(existing.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo').submission.closed_at, '2026-01-02T03:04:05.000Z');
+});
+
+test('handling fields may be reordered within their atomic range without touching receipt cells', () => {
+  const headers = runtime().headers;
+  const reordered = [...headers.slice(0, 13), ...headers.slice(13).reverse()];
+  const env = runtime('reader@abroad-o.com', { headerOrder: reordered });
+  const receipt = env.rows[1].slice(0, 13);
+  const result = env.api.updateContactSubmissionStatus('case-a', '対応済み', '=memo').submission;
+  assert.equal(result.closed_at, result.handled_at);
+  assert.equal(result.internal_note, '=memo');
+  assert.deepEqual(env.rows[1].slice(0, 13), receipt);
+  assert.deepEqual(env.writeBatches, [{ row: 2, col: 14, height: 1, width: 5 }]);
+});
+
+test('detail shows closure as read-only and distinguishes legacy unknown completion', async () => {
+  const app = uiRuntime();
+  await app.ui.selectSubmission('case-b');
+  assert.match(app.elements.get('detailView').innerHTML, /終了日時: 未確認/);
+  await app.ui.selectSubmission('case-a');
+  assert.match(app.elements.get('detailView').innerHTML, /終了日時: -/);
+  await app.ui.saveStatus('対応済み');
+  assert.ok(app.state.detail.closed_at);
+  assert.doesNotMatch(app.elements.get('detailView').innerHTML, /終了日時: 未確認|id="closed_at"|name="closed_at"/);
+});
+
+test('closure schema and write failures release the lock without partial handling writes', () => {
+  for (const options of [{ missingHeader: 'closed_at' }, { writeThrows: true }]) {
+    const env = runtime('reader@abroad-o.com', options);
+    assert.throws(() => env.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo'), /列|Write failed/);
+    assert.deepEqual(env.writes, []);
+    assert.equal(env.isLocked(), false);
+    assert.equal(env.saveEvents.at(-1), 'release');
+  }
+  const normal = runtime();
+  const headers = normal.headers.slice();
+  [headers[0], headers[13]] = [headers[13], headers[0]];
+  const reordered = runtime('reader@abroad-o.com', { headerOrder: headers });
+  assert.throws(() => reordered.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo'), /連続/);
+  assert.deepEqual(reordered.writes, []);
+  assert.equal(reordered.isLocked(), false);
+});
+
+test('a save that cannot acquire the script lock never reads or changes the case', () => {
+  const env = runtime();
+  const held = env.api.LockService.getScriptLock();
+  held.waitLock(10000);
+  const accesses = env.accesses.length;
+  assert.throws(() => env.api.updateContactSubmissionStatus('case-a', '対応済み', 'blocked'));
+  assert.equal(env.accesses.length, accesses);
+  assert.deepEqual(env.writes, []);
+  assert.equal(env.isLocked(), true);
+  held.releaseLock();
+  assert.ok(env.api.updateContactSubmissionStatus('case-a', '対応済み', 'saved').submission.closed_at);
+  assert.equal(env.isLocked(), false);
 });
 
 test('attachment preview requires the selected row reference and configured folder', () => {

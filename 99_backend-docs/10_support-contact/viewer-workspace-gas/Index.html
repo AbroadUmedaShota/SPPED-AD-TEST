@@ -971,6 +971,7 @@
               </div>
               <span class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</span>
             </div>
+            <p class="muted">終了日時: ${currentStatus === '対応済み' ? escapeHtml(submission.closed_at ? formatDate(submission.closed_at) : '未確認') : '-'}</p>
           </div>
         </section>
         <section class="section">

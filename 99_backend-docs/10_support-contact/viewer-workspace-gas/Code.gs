@@ -26,7 +26,8 @@ var CONTACT_HEADERS = [
   'handled_status',
   'handled_by',
   'handled_at',
-  'internal_note'
+  'internal_note',
+  'closed_at'
 ];
 
 function doGet(e) {
@@ -223,25 +224,38 @@ function updateContactSubmissionStatus(submissionId, status, note, authProof) {
     throw new Error('対応ステータスが不正です。');
   }
 
-  var sheet = getSheet_();
-  var headers = ensureHeaders_(sheet);
-  var match = findSubmission_(submissionId, sheet, headers);
-  if (!match) {
-    throw new Error('問い合わせが見つかりません。');
-  }
-
-  var fields = {
-    handled_status: normalizedStatus,
-    handled_by: context.email,
-    handled_at: new Date().toISOString(),
-    internal_note: asSheetText_(String(note || '').trim())
-  };
-  Object.keys(fields).forEach(function (key) {
-    var colIndex = headers.indexOf(key);
-    if (colIndex !== -1) {
-      sheet.getRange(match.rowNumber, colIndex + 1).setValue(fields[key]);
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var sheet = getSheet_();
+    var headers = ensureHeaders_(sheet);
+    var match = findSubmission_(submissionId, sheet, headers);
+    if (!match) {
+      throw new Error('問い合わせが見つかりません。');
     }
-  });
+    var at = new Date().toISOString();
+    var wasClosed = normalizeHandledStatus_(match.record.handled_status) === '対応済み';
+    var fields = {
+      handled_status: normalizedStatus,
+      handled_by: context.email,
+      handled_at: at,
+      internal_note: asSheetText_(String(note || '').trim()),
+      closed_at: normalizedStatus === '対応済み' ? (wasClosed ? match.record.closed_at : at) : ''
+    };
+    var columns = Object.keys(fields).map(function (key) { return headers.indexOf(key); });
+    var firstColumn = Math.min.apply(null, columns);
+    var lastColumn = Math.max.apply(null, columns);
+    // Keep closure and status in one write without rewriting original contact data.
+    if (lastColumn - firstColumn + 1 !== columns.length) {
+      throw new Error('対応保存用の列は連続して配置してください。');
+    }
+    sheet.getRange(match.rowNumber, firstColumn + 1, 1, columns.length).setValues([
+      headers.slice(firstColumn, lastColumn + 1).map(function (key) { return fields[key]; })
+    ]);
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
 
   return getContactSubmission(submissionId, authProof);
 }
@@ -349,7 +363,8 @@ function toSummary_(record) {
     attachment_count: record.attachment_count,
     handled_status: record.handled_status || '未対応',
     handled_by: record.handled_by,
-    handled_at: record.handled_at
+    handled_at: record.handled_at,
+    closed_at: record.closed_at
   };
 }
 
