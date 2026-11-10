@@ -18,6 +18,7 @@
   <script>
     const callback = <?!= JSON.stringify(callback).replace(/</g, '\\u003c') ?>;
     const initialId = <?!= JSON.stringify(submissionId).replace(/</g, '\\u003c') ?>;
+    const authuserHint = <?!= JSON.stringify(authuser).replace(/</g, '\\u003c') ?>;
     const proofStorageKey = 'speed-ad-contact-oauth-tab-proof-v2';
     const message = document.getElementById('loginMessage');
     const link = document.getElementById('loginLink');
@@ -28,20 +29,37 @@
       });
     }
 
+    function loginFailureCode(error) {
+      const text = error && typeof error.message === 'string' ? error.message : '';
+      if (['Missing original tab proof', 'Tab storage unavailable'].includes(text)) return 'AUTH_TAB_STORAGE';
+      const match = text.match(/\[(AUTH_[A-Z0-9_]+)\]$/);
+      const allowed = ['AUTH_CONFIG', 'AUTH_STATE', 'AUTH_PROOF', 'AUTH_IDENTITY', 'AUTH_PERMISSION',
+        'AUTH_TOKEN_HTTP400', 'AUTH_TOKEN_NETWORK', 'AUTH_TOKEN', 'AUTH_UNKNOWN'];
+      return match && allowed.includes(match[1]) ? match[1] : 'AUTH_UNKNOWN';
+    }
+
     async function prepareLogin() {
       try {
         // No proof is ever recovered from URL, postMessage, or server context.
         let proof = '';
         if (callback) {
-          proof = window.sessionStorage.getItem(proofStorageKey) || '';
+          try {
+            proof = window.sessionStorage.getItem(proofStorageKey) || '';
+          } catch (_error) {
+            throw new Error('Tab storage unavailable');
+          }
           if (!/^[a-f0-9]{64}$/.test(proof)) throw new Error('Missing original tab proof');
         } else {
           // A new authorization attempt must never revive a previously stolen proof.
           const bytes = new Uint8Array(32);
           window.crypto.getRandomValues(bytes);
           proof = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
-          window.sessionStorage.setItem(proofStorageKey, proof);
-          if (window.sessionStorage.getItem(proofStorageKey) !== proof) throw new Error('Storage unavailable');
+          try {
+            window.sessionStorage.setItem(proofStorageKey, proof);
+            if (window.sessionStorage.getItem(proofStorageKey) !== proof) throw new Error('Tab storage unavailable');
+          } catch (_error) {
+            throw new Error('Tab storage unavailable');
+          }
         }
         let result;
         if (callback) {
@@ -52,12 +70,12 @@
         } else {
           const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(proof));
           const proofHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-          result = await loginRpc('beginCustomerOAuthLogin', proofHash, initialId);
+          result = await loginRpc('beginCustomerOAuthLogin', proofHash, initialId, authuserHint);
           link.href = result.authorizationUrl;
         }
         link.hidden = false;
       } catch (_error) {
-        message.textContent = 'ログインを確認できません。同じタブで通常URLからやり直してください。';
+        message.textContent = 'ログインを確認できません。同じタブで通常URLからやり直してください。 [' + loginFailureCode(_error) + ']';
         link.hidden = true;
       }
     }

@@ -39,15 +39,15 @@ function doGet(e) {
       if (typeof params[key] === 'string') callback[key] = params[key].slice(0, 4096);
     });
     // Callback GET never consumes state, exchanges code, issues grant, or reads contact data.
-    return renderLogin_('', invalid ? { invalid: true } : callback);
+    return renderLogin_('', invalid ? { invalid: true } : callback, params.authuser);
   }
-  if (params.login === 'google') return renderLogin_(String(params.id || '').slice(0, 256), null);
+  if (params.login === 'google') return renderLogin_(String(params.id || '').slice(0, 256), null, params.authuser);
   var email = getActiveUserEmail_();
   var template = HtmlService.createTemplateFromFile('Index');
   template.initialSubmissionId = String(params.id || '');
   // External GET is only a data-free shell. Its first RPC must prove the tab secret.
   template.viewerContext = /^[^\s@]+@abroad-o\.com$/.test(email) ? getViewerContext_() : {};
-  template.loginStartUrl = customerLoginStartUrl_(params.id);
+  template.loginStartUrl = customerLoginStartUrl_(params.id, params.authuser);
   return template.evaluate().setTitle('SPEED AD お問い合わせ確認（社内）');
 }
 

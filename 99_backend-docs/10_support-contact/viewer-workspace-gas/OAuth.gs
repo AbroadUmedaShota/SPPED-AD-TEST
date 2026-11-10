@@ -45,7 +45,7 @@ function assertCustomerOAuthPrincipal_() {
   if (email && email !== OAUTH_CUSTOMER_EMAIL) throw new Error('Known principal mismatch');
 }
 
-function beginCustomerOAuth_(submissionId, proofHash) {
+function beginCustomerOAuth_(submissionId, proofHash, authuser) {
   assertCustomerOAuthPrincipal_();
   var config = oauthConfig_();
   var binding = oauthBinding_(config, oauthTemporaryUserKey_(), proofHash);
@@ -54,7 +54,8 @@ function beginCustomerOAuth_(submissionId, proofHash) {
   var verifier = oauthRandom_(config, 'pkce');
   CacheService.getScriptCache().put('oauth-state-v2:' + state, JSON.stringify({
     version: 2, proofHash: proofHash, binding: binding, nonce: nonce, verifier: verifier,
-    createdAt: Date.now(), submissionId: String(submissionId || '').slice(0, 256)
+    createdAt: Date.now(), submissionId: String(submissionId || '').slice(0, 256),
+    authuser: normalizeOAuthAuthuser_(authuser)
   }), OAUTH_STATE_SECONDS);
   var params = {
     client_id: config.clientId, redirect_uri: config.redirectUri,
@@ -94,7 +95,12 @@ function consumeCustomerOAuthState_(state, config, proofHash) {
 
 function decodeOAuthJson_(part) {
   if (!/^[A-Za-z0-9_-]+$/.test(part)) throw new Error('Invalid ID token encoding');
-  var decoded = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(part)).getDataAsString('UTF-8'));
+  var decoded;
+  try {
+    decoded = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(part)).getDataAsString('UTF-8'));
+  } catch (_err) {
+    throw new Error('Invalid ID token JSON');
+  }
   if (!decoded || typeof decoded !== 'object' || Array.isArray(decoded)) throw new Error('Invalid ID token JSON');
   return decoded;
 }
@@ -131,17 +137,29 @@ function completeCustomerOAuth_(params, authProof) {
   if ('error' in params || typeof params.code !== 'string' || !params.code || params.code.length > 4096) {
     throw new Error('OAuth authorization failed');
   }
-  var response = UrlFetchApp.fetch('https://oauth2.googleapis.com/token', {
-    method: 'post', contentType: 'application/x-www-form-urlencoded',
-    payload: {
-      grant_type: 'authorization_code', code: params.code,
-      client_id: config.clientId, client_secret: config.clientSecret,
-      redirect_uri: config.redirectUri, code_verifier: pending.verifier
-    },
-    followRedirects: false, validateHttpsCertificates: true, muteHttpExceptions: true
-  });
-  if (response.getResponseCode() !== 200) throw new Error('OAuth exchange failed');
-  var body = JSON.parse(response.getContentText());
+  var response;
+  try {
+    response = UrlFetchApp.fetch('https://oauth2.googleapis.com/token', {
+      method: 'post', contentType: 'application/x-www-form-urlencoded',
+      payload: {
+        grant_type: 'authorization_code', code: params.code,
+        client_id: config.clientId, client_secret: config.clientSecret,
+        redirect_uri: config.redirectUri, code_verifier: pending.verifier
+      },
+      followRedirects: false, validateHttpsCertificates: true, muteHttpExceptions: true
+    });
+  } catch (_err) {
+    throw new Error('OAuth token request failed');
+  }
+  var responseCode = response.getResponseCode();
+  if (responseCode === 400) throw new Error('OAuth exchange HTTP 400');
+  if (responseCode !== 200) throw new Error('OAuth exchange failed');
+  var body;
+  try {
+    body = JSON.parse(response.getContentText());
+  } catch (_err) {
+    throw new Error('Invalid token response');
+  }
   if (!body || body.error) throw new Error('OAuth exchange rejected');
   var session = validateCustomerClaims_(body.id_token, pending, config);
   assertCustomerOAuthPrincipal_();
@@ -151,7 +169,7 @@ function completeCustomerOAuth_(params, authProof) {
   if (ttl < 1) throw new Error('OAuth identity expired');
   session.version = 2;
   CacheService.getScriptCache().put('oauth-tab-session-v2:' + pending.binding, JSON.stringify(session), ttl);
-  return { redirectUri: config.redirectUri, submissionId: pending.submissionId };
+  return { redirectUri: config.redirectUri, submissionId: pending.submissionId, authuser: normalizeOAuthAuthuser_(pending.authuser) };
 }
 
 function getCustomerOAuthSession_(authProof) {
@@ -180,34 +198,64 @@ function customerProofHash_(authProof) {
   }).join('');
 }
 
-function beginCustomerOAuthLogin(proofHash, submissionId) {
+function beginCustomerOAuthLogin(proofHash, submissionId, authuser) {
   try {
-    return { ok: true, authorizationUrl: beginCustomerOAuth_(submissionId, proofHash) };
+    return { ok: true, authorizationUrl: beginCustomerOAuth_(submissionId, proofHash, authuser) };
   } catch (_err) {
-    throw new Error('ログインを開始できません。許可されたGoogleアカウントで開き直してください。');
+    throw new Error('ログインを開始できません。 [' + oauthFailureCode_(_err) + ']');
   }
 }
 
 function completeCustomerOAuthLogin(params, authProof) {
   try {
     var result = completeCustomerOAuth_(params, authProof);
-    return { ok: true, returnUrl: result.redirectUri + (result.submissionId ? '?id=' + encodeURIComponent(result.submissionId) : '') };
+    var query = result.submissionId ? 'id=' + encodeURIComponent(result.submissionId) : '';
+    if (result.authuser) query += (query ? '&' : '') + 'authuser=' + result.authuser;
+    return { ok: true, returnUrl: result.redirectUri + (query ? '?' + query : '') };
   } catch (_err) {
-    throw new Error('ログインを確認できませんでした。通常URLからやり直してください。');
+    throw new Error('ログインを確認できませんでした。 [' + oauthFailureCode_(_err) + ']');
   }
 }
 
-function customerLoginStartUrl_(id) {
+function customerLoginStartUrl_(id, authuser) {
   try {
-    return oauthConfig_().redirectUri + '?login=google' + (id ? '&id=' + encodeURIComponent(String(id).slice(0, 256)) : '');
+    var hint = normalizeOAuthAuthuser_(authuser);
+    return oauthConfig_().redirectUri + '?login=google' + (id ? '&id=' + encodeURIComponent(String(id).slice(0, 256)) : '') +
+      (hint ? '&authuser=' + hint : '');
   } catch (_err) {
     return '';
   }
 }
 
-function renderLogin_(submissionId, callback) {
+function renderLogin_(submissionId, callback, authuser) {
   var template = HtmlService.createTemplateFromFile('Login');
   template.submissionId = submissionId;
   template.callback = callback;
+  template.authuser = normalizeOAuthAuthuser_(authuser);
   return template.evaluate().setTitle('SPEED AD ログイン');
+}
+
+// Google account routing only; never identity, proof, or authorization input.
+function normalizeOAuthAuthuser_(value) {
+  return typeof value === 'string' && /^[0-9]{1,10}$/.test(value) ? value : '';
+}
+
+// Exact internal messages only. Never expose exception text, provider bodies, or identifiers.
+function oauthFailureCode_(error) {
+  var groups = {
+    AUTH_CONFIG: ['OAuth configuration unavailable'],
+    AUTH_STATE: ['Invalid state', 'Invalid tab proof', 'Expired or unbound state'],
+    AUTH_PROOF: ['Tab proof unavailable'],
+    AUTH_IDENTITY: ['Temporary user identity unavailable', 'Temporary user changed', 'Invalid customer identity', 'OAuth identity expired'],
+    AUTH_PERMISSION: ['Known principal mismatch'],
+    AUTH_TOKEN_HTTP400: ['OAuth exchange HTTP 400'],
+    AUTH_TOKEN_NETWORK: ['OAuth token request failed'],
+    AUTH_TOKEN: ['Invalid callback', 'OAuth authorization failed', 'OAuth exchange failed', 'OAuth exchange rejected', 'Invalid token response', 'Missing ID token', 'Invalid ID token', 'Invalid ID token encoding', 'Invalid ID token JSON']
+  };
+  var message = error && typeof error.message === 'string' ? error.message : '';
+  var codes = Object.keys(groups);
+  for (var index = 0; index < codes.length; index++) {
+    if (groups[codes[index]].indexOf(message) !== -1) return codes[index];
+  }
+  return 'AUTH_UNKNOWN';
 }

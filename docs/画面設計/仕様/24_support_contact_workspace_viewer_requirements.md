@@ -71,3 +71,7 @@ last_reviewed: 2026-11-10
 配備手順は [新viewer README](../../../99_backend-docs/10_support-contact/viewer-workspace-gas/README.md) を参照。ローカル検証の合格は実配備・実アカウントでの受入完了を意味しない。
 
 タブ複製/openerによるsessionStorageコピーやproofの明示持出しは同じセッション能力の複製となる。proofは物理ブラウザの身元証明ではない。正規導線は同じタブの `_top` 移動とする。ライブ確認と独立レビューが終わるまでcustomerの利用完了/配備可とは報告しない。
+
+複数Googleアカウントのルーティング: 通常GETの `e.parameter.authuser` が1〜10桁の数字文字列なら、ログイン開始リンク→Loginテンプレート→開始RPCの任意第3引数→pending state→完了後の通常URLへ引き継ぐ。その他の値は捨てる。`authuser` はGoogleのアカウント選択維持のためのヒントだけで、認証・認可・grantの拘束条件には使わない。callback側のヒントは保存済みreturn routingを上書きしない。登録済みredirect URIとコード交換のredirect_uriはクエリなしのグローバル `/exec` 固定値を維持する。社員の既存RPC呼出しは変更しない。実際にauthuserがGASへ渡ること、同じHTML Service originの維持、customerの利用可否はライブ確認待ち。ヒント欠落時に本人情報を推定しない。
+
+失敗の安全な診断: 開始/完了RPCは既知の内部エラーメッセージとの完全一致だけで `AUTH_CONFIG` / `AUTH_STATE` / `AUTH_PROOF` / `AUTH_IDENTITY` / `AUTH_PERMISSION` / `AUTH_TOKEN` / `AUTH_TOKEN_HTTP400` / `AUTH_TOKEN_NETWORK` に分類し、その他は `AUTH_UNKNOWN` とする。HTTP 400/他の非200では応答本文を読まない。Login側の元proof欠落・sessionStorage利用不可は `AUTH_TAB_STORAGE`。画面には固定コードのallowlistのみ表示し、任意の例外文・Google応答本文/description・code・token・メール・secretを出さない。診断用RPC/権限/認証fallbackは追加しない。これらのコードは原因の手掛かりであり、アクセス条件を緩める根拠にはしない。

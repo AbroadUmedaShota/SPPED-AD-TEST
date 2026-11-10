@@ -747,7 +747,7 @@ test('dedicated HMAC key replaces client secret for state unpredictability', () 
 
 const tabProofKey = 'speed-ad-contact-oauth-tab-proof-v2';
 
-function loginClientRuntime(env, storage = new Map(), callback = null) {
+function loginClientRuntime(env, storage = new Map(), callback = null, authuser = '') {
   const elements = new Map([['loginMessage', {}], ['loginLink', { hidden: true }]]);
   const run = { withSuccessHandler(success) { return { withFailureHandler(failure) {
     return new Proxy({}, { get(_target, method) { return (...args) => {
@@ -768,7 +768,7 @@ function loginClientRuntime(env, storage = new Map(), callback = null) {
   vm.createContext(context);
   const login = readFileSync(new URL('Login.html', root), 'utf8');
   const script = login.match(/<script>([\s\S]*?)<\/script>/)[1]
-    .replace(/<\?!= ([\s\S]*?) \?>/g, (_match, expression) => vm.runInNewContext(expression, { callback, submissionId: 'case-b' }))
+    .replace(/<\?!= ([\s\S]*?) \?>/g, (_match, expression) => vm.runInNewContext(expression, { callback, submissionId: 'case-b', authuser }))
     .replace('    prepareLogin();', '');
   vm.runInContext(script, context);
   return { ui: context, elements, storage };
@@ -940,4 +940,123 @@ test('two successive logins after grant A expiry never revive proof A under the 
   assert.equal(env.api.getViewerContext(proofB).email, 'customer@speed-ad.com');
   assert.equal(env.api.listContactSubmissions({}, proofB).submissions.length, 2);
   assert.equal(env.network.length, 2);
+});
+
+
+test('authuser 2 routing survives customer URL, Login start RPC, pending state and completion URL', async () => {
+  const env = runtime('', { oauth: true });
+  env.api.doGet({ parameter: { id: 'case-b', authuser: '2', pli: '1' } });
+  const startUrl = env.templates.at(-1).loginStartUrl;
+  assert.equal(startUrl, env.properties.OAUTH_REDIRECT_URI + '?login=google&id=case-b&authuser=2');
+  env.api.doGet({ parameter: Object.fromEntries(new URL(startUrl).searchParams) });
+  assert.equal(env.templates.at(-1).authuser, '2');
+  const login = loginClientRuntime(env, new Map(), null, env.templates.at(-1).authuser);
+  await login.ui.prepareLogin();
+  const authorization = new URL(login.elements.get('loginLink').href);
+  assert.equal(authorization.searchParams.get('redirect_uri'), env.properties.OAUTH_REDIRECT_URI);
+  assert.equal(new URL(authorization.searchParams.get('redirect_uri')).search, '');
+  const pending = JSON.parse([...env.cacheEntries.values()][0].value);
+  assert.equal(pending.authuser, '2');
+  env.respond(() => tokenResponse(env, authorization));
+  env.api.doGet({ parameter: { code: 'google-code', state: authorization.searchParams.get('state'), authuser: '7' } });
+  const result = env.api.completeCustomerOAuthLogin(env.templates.at(-1).callback, login.storage.get(tabProofKey));
+  assert.equal(result.returnUrl, env.properties.OAUTH_REDIRECT_URI + '?id=case-b&authuser=2', 'callback hint cannot replace the original return routing');
+  assert.equal(env.api.getViewerContext(login.storage.get(tabProofKey)).email, 'customer@speed-ad.com');
+});
+
+test('malformed authuser hints are ignored and never grant authorization', () => {
+  for (const hint of ['2&email=customer@speed-ad.com', '-1', '2.0', ' 2', '2\n', 'a', ['2'], {}, '99999999999']) {
+    const env = runtime('', { oauth: true });
+    env.api.doGet({ parameter: { authuser: hint } });
+    assert.equal(env.templates.at(-1).loginStartUrl, env.properties.OAUTH_REDIRECT_URI + '?login=google');
+    const proofHash = createHash('sha256').update(env.proof).digest('hex');
+    const authorization = new URL(env.api.beginCustomerOAuthLogin(proofHash, '', hint).authorizationUrl);
+    const pending = JSON.parse([...env.cacheEntries.values()][0].value);
+    assert.equal(pending.authuser, '');
+    assert.equal(authorization.searchParams.get('redirect_uri'), env.properties.OAUTH_REDIRECT_URI);
+    env.respond(() => tokenResponse(env, authorization));
+    const result = finishOAuth(env, authorization);
+    assert.equal(result.returnUrl, env.properties.OAUTH_REDIRECT_URI);
+  }
+  const knownOther = runtime('other@speed-ad.com', { oauth: true });
+  knownOther.api.doGet({ parameter: { authuser: '2' } });
+  assert.equal(Object.keys(knownOther.templates.at(-1).viewerContext).length, 0);
+  assert.throws(() => knownOther.api.beginCustomerOAuthLogin(createHash('sha256').update(knownOther.proof).digest('hex'), '', '2'), /ログイン/);
+  assert.throws(() => knownOther.api.getViewerContext(knownOther.proof), /権限/);
+});
+
+test('diagnostic mapper exposes only fixed codes for exact internal messages', () => {
+  const env = runtime();
+  const known = {
+    'OAuth configuration unavailable': 'AUTH_CONFIG',
+    'Invalid state': 'AUTH_STATE', 'Invalid tab proof': 'AUTH_STATE',
+    'Tab proof unavailable': 'AUTH_PROOF',
+    'Invalid customer identity': 'AUTH_IDENTITY',
+    'Known principal mismatch': 'AUTH_PERMISSION',
+    'OAuth exchange HTTP 400': 'AUTH_TOKEN_HTTP400',
+    'OAuth token request failed': 'AUTH_TOKEN_NETWORK',
+    'Invalid token response': 'AUTH_TOKEN',
+  };
+  for (const [message, code] of Object.entries(known)) assert.equal(env.api.oauthFailureCode_({ message }), code);
+  for (const message of ['Known principal mismatch customer@speed-ad.com', 'secret=PII_TOKEN [AUTH_STATE]', 'HTTP 400 arbitrary body', '']) {
+    assert.equal(env.api.oauthFailureCode_({ message }), 'AUTH_UNKNOWN');
+  }
+  assert.equal(env.api.oauthFailureCode_(null), 'AUTH_UNKNOWN');
+});
+
+test('HTTP 400 diagnostic does not read or expose the token response body', () => {
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  let bodyReads = 0;
+  env.respond(() => ({ getResponseCode: () => 400, getContentText() {
+    bodyReads++;
+    return 'private description customer@speed-ad.com secret=PII_TOKEN';
+  } }));
+  const result = finishOAuth(env, authorization);
+  assert.equal(result.returnUrl, '');
+  assert.match(result.error, /\[AUTH_TOKEN_HTTP400\]$/);
+  assert.equal(bodyReads, 0);
+  assert.doesNotMatch(result.error, /customer@|PII_TOKEN|description/);
+  assertNoContactAccess(env);
+});
+
+test('public begin/complete sanitize known, network and unknown exceptions', () => {
+  const denied = runtime('other@speed-ad.com', { oauth: true });
+  assert.throws(() => denied.api.beginCustomerOAuthLogin('a'.repeat(64), ''), /\[AUTH_PERMISSION\]$/);
+  const env = runtime('', { oauth: true });
+  const authorization = beginOAuth(env);
+  env.respond(() => { throw new Error('request with secret=PII_TOKEN customer@speed-ad.com'); });
+  const result = finishOAuth(env, authorization);
+  assert.match(result.error, /\[AUTH_TOKEN_NETWORK\]$/);
+  assert.doesNotMatch(result.error, /PII_TOKEN|customer@/);
+  const unknown = runtime('', { oauth: true });
+  unknown.api.CacheService.getScriptCache = () => { throw new Error('unexpected private=PII_TOKEN customer@speed-ad.com'); };
+  assert.throws(() => unknown.api.beginCustomerOAuthLogin('a'.repeat(64), ''), (error) => {
+    assert.match(error.message, /\[AUTH_UNKNOWN\]$/);
+    assert.doesNotMatch(error.message, /PII_TOKEN|customer@/);
+    return true;
+  });
+});
+
+test('Login catch shows only whitelisted fixed server codes and separates missing/storage proof', async () => {
+  const env = runtime('', { oauth: true });
+  const missing = loginClientRuntime(env, new Map(), { code: 'private-code', state: 'state' });
+  await missing.ui.prepareLogin();
+  assert.match(missing.elements.get('loginMessage').textContent, /\[AUTH_TAB_STORAGE\]$/);
+  assert.equal(env.network.length, 0);
+  const blocked = loginClientRuntime(env, new Map(), { code: 'private-code', state: 'state' });
+  blocked.ui.window.sessionStorage.getItem = () => { throw new Error('raw storage error secret=PII_TOKEN'); };
+  await blocked.ui.prepareLogin();
+  assert.match(blocked.elements.get('loginMessage').textContent, /\[AUTH_TAB_STORAGE\]$/);
+  assert.doesNotMatch(blocked.elements.get('loginMessage').textContent, /PII_TOKEN|private-code/);
+  const login = loginClientRuntime(env);
+  for (const code of ['AUTH_CONFIG', 'AUTH_STATE', 'AUTH_PROOF', 'AUTH_IDENTITY', 'AUTH_PERMISSION', 'AUTH_TOKEN_HTTP400', 'AUTH_TOKEN_NETWORK', 'AUTH_TOKEN', 'AUTH_UNKNOWN']) {
+    assert.equal(login.ui.loginFailureCode({ message: 'Error: generic [' + code + ']' }), code);
+  }
+  assert.equal(login.ui.loginFailureCode({ message: 'secret=PII_TOKEN [AUTH_NOT_ALLOWED]' }), 'AUTH_UNKNOWN');
+  assert.equal(login.ui.loginFailureCode({ message: 'secret=PII_TOKEN' }), 'AUTH_UNKNOWN');
+  const callback = loginClientRuntime(env, new Map([[tabProofKey, env.proof]]), { code: 'private-code', state: 'bad-state' });
+  await callback.ui.prepareLogin();
+  assert.match(callback.elements.get('loginMessage').textContent, /\[AUTH_STATE\]$/);
+  assert.doesNotMatch(callback.elements.get('loginMessage').textContent, /private-code|bad-state/);
 });

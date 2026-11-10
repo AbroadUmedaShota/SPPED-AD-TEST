@@ -45,3 +45,7 @@ node --test tests/support-contact-workspace-viewer.test.mjs
 対象customerの実ID tokenで `hd=speed-ad.com` とverified emailを確認することも未実施。claim欠落時は拒否を維持する。社員操作、通常URL再読込、初期id、保存ボタンとクイック操作、期限/キー変化/キャッシュ失効後の再認証、全対応ブラウザでの表示は配備後に確認する。旧viewerは維持する。
 
 **統合hold継続:** 親担当・独立レビューでタブproof拘束の構造を確認し、実環境でLogin/callback/Index間のHTML Service originとsessionStorage継続性、WebCrypto、同じタブの再読込、異なるブラウザのproof分離を確認するまでcustomer完了/配備可とは判定しない。sessionStorageはブラウザのタブ複製やopenerによってコピーされ得るため、物理ブラウザの証明とは扱わない。同じproofを複製/持ち出した場合は同一セッション能力となる。通常導線は `_top` の同じタブとし、旧共通メールtokenやGoogle tokenのブラウザ保存を復活させない。
+
+複数Googleアカウントのルーティング: 通常GETの `e.parameter.authuser` が1〜10桁の数字文字列なら、ログイン開始リンク→Loginテンプレート→開始RPCの任意第3引数→pending state→完了後の通常URLへ引き継ぐ。その他の値は捨てる。`authuser` はGoogleのアカウント選択維持のためのヒントだけで、認証・認可・grantの拘束条件には使わない。callback側のヒントは保存済みreturn routingを上書きしない。登録済みredirect URIとコード交換のredirect_uriはクエリなしのグローバル `/exec` 固定値を維持する。社員の既存RPC呼出しは変更しない。実際にauthuserがGASへ渡ること、同じHTML Service originの維持、customerの利用可否はライブ確認待ち。ヒント欠落時に本人情報を推定しない。
+
+失敗の安全な診断: 開始/完了RPCは既知の内部エラーメッセージとの完全一致だけで `AUTH_CONFIG` / `AUTH_STATE` / `AUTH_PROOF` / `AUTH_IDENTITY` / `AUTH_PERMISSION` / `AUTH_TOKEN` / `AUTH_TOKEN_HTTP400` / `AUTH_TOKEN_NETWORK` に分類し、その他は `AUTH_UNKNOWN` とする。HTTP 400/他の非200では応答本文を読まない。Login側の元proof欠落・sessionStorage利用不可は `AUTH_TAB_STORAGE`。画面には固定コードのallowlistのみ表示し、任意の例外文・Google応答本文/description・code・token・メール・secretを出さない。診断用RPC/権限/認証fallbackは追加しない。これらのコードは原因の手掛かりであり、アクセス条件を緩める根拠にはしない。
