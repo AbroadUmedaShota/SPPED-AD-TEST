@@ -9,6 +9,7 @@ const options = { execute: true, desktopClient: true, confirmMailbox: MAILBOX,
   clientId: '1-test.apps.googleusercontent.com', clientSecret: 'synthetic-client-secret',
   retentionNotice: '合成試験の保存期間', deletionContact: 'synthetic-operator@example.com' };
 const canonicalSecretName = 'projects/1234567890/secrets/existing-mailbox';
+const fetchCallback = (url) => fetch(url, { signal: AbortSignal.timeout(5000) });
 
 function fixture(overrides = {}) {
   const calls = { writes: [], metadata: [], token: [], opened: [], auth: [] };
@@ -200,11 +201,11 @@ test('loopback callback rejects wrong state and duplicate codes before consuming
   const proof = createProof();
   const listener = await listenForOAuthCallback(proof.state, { timeoutMs: 10000 });
   try {
-    const wrong = await fetch(`${listener.redirectUri}?state=wrong&code=not-accepted`);
+    const wrong = await fetchCallback(`${listener.redirectUri}?state=wrong&code=not-accepted`);
     assert.equal(wrong.status, 400);
-    const duplicate = await fetch(`${listener.redirectUri}?state=${proof.state}&code=one&code=two`);
+    const duplicate = await fetchCallback(`${listener.redirectUri}?state=${proof.state}&code=one&code=two`);
     assert.equal(duplicate.status, 400);
-    const accepted = await fetch(`${listener.redirectUri}?state=${proof.state}&code=synthetic-code`);
+    const accepted = await fetchCallback(`${listener.redirectUri}?state=${proof.state}&code=synthetic-code`);
     assert.equal(accepted.status, 200);
     const body = await accepted.text();
     assert.equal(body.includes('synthetic-code'), false);
@@ -217,7 +218,7 @@ test('loopback consent denial and timeout return fixed safe errors', async () =>
   const proof = createProof();
   const denied = await listenForOAuthCallback(proof.state, { timeoutMs: 10000 });
   const rejected = assert.rejects(denied.result, /OAUTH_CONSENT_DECLINED/);
-  await fetch(`${denied.redirectUri}?state=${proof.state}&error=arbitrary-sensitive-description`);
+  await fetchCallback(`${denied.redirectUri}?state=${proof.state}&error=arbitrary-sensitive-description`);
   await rejected;
   const expired = await listenForOAuthCallback(proof.state, { timeoutMs: 10 });
   await assert.rejects(expired.result, /OAUTH_CALLBACK_TIMEOUT/);
