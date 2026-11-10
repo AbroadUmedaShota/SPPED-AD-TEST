@@ -1,10 +1,12 @@
 import { assertMail, MailError } from './errors.mjs';
+import { createAttachmentCache } from './attachmentCache.mjs';
 
 const MAILBOX = 'customer@speed-ad.com';
 const GMAIL = 'https://gmail.googleapis.com/gmail/v1/users/me/';
 const READONLY_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 
-export async function createGmailAdapter({ secretManager, secretVersion, createOAuthClient, fetchImpl = fetch }) {
+export async function createGmailAdapter({ secretManager, secretVersion, createOAuthClient, fetchImpl = fetch,
+  attachmentCache = createAttachmentCache() }) {
   assertMail(/^projects\/[^/]+\/secrets\/[^/]+\/versions\/[^/]+$/.test(secretVersion || ''), 'MAIL_NOT_CONFIGURED', 503);
   const [secret] = await secretManager.accessSecretVersion({ name: secretVersion });
   let credentials;
@@ -15,7 +17,7 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
   let verified = false;
   let scopeVerifiedToken = null;
 
-  async function request(path, query = {}, kind = 'message') {
+  async function accessToken() {
     let token;
     try { token = await oauth.getAccessToken(); } catch { throw new MailError('MAIL_AUTH_REQUIRED', 401); }
     assertMail(token?.token, 'MAIL_AUTH_REQUIRED', 401);
@@ -26,12 +28,17 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
         'MAIL_SCOPE_MISMATCH', 403);
       scopeVerifiedToken = token.token;
     }
+    return token.token;
+  }
+
+  async function request(path, query = {}, kind = 'message') {
+    const token = await accessToken();
     const url = new URL(path, GMAIL);
     assertMail(url.origin === 'https://gmail.googleapis.com' && url.pathname.startsWith('/gmail/v1/users/me/'));
     for (const [key, value] of Object.entries(query)) if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, String(value));
     let response;
     try {
-      response = await fetchImpl(url, { headers: { Authorization: `Bearer ${token.token}` }, signal: AbortSignal.timeout(30000), redirect: 'error' });
+      response = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30000), redirect: 'error' });
     } catch { throw new MailError('MAIL_UPSTREAM_TIMEOUT', 504); }
     if (!response.ok) {
       if (response.status === 404) throw new MailError(kind === 'history' ? 'MAIL_HISTORY_EXPIRED' : 'MAIL_CONTENT_UNAVAILABLE', kind === 'history' ? 409 : 410);
@@ -56,7 +63,13 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
   return {
     getProfile: profile,
     async getMessage(id) { return read(`messages/${encodeURIComponent(id)}`, { format: 'full' }); },
-    async getAttachment(id, attachmentId) { return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`); },
+    async getAttachment(id, attachmentId, { cache = true } = {}) {
+      if (!cache) return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`);
+      if (!verified) await profile();
+      await accessToken();
+      return attachmentCache.get(JSON.stringify([MAILBOX, id, attachmentId]),
+        () => request(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`));
+    },
     async listMessages({ pageToken, startAt, cutoffAt }) {
       assertMail(typeof startAt === 'string' && Number.isFinite(Date.parse(startAt)), 'MAIL_PERIOD_REQUIRED', 409);
       const query = ['-in:drafts'];

@@ -1,6 +1,7 @@
 import { htmlToPlainText, safeFilename, safeMailText } from './safeMail.mjs';
+import { MAX_ATTACHMENT_BYTES } from './attachmentLimits.mjs';
 
-const defaultLimits = { maxParts: 500, maxDepth: 20, maxBytes: 32 * 1024 * 1024, maxTextBytes: 2 * 1024 * 1024 };
+const defaultLimits = { maxParts: 500, maxDepth: 20, maxBytes: MAX_ATTACHMENT_BYTES, maxTextBytes: 2 * 1024 * 1024 };
 
 export function headerValue(headers, name) {
   return (headers || []).filter((header) => String(header.name).toLowerCase() === name.toLowerCase())
@@ -62,13 +63,13 @@ function findPart(message, path) {
   return part;
 }
 
-async function readPart(message, descriptor, fetchAttachment, maxBytes) {
+async function readPart(message, descriptor, fetchAttachment, maxBytes, cacheAttachment = false) {
   if (descriptor.size > maxBytes) throw new Error('MAIL_SIZE_LIMIT');
   const part = findPart(message, descriptor.partId);
   let data = part.body?.data;
   if (descriptor.attachmentId) {
     if (typeof fetchAttachment !== 'function') throw new Error('MAIL_CONTENT_UNAVAILABLE');
-    const result = await fetchAttachment(String(message.id), descriptor.attachmentId);
+    const result = await fetchAttachment(String(message.id), descriptor.attachmentId, { cache: cacheAttachment });
     data = result?.data;
   }
   if (data == null) {
@@ -139,7 +140,7 @@ export async function readMailAttachment(message, partId, fetchAttachment, optio
   const limits = { ...defaultLimits, ...options };
   const descriptor = inspectMime(message, limits).attachments.find((item) => item.partId === partId);
   if (!descriptor) throw new Error('MAIL_ATTACHMENT_NOT_FOUND');
-  const { bytes } = await readPart(message, descriptor, fetchAttachment, limits.maxBytes);
+  const { bytes } = await readPart(message, descriptor, fetchAttachment, limits.maxBytes, true);
   const [previewKind, mimeType] = previewType(bytes, descriptor.mimeType);
   return { ...descriptor, mimeType, previewKind, bytes, ...(previewKind === 'text' ? { text: safeMailText(bytes.toString('utf8')) } : {}) };
 }

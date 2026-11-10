@@ -63,7 +63,7 @@ test('nested multipart resolves plain body and image attachment ownership', asyn
     observed.push(args);
     return { data: png.toString('base64url') };
   });
-  assert.deepEqual(observed, [['mail1', 'att1']]);
+  assert.deepEqual(observed, [['mail1', 'att1', { cache: true }]]);
   assert.equal(content.previewKind, 'image');
   assert.deepEqual(content.bytes, png);
   await assert.rejects(readMailAttachment(mail, '0.0.1'), /MAIL_ATTACHMENT_NOT_FOUND/);
@@ -117,7 +117,10 @@ test('alternative content selection fetches bodies within one text budget and sk
 test('body stored behind attachmentId is fetched but is not a form attachment', async () => {
   const mail = message({ mimeType: 'text/plain', body: { attachmentId: 'body1', size: 4 } });
   assert.equal(inspectMime(mail).attachments.length, 0);
-  assert.equal(await readMessageText(mail, async () => ({ data: Buffer.from('body').toString('base64url') })), 'body');
+  assert.equal(await readMessageText(mail, async (_id, _attachmentId, options) => {
+    assert.equal(options.cache, false);
+    return { data: Buffer.from('body').toString('base64url') };
+  }), 'body');
   await assert.rejects(readMessageText(mail), /MAIL_CONTENT_UNAVAILABLE/);
 });
 
@@ -199,8 +202,8 @@ test('MIME limits and byte mismatches fail closed', async () => {
   await assert.rejects(readMessageText(invalid), /INVALID_MIME_DATA/);
 });
 
-test('default attachment limit admits 32MiB metadata and excess remains an acceptance blocker', async () => {
-  const limit = 32 * 1024 * 1024;
+test('default attachment limit admits 64MiB metadata and excess remains an acceptance blocker', async () => {
+  const limit = 64 * 1024 * 1024;
   const mail = message({ mimeType: 'application/octet-stream', filename: 'large.bin', body: { attachmentId: 'large1', size: limit } });
   let fetchCount = 0;
   const fetchAttachment = async () => {
@@ -215,6 +218,15 @@ test('default attachment limit admits 32MiB metadata and excess remains an accep
   const report = buildReconciliationReport(synced, [{ ...matched, unavailableAttachmentCount: 1 }], [caseA]);
   assert.equal(report.counts.unavailableAttachments, 1);
   assert.equal(report.complete, false);
+});
+
+test('a full 64MiB attachment is decoded without truncation', async () => {
+  const bytes = Buffer.alloc(64 * 1024 * 1024, 7);
+  const mail = message({ mimeType: 'application/octet-stream', filename: 'maximum.bin', body: { attachmentId: 'max', size: bytes.length } });
+  const result = await readMailAttachment(mail, '0', async () => ({ size: bytes.length, data: bytes.toString('base64url') }));
+  assert.equal(result.bytes.length, bytes.length);
+  assert.equal(result.bytes[0], 7); assert.equal(result.bytes.at(-1), 7);
+  assert.equal(result.previewKind, 'download');
 });
 
 test('first explicit review is immutable and uses verified server actor and time', () => {

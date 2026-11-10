@@ -1361,6 +1361,7 @@
         HISTORY_EXPIRED: 'メールの同期履歴が失効しています。全件同期が必要です。',
         MAIL_CONTENT_UNAVAILABLE: 'このメール本文を取得できません。',
         MAIL_ATTACHMENT_UNAVAILABLE: 'このメール添付を取得できません。',
+        MAIL_ATTACHMENT_BUSY: '別の添付を取得中です。完了後にもう一度操作してください。',
         MAIL_ATTACHMENT_NOT_FOUND: 'このメール添付が見つかりません。',
         MAIL_MAPPING_CHANGED: '別の操作で照合状態が変わりました。更新して確認してください。',
         MAIL_REQUEST_CONFLICT: '操作内容が競合しました。更新して確認してください。',
@@ -1444,7 +1445,7 @@
         !['verified', 'unverified'].includes(result.attachment.availability) || typeof result.reviewReady !== 'boolean' ||
         !['image', 'pdf', 'text', 'download'].includes(result.attachment.previewKind) ||
         result.offset !== offset || !Number.isInteger(result.nextOffset) || !Number.isInteger(result.totalSize) ||
-        result.totalSize < 0 || result.totalSize > 52428800 || result.nextOffset < offset || result.nextOffset > result.totalSize ||
+        result.totalSize < 0 || result.totalSize > 67108864 || result.nextOffset < offset || result.nextOffset > result.totalSize ||
         typeof result.dataBase64 !== 'string' || !/^[A-Za-z0-9+/]*={0,2}$/.test(result.dataBase64) ||
         typeof result.done !== 'boolean' || result.done !== (result.nextOffset === result.totalSize) ||
         (!result.done && result.nextOffset === offset)) throw new Error('MAIL_INVALID_RESPONSE');

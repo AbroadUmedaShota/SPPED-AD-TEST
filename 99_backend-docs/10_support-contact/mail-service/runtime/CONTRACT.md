@@ -37,11 +37,13 @@ GASの`advanceSync`送信前に、正本検査での計画変更、固定URLの�
 
 一覧は日時・messageId降順の50件。返却は`{ok:true,messages,page:{nextPageToken,previousPageToken,pageSize},sync}`。詳細は`message.bodyText`と添付descriptorを返す。MIME partIdはrootを`0`、子を`0.1`のように表す。本文は安全なテキストとし、HTML・remote画像を実行しない。同じ`multipart/alternative`内だけ、デコード・安全化後に空白以外の表示文字があるプレーンテキスト、その他の表現の順で1表現を選び、全表現が空なら空本文を維持する。選択のために取得した各表現の元バイト数も本文上限に合算する。独立した本文partは順に連結する。旧秘密付きURLを表示・ログ前に除去する。
 
-添付はmessage内の所有partを再検証し、512KiB以下のbase64 chunkを返す。返却は`{attachment:{partId,name,mimeType,size,previewKind},offset,nextOffset,totalSize,dataBase64,done}`。画像・PDFはsignature確認、テキストは安全なUTF-8プレビュー、それ以外はoctet-stream取得。転送メール添付などで元のバイト列が取得できず子MIME partだけが存在する場合は、空ファイルに置き換えず取得不能とする。テキスト添付の表示用データも秘密URLを除去する。実装は各chunkでGmail添付全体を読んで切り出すため、大容量添付の実測による待ち時間・API読取回数・費用判断が本番接続前に必要。
+添付は元サイズ・配信サイズとも最大64MiBとし、各要求でmessage内の所有partを再検証して512KiB以下のbase64 chunkを返す。返却は`{attachment:{partId,name,mimeType,size,previewKind},offset,nextOffset,totalSize,dataBase64,done}`。画像・PDFはsignature確認、テキストは安全なUTF-8プレビュー、それ以外はoctet-stream取得。転送メール添付などで元のバイト列が取得できず子MIME partだけが存在する場合は、空ファイルに置き換えず取得不能とする。テキスト添付の表示用データも秘密URLを除去する。
+
+Gmail adapterは添付取得応答を固定窓口・message ID・attachment IDで識別し、Cloud Runのプロセスメモリに1添付分だけ保持する。64MiBのdecoded相当（base64では約85.4MiB）が上限で、アイドル120秒・取得開始から絶対5分の短い方で破棄する。同じキーの取得中要求は共有し、別添付の取得が進行中なら`MAIL_ATTACHMENT_BUSY`で明示再操作を求める。busyは取得不能や確認済みへ変更しない。各chunkの利用者・案件・最新messageとpartの確認はcacheにかかわらず行う。cache hitでも現在のOAuth scopeを検証し、本文・添付をFirestore・ファイル・ログへ保存しない。別instance、期限切れ、再起動、別添付への切替では再取得するため、取得1回は保証しない。デコード・安全化・digest計算はchunkごとに行うので、大容量添付の待ち時間・メモリ・API回数・費用は本番接続前に実測する。
 
 初回確認者・日時はCloud Run側の時刻と、GASで確認した実利用者をtransactionで一度だけ保存する。同一requestId・同内容は同じreceiptを返し、内容相違は409。分類変更はversion照合と理由付きeventを残す。
 
-添付の取得確認は512KiBごとの全範囲が応答へ渡った時だけ完了とする。Firestoreにはcontent digest、転送サイズ、取得済みチャンク位置を最大64個保存し、順不同・再取得・並行取得をtransactionで統合する。1チャンクだけ、末尾だけ、途中失敗では未検証を維持し、内容が変われば取得範囲をリセットする。0byte添付も明示取得を要する。再同期では同一part・名前・元サイズの取得範囲を保持する。確認済み操作は本文取得済みかつ全添付の全範囲取得済みの場合だけサーバーで許可し、画面は`reviewReady`と添付の取得状態を応答から読み戻す。これはデータ到達の証拠であり、利用者が内容を読んだことは明示操作で記録する。
+添付の取得確認は512KiBごとの全範囲が応答へ渡った時だけ完了とする。Firestoreにはcontent digest、転送サイズ、取得済みチャンク位置を最大128個保存し、順不同・再取得・並行取得をtransactionで統合する。1チャンクだけ、末尾だけ、途中失敗では未検証を維持し、内容が変われば取得範囲をリセットする。0byte添付も明示取得を要する。再同期では同一part・名前・元サイズの取得範囲を保持する。確認済み操作は本文取得済みかつ全添付の全範囲取得済みの場合だけサーバーで許可し、画面は`reviewReady`と添付の取得状態を応答から読み戻す。これはデータ到達の証拠であり、利用者が内容を読んだことは明示操作で記録する。
 
 ## 同期と未達の扱い
 

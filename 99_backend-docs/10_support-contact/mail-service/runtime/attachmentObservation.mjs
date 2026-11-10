@@ -1,13 +1,13 @@
 import { assertMail } from './errors.mjs';
+import { MAX_ATTACHMENT_BYTES, ATTACHMENT_CHUNK_SIZE } from '../attachmentLimits.mjs';
 
-export const ATTACHMENT_CHUNK_SIZE = 512 * 1024;
-const MAX_BYTES = 32 * 1024 * 1024;
+export { ATTACHMENT_CHUNK_SIZE };
 
 // Store only bounded transfer metadata, never attachment bytes.
 export function observeAttachment(item, availability, at, transfer) {
   if (availability === 'unavailable') return { ...item, availability, checkedAt: at, servedChunks: [], transferVersion: 1 };
   assertMail(availability === 'served' && transfer && Number.isSafeInteger(transfer.totalSize) && transfer.totalSize >= 0 &&
-    transfer.totalSize <= MAX_BYTES && Number.isSafeInteger(transfer.offset) && transfer.offset >= 0 &&
+    transfer.totalSize <= MAX_ATTACHMENT_BYTES && Number.isSafeInteger(transfer.offset) && transfer.offset >= 0 &&
     (transfer.offset < transfer.totalSize || (transfer.offset === 0 && transfer.totalSize === 0)) && transfer.offset % ATTACHMENT_CHUNK_SIZE === 0 &&
     /^[a-f0-9]{64}$/.test(transfer.contentDigest), 'MAIL_INVALID_REQUEST');
   const same = item.transferVersion === 1 && item.transferSize === transfer.totalSize && item.transferDigest === transfer.contentDigest;

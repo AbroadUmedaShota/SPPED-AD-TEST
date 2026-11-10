@@ -509,6 +509,36 @@ test('attachment chunks validate ownership/offset and assemble safe text preview
   assert.equal(app.revoked.length, 1);
 });
 
+test('attachment bridge and UI agree on the 64MiB transfer boundary', () => {
+  const limit = 64 * 1024 * 1024;
+  const bridgeApp = bridgeRuntime();
+  assert.equal(bridgeApp.api.getContactMailAttachmentChunk({ scope: 'case', caseId, messageId: 'mail1', partId: '0.1', offset: limit - 524288 }).ok, true);
+  assert.throws(() => bridgeApp.api.getContactMailAttachmentChunk({ scope: 'case', caseId, messageId: 'mail1', partId: '0.1', offset: limit + 1 }), /取得位置/);
+  const app = uiRuntime();
+  const chunk = { ok: true, attachment: { partId: '0.1', name: 'large.bin', mimeType: 'application/octet-stream', previewKind: 'download', availability: 'verified' },
+    reviewReady: true, offset: limit - 524288, nextOffset: limit, totalSize: limit, dataBase64: Buffer.alloc(524288).toString('base64'), done: true };
+  assert.equal(app.ui.validateContactMailChunk(chunk, chunk.offset, '0.1').length, 524288);
+  assert.throws(() => app.ui.validateContactMailChunk({ ...chunk, totalSize: limit + 1, done: false }, chunk.offset, '0.1'), /MAIL_INVALID_RESPONSE/);
+});
+
+test('temporary attachment busy reaches the UI without retry or verified state', async () => {
+  const bridgeApp = bridgeRuntime();
+  bridgeApp.respond(() => ({ ok: false, error: { code: 'MAIL_ATTACHMENT_BUSY' } }));
+  assert.equal(bridgeApp.api.getContactMailAttachmentChunk({ scope: 'case', caseId, messageId: 'mail1', partId: '0.1', offset: 0 }).error.code, 'MAIL_ATTACHMENT_BUSY');
+  const app = uiRuntime({ getContactMailAttachmentChunk: () => ({ ok: false, error: { code: 'MAIL_ATTACHMENT_BUSY' } }) });
+  app.mail.case.caseId = caseId;
+  app.mail.case.message = detail('mail1', { reviewReady: false,
+    attachments: [{ partId: '0.1', name: 'note.txt', mimeType: 'text/plain', size: 3, availability: 'unverified' }] });
+  const parent = app.element('busy-parent');
+  const button = app.element('busy-button'); button.parentElement = parent;
+  await app.ui.loadContactMailAttachment('case', '0.1', button);
+  assert.equal(app.calls.filter((call) => call.name === 'getContactMailAttachmentChunk').length, 1);
+  assert.match(parent.querySelector('[data-mail-attachment-preview]').textContent, /別の添付を取得中/);
+  assert.equal(app.mail.case.message.reviewReady, false);
+  assert.equal(app.mail.case.message.attachments[0].availability, 'unverified');
+  assert.equal(button.disabled, false);
+});
+
 test('mail text removes encoded secret URLs and technical readiness is not business acceptance', () => {
   const app = uiRuntime();
   for (const value of ['https://old.example/#token=secret', 'https://old.example/%23token%3Dsecret', 'https://old.example/?code=secret&state=secret', 'https%3A%2F%2Fold.example%2F%23token%3Dsecret', 'https://old.example/%ZZ']) {

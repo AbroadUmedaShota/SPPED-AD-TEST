@@ -268,7 +268,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     let result;
     try {
       result = await core.readMailAttachment(message, payload.partId, gmail.getAttachment.bind(gmail));
-    } catch {
+    } catch (error) {
+      if (error instanceof MailError && error.code === 'MAIL_ATTACHMENT_BUSY') throw error;
       await store.recordAttachmentObservation(record.messageId, payload.partId, 'unavailable', now().toISOString());
       throw new MailError('MAIL_ATTACHMENT_UNAVAILABLE', 410);
     }

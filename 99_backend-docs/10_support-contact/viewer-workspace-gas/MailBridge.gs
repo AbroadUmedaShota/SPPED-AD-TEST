@@ -7,7 +7,7 @@ var MAIL_SAFE_ERROR_CODES = [
   'MAIL_INVALID_REQUEST', 'MAIL_ATTACHMENT_NOT_FOUND', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT',
   'MAIL_SYNC_BUSY', 'MAIL_CONTENT_UNAVAILABLE', 'MAIL_HISTORY_EXPIRED', 'MAIL_INVALID_UPSTREAM',
   'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
-  'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_CASE_NOT_FOUND',
+  'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
   'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
   'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED'
 ];
@@ -34,7 +34,7 @@ function getContactMailAttachmentChunk(options, authProof) {
   payload.partId = String(options && options.partId || '');
   if (!/^0(?:\.\d+)*$/.test(payload.partId) || payload.partId.length > 64) throw new Error('メール添付の指定が不正です。');
   payload.offset = options && options.offset;
-  if (typeof payload.offset !== 'number' || !isFinite(payload.offset) || payload.offset < 0 || Math.floor(payload.offset) !== payload.offset || payload.offset > 52428800) throw new Error('メール添付の取得位置が不正です。');
+  if (typeof payload.offset !== 'number' || !isFinite(payload.offset) || payload.offset < 0 || Math.floor(payload.offset) !== payload.offset || payload.offset > 67108864) throw new Error('メール添付の取得位置が不正です。');
   return callMailService_('getAttachmentChunk', payload, context);
 }
 

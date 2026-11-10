@@ -866,3 +866,47 @@ test('zero-byte attachments require a successful transfer and body failures prev
     await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: `body-${availability}`, expectedVersion: 1 })), { code: 'MAIL_CONTENT_UNAVAILABLE' });
   }
 });
+
+test('cached Gmail attachment chunks still verify message and scope on every request', async () => {
+  const f = fixture([A]); let reads = 0;
+  const bytes = Buffer.alloc(512 * 1024 + 1, 7);
+  const message = gmailMessage('cached', 'body', [], { bytes, mimeType: 'application/octet-stream', name: 'cached.bin' });
+  message.payload.parts[1].body = { size: bytes.length, attachmentId: 'external' };
+  f.messages.set('cached', message);
+  f.store.seed(record('cached', { attachmentCount: 1, unverifiedAttachmentCount: 1,
+    attachments: [{ partId: '0.1', name: 'cached.bin', mimeType: 'application/octet-stream', size: bytes.length, availability: 'unverified' }] }));
+  const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
+    secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
+    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
+      async getTokenInfo() { return { scopes: ['https://www.googleapis.com/auth/gmail.readonly'] }; } }),
+    fetchImpl: async (url) => ({ ok: true, async json() {
+      if (String(url).endsWith('/profile')) return { emailAddress: 'customer@speed-ad.com' };
+      reads++; return { size: bytes.length, data: bytes.toString('base64url') };
+    } })
+  });
+  f.gmail.getAttachment = adapter.getAttachment.bind(adapter);
+  const read = (offset, changes = {}) => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'cached', partId: '0.1', offset, ...changes }));
+  assert.equal((await read(0)).reviewReady, false);
+  assert.equal((await read(512 * 1024)).reviewReady, true);
+  assert.equal(reads, 1); assert.equal(f.calls.length, 2);
+  await assert.rejects(() => read(0, { caseId: B }), { code: 'MAIL_MAPPING_CHANGED' });
+  f.messages.get('cached').labelIds = ['DRAFT'];
+  await assert.rejects(() => read(0), { code: 'MAIL_MAPPING_CHANGED' });
+  assert.equal(reads, 1);
+  f.store.seed(record('cached', { attachmentCount: 1, attachments: [{ partId: '0.1', availability: 'unverified' }] }));
+  f.messages.delete('cached');
+  await assert.rejects(() => read(0), { code: 'MAIL_CONTENT_UNAVAILABLE' });
+});
+
+test('temporary attachment busy does not record unavailable or allow review', async () => {
+  const f = fixture([A]); const bytes = Buffer.from('file');
+  const message = gmailMessage('busy', 'body', [], { bytes, name: 'file.txt' });
+  message.payload.parts[1].body = { size: bytes.length, attachmentId: 'busy' };
+  f.messages.set('busy', message);
+  f.store.seed(record('busy', { attachmentCount: 1, unverifiedAttachmentCount: 1,
+    attachments: [{ partId: '0.1', name: 'file.txt', mimeType: 'text/plain', size: bytes.length, availability: 'unverified' }] }));
+  f.gmail.getAttachment = async () => { throw new MailError('MAIL_ATTACHMENT_BUSY', 503); };
+  await assert.rejects(() => f.execute(f.envelope('getAttachmentChunk', { scope: 'case', caseId: A, messageId: 'busy', partId: '0.1', offset: 0 })), { code: 'MAIL_ATTACHMENT_BUSY' });
+  assert.equal((await f.store.getMessage('busy')).attachments[0].availability, 'unverified');
+  await assert.rejects(() => f.execute(f.envelope('markReviewed', { scope: 'case', caseId: A, messageId: 'busy', expectedVersion: 1 })), { code: 'MAIL_CONTENT_UNAVAILABLE' });
+});
