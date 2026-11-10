@@ -14,12 +14,13 @@ last_reviewed: 2026-11-10
 
 | 用途 | 準備済みのprojectと設定 | 残る確認 |
 | --- | --- | --- |
-| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、External / Testing、テスト利用者0件、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本番用のbranding・公開ページ、制限付きscope審査とセキュリティ評価の適用または除外根拠、本人のGmail同意、Secret version登録、初回読取後のquotaと費用。 |
+| 窓口Gmail用OAuthの検証環境 | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、External / Testing、テスト利用者0件、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本番用の資格情報・同意をこのprojectへ混在させない。 |
+| 窓口Gmail用OAuthの本番環境（推奨） | 正式運営主体アブロードアウトソーシング株式会社の `abroad-o.com` 組織に新規専用projectを置く。project ID候補は `spd-contact-mail-prod-261110`。現時点では未作成。第1段階ログイン用projectとは分ける。 | project新設とGmail API・External audience・`gmail.readonly`・Desktop clientの設定判断、branding・公開案内、制限付きscope審査とセキュリティ評価、本人のGmail同意、Secret version登録、quota・費用。 |
 | Cloud Run・Firestore・Secret Manager | `abroad-o.com` 組織の `spd-contact-viewer-20261110`。承認済み請求先、同project限定の月額3,000円予算通知、必要API、東京の保存先と専用サービスアカウントを準備済み。 | imageとCloud Run配備、数値固定のSecret version、GAS連携と実環境受入。 |
 
 OAuth clientの所属projectとSecret保存先のprojectは別に照合します。実行基盤側の予算通知はOAuth側projectを含みません。この準備状況は本番受入の完了を示さず、以後の変更と読戻しは切替記録を正本にします。
 
-推奨構成は既存の窓口OAuth専用projectを維持し、`customer@speed-ad.com` がGmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認する形です。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。現在、窓口のGmail同意・refresh token・Secret version・実メール読取は未実施です。
+推奨構成では、本番のGmail認可専用projectを運営法人の管理組織へ置き、既存の子会社側projectは検証用にします。`customer@speed-ad.com` だけが本番Gmail読取りを認可し、`@abroad-o.com` 利用者は既存GASで本人確認します。Gmail用OAuthの変更範囲を第1段階のログイン設定から分離します。Cloud Runは実行基盤側のSecret Managerから窓口資格情報を取得するため、OAuth clientと実行基盤のprojectを一致させる必要はありません。現在、本番用projectも、窓口のGmail同意・refresh token・Secret version・実メール読取もありません。
 
 アプリの業務利用者は組織をまたぐため、窓口本人だけがGmail認可することを根拠に[Internal用途の審査除外](https://support.google.com/cloud/answer/13464323?hl=en)を確定しません。[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)に沿って、アプリ専用の公開ホーム・プライバシー案内、制限付きscope審査、サーバー処理に対する年次CASA評価の適用または除外根拠を本番接続前に確認します。[OAuthの本番ポリシー](https://developers.google.com/identity/protocols/oauth2/policies)はホームから利用規約とプライバシー方針へのリンクと、本番・試験用projectの分離を求めます。既存の公開 `/privacy/` はGmail取得・利用者への共有・保存期間の説明が不足しています。改訂案を作成し、公開条件を照合してから反映します。審査申請・公開と評価費用はそれぞれ別に判断します。
 
