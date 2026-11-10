@@ -96,10 +96,7 @@ function advanceContactMailSync(options, authProof) {
       if (plannedStartAt !== null && (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt)) throw new Error('同期対象期間が不正です。');
       if (options.confirmOnly !== true) {
         var source = mailCatalogSource_();
-        if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return {
-          ok: false, error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause: 'MAIL_CATALOG_CHANGED' },
-          dispatch: { sent: false, operation: 'advanceSync', requestId: requestId, executionId: executionId }
-        };
+        if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return mailPreDispatchError_('advanceSync', payload, requestId, 'MAIL_CATALOG_CHANGED');
       }
       if (options.mode === 'full' && plannedStartAt) payload.startAt = plannedStartAt;
     }
@@ -220,12 +217,12 @@ function mailString_(value, limit, optional) {
 
 function callMailService_(operation, payload, context, requestId) {
   var serviceUrl = getProperty_('MAIL_SERVICE_URL', '');
-  if (!serviceUrl) return mailError_('MAIL_NOT_CONFIGURED');
+  if (!serviceUrl) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
   // Only the configured Cloud Run origin is callable; redirects and arbitrary proxy URLs are forbidden.
-  if (!/^https:\/\/[a-z0-9][a-z0-9.-]*\.run\.app$/.test(serviceUrl)) return mailError_('MAIL_NOT_CONFIGURED');
+  if (!/^https:\/\/[a-z0-9][a-z0-9.-]*\.run\.app$/.test(serviceUrl)) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
   var identityToken;
-  try { identityToken = ScriptApp.getIdentityToken(); } catch (_error) { return mailError_('MAIL_SERVICE_AUTH'); }
-  if (!identityToken) return mailError_('MAIL_SERVICE_AUTH');
+  try { identityToken = ScriptApp.getIdentityToken(); } catch (_error) { return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH'); }
+  if (!identityToken) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH');
   var envelope = {
     contractVersion: 1,
     operation: operation,
@@ -253,6 +250,12 @@ function callMailService_(operation, payload, context, requestId) {
     // Do not expose or log service responses, tokens, message bodies, or exception details.
     return mailError_('MAIL_SERVICE_UNAVAILABLE');
   }
+}
+
+function mailPreDispatchError_(operation, payload, requestId, code) {
+  if (operation !== 'advanceSync') return mailError_(code);
+  return { ok: false, error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause: code },
+    dispatch: { sent: false, operation: operation, requestId: requestId, executionId: payload.executionId } };
 }
 
 function mailError_(code) {

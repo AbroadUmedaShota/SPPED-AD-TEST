@@ -1640,11 +1640,13 @@
             ...progress.requestPayload, requestId: progress.requestId, ...(confirming ? { confirmOnly: true } : {}),
           });
           if (serial !== contactMailState.syncSerial) return;
-          if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && response.error.cause === 'MAIL_CATALOG_CHANGED' &&
+          if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && ['MAIL_CATALOG_CHANGED', 'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH'].includes(response.error.cause) &&
               response.dispatch && response.dispatch.sent === false && response.dispatch.operation === 'advanceSync' && response.dispatch.requestId === progress.requestId && response.dispatch.executionId === progress.executionId) {
             progress.requestPending = false;
-            contactMailState.syncProgress = null;
-            element.textContent = '受付データが変わったため、GASの事前確認で停止しました。この同期要求はCloudへ送信していません。メール同期ボタンで現在のSheetから計画を作り直してください。';
+            if (response.error.cause === 'MAIL_CATALOG_CHANGED') {
+              contactMailState.syncProgress = null;
+              element.textContent = '受付データが変わったため、GASの事前確認で停止しました。この同期要求はCloudへ送信していません。メール同期ボタンで現在のSheetから計画を作り直してください。';
+            } else element.textContent = `${contactMailErrorText(response.error.cause)} この同期要求はCloudへ送信していません。設定・認証の回復後、続行ボタンから同じ要求を明示的に送信できます。`;
             break;
           }
           const result = contactMailResult(response);

@@ -35,7 +35,7 @@ function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'doma
   };
   vm.createContext(context);
   vm.runInContext(bridge, context, { filename: 'MailBridge.gs' });
-  return { api: context, calls, reads, respond(fn) { response = fn; }, setActor(value) { actor = value; } };
+  return { api: context, calls, reads, respond(fn) { response = fn; }, setActor(value) { actor = value; }, setUrl(value) { url = value; } };
 }
 
 test('every mail RPC authorizes before Sheet or service access', () => {
@@ -225,12 +225,31 @@ test('unknown first-sync confirmation preserves the original plan after Sheet da
 });
 
 test('upstream responses cannot manufacture the GAS-only definite-not-dispatched outcome', () => {
+  for (const cause of ['MAIL_CATALOG_CHANGED', 'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH']) {
   const app = bridgeRuntime();
   const options = { executionId: randomUUID(), requestId: randomUUID() };
-  app.respond(() => ({ ok: false, error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause: 'MAIL_CATALOG_CHANGED' }, dispatch: { sent: false, operation: 'advanceSync', ...options } }));
+  app.respond(() => ({ ok: false, error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause }, dispatch: { sent: false, operation: 'advanceSync', ...options } }));
   const result = app.api.advanceContactMailSync(options);
   assert.equal(result.error.code, 'MAIL_SERVICE_UNAVAILABLE');
   assert.equal(result.dispatch, undefined);
+  }
+});
+
+test('GAS advance pre-dispatch config and identity failures carry exact not-sent identity without fetching', () => {
+  for (const failure of ['missing-url', 'invalid-url', 'empty-token', 'token-exception']) {
+    const app = bridgeRuntime();
+    if (failure === 'missing-url') app.setUrl('');
+    if (failure === 'invalid-url') app.setUrl('http://invalid.example');
+    if (failure === 'empty-token') app.api.ScriptApp.getIdentityToken = () => '';
+    if (failure === 'token-exception') app.api.ScriptApp.getIdentityToken = () => { throw new Error('private token error'); };
+    const options = { executionId: randomUUID(), requestId: randomUUID() };
+    const result = app.api.advanceContactMailSync(options);
+    assert.equal(result.error.code, 'MAIL_SYNC_NOT_DISPATCHED');
+    assert.equal(result.error.cause, failure.includes('url') ? 'MAIL_NOT_CONFIGURED' : 'MAIL_SERVICE_AUTH');
+    assert.deepEqual(JSON.parse(JSON.stringify(result.dispatch)), { sent: false, operation: 'advanceSync', ...options });
+    assert.equal(app.calls.length, 0);
+    assert.doesNotMatch(JSON.stringify(result), /private token error/);
+  }
 });
 
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
@@ -722,6 +741,63 @@ test('mismatched not-sent metadata cannot clear a pending network-unknown reques
   assert.ok(app.mail.syncProgress.requestId);
   assert.equal(app.mail.syncProgress.requestPending, true);
   assert.equal(app.calls.length, 1);
+});
+
+test('recovered GAS token or config resumes the same definitely-unsent request without receipt lookup', async () => {
+  for (const failure of ['empty-token', 'token-exception', 'missing-url']) {
+    const bridgeApp = bridgeRuntime();
+    const originalToken = bridgeApp.api.ScriptApp.getIdentityToken;
+    if (failure === 'empty-token') bridgeApp.api.ScriptApp.getIdentityToken = () => '';
+    if (failure === 'token-exception') bridgeApp.api.ScriptApp.getIdentityToken = () => { throw new Error('token unavailable'); };
+    if (failure === 'missing-url') bridgeApp.setUrl('');
+    bridgeApp.respond((envelope) => syncResponse(envelope.payload.executionId, 'complete'));
+    const app = uiRuntime({ advanceContactMailSync: (options) => bridgeApp.api.advanceContactMailSync(options) });
+    app.mail.sync = syncResponse(randomUUID()).sync;
+    await app.ui.advanceContactMailSyncFromUi();
+    const request = JSON.parse(JSON.stringify(app.calls[0].args[0]));
+    assert.equal(app.mail.syncProgress.requestPending, false);
+    assert.equal(app.mail.syncProgress.requestId, request.requestId);
+    assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    assert.equal(bridgeApp.calls.length, 0);
+    bridgeApp.api.ScriptApp.getIdentityToken = originalToken;
+    bridgeApp.setUrl('https://contact-mail-example.a.run.app');
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.deepEqual(JSON.parse(JSON.stringify(app.calls[1].args[0])), request);
+    assert.equal(bridgeApp.calls.length, 1);
+    assert.equal(bridgeApp.calls[0].envelope.operation, 'advanceSync');
+    assert.equal(app.mail.syncProgress, null);
+  }
+});
+
+test('post-dispatch auth failure or timeout remains unknown and uses only receipt confirmation', async () => {
+  for (const failure of ['auth', 'timeout']) {
+    const bridgeApp = bridgeRuntime();
+    bridgeApp.respond((envelope) => {
+      if (envelope.operation === 'advanceSync') return failure === 'auth' ? { status: 403, raw: '<html>IAM denied</html>' } : { status: 504, body: { ok: false, error: { code: 'MAIL_UPSTREAM_TIMEOUT' } } };
+      const current = syncResponse(envelope.payload.requestPayload.executionId, 'complete').sync;
+      return { ok: true, found: true, receipt: { sync: current }, sync: current };
+    });
+    const app = uiRuntime({ advanceContactMailSync: (options) => bridgeApp.api.advanceContactMailSync(options) });
+    app.mail.sync = syncResponse(randomUUID()).sync;
+    await app.ui.advanceContactMailSyncFromUi();
+    const requestId = app.mail.syncProgress.requestId;
+    assert.equal(app.mail.syncProgress.requestPending, true);
+    assert.doesNotMatch(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    const originalToken = bridgeApp.api.ScriptApp.getIdentityToken;
+    bridgeApp.api.ScriptApp.getIdentityToken = () => '';
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(app.calls[1].args[0].confirmOnly, true);
+    assert.equal(app.calls[1].args[0].requestId, requestId);
+    assert.equal(app.mail.syncProgress.requestPending, true);
+    assert.equal(bridgeApp.calls.length, 1);
+    assert.doesNotMatch(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+    bridgeApp.api.ScriptApp.getIdentityToken = originalToken;
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(app.calls[2].args[0].confirmOnly, true);
+    assert.equal(app.calls[2].args[0].requestId, requestId);
+    assert.deepEqual(bridgeApp.calls.map((call) => call.envelope.operation), ['advanceSync', 'getSyncRequestResult']);
+    assert.equal(app.mail.syncProgress, null);
+  }
 });
 
 test('well-formed initial not-started sync status remains observable', async () => {
