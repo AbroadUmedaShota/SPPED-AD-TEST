@@ -111,6 +111,7 @@ review_cycle: quarterly
 | 利用規約 | `02_dashboard/terms-of-service.html` | `https://support.speed-ad.com/terms/` |
 | 特定商取引法表示 | `02_dashboard/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` |
 | 個人情報保護方針 | `02_dashboard/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` |
+| お問い合わせメール確認アプリ案内 | 新規（公開前の草案。詳細は `26_support_contact_mail_notice_requirements.md`） | `https://support.speed-ad.com/contact-review/` |
 | 会員登録における個人情報の取扱い | 新規（ログイン前トップの新規アカウント作成モーダルから接続） | `https://support.speed-ad.com/privacy/member-registration/` |
 | お知らせ一覧/詳細 | 新規（ログイン前トップのティザーから接続） | `https://support.speed-ad.com/news/`, `https://support.speed-ad.com/news/<slug>/` |
 | お知らせJSON | 新規（ログイン前トップの最大3件表示で参照） | `https://support.speed-ad.com/news.json` |
