@@ -20,7 +20,7 @@
 
 正本Sheet・独立したGmail列挙・app記録の照合は[独立照合CLIとmanifest契約](tools/ACCEPTANCE.md)を使う。IDをhash化した入力の完全性と双方向一致を検査し、本文・添付・確認記録の残件を返す。合成試験済みの照合器と、本番source採取・業務受入の実施を区別する。
 
-Gmailのsource採取は `tools/captureGmailAcceptanceCli.mjs` を使う。計画表示を既定とし、明示実行・同じprojectの数値固定Secret version・窓口・受入期間・private保存先を必要とする。受入の全メールID走査を追加した説明version `2026-11-11.6` を通常サービスとマーカー整理でも検証し、旧同意記録では接続しない。Google審査・人による閲覧条件・本人同意を解決した後にだけ実採取する。
+Gmailのsource採取は `tools/captureGmailAcceptanceCli.mjs` を使う。計画表示を既定とし、明示実行・同じprojectの数値固定Secret version・窓口・受入期間・private保存先を必要とする。関連メールなしの案件確認を含む説明version `2026-11-11.7` を通常サービスとマーカー整理でも検証し、旧同意記録では接続しない。Google審査・人による閲覧条件・本人同意を解決した後にだけ実採取する。
 
 ## 公開前に必要な設定と判断
 
