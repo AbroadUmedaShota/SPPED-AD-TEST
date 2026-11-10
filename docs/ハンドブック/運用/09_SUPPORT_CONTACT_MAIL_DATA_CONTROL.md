@@ -46,6 +46,8 @@ SPEED AD お問い合わせ確認アプリは `customer@speed-ad.com` に `https
 
 案件終了日時は第2段階で追加するSheetの `closed_at` を使います。`対応済み` への移行時だけ記録し、同じ状態のメモ編集では維持、再開時には空にします。既存の対応済みで終了日時が不明な行は空のまま保持し、証拠を確認して補完するまで期限削除の対象にしません。`handled_at` は対応状態や内部メモの保存ごとに更新されるため、起算日には使いません。
 
+`closed_at`を更新しない旧版へ巻戻す場合は期限削除を停止し、期間中の状態更新を全件監査します。現行版へ戻した後、影響した終了日時を根拠で再確認するか空にするまで再開しません。監査範囲が不明なら全案件を終了日未確認として扱います。詳細は[巻戻し手順](../デプロイ/10_SUPPORT_CONTACT_MAIL_OPERATIONS.md#7-巻戻し)に従います。
+
 **現在の制約:** `closed_at` 列の正本追加と配備後の読戻し、期限削除の実行手段、照合待ち・除外メール等の保存期間を実装・確定する必要があります。個別メールの削除と再同期時の再登録防止も未実装です。削除対象を再取得しない方法が確定するまで、その対象を含む同期を再開できません。この文書とツールの追加だけで期限削除・削除申請対応を受入済みとは扱いません。
 
 通知と同意の要件は[Google Workspace user data policy](https://developers.google.com/workspace/workspace-api-user-data-developer-policy#transparent-and-accurate-notice-and-control)、Google側の接続解除は[Googleアカウントの接続管理](https://myaccount.google.com/connections)を参照してください。

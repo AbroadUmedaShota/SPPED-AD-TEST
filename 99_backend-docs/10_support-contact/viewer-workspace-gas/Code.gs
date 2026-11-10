@@ -318,6 +318,10 @@ function ensureHeaders_(sheet) {
   if (missing.length) {
     throw new Error('問い合わせ保存シートの必須列がありません: ' + missing.join(', '));
   }
+  // The public form writes the original first 17 columns by fixed position.
+  if (CONTACT_HEADERS.some(function (header, index) { return current[index] !== header; })) {
+    throw new Error('問い合わせ保存シートの列順が不正です。先頭18列の定義を確認してください。');
+  }
   return current;
 }
 

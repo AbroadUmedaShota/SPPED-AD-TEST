@@ -7,6 +7,7 @@ import test from 'node:test';
 const root = new URL('../99_backend-docs/10_support-contact/viewer-workspace-gas/', import.meta.url);
 const source = readFileSync(new URL('Code.gs', root), 'utf8');
 const oauthSource = existsSync(new URL('OAuth.gs', root)) ? readFileSync(new URL('OAuth.gs', root), 'utf8') : '';
+const publicFormSource = readFileSync(new URL('../gas/Code.gs', root), 'utf8');
 const html = readFileSync(new URL('Index.html', root), 'utf8');
 const publicNames = ['doGet', 'getViewerContext', 'listContactSubmissions', 'getContactSubmission', 'getAttachmentPreview', 'updateContactSubmissionStatus', 'beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'];
 
@@ -40,6 +41,10 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
   const rows = [headers.slice(), ...records.map((record) => headers.map((key) => record[key] || ''))];
   const sheet = {
     getLastColumn: () => headers.length,
+    getLastRow: () => rows.length,
+    getParent: () => ({ getUrl: () => 'https://docs.google.com/spreadsheets/d/configured-sheet/edit' }),
+    getName: () => 'contact_submissions',
+    getSheetId: () => 1,
     getDataRange: () => ({ getValues: () => { if (locked) saveEvents.push('read'); return rows.map((row) => row.slice()); } }),
     getRange(row, col, height = 1, width = 1) {
       return {
@@ -50,13 +55,15 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
         },
         setValues(values) {
           assert.notEqual(row, 1, 'schema must never change during reads or saves');
-          assert.equal(locked, true, 'status and closure save must hold the script lock');
+          const appendingReceipt = row === rows.length + 1 && col === 1 && width === 17 && height === 1;
+          if (!appendingReceipt) assert.equal(locked, true, 'status and closure save must hold the script lock');
           if (writeThrows) throw new Error('Write failed');
           assert.equal(values.length, height);
           writeBatches.push({ row, col, height, width });
           saveEvents.push('write');
           values.forEach((cells, rowOffset) => {
             assert.equal(cells.length, width);
+            if (!rows[row - 1 + rowOffset]) rows[row - 1 + rowOffset] = [];
             cells.forEach((value, index) => {
               writes.push({ row: row + rowOffset, col: col + index, value });
               rows[row - 1 + rowOffset][col - 1 + index] = typeof value === 'string' && value.startsWith("'") ? value.slice(1) : value;
@@ -254,16 +261,52 @@ test('legacy completed cases keep unknown closure until reopened and completed a
   assert.equal(existing.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo').submission.closed_at, '2026-01-02T03:04:05.000Z');
 });
 
-test('handling fields may be reordered within their atomic range without touching receipt cells', () => {
+test('viewer rejects reordered columns before the public form can overwrite header meanings', () => {
   const headers = runtime().headers;
   const reordered = [...headers.slice(0, 13), ...headers.slice(13).reverse()];
   const env = runtime('reader@abroad-o.com', { headerOrder: reordered });
-  const receipt = env.rows[1].slice(0, 13);
-  const result = env.api.updateContactSubmissionStatus('case-a', '対応済み', '=memo').submission;
-  assert.equal(result.closed_at, result.handled_at);
-  assert.equal(result.internal_note, '=memo');
-  assert.deepEqual(env.rows[1].slice(0, 13), receipt);
-  assert.deepEqual(env.writeBatches, [{ row: 2, col: 14, height: 1, width: 5 }]);
+  assert.throws(() => env.api.listContactSubmissions({ status: 'all' }), /列順/);
+  assert.throws(() => env.api.updateContactSubmissionStatus('case-a', '対応済み', '=memo'), /列順/);
+  assert.deepEqual(env.writes, []);
+  assert.equal(env.isLocked(), false);
+});
+
+test('public form receipt append preserves existing closure and memo under the exact 18-column schema', () => {
+  const env = runtime();
+  const closed = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'existing memo').submission;
+  const form = { SpreadsheetApp: env.api.SpreadsheetApp, PropertiesService: env.api.PropertiesService };
+  vm.createContext(form);
+  vm.runInContext(publicFormSource, form, { filename: 'public-form/Code.gs' });
+  const receipt = form.appendRow_({ submission_id: 'case-new', submitted_at: '2026-11-11T01:02:03.000Z', handled_status: '未対応', internal_note: '' });
+  assert.equal(receipt.rowNumber, 4);
+  assert.deepEqual(Array.from(form.CONTACT_HEADERS), env.headers.slice(0, 17));
+  assert.equal(env.rows[0][17], 'closed_at');
+  const reread = env.api.getContactSubmission('case-a').submission;
+  assert.equal(reread.closed_at, closed.closed_at);
+  assert.equal(reread.internal_note, 'existing memo');
+  const added = env.api.getContactSubmission('case-new').submission;
+  assert.equal(added.closed_at, '');
+  assert.equal(added.handled_status, '未対応');
+});
+
+test('rollback writes require clearing audited closure dates before expiry processing resumes', () => {
+  const env = runtime();
+  const closed = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'first completion').submission;
+  // Phase1 has no closed_at handling: reopening and completing leave the old date behind.
+  for (const status of ['対応中', '対応済み']) {
+    env.advance(60);
+    env.rows[1][env.headers.indexOf('handled_status')] = status;
+    env.rows[1][env.headers.indexOf('handled_at')] = new Date(env.nowSeconds() * 1000).toISOString();
+  }
+  assert.equal(env.api.getContactSubmission('case-a').submission.closed_at, closed.closed_at);
+  // The rollback runbook suspends expiry and clears affected dates unless the closure is verified.
+  env.rows[1][env.headers.indexOf('closed_at')] = '';
+  assert.equal(env.api.updateContactSubmissionStatus('case-a', '対応済み', 'after rollback audit').submission.closed_at, '');
+  env.api.updateContactSubmissionStatus('case-a', '対応中', 'reopen with current version');
+  env.advance(60);
+  const reclosed = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'verified new transition').submission;
+  assert.equal(reclosed.closed_at, reclosed.handled_at);
+  assert.notEqual(reclosed.closed_at, closed.closed_at);
 });
 
 test('detail shows closure as read-only and distinguishes legacy unknown completion', async () => {
@@ -289,7 +332,7 @@ test('closure schema and write failures release the lock without partial handlin
   const headers = normal.headers.slice();
   [headers[0], headers[13]] = [headers[13], headers[0]];
   const reordered = runtime('reader@abroad-o.com', { headerOrder: headers });
-  assert.throws(() => reordered.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo'), /連続/);
+  assert.throws(() => reordered.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo'), /列順/);
   assert.deepEqual(reordered.writes, []);
   assert.equal(reordered.isLocked(), false);
 });
