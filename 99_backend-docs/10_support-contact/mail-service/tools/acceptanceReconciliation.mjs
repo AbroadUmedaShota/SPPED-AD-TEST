@@ -53,12 +53,15 @@ export function reconcileAcceptance(input) {
     if (!validPages || rowCount !== m.rows.length) add('PAGINATION_INVALID', source);
   }
   const context = sources.sheet;
+  for (const source of ['sheet', 'sheetAfter']) {
+    if (sources[source]?.rows.length === 0) add('SHEET_EMPTY', source);
+  }
   for (const [source, m] of Object.entries(sources)) {
     if (context && ['runId', 'hashKeyId', 'startAt', 'cutoffAt'].some((field) => m[field] !== context[field])) add('CONTEXT_MISMATCH', source);
   }
   if (sources.sheet && sources.gmail && sources.app && sources.sheetAfter &&
-      !(sources.sheet.capturedAt <= sources.gmail.capturedAt && sources.gmail.capturedAt <= sources.app.capturedAt &&
-        sources.app.capturedAt <= sources.sheetAfter.capturedAt)) add('OBSERVATION_ORDER_INVALID', 'app');
+      !(sources.sheet.capturedAt < sources.gmail.capturedAt && sources.gmail.capturedAt < sources.app.capturedAt &&
+        sources.app.capturedAt < sources.sheetAfter.capturedAt)) add('OBSERVATION_ORDER_INVALID', 'app');
   const cases = (rows, source) => {
     const map = new Map();
     for (const row of rows || []) {

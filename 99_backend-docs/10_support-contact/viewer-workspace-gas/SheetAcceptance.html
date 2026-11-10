@@ -21,7 +21,7 @@
 <body>
 <main>
   <h1>受入用Sheet取得</h1>
-  <p>正本の受付ID・受付日時・対応状態・終了日時を照合用JSONにします。Sheet前 → Gmail → App → Sheet後の順で取得してください。一時キーは取得のたびに入力し、JSONは社内の受入記録へ保管してください。</p>
+  <p>正本の受付ID・受付日時・対応状態・終了日時を照合用JSONにします。Sheet前 → Gmail → App → Sheet後の順で取得してください。一時キーは取得のたびに入力し、JSONはアクセス制限された一時フォルダへ保存して照合後に削除してください。</p>
   <form id="capture-form" method="post" autocomplete="off" novalidate>
     <label>取得の順番<select id="capture-phase"><option value="before">Sheet前（Gmail/App取得の前）</option><option value="after">Sheet後（Gmail/App取得の後）</option></select></label>
     <label>実行ID<input id="run-id" type="text" maxlength="80" autocomplete="off" spellcheck="false" required></label>
@@ -87,7 +87,7 @@
       link.download = phase === 'after' ? 'speed-ad-sheet-after.json' : 'speed-ad-sheet-before.json';
       document.body.appendChild(link);
       link.click();
-    } finally { link.remove(); URL.revokeObjectURL(url); }
+    } finally { setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000); }
   }
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -105,7 +105,7 @@
       const value = await rpc('exportContactMailSheetAcceptance', options, '');
       if (!validResult(value, options)) throw new Error('MAIL_ACCEPTANCE_RESPONSE_INVALID');
       download(value, phase);
-      status.textContent = 'JSONを取得しました。件数: ' + value.receipt.total + '件。';
+      status.textContent = 'JSONのダウンロードを開始しました。件数: ' + value.receipt.total + '件。';
     } catch (error) {
       const allowed = ['MAIL_ACCEPTANCE_INPUT_INVALID', 'MAIL_ACCEPTANCE_SOURCE_INVALID', 'MAIL_ACCEPTANCE_SOURCE_CHANGED', 'MAIL_ACCEPTANCE_CUTOFF_CHANGED', 'MAIL_ACCEPTANCE_RESPONSE_INVALID', 'FORBIDDEN'];
       const message = error && typeof error.message === 'string' ? error.message : '';

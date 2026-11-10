@@ -1,6 +1,6 @@
 # 全件受入の独立照合
 
-`verifyMailAcceptance.mjs` は、正本Sheet・同期と独立したGmail列挙・Firestoreの3sourceを照合する。Sheetは前後2つのprivate manifestを使う。本文・件名・宛先・添付名・添付本体を入力しない。IDは実行ごとの32byte以上の乱数keyを使い、`hashAcceptanceId(kind, value, key)` のHMAC-SHA256へ変換する。keyはmanifestやログへ書かず、全sourceに同じkeyを使う。`hashKeyId` はkey bytesのSHA-256。hashも匿名情報とは扱わず、受入記録とともに限定管理する。
+`verifyMailAcceptance.mjs` は、正本Sheet・同期と独立したGmail列挙・Firestoreの3sourceを照合する。Sheetは専用画面が前後に出力した `{manifest,receipt}` のJSONファイルをそのまま渡す。CLIはreceiptの件数・二重読取り・前後catalogDigest一致を検査し、manifestだけの入力を拒否する。本文・件名・宛先・添付名・添付本体を入力しない。IDは実行ごとの32byte以上の乱数keyを使い、`hashAcceptanceId(kind, value, key)` のHMAC-SHA256へ変換する。keyはmanifestやログへ書かず、全sourceに同じkeyを使う。`hashKeyId` はkey bytesのSHA-256。hashも匿名情報とは扱わず、アクセス制限された一時フォルダで扱い、照合後に削除する。
 
 ## 実行と判定
 
@@ -8,14 +8,14 @@
 node tools/verifyMailAcceptance.mjs --sheet PRIVATE/sheet-before.json --gmail PRIVATE/gmail.json --app PRIVATE/app.json --sheet-after PRIVATE/sheet-after.json
 ```
 
-標準出力は件数と固定エラーコードだけ。終了codeは技術残件なしが0、照合不一致・残件ありが1、引数・JSON・ファイル読取不正が2。`idReconciliationPass` はID集合・source完全性・案件状態の一致、`technicalReady` はさらに本文・添付・初回確認・照合残件なしを表す。`businessAcceptance` は常に `unverified`。入力の真正性、内容の目視確認、フォーム添付への到達、別利用者の確認記録読戻しはこのCLIだけでは証明しない。
+標準出力は件数と固定エラーコードだけ。終了codeは技術残件なしが0、照合不一致・残件ありが1、引数・JSON・ファイル読取不正が2。Sheetは1件以上を必須とし、Sheet前・Gmail・App・Sheet後の取得時刻は厳密に昇順でなければ不合格にする。同じSheetファイルやコピーを前後に渡しても合格しない。`idReconciliationPass` はID集合・source完全性・案件状態の一致、`technicalReady` はさらに本文・添付・初回確認・照合残件なしを表す。`businessAcceptance` は常に `unverified`。入力の真正性、内容の目視確認、フォーム添付への到達、別利用者の確認記録読戻しはこのCLIだけでは証明しない。
 
 ## manifest version 1
 
 全sourceの共通キーは以下だけとする。余分なキーを含むデータは受入不可。
 
 - `schemaVersion: 1`、`source: sheet|gmail|app`、`runId`（英数字・`.`・`_`・`-`、80字以内）、`hashKeyId`（64桁hex）。
-- `startAt`、`cutoffAt`、`capturedAt` はミリ秒付きUTC ISO日時。期間は両端を含み、captureはcutoff以降。全manifestでrunId・key・期間が同じでなければ失敗する。capturedAtはSheet-before → Gmail → app → Sheet-afterの順とし、前後Sheetの受付日時・状態・終了日時を含む全行が同じであること。
+- `startAt`、`cutoffAt`、`capturedAt` はミリ秒付きUTC ISO日時。期間は両端を含み、captureはcutoff以降。全manifestでrunId・key・期間が同じでなければ失敗する。capturedAtはSheet-before < Gmail < app < Sheet-afterとし、前後Sheetの受付日時・状態・終了日時を含む全行が同じであること。
 - `sourceComplete` はtrue、`errors` は空配列であること。失敗時は内容を含まない大文字コードを保存する。
 - `pages`: `{index, requestTokenHash, nextTokenHash, rowCount}` 配列。先頭requestと末尾nextはnull、中間は同じkeyによるpage token hashで連結し、indexは0始まり連続。循環・未終了・件数不一致を拒否する。ページなしは空結果と扱わない。正常な0件はrowCount 0の1ページとする。
 - `rows` は最大100,000件。Set化前に全行の重複を検出する。

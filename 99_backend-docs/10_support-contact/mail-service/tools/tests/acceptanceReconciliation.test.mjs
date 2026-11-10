@@ -17,7 +17,10 @@ function fixture() {
       manualExclusion: false, unavailable: false, bodyVerified: true, attachmentCount: 0, attachments: [],
       firstReview: { actorHash: id('actor'), at: END } }]), catalog: [structuredClone(row)], syncComplete: true,
     residualCount: 0, noMailConfirmations: [] } };
+  result.gmail.capturedAt = '2026-11-11T00:00:00.001Z';
+  result.app.capturedAt = '2026-11-11T00:00:00.002Z';
   result.sheetAfter = structuredClone(result.sheet);
+  result.sheetAfter.capturedAt = '2026-11-11T00:00:00.003Z';
   return result;
 }
 const run = (f) => reconcileAcceptance(f);
@@ -121,4 +124,9 @@ test('final Sheet observation is mandatory, detects drift and brackets Gmail/App
   assert.ok(run(changed).failures.some((x) => x.code === 'SHEET_CHANGED'));
   const order = fixture(); order.gmail.capturedAt = '2026-11-11T01:00:00.000Z';
   assert.ok(run(order).failures.some((x) => x.code === 'OBSERVATION_ORDER_INVALID'));
+  const copied = fixture(); copied.sheetAfter.capturedAt = copied.sheet.capturedAt;
+  assert.ok(run(copied).failures.some((x) => x.code === 'OBSERVATION_ORDER_INVALID'));
+  const empty = fixture(); empty.sheet.rows = []; empty.sheet.pages[0].rowCount = 0;
+  empty.sheetAfter.rows = []; empty.sheetAfter.pages[0].rowCount = 0;
+  assert.ok(run(empty).failures.some((x) => x.code === 'SHEET_EMPTY'));
 });

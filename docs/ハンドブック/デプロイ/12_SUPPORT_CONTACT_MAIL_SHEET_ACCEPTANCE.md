@@ -13,7 +13,7 @@
 | `cutoffAt` | 今回の同期・照合に固定した基準日時。現在以前の正規UTC ISO文字列。 |
 | `hashKeyBase64` | 今回だけ使うランダム32byteの共通キーを標準base64にした値。Gmail/App取得と同じキーを使い、manifestやログには保存しない。 |
 
-専用画面で「Sheet前」または「Sheet後」を選び、4欄へ入力して「JSONを取得」を押します。画面は既存の `getViewerContext` でdomain経路を確認し、`exportContactMailSheetAcceptance(options, '')` を呼びます。成功時は `{manifest,receipt}` だけを `speed-ad-sheet-before.json` または `speed-ad-sheet-after.json` としてBlobから端末へ保存し、行データを画面へ展開しません。順番の選択は固定の保存名を決めるだけで、GASへの入力には追加しません。Sheet前・後で取得したファイルはprivateな受入記録のそれぞれの場所へ分けます。関数は認証、入力検査の順に処理し、Cloud Run/Gmail/Driveを呼びません。
+専用画面で「Sheet前」または「Sheet後」を選び、4欄へ入力して「JSONを取得」を押します。画面は既存の `getViewerContext` でdomain経路を確認し、`exportContactMailSheetAcceptance(options, '')` を呼びます。成功時は `{manifest,receipt}` だけを `speed-ad-sheet-before.json` または `speed-ad-sheet-after.json` としてBlobから端末へ保存し、行データを画面へ展開しません。順番の選択は固定の保存名を決めるだけで、GASへの入力には追加しません。Sheet前・後で取得したファイルはアクセス制限された一時フォルダへ分けて置き、照合後に削除します。関数は認証、入力検査の順に処理し、Cloud Run/Gmail/Driveを呼びません。
 
 入力値をURLへ付けず、一時キーをbrowser storage・console・ログへ保存しません。成功・入力不備・取得失敗のいずれでも一時キー欄を消すため、再取得時は同じ実行キーを再入力します。任意の例外文を表示せず、固定の失敗案内だけを示します。ダウンロード後のファイルは社内の管理対象として扱い、端末の不要コピーを残さない運用にします。
 
@@ -28,7 +28,7 @@
 3. 独立したGmail manifestを取得する。
 4. 読取り専用のApp manifestを取得する。
 5. 専用画面へ同じ入力を再入力し、Sheet-afterを取得する。
-6. Sheet-beforeとSheet-afterの全行が一致し、Sheet-afterのcapturedAtがGmail/App取得後であることを照合器で確認する。両receiptのcatalogDigestは受入記録で照合する。
+6. Sheet-beforeとSheet-afterの全行が一致し、Sheet-afterのcapturedAtがGmail/App取得後であることを照合器で確認する。照合CLIは両receiptの件数・二重読取り・catalogDigest一致も検査する。
 
 各呼出しでも正本を2回読み、受付ID・受付日時・状態・終了日時が一致した場合だけ完了結果を返します。200件の上限は設けず、保存先の全データ行を確認します。空の保存先、受付IDを欠く非空行、不正・重複ID、不正日時、状態と終了日時の不整合、基準日時より後の受付、読取り間の変更は固定エラーで停止します。行の不備を黙って省略せず、基準日時より後の受付があれば新しい基準で同期と採取をやり直します。
 

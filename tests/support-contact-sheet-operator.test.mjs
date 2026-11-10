@@ -46,6 +46,7 @@ function browser({ actor = { allowed: true, authMode: 'domain' }, response = res
     createElement: () => ({ click() { downloads.push({ href: this.href, download: this.download }); }, remove() {} }) },
   URL: { createObjectURL(blob) { blobs.push(blob); const url = 'blob:synthetic'; urls.push(url); return url; }, revokeObjectURL: (url) => revoked.push(url) },
   Blob: class { constructor(parts, options) { this.parts = parts; this.options = options; } },
+  setTimeout: (callback) => callback(),
   atob: (value) => Buffer.from(value, 'base64').toString('binary'), btoa: (value) => Buffer.from(value, 'binary').toString('base64'),
   google: { script: { run: { withSuccessHandler(success) { return { withFailureHandler(fail) { return {
     getViewerContext() { calls.push('auth'); success(actor); },
