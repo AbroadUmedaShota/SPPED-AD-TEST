@@ -1,5 +1,6 @@
 {
   "indexes": [
+    { "collectionGroup": "deletionDiagnostics", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "detectedAt", "order": "DESCENDING" }, { "fieldPath": "messageId", "order": "DESCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "caseId", "order": "ASCENDING" }, { "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "DESCENDING" }, { "fieldPath": "messageId", "order": "DESCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "caseId", "order": "ASCENDING" }, { "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "ASCENDING" }, { "fieldPath": "messageId", "order": "ASCENDING" }] },
     { "collectionGroup": "messages", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "matchState", "order": "ASCENDING" }, { "fieldPath": "internalDate", "order": "DESCENDING" }, { "fieldPath": "messageId", "order": "DESCENDING" }] },

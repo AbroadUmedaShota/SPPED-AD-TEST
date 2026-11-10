@@ -13,6 +13,7 @@ export function createFirestoreStore(db) {
   const syncRef = meta.doc('sync');
   const leaseRef = meta.doc('syncLease');
   const activeRef = meta.doc('activeCatalog');
+  const deletionDiagnostics = mailbox.collection('deletionDiagnostics');
   const data = (snapshot) => snapshot.exists ? snapshot.data() : null;
   function updateCoverage(transaction, before, after) {
     const previous = before?.matchState === 'matched' ? before.caseId : null;
@@ -57,6 +58,33 @@ export function createFirestoreStore(db) {
       return { complete: true, snapshotId: page.snapshotId, total: ids.length };
     },
     async getMessage(id) { return data(await messages.doc(id).get()); },
+    async recordUnobservedDeletion(id, at) {
+      const ref = deletionDiagnostics.doc(id);
+      await db.runTransaction(async (transaction) => {
+        const [message, diagnostic] = await Promise.all([transaction.get(messages.doc(id)), transaction.get(ref)]);
+        if (!message.exists && !diagnostic.exists) transaction.set(ref, { messageId: id, detectedAt: at });
+      });
+    },
+    async countUnobservedDeletions() { return (await deletionDiagnostics.count().get()).data().count; },
+    async listUnobservedDeletions({ cursor, limit }) {
+      let query = deletionDiagnostics.orderBy('detectedAt', 'desc').orderBy('messageId', 'desc');
+      if (cursor) query = query.startAfter(cursor.at, cursor.id);
+      return (await query.limit(limit).get()).docs.map((item) => item.data());
+    },
+    async excludeDraft(id, at) {
+      const ref = messages.doc(id);
+      await db.runTransaction(async (transaction) => {
+        const existing = data(await transaction.get(ref));
+        const record = { ...(existing || { messageId: id, threadId: '', internalDate: at,
+          subject: '', from: '', to: '', direction: 'unknown', attachmentCount: 0, firstReview: null,
+          bodyAvailability: 'unverified', attachments: [], unverifiedAttachmentCount: 0, unavailableAttachmentCount: 0 }),
+        sourceKind: 'draft', matchState: 'excluded', caseId: null, reason: 'unsent_draft',
+        version: (existing?.version || 0) + (existing?.sourceKind === 'draft' ? 0 : 1), unavailable: false };
+        transaction.set(ref, record);
+        transaction.delete(deletionDiagnostics.doc(id));
+        updateCoverage(transaction, existing, record);
+      });
+    },
     async listMessages({ mode, caseId, cursor, limit }) {
       let query = messages;
       if (mode === 'case') query = query.where('caseId', '==', caseId).where('matchState', '==', 'matched');
@@ -149,6 +177,7 @@ export function createFirestoreStore(db) {
         const demotions = mixedThreadDemotions([...threadRecords.filter((item) => item.messageId !== incoming.messageId), merged], incoming.indexedAt);
         const final = demotions.find((item) => item.record.messageId === incoming.messageId)?.record || merged;
         transaction.set(ref, final);
+        transaction.delete(deletionDiagnostics.doc(incoming.messageId));
         updateCoverage(transaction, existing, final);
         const event = indexedClassificationEvent(existing, merged, incoming.indexedAt);
         if (event) transaction.set(mailbox.collection('events').doc(), event);
@@ -166,11 +195,7 @@ export function createFirestoreStore(db) {
       const ref = messages.doc(id);
       await db.runTransaction(async (transaction) => {
         const existing = data(await transaction.get(ref));
-        transaction.set(ref, { ...(existing || { messageId: id, threadId: '', internalDate: at,
-          subject: '', from: '', to: '', direction: 'received', attachmentCount: 0,
-          caseId: null, matchState: 'pending', version: 1, firstReview: null,
-          bodyAvailability: 'unavailable', attachments: [], unverifiedAttachmentCount: 0,
-          unavailableAttachmentCount: 0 }), unavailable: true });
+        if (existing && existing.sourceKind !== 'draft') transaction.update(ref, { unavailable: true });
       });
     },
     async recordBodyObservation(id, availability, at) {

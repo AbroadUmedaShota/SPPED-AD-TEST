@@ -74,12 +74,13 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
   async function syncStatus(override) {
     const state = override || await store.getSyncState();
     const counts = await store.countMessages();
+    const unobservedDeletedCount = await store.countUnobservedDeletions();
     const catalog = await store.getCatalog();
     const covered = new Set(await store.getCoveredCaseIds());
     const coverageUnverified = catalog.caseIds.filter((id) => !covered.has(id));
     const enumerationComplete = state?.state === 'complete';
     const residual = counts.pending + counts.unreviewed + counts.unavailable + (state?.failedCount || 0) +
-      counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable;
+      counts.bodyUnverified + counts.bodyUnavailable + counts.attachmentUnverified + counts.attachmentUnavailable + unobservedDeletedCount;
     return {
       state: state?.state || 'not_started', lastSuccessAt: state?.lastSuccessAt || null,
       pendingCount: counts.pending, unreviewedCount: counts.unreviewed, failedCount: state?.failedCount || 0,
@@ -87,6 +88,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       startAt: state?.startAt || null, cutoffAt: state?.cutoffAt || null, errorCode: state?.errorCode || null,
       processedCount: state?.processedCount || 0, phase: state?.phase || 'enumerate',
       failedMessageIds: state?.failedMessageIds || [],
+      unobservedDeletedCount,
       executionId: state?.executionId || null, mode: state?.mode || null, historyAvailable: Boolean(state?.historyId),
       enumerationComplete, acceptanceReady: enumerationComplete && catalog.complete && residual === 0 && coverageUnverified.length === 0,
       coverageUnverifiedCaseCount: catalog.complete ? coverageUnverified.length : null,
@@ -104,10 +106,14 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     return record;
   }
 
-  async function fetchMessage(id) {
+  async function fetchMessage(id, includeDraft = false) {
     try {
       const message = await gmail.getMessage(id);
       assertMail(message?.id === id, 'MAIL_INVALID_UPSTREAM', 502);
+      if (!includeDraft && message.labelIds?.includes('DRAFT')) {
+        await store.excludeDraft(id, now().toISOString());
+        throw new MailError('MAIL_MAPPING_CHANGED', 409);
+      }
       return message;
     } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') await store.markUnavailable(id, now().toISOString());
@@ -238,12 +244,17 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
 
   async function indexMessage(id, catalog, scope = {}) {
     let message;
-    try { message = await fetchMessage(id); } catch (error) {
+    try { message = await fetchMessage(id, true); } catch (error) {
       if (error.code === 'MAIL_CONTENT_UNAVAILABLE') {
-        await store.markUnavailable(id, now().toISOString());
+        if (scope.draftEvidence) await store.excludeDraft(id, now().toISOString());
+        else if (!await store.getMessage(id)) await store.recordUnobservedDeletion(id, now().toISOString());
         return;
       }
       throw error;
+    }
+    if (message.labelIds?.includes('DRAFT')) {
+      await store.excludeDraft(id, now().toISOString());
+      return;
     }
     const internalDate = new Date(Number(message.internalDate)).toISOString();
     if ((scope.startAt && internalDate < scope.startAt) || (scope.cutoffAt && internalDate > scope.cutoffAt)) return;
@@ -270,7 +281,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
     const to = scrub(core.headerValue(headers, 'To'));
     const rawRfcMessageId = core.headerValue(headers, 'Message-ID').trim();
     const rfcMessageId = rawRfcMessageId.length <= 512 && /^<[^<>\s]+@[^<>\s]+>$/.test(rawRfcMessageId) ? rawRfcMessageId : '';
-    await store.upsertIndexedMessage({ messageId: id, threadId: message.threadId || '', internalDate,
+    await store.upsertIndexedMessage({ messageId: id, sourceKind: 'mail', threadId: message.threadId || '', internalDate,
       subject: scrub(core.headerValue(headers, 'Subject')), from, to,
       direction: Array.isArray(message.labelIds) ? (message.labelIds.includes('SENT') ? 'sent' : 'received') : 'unknown',
       attachmentCount: parsed.attachments.length, rfcMessageId, unavailable: false,
@@ -367,6 +378,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       }
       assertMail(Array.isArray(page.messageIds) && page.messageIds.length <= 1000 &&
         (!page.deletedIds || (Array.isArray(page.deletedIds) && page.deletedIds.length <= 1000)) &&
+        (!page.draftIds || (Array.isArray(page.draftIds) && page.draftIds.length <= 1000)) &&
         (!page.nextPageToken || typeof page.nextPageToken === 'string'), 'MAIL_INVALID_UPSTREAM', 502);
       if (page.nextPageToken) assertMail(page.nextPageToken !== state.pageToken, 'MAIL_INVALID_UPSTREAM', 502);
       if (state.mode === 'history') {
@@ -375,16 +387,18 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         state.lastPageHistoryId = String(page.historyId);
       }
       if (!state.inFlightPage) {
-        page = { ...page, messageIds: [...new Set(page.messageIds)].map(messageId), deletedIds: [...new Set(page.deletedIds || [])].map(messageId) };
+        page = { ...page, messageIds: [...new Set(page.messageIds)].map(messageId), deletedIds: [...new Set(page.deletedIds || [])].map(messageId),
+          draftIds: [...new Set(page.draftIds || [])].map(messageId) };
+        for (const id of page.draftIds) if (!page.messageIds.includes(id)) await store.excludeDraft(id, now().toISOString());
         state.inFlightPage = { page, index: 0 };
         await store.setSyncState(state, lease);
       }
       const end = Math.min(state.inFlightPage.index + WORK_SIZE, page.messageIds.length);
       while (state.inFlightPage.index < end) {
         const id = page.messageIds[state.inFlightPage.index];
-        try { await indexMessage(messageId(id), catalog, state.mode === 'full' ? {
+        try { await indexMessage(messageId(id), catalog, { ...(state.mode === 'full' ? {
           startAt: state.startAt, cutoffAt: state.cutoffAt, generation: state.executionId
-        } : { startAt: state.startAt }); }
+        } : { startAt: state.startAt }), draftEvidence: page.draftIds?.includes(id) === true }); }
         catch (error) { state.failedMessageIds = [id]; throw error; }
         state.inFlightPage.index += 1;
         state.processedCount += 1;
@@ -394,7 +408,11 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         await store.setSyncState(state, lease, { requestId, fingerprint, result });
         return result;
       }
-      for (const id of new Set(page.deletedIds || [])) await store.markUnavailable(messageId(id), now().toISOString());
+      for (const id of new Set(page.deletedIds || [])) {
+        const record = await store.getMessage(messageId(id));
+        if (record) await store.markUnavailable(id, now().toISOString());
+        else await store.recordUnobservedDeletion(id, now().toISOString());
+      }
       const complete = !page.nextPageToken && state.mode === 'history';
       state = { ...state, pageToken: page.nextPageToken || null,
         inFlightPage: null,

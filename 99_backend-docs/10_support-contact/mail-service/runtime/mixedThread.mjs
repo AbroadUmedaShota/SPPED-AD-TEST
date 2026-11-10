@@ -21,6 +21,7 @@ export function mixedThreadDemotions(records, at) {
 
 export function mergeIndexedMessage(existing, incoming) {
   if (!existing) return incoming;
+  if (existing.sourceKind === 'draft') return { ...incoming, version: existing.version + 1, firstReview: null, manualClassification: false };
   const manual = isManual(existing);
   const changed = !manual && (existing.matchState !== incoming.matchState || existing.caseId !== incoming.caseId || existing.reason !== incoming.reason);
   const attachments = incoming.attachments.map((item) => {

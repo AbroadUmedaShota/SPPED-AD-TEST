@@ -58,7 +58,7 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
     async getMessage(id) { return read(`messages/${encodeURIComponent(id)}`, { format: 'full' }); },
     async getAttachment(id, attachmentId) { return read(`messages/${encodeURIComponent(id)}/attachments/${encodeURIComponent(attachmentId)}`); },
     async listMessages({ pageToken, startAt, cutoffAt }) {
-      const query = [];
+      const query = ['-in:drafts'];
       if (startAt) query.push(`after:${Math.floor(Date.parse(startAt) / 1000) - 1}`);
       if (cutoffAt) query.push(`before:${Math.floor(Date.parse(cutoffAt) / 1000) + 1}`);
       const result = await read('messages', { maxResults: 50, includeSpamTrash: true, pageToken, q: query.join(' ') });
@@ -70,14 +70,27 @@ export async function createGmailAdapter({ secretManager, secretVersion, createO
       assertMail(result.history === undefined || Array.isArray(result.history), 'MAIL_INVALID_UPSTREAM', 502);
       const ids = new Set();
       const deleted = new Set();
+      const drafts = new Set();
+      const observe = (message, target) => {
+        if (!message?.id) return;
+        target.add(message.id);
+        if (message.labelIds?.includes('DRAFT')) drafts.add(message.id);
+      };
       for (const history of result.history || []) {
-        for (const item of history.messages || []) ids.add(item.id);
-        for (const item of history.messagesAdded || []) ids.add(item.message?.id);
-        for (const item of history.messagesDeleted || []) deleted.add(item.message?.id);
+        for (const item of history.messages || []) observe(item, ids);
+        for (const item of history.messagesAdded || []) observe(item.message, ids);
+        for (const item of history.messagesDeleted || []) observe(item.message, deleted);
+        for (const key of ['labelsAdded', 'labelsRemoved']) {
+          for (const item of history[key] || []) {
+            observe(item.message, ids);
+            if (item.labelIds?.includes('DRAFT')) drafts.add(item.message?.id);
+          }
+        }
       }
-      ids.delete(undefined);
-      deleted.delete(undefined);
-      return { messageIds: [...ids].filter((id) => !deleted.has(id)), deletedIds: [...deleted], nextPageToken: result.nextPageToken || null, historyId: result.historyId };
+      drafts.delete(undefined);
+      return { messageIds: [...ids].filter((id) => !deleted.has(id)),
+        deletedIds: [...deleted].filter((id) => !drafts.has(id)), draftIds: [...drafts],
+        nextPageToken: result.nextPageToken || null, historyId: result.historyId };
     }
   };
 }

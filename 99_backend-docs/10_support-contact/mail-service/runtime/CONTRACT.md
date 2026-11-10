@@ -37,6 +37,8 @@ catalog・同期・再照合は社員操作だけに限定する。catalog diges
 
 全同期はspam/trashを含む全mailboxの指定開始日〜開始時cutoffを列挙し、GmailページごとのIDだけを一時保持する。1要求のGmail本文処理は最大5通。全列挙後、過去indexの同じ対象期間を50件ずつ確認し、今回列挙されなかったものは取得不能へ残す。開始時historyIdを保存し、その後のhistory同期で全同期中の新着を回収する。history同期は同じ開始日を保ち、新着を含める。history期限切れは全同期必要として表示する。
 
+未送信の下書きは送受信メールの対象外とする。全件検索に`-in:drafts`を付け、閲覧・同期時も取得したmessageの`DRAFT`ラベルを確認して除外する。履歴同期は追加・削除に加えてラベル変更も観測し、既知の下書きIDは非表示の除外メタ情報として保持する。[Gmailの下書き](https://developers.google.com/workspace/gmail/api/guides/drafts)は編集時にmessage IDが変わり、送信時は新しい`SENT`メールが作られるため、下書きの削除を送受信済みメールの取得不能として数えない。履歴だけでは下書きと証明できない未観測の削除IDは、メール行を作らず`deletionDiagnostics`へ保存する。`unobservedDeletedCount`は技術的受入を妨げる残件とし、`listUnobservedDeletions`で日時・ID順に全対象をページ取得できる。次の同期だけで診断を消去しない。
+
 現在の既定実装は`trustedAnchor=false`。UUID・From・件名・threadIdだけで自動確定しない。手動確定済みmailに一意な返信関係がある場合だけ自動照合する。同じスレッド内の別案件の根拠も確認し、混在・未知・未解決の親・本文取得不能は照合待ち。後から混在が判明した場合、明示的な手動確定を保持し、自動照合だけをversion・監査イベント・案件到達件数とともにtransactionで照合待ちへ戻す。初回確認記録は保持する。親の確定後は明示再照合で5通ずつ再評価できる。深い返信関係は次のpassで再評価する。
 
 `sync.state=complete`と`enumerationComplete`は列挙完了だけを示す。未確認、照合待ち、失敗、本文/添付の未検証・取得不能、案件ごとの関連mail有無の未照合を別に返す。`acceptanceReady`はこれらが残らない技術的準備指標であり、業務上の最終受入ではない。関連mailがない案件は正本との業務受入記録で確認する。対象外と明示分類したmailの本文/添付は達成条件から除く。

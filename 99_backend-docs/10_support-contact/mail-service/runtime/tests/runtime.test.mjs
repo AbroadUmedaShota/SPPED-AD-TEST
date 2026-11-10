@@ -267,7 +267,99 @@ test('Gmail adapter verifies mailbox before fixed GET endpoints and preserves li
   const result = await adapter.listMessages({ pageToken: 'page2', cutoffAt: NOW });
   assert.deepEqual(result.messageIds, ['a']); assert.equal(result.nextPageToken, 'next');
   assert.equal(calls.length, 2); assert.ok(calls[1].url.includes('includeSpamTrash=true'));
+  assert.ok(new URL(calls[1].url).searchParams.get('q').includes('-in:drafts'));
   assert.ok(calls[1].url.includes('pageToken=page2')); assert.equal(calls[1].options.redirect, 'error');
+});
+
+test('drafts stay outside mail queues through full sync, edit, delete and send history', async () => {
+  const f = fixture([A]);
+  f.store.seed(record('parent', { rfcMessageId: '<parent@test.example>', reason: 'manual' }));
+  f.messages.set('parent', gmailMessage('parent'));
+  const draft = gmailMessage('draft-1', 'unsent reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]);
+  draft.labelIds = ['DRAFT']; f.messages.set('draft-1', draft);
+  const run = randomUUID();
+  await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  assert.equal((await f.store.getMessage('draft-1')).sourceKind, 'draft');
+  assert.equal((await f.store.getMessage('draft-1')).matchState, 'excluded');
+  assert.equal((await f.execute(f.envelope('listCaseMail', { caseId: A }))).messages.some((item) => item.messageId === 'draft-1'), false);
+  const edit = gmailMessage('draft-2', 'edited reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]);
+  edit.labelIds = ['DRAFT']; f.messages.delete('draft-1'); f.messages.set('draft-2', edit);
+  f.gmail.listHistory = async () => ({ messageIds: ['draft-2'], deletedIds: ['draft-1'], historyId: '201' });
+  let result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.equal(result.sync.unobservedDeletedCount, 0);
+  assert.equal((await f.store.getMessage('draft-1')).unavailable, false);
+  f.messages.delete('draft-2');
+  const sent = gmailMessage('sent-1', 'sent reply', [{ name: 'In-Reply-To', value: '<parent@test.example>' }]);
+  sent.labelIds = ['SENT']; f.messages.set('sent-1', sent);
+  f.gmail.listHistory = async () => ({ messageIds: ['sent-1', 'sent-1'], deletedIds: ['draft-2'], historyId: '202' });
+  result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.equal(result.sync.unavailableCount, 0);
+  assert.equal(result.sync.unobservedDeletedCount, 0);
+  assert.equal((await f.store.getMessage('sent-1')).direction, 'sent');
+  assert.equal(f.calls.filter((id) => id === 'sent-1').length, 1);
+  assert.equal((await f.store.getMessage('draft-2')).unavailable, false);
+  assert.equal((await f.execute(f.envelope('listUnreviewedMail'))).messages.filter((item) => item.messageId === 'sent-1').length, 1);
+});
+
+test('draft guard clears stale mapped rows and never exposes draft bodies or attachments', async () => {
+  const f = fixture([A]); const draft = gmailMessage('old-draft', 'private unsent text'); draft.labelIds = ['DRAFT'];
+  f.messages.set('old-draft', draft); f.store.seed(record('old-draft'));
+  await assert.rejects(() => f.execute(f.envelope('getMail', { scope: 'case', caseId: A, messageId: 'old-draft' })), { code: 'MAIL_MAPPING_CHANGED' });
+  assert.equal((await f.store.getMessage('old-draft')).matchState, 'excluded');
+  assert.equal((await f.store.countMessages()).unreviewed, 0);
+  assert.equal((await f.store.countMessages()).unavailable, 0);
+});
+
+test('historical draft evidence never erases a current sent message classification', async () => {
+  const f = fixture([A]);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  const firstReview = { email: 'reviewer@abroad-o.com', at: NOW };
+  f.store.seed(record('sent', { sourceKind: 'mail', version: 4, reason: 'manual', firstReview }));
+  const sent = gmailMessage('sent'); sent.labelIds = ['SENT']; f.messages.set('sent', sent);
+  f.gmail.listHistory = async () => ({ messageIds: ['sent'], draftIds: ['sent'], historyId: '201' });
+  await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  const saved = await f.store.getMessage('sent');
+  assert.equal(saved.matchState, 'matched'); assert.equal(saved.caseId, A); assert.equal(saved.version, 4);
+  assert.deepEqual(saved.firstReview, firstReview); assert.equal(saved.direction, 'sent');
+});
+
+test('unknown deleted history IDs remain diagnostics without phantom received mail rows', async () => {
+  const f = fixture([A]);
+  const run = randomUUID(); await f.execute(f.envelope('advanceSync', { executionId: run, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: run }));
+  f.store.seed(record('known'));
+  f.gmail.listHistory = async () => ({ messageIds: [], deletedIds: ['unknown', 'known'], draftIds: ['proven-draft'], historyId: '201' });
+  const result = await f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' }));
+  assert.equal(await f.store.getMessage('unknown'), null);
+  assert.equal(result.sync.unobservedDeletedCount, 1); assert.equal(result.sync.acceptanceReady, false);
+  assert.equal(result.sync.unavailableCount, 1); assert.equal((await f.store.getMessage('known')).unavailable, true);
+  assert.equal((await f.store.getMessage('proven-draft')).sourceKind, 'draft');
+  assert.deepEqual(await f.store.listUnobservedDeletions({ limit: 50 }), [{ messageId: 'unknown', detectedAt: NOW }]);
+  for (let index = 0; index < 73; index++) await f.store.recordUnobservedDeletion(`unknown-${String(index).padStart(2, '0')}`, NOW);
+  const first = await f.store.listUnobservedDeletions({ limit: 50 });
+  const second = await f.store.listUnobservedDeletions({ cursor: { at: first.at(-1).detectedAt, id: first.at(-1).messageId }, limit: 50 });
+  assert.equal(new Set([...first, ...second].map((item) => item.messageId)).size, 74);
+});
+
+test('Gmail history observes draft evidence and label-only sent updates', async () => {
+  const adapter = await createGmailAdapter({ secretVersion: 'projects/test/secrets/mail/versions/1',
+    secretManager: { async accessSecretVersion() { return [{ payload: { data: Buffer.from(JSON.stringify({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })) } }]; } },
+    createOAuthClient: () => ({ setCredentials() {}, async getAccessToken() { return { token: 'opaque' }; },
+      async getTokenInfo() { return { scopes: ['https://www.googleapis.com/auth/gmail.readonly'] }; } }),
+    fetchImpl: async (url) => ({ ok: true, async json() {
+      if (String(url).endsWith('/profile')) return { emailAddress: 'customer@speed-ad.com', historyId: '100' };
+      return { historyId: '200', history: [
+        { messagesAdded: [{ message: { id: 'draft-old', labelIds: ['DRAFT'] } }], messagesDeleted: [{ message: { id: 'draft-old' } }] },
+        { messagesDeleted: [{ message: { id: 'unknown' } }] },
+        { labelsAdded: [{ message: { id: 'sent' }, labelIds: ['SENT'] }], labelsRemoved: [{ message: { id: 'sent' }, labelIds: ['DRAFT'] }] }
+      ] };
+    } })
+  });
+  const page = await adapter.listHistory({ startHistoryId: '100' });
+  assert.deepEqual(page.messageIds, ['sent']); assert.deepEqual(page.deletedIds, ['unknown']);
+  assert.deepEqual(page.draftIds, ['draft-old', 'sent']);
 });
 
 test('Gmail adapter rejects any scope other than exactly readonly before Gmail GET', async () => {
