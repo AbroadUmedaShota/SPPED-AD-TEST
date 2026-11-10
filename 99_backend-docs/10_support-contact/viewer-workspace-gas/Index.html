@@ -1585,10 +1585,11 @@
       return { scope: current.scope, ...(current.scope === 'case' ? { caseId: current.caseId } : {}), ...extra };
     }
 
-    function contactMailResult(result) {
+    function contactMailResult(result, isCurrentRequest = () => false) {
       if (!result || result.ok !== true) {
         const code = result && result.error && result.error.code || 'MAIL_SERVICE_UNAVAILABLE';
-        if (['MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_UNVERIFIED', 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_PERIOD_REQUIRED'].includes(code)) invalidateContactMailCatalog(code);
+        // Error-side invalidation obeys the same request generation as protected success data.
+        if (viewerContext.allowed && isCurrentRequest() && ['MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_UNVERIFIED', 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID', 'MAIL_PERIOD_REQUIRED'].includes(code)) invalidateContactMailCatalog(code);
         throw new Error(code);
       }
       return result;
@@ -1642,7 +1643,7 @@
       const element = document.getElementById('mailSyncSummary');
       element.textContent = 'メール連携を確認中...';
       try {
-        const result = contactMailResult(await callServer('getContactMailSyncStatus'));
+        const result = contactMailResult(await callServer('getContactMailSyncStatus'), () => serial === contactMailState.syncSerial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== contactMailState.syncSerial || observationSerial !== contactMailState.syncObservationSerial) return;
         validateContactMailSync(result.sync);
         observeContactMailSync(result.sync);
@@ -1768,14 +1769,14 @@
           element.textContent = '正本の受付IDを照合中...';
           progress.catalog = progress.catalog || { snapshotId: window.crypto.randomUUID(), requestId: contactMailRequestId(), nextPageIndex: 0 };
           if (!progress.catalog.digest) {
-            const prepared = contactMailResult(await callContactMailSync({ prepareCatalog: true, catalog: progress.catalog }));
+            const prepared = contactMailResult(await callContactMailSync({ prepareCatalog: true, catalog: progress.catalog }), () => serial === contactMailState.syncSerial && observationSerial === contactMailState.syncObservationSerial);
             if (serial !== contactMailState.syncSerial) return;
             validateContactMailCatalog(prepared.catalog, progress.catalog, true);
             progress.catalog = prepared.catalog;
             if (contactMailState.syncStopRequested) { element.textContent = '受付ID登録の続行を止めました。続行ボタンから再開できます。'; return; }
           }
           progress.catalogPending = true;
-          const catalogResult = contactMailResult(await callContactMailSync({ catalog: progress.catalog }));
+          const catalogResult = contactMailResult(await callContactMailSync({ catalog: progress.catalog }), () => serial === contactMailState.syncSerial && observationSerial === contactMailState.syncObservationSerial);
           if (serial !== contactMailState.syncSerial) return;
           const catalog = catalogResult.catalog;
           validateContactMailCatalog(catalog, progress.catalog, false);
@@ -1815,7 +1816,7 @@
             break;
           }
           if (observationSerial !== contactMailState.syncObservationSerial) { element.textContent = newerObservationText(); break; }
-          const result = contactMailResult(response);
+          const result = contactMailResult(response, () => serial === contactMailState.syncSerial && observationSerial === contactMailState.syncObservationSerial);
           if (confirming) {
             if (typeof result.found !== 'boolean' || (result.found ? !result.receipt : result.receipt !== null)) throw new Error('MAIL_INVALID_RESPONSE');
             validateContactMailSync(result.sync);
@@ -1879,7 +1880,7 @@
       current.result = null;
       renderContactMailIssues('対象を確認中...');
       try {
-        const result = contactMailResult(await callServer('listContactMailIssues', { kind: current.kind, pageToken: current.pageToken }));
+        const result = contactMailResult(await callServer('listContactMailIssues', { kind: current.kind, pageToken: current.pageToken }), () => serial === current.serial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.serial) return;
         validateContactMailIssues(result, current.kind);
         if (observeContactMailResponse(result.sync, observationSerial)) return;
@@ -1955,7 +1956,7 @@
       Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'loading', error: '', pendingWrite: current.catalogUnverified ? current.pendingWrite : null, noMail: null, page: null, pageToken: options.pageToken || '' });
       renderContactMailView(view);
       try {
-        const result = contactMailResult(await callServer('listContactMail', contactMailOptions(current, { pageToken: current.pageToken })));
+        const result = contactMailResult(await callServer('listContactMail', contactMailOptions(current, { pageToken: current.pageToken })), () => serial === current.serial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.serial) return;
         validateContactMailList(result, current.scope, current.caseId);
         const newerObservation = observationSerial !== contactMailState.syncObservationSerial;
@@ -1991,6 +1992,7 @@
       const current = contactMailState[view];
       if (current.writing || !current.messages[index]) return;
       const serial = ++current.detailSerial;
+      const observationSerial = contactMailState.syncObservationSerial;
       current.urls.forEach((url) => URL.revokeObjectURL(url));
       current.urls = [];
       current.selectedIndex = index;
@@ -2002,7 +2004,7 @@
       renderContactMailView(view);
       const messageId = current.messages[index].messageId;
       try {
-        const result = contactMailResult(await callServer('getContactMailMessage', contactMailOptions(current, { messageId })));
+        const result = contactMailResult(await callServer('getContactMailMessage', contactMailOptions(current, { messageId })), () => serial === current.detailSerial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.detailSerial) return;
         current.message = validateContactMailMessage(result, messageId);
         if (current.scope === 'case' && current.noMail && (current.noMail.eligible || current.noMail.confirmation) &&
@@ -2110,7 +2112,7 @@
       current.reconcileMessage = '照合待ちを再照合中...';
       renderContactMailView('queue');
       try {
-        const result = contactMailResult(await callServer('reconcileContactMailPending', { pageToken: current.reconcilePageToken || '', requestId: current.reconcileRequestId }));
+        const result = contactMailResult(await callServer('reconcileContactMailPending', { pageToken: current.reconcilePageToken || '', requestId: current.reconcileRequestId }), () => serial === current.serial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.serial) return;
         if (!Number.isInteger(result.processedCount) || !result.page || typeof result.page.nextPageToken !== 'string') throw new Error('MAIL_INVALID_RESPONSE');
         if (observeContactMailResponse(result.sync, observationSerial)) return;
@@ -2152,7 +2154,7 @@
       renderContactMailView(view);
       try {
         const { caseId, contextToken, requestId } = current.pendingNoMail;
-        const result = contactMailResult(await contactCaseNoMailCall({ caseId, contextToken, requestId }));
+        const result = contactMailResult(await contactCaseNoMailCall({ caseId, contextToken, requestId }), () => serial === current.serial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.serial) return;
         validateContactMailSync(result.sync);
         const noMail = validateContactCaseNoMail(result.noMail, result.sync);
@@ -2201,6 +2203,7 @@
       const message = current.message;
       if (action === 'review' && message.reviewReady !== true) return;
       const serial = current.detailSerial;
+      const observationSerial = contactMailState.syncObservationSerial;
       const caseId = action === 'match' ? contactMailRoot(view).querySelector('[data-mail-case-id]').value.trim() : '';
       const reason = action !== 'review' ? contactMailRoot(view).querySelector('[data-mail-reason]').value.trim() : '';
       current.resolveCaseId = caseId;
@@ -2217,7 +2220,7 @@
       try {
         const options = { messageId: message.messageId, expectedVersion: message.version, requestId };
         const result = contactMailResult(await callServer(action === 'review' ? 'markContactMailReviewed' : 'resolveContactMailPending',
-          action === 'review' ? contactMailOptions(current, options) : { ...options, action, reason, ...(caseId ? { caseId } : {}) }));
+          action === 'review' ? contactMailOptions(current, options) : { ...options, action, reason, ...(caseId ? { caseId } : {}) }), () => serial === current.detailSerial && observationSerial === contactMailState.syncObservationSerial);
         if (serial !== current.detailSerial) return;
         if (!validContactMailSummary(result.message) || result.message.messageId !== message.messageId) throw new Error('MAIL_INVALID_RESPONSE');
         current.writing = false;
@@ -2244,6 +2247,7 @@
       if (!message || !message.attachments.some((attachment) => attachment.partId === partId)) return;
       const serial = current.detailSerial;
       const attachmentSerial = current.attachmentSerial;
+      const observationSerial = contactMailState.syncObservationSerial;
       const panel = button.parentElement.querySelector('[data-mail-attachment-preview]');
       button.disabled = true;
       panel.textContent = '添付を読み込み中...';
@@ -2253,7 +2257,7 @@
       let reviewReady = false;
       try {
         while (true) {
-          const result = contactMailResult(await callServer('getContactMailAttachmentChunk', contactMailOptions(current, { messageId: message.messageId, partId, offset })));
+          const result = contactMailResult(await callServer('getContactMailAttachmentChunk', contactMailOptions(current, { messageId: message.messageId, partId, offset })), () => serial === current.detailSerial && attachmentSerial === current.attachmentSerial && observationSerial === contactMailState.syncObservationSerial);
           if (serial !== current.detailSerial || attachmentSerial !== current.attachmentSerial) return;
           const bytes = validateContactMailChunk(result, offset, partId);
           if (metadata && (metadata.size !== result.totalSize || metadata.mimeType !== result.attachment.mimeType)) throw new Error('MAIL_INVALID_RESPONSE');

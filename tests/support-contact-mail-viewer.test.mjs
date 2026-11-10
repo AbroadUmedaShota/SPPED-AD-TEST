@@ -1012,6 +1012,68 @@ test('catalog-unknown reconciliation keeps its request until successful pending 
   assert.notEqual(app.calls.filter((call) => call.name === 'reconcileContactMailPending').at(-1).args[0].requestId, requestId);
 });
 
+test('late catalog errors from older list, detail and sync requests cannot invalidate newer content or denied state', async () => {
+  const newerCaseId = '22222222-2222-4222-8222-222222222222';
+  for (const kind of ['list', 'detail', 'sync']) {
+    for (const denied of [false, true]) {
+      let finish;
+      const pendingResponse = () => new Promise((resolve) => { finish = resolve; });
+      const app = uiRuntime({
+        listContactMail: (options) => kind === 'list' && options.caseId === caseId ? pendingResponse() :
+          list([summary(options.caseId === caseId ? 'old' : 'new', { caseId: options.caseId })]),
+        getContactMailMessage: (options) => kind === 'detail' && options.messageId === 'old' ? pendingResponse() :
+          ({ ok: true, message: detail(options.messageId, { caseId: options.caseId, bodyText: 'new protected body' }) }),
+        getContactMailSyncStatus: pendingResponse,
+      });
+      const pending = kind === 'sync' ? app.ui.loadContactMailSyncStatus() : app.ui.loadContactMailList('case', { caseId });
+      await new Promise(setImmediate);
+      await app.ui.loadContactMailList('case', { caseId: newerCaseId });
+      if (denied) app.ui.showDenied('認証失効');
+      const currentSync = app.mail.sync;
+      const currentText = app.element('mailSyncSummary').textContent;
+      finish({ ok: false, error: { code: kind === 'sync' ? 'MAIL_CATALOG_UNVERIFIED' : 'MAIL_CATALOG_CHANGED' } });
+      await pending;
+      assert.equal(app.mail.sync, currentSync, `${kind}/${denied}`);
+      assert.equal(app.element('mailSyncSummary').textContent, currentText, `${kind}/${denied}`);
+      if (denied) {
+        assert.equal(app.element('caseMailSection').innerHTML, '');
+        assert.equal(app.mail.case.message, null);
+        assert.equal(app.mail.sync, null);
+      } else {
+        assert.equal(app.mail.case.caseId, newerCaseId);
+        assert.equal(app.mail.case.status, 'loaded');
+        assert.equal(app.mail.case.message.bodyText, 'new protected body');
+        assert.match(app.element('caseMailSection').innerHTML, /new protected body/);
+        assert.equal(app.mail.sync.state, 'complete');
+      }
+    }
+  }
+});
+
+test('a late catalog-unknown mutation retains its original request without changing the newer case', async () => {
+  const newerCaseId = '22222222-2222-4222-8222-222222222222';
+  let finish;
+  const app = uiRuntime({
+    listContactMail: (options) => options.caseId === caseId ? { ...list([]), noMail: noMail({ eligible: true }) } :
+      list([summary('new', { caseId: newerCaseId })]),
+    getContactMailMessage: () => ({ ok: true, message: detail('new', { caseId: newerCaseId, bodyText: 'new protected body' }) }),
+    confirmContactCaseNoMail: () => new Promise((resolve) => { finish = resolve; }),
+  });
+  await app.ui.loadContactMailList('case', { caseId });
+  const pending = app.ui.confirmContactCaseNoMailFromUi('case');
+  await new Promise(setImmediate);
+  const requestId = app.mail.noMailRequests[caseId].requestId;
+  app.ui.clearContactMailView('case');
+  await app.ui.loadContactMailList('case', { caseId: newerCaseId });
+  const currentSync = app.mail.sync;
+  finish({ ok: false, error: { code: 'MAIL_CATALOG_UNVERIFIED' } });
+  await pending;
+  assert.equal(app.mail.noMailRequests[caseId].requestId, requestId);
+  assert.equal(app.mail.sync, currentSync);
+  assert.equal(app.mail.case.caseId, newerCaseId);
+  assert.equal(app.mail.case.message.bodyText, 'new protected body');
+});
+
 test('post-cutoff case mail stays visible beside fixed-period no-mail confirmation across pages', async () => {
   let confirmed = false;
   const dates = { later: '2026-11-10T00:00:00.002Z', earlier: '2026-11-10T00:00:00.001Z' };
