@@ -87,7 +87,8 @@ function selectBodyParts(message, bodyParts) {
     const children = (part.parts || []).map((child, index) => select(child, `${path}.${index}`));
     const mimeType = String(part.mimeType || '').toLowerCase().split(';')[0].trim();
     if (mimeType === 'multipart/alternative') {
-      return children.find((parts) => parts.some((item) => item.mimeType === 'text/plain')) || children.find((parts) => parts.length) || [];
+      return children.find((parts) => parts.some((item) => item.mimeType === 'text/plain' && item.size > 0)) ||
+        children.find((parts) => parts.some((item) => item.size > 0)) || children.find((parts) => parts.length) || [];
     }
     return [...(byPath.has(path) ? [byPath.get(path)] : []), ...children.flat()];
   }

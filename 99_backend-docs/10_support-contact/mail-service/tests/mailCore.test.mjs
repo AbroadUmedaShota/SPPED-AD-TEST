@@ -77,6 +77,18 @@ test('independent mixed bodies remain in order while alternatives use one repres
   assert.equal(await readMessageText(mail), 'introduction\nindependent HTML\nplain alternative\nHTML alternative\nending');
 });
 
+test('empty alternatives do not hide a nonempty body and nonempty plain text remains preferred', async () => {
+  const html = part('<span>HTML body</span>', 'text/html');
+  for (const [parts, expected] of [
+    [[part(''), html], 'HTML body'],
+    [[part('', 'text/html'), html], 'HTML body'],
+    [[part(''), html, part('plain body')], 'plain body'],
+    [[part(''), part('', 'text/html')], '']
+  ]) {
+    assert.equal(await readMessageText(message({ mimeType: 'multipart/alternative', parts })), expected);
+  }
+});
+
 test('body stored behind attachmentId is fetched but is not a form attachment', async () => {
   const mail = message({ mimeType: 'text/plain', body: { attachmentId: 'body1', size: 4 } });
   assert.equal(inspectMime(mail).attachments.length, 0);
