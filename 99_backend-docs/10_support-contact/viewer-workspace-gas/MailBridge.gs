@@ -95,7 +95,10 @@ function advanceContactMailSync(options, authProof) {
       var plannedStartAt = options.catalogStartAt;
       if (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt) throw new Error('同期対象期間が不正です。');
       if (options.confirmOnly !== true) {
-        var source = mailCatalogSource_();
+        var source;
+        try { source = mailCatalogSource_(); } catch (error) {
+          return mailPreDispatchError_('advanceSync', payload, requestId, error.message === 'MAIL_PERIOD_REQUIRED' ? 'MAIL_PERIOD_REQUIRED' : 'MAIL_CATALOG_INVALID');
+        }
         if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return mailPreDispatchError_('advanceSync', payload, requestId, 'MAIL_CATALOG_CHANGED');
       }
       payload.startAt = plannedStartAt;

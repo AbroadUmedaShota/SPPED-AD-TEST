@@ -31,7 +31,7 @@ catalog・同期・再照合は社員操作だけに限定する。catalog diges
 
 同期要求が応答不明になった場合、GASは元の受付ID計画と開始日を保持し、正本Sheetの現在値で要求を作り直さず`getSyncRequestResult`で確認する。この操作もdomain認証必須で、`advanceSync`・元payload（実行IDを含む）・実利用者actorのfingerprintが一致するレシートだけを返す。レシート内の同期メタ情報と現在の同期状態以外は返さず、同期・Gmail取得・状態更新は実行しない。未作成レシートは`found:false`とし、自動再送しない。別利用者が同じ実行を進めた場合、古いレシートは元要求の成立確認に使い、画面の新しい進捗を戻さない。
 
-GASの`advanceSync`送信前に、正本検査での計画変更、固定URLの未設定・不正、ID tokenの取得例外・空値を検出した場合だけ、`MAIL_SYNC_NOT_DISPATCHED`と原因コード、一致する要求ID・実行ID、`sent:false`を直接返す。計画変更なら明示的な計画再作成を案内し、設定・token取得失敗なら同じ未送信要求を保持して回復後の明示送信を待つ。このコードはCloud Runのエラーallowlistへ含めず、upstream応答から同じ未送信結果を再構成しない。fetch開始後の認証エラー・通信失敗は未送信の証拠にはせず、元要求のレシート照会へ進む。レシート照会自体のtoken取得失敗も元要求の未送信を証明しない。
+GASの`advanceSync`送信前に、正本検査での計画変更・読取り失敗・受付日時欠落/不正、固定URLの未設定・不正、ID tokenの取得例外・空値を検出した場合だけ、`MAIL_SYNC_NOT_DISPATCHED`と原因コード、一致する要求ID・実行ID、`sent:false`を直接返す。計画変更・正本読取り失敗なら明示的な計画再作成を案内し、受付日時・設定・token取得失敗なら同じ未送信要求を保持して回復後の明示送信を待つ。このコードはCloud Runのエラーallowlistへ含めず、upstream応答から同じ未送信結果を再構成しない。fetch開始後の認証エラー・通信失敗は未送信の証拠にはせず、元要求のレシート照会へ進む。レシート照会自体のtoken取得失敗も元要求の未送信を証明しない。
 
 残件一覧は種類を選び、保存済みメールを日時・messageId降順に50件ずつ走査する。該当0件のページにも次ページが残る場合がある。同期失敗で未登録のメールID、案件別の関連メール有無が未確認の受付ID、取得前削除で種類未確認のIDも50件ずつ列挙する。受付ID一覧・失敗ID一覧の対象集合が変化したcursorは拒否し、更新して先頭から確認する。取得不能のメールは保存済みメタ情報と添付descriptorを表示し、本文取得不能でも添付確認経路を維持する。
 
@@ -68,3 +68,5 @@ Gmail adapterは添付取得応答を固定窓口・message ID・attachment ID�
 統合後は`npm ci --ignore-scripts`、`npm test`。Cloud Run imageはmail-serviceをcontextとして`docker build -f runtime/Dockerfile .`で作る。`.dockerignore`でnode_modules・秘密候補・test/toolsを除外する。Firestoreの必要複合indexは`runtime/firestore.indexes.json`に置く。
 
 合成adapterの試験は、GAS token→Cloud Run IAM、Firestoreの実transaction/index、公式窓口の送受信保持、実メール/添付の到達、別利用者での確認記録読戻しを証明しない。Gmailの同意・審査、Cloud請求/予算、IAM/secret/index設定、実配備は別の判断を要する。
+
+開始日が未確定の`not_started`または旧状態からの`needs_full_sync`では、対象期間依存の残件数は`null`として返す。画面は不明と表示し、0件や達成済みには変換しない。開始日のないrunning/complete応答は採用しない。

@@ -14,16 +14,17 @@ test('mail service exposes only the authenticated business RPC surface', () => {
   assert.deepEqual(actual, ['listContactMail', 'getContactMailMessage', 'getContactMailAttachmentChunk', 'markContactMailReviewed', 'resolveContactMailPending', 'getContactMailSyncStatus', 'reconcileContactMailPending', 'advanceContactMailSync', 'listContactMailIssues'].sort());
 });
 
-function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates = ids.map(() => '2026-11-10T00:00:00.000Z'), url = 'https://contact-mail-example.a.run.app' } = {}) {
+function bridgeRuntime({ actor = { email: 'reader@abroad-o.com', authMode: 'domain' }, ids = [caseId], dates, url = 'https://contact-mail-example.a.run.app' } = {}) {
   const calls = [];
   const reads = [];
+  const sourceDates = () => dates === undefined ? ids.map(() => '2026-11-10T00:00:00.000Z') : dates;
   let response = () => ({ ok: true });
   const context = {
     requireViewer_() { if (!actor) throw new Error('権限がありません'); return actor; },
     findSubmission_(id) { reads.push(id); return ids.includes(id) ? { record: { submission_id: id } } : null; },
     getProperty_: () => url,
-    getSheet_: () => ({ getDataRange: () => ({ getValues: () => [dates ? ['submission_id', 'submitted_at'] : ['submission_id'], ...ids.map((id, index) => dates ? [id, dates[index]] : [id])] }) }),
-    ensureHeaders_: () => dates ? ['submission_id', 'submitted_at'] : ['submission_id'],
+    getSheet_: () => ({ getDataRange: () => ({ getValues: () => { const values = sourceDates(); return [values ? ['submission_id', 'submitted_at'] : ['submission_id'], ...ids.map((id, index) => values ? [id, values[index]] : [id])]; } }) }),
+    ensureHeaders_: () => sourceDates() ? ['submission_id', 'submitted_at'] : ['submission_id'],
     ScriptApp: { getIdentityToken: () => 'server-only-google-identity-token' },
     Utilities: { getUuid: randomUUID, Charset: { UTF_8: 'UTF-8' }, DigestAlgorithm: { SHA_256: 'SHA-256' }, computeDigest: (_kind, text) => [...createHash('sha256').update(text).digest()] },
     UrlFetchApp: { fetch(target, options) {
@@ -221,7 +222,7 @@ test('unknown first-sync confirmation preserves the original plan after Sheet da
     app.api.advanceContactMailSync(options);
     const original = JSON.parse(JSON.stringify(app.calls.at(-1).envelope.payload));
     if (change === 'date') dates[0] = '2026-10-01T04:00:00Z';
-    else ids.push('22222222-2222-4222-8222-222222222222');
+    else { ids.push('22222222-2222-4222-8222-222222222222'); dates.push('2026-11-10T04:00:00Z'); }
     app.api.advanceContactMailSync({ ...options, confirmOnly: true });
     const confirmation = app.calls.at(-1).envelope;
     assert.equal(confirmation.operation, 'getSyncRequestResult');
@@ -265,7 +266,7 @@ test('GAS advance pre-dispatch config and identity failures carry exact not-sent
 
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
-const sync = { state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: null, historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
+const sync = { executionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: '2026-11-01T00:00:00.000Z', historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
 const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', ...extra } });
 const syncCallResponse = (options, state = 'running', extra = {}) => {
   const result = syncResponse(options.executionId, state, extra);
@@ -362,7 +363,7 @@ test('newer mail list and auth loss invalidate late protected responses', async 
 
 test('observed period shrink clears open mail, revokes previews and discards a pending attachment response', async () => {
   const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z' };
-  const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z' };
+  const narrow = { ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', startAt: '2026-11-01T00:00:00.000Z' };
   let resolveAttachment;
   const chunk = (partId) => ({ ok: true, attachment: { partId, name: 'note.txt', mimeType: 'text/plain', previewKind: 'text', availability: 'verified' }, reviewReady: false, offset: 0, nextOffset: 3, totalSize: 3, dataBase64: 'YWJj', done: true });
   const app = uiRuntime({
@@ -402,14 +403,14 @@ test('observed period shrink clears open mail, revokes previews and discards a p
 
 test('sync advance with a new period invalidates old list and detail responses before they can restore content', async () => {
   const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z' };
-  const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z' };
+  const narrow = { ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', startAt: '2026-11-01T00:00:00.000Z' };
   let resolveList;
   let resolveDetail;
   let detailCalls = 0;
   const app = uiRuntime({
     listContactMail: (options) => options.scope === 'pending' ? new Promise((resolve) => { resolveList = resolve; }) : { ...list([summary()]), sync: broad },
     getContactMailMessage: () => ++detailCalls === 1 ? { ok: true, message: detail('mail1', { bodyText: 'old open body' }) } : new Promise((resolve) => { resolveDetail = resolve; }),
-    advanceContactMailSync: (options) => !options.executionId ? { ok: true, catalog: { complete: true, nextPageIndex: 1, pageCount: 1, digest: 'digest', snapshotId: randomUUID(), startAt: narrow.startAt } } : { ok: true, sync: narrow },
+    advanceContactMailSync: (options) => !options.executionId ? catalogResponse(options) : syncCallResponse(options, 'complete', { startAt: narrow.startAt }),
   });
   await app.ui.loadContactMailList('case', { caseId });
   const oldDetail = app.ui.selectContactMail('case', 0);
@@ -430,7 +431,7 @@ test('sync advance with a new period invalidates old list and detail responses b
 test('an older sync-status success or failure cannot overwrite a newer list period and counts', async () => {
   for (const outcome of ['success', 'failure']) {
     const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z', pendingCount: 99 };
-    const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z', pendingCount: 2 };
+    const narrow = { ...sync, executionId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', startAt: '2026-11-01T00:00:00.000Z', pendingCount: 2 };
     let resolveStatus;
     let rejectStatus;
     const app = uiRuntime({
@@ -936,7 +937,7 @@ test('post-dispatch auth failure or timeout remains unknown and uses only receip
 });
 
 test('well-formed initial not-started sync status remains observable', async () => {
-  const initial = { ...sync, state: 'not_started', executionId: null, mode: null, cutoffAt: null, startAt: null, lastSuccessAt: null, historyAvailable: false, enumerationComplete: false };
+  const initial = { ...sync, ...Object.fromEntries(['pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount', 'coverageUnverifiedCaseCount'].map((key) => [key, null])), state: 'not_started', executionId: null, mode: null, cutoffAt: null, startAt: null, lastSuccessAt: null, historyAvailable: false, enumerationComplete: false };
   const app = uiRuntime({ getContactMailSyncStatus: () => ({ ok: true, sync: initial }) });
   await app.ui.loadContactMailSyncStatus();
   assert.equal(app.mail.sync, initial);
@@ -1044,4 +1045,75 @@ test('review action stays unavailable until server confirms body and complete at
   assert.match(app.element('caseMailSection').innerHTML, /本文とすべての添付を取得/);
   await app.ui.writeContactMail('case', 'review');
   assert.equal(app.calls.filter((item) => item.name === 'markContactMailReviewed').length, 0);
+});
+
+test('unscoped initial and legacy sync status keeps unknown counts and permits an explicit full start', async () => {
+  const unknownCounts = Object.fromEntries(['pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount', 'coverageUnverifiedCaseCount'].map((key) => [key, null]));
+  for (const state of ['not_started', 'needs_full_sync']) {
+    const stopped = { ...sync, ...unknownCounts, state, startAt: null, historyAvailable: false, enumerationComplete: false, acceptanceReady: false,
+      ...(state === 'not_started' ? { executionId: null, mode: null, cutoffAt: null, lastSuccessAt: null } : {}) };
+    const app = uiRuntime({ getContactMailSyncStatus: () => ({ ok: true, sync: stopped }),
+      advanceContactMailSync: (options) => !options.executionId ? catalogResponse(options) : syncCallResponse(options, 'complete') });
+    await app.ui.loadContactMailSyncStatus();
+    assert.equal(app.mail.sync.state, state);
+    assert.match(app.element('mailSyncSummary').textContent, /照合待ち 不明件/);
+    assert.doesNotMatch(app.element('mailSyncSummary').textContent, /技術残件は0件|応答形式/);
+    await app.ui.advanceContactMailSyncFromUi();
+    const request = app.calls.find((call) => call.args[0]?.executionId).args[0];
+    assert.equal(request.mode, 'full');
+    assert.equal(app.mail.sync.state, 'complete');
+  }
+});
+
+test('catalog preparation without a valid period never advances to an upload or sync', async () => {
+  const app = uiRuntime({ advanceContactMailSync: (options) => ({ ...catalogResponse(options), catalog: { ...catalogResponse(options).catalog, startAt: null } }) });
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(app.calls.length, 1);
+  assert.equal(app.calls[0].args[0].prepareCatalog, true);
+  assert.match(app.element('mailSyncSummary').textContent, /メールの応答を確認できません/);
+});
+
+test('invalid authoritative dates after catalog upload are definitely unsent and recover with the original request', async () => {
+  const dates = ['2026-11-10T00:00:00.000Z'];
+  const bridgeApp = bridgeRuntime({ dates });
+  bridgeApp.respond((envelope) => {
+    if (envelope.operation === 'uploadCaseCatalog') { dates[0] = ''; return { ok: true, catalog: { complete: true } }; }
+    return syncResponse(envelope.payload.executionId, 'complete');
+  });
+  const app = uiRuntime({ advanceContactMailSync: (options) => bridgeApp.api.advanceContactMailSync(options) });
+  await app.ui.advanceContactMailSyncFromUi();
+  const original = JSON.parse(JSON.stringify(app.calls.find((call) => call.args[0].executionId).args[0]));
+  assert.equal(bridgeApp.calls.some((call) => call.envelope.operation === 'advanceSync'), false);
+  assert.equal(app.mail.syncProgress.requestPending, false);
+  assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+  dates[0] = '2026-11-10T00:00:00.000Z';
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.deepEqual(JSON.parse(JSON.stringify(app.calls.at(-1).args[0])), original);
+  assert.equal(bridgeApp.calls.filter((call) => call.envelope.operation === 'advanceSync').length, 1);
+  assert.equal(bridgeApp.calls.some((call) => call.envelope.operation === 'getSyncRequestResult'), false);
+  assert.equal(app.mail.syncProgress, null);
+});
+
+
+test('catalog source failure before dispatch requires an explicit rebuild without a phantom receipt', async () => {
+  const ids = [caseId];
+  const bridgeApp = bridgeRuntime({ ids });
+  let firstUpload = true;
+  bridgeApp.respond((envelope) => {
+    if (envelope.operation === 'uploadCaseCatalog') {
+      if (firstUpload) { firstUpload = false; ids.push(caseId); }
+      return { ok: true, catalog: { complete: true } };
+    }
+    return syncResponse(envelope.payload.executionId, 'complete');
+  });
+  const app = uiRuntime({ advanceContactMailSync: (options) => bridgeApp.api.advanceContactMailSync(options) });
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(app.mail.syncProgress, null);
+  assert.equal(bridgeApp.calls.some((call) => ['advanceSync', 'getSyncRequestResult'].includes(call.envelope.operation)), false);
+  assert.match(app.element('mailSyncSummary').textContent, /Cloudへ送信していません/);
+  ids.pop();
+  await app.ui.advanceContactMailSyncFromUi();
+  assert.equal(bridgeApp.calls.filter((call) => call.envelope.operation === 'advanceSync').length, 1);
+  assert.equal(bridgeApp.calls.some((call) => call.envelope.operation === 'getSyncRequestResult'), false);
+  assert.equal(app.mail.syncProgress, null);
 });

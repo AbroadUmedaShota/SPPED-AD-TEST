@@ -1600,8 +1600,10 @@
           typeof sync.historyAvailable !== 'boolean' || typeof sync.acceptanceReady !== 'boolean' ||
           !['enumerate', 'finalize'].includes(sync.phase)) invalid();
       const counts = ['processedCount', 'pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount'];
-      if (counts.some((key) => !Number.isSafeInteger(sync[key]) || sync[key] < 0) ||
+      const unscoped = sync.startAt === null;
+      if (counts.some((key) => unscoped && key !== 'processedCount' ? sync[key] !== null : !Number.isSafeInteger(sync[key]) || sync[key] < 0) ||
           (sync.coverageUnverifiedCaseCount !== null && (!Number.isSafeInteger(sync.coverageUnverifiedCaseCount) || sync.coverageUnverifiedCaseCount < 0))) invalid();
+      if (unscoped && (!['not_started', 'needs_full_sync'].includes(sync.state) || sync.historyAvailable || sync.acceptanceReady || sync.coverageUnverifiedCaseCount !== null)) invalid();
       const validDate = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 19) === value.slice(0, 19);
       if (sync.lastSuccessAt !== null && !validDate(sync.lastSuccessAt)) invalid();
       if (sync.state === 'not_started') {
@@ -1678,12 +1680,12 @@
             ...progress.requestPayload, requestId: progress.requestId, ...(confirming ? { confirmOnly: true } : {}),
           });
           if (serial !== contactMailState.syncSerial) return;
-          if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && ['MAIL_CATALOG_CHANGED', 'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH'].includes(response.error.cause) &&
+          if (!confirming && response && response.ok === false && response.error && response.error.code === 'MAIL_SYNC_NOT_DISPATCHED' && ['MAIL_CATALOG_CHANGED', 'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH', 'MAIL_PERIOD_REQUIRED', 'MAIL_CATALOG_INVALID'].includes(response.error.cause) &&
               response.dispatch && response.dispatch.sent === false && response.dispatch.operation === 'advanceSync' && response.dispatch.requestId === progress.requestId && response.dispatch.executionId === progress.executionId) {
             progress.requestPending = false;
-            if (response.error.cause === 'MAIL_CATALOG_CHANGED') {
+            if (['MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_INVALID'].includes(response.error.cause)) {
               contactMailState.syncProgress = null;
-              element.textContent = '受付データが変わったため、GASの事前確認で停止しました。この同期要求はCloudへ送信していません。メール同期ボタンで現在のSheetから計画を作り直してください。';
+              element.textContent = '受付データが変わったか確認できないため、GASの事前確認で停止しました。この同期要求はCloudへ送信していません。メール同期ボタンで現在のSheetから計画を作り直してください。';
             } else element.textContent = `${contactMailErrorText(response.error.cause)} この同期要求はCloudへ送信していません。設定・認証の回復後、続行ボタンから同じ要求を明示的に送信できます。`;
             break;
           }
