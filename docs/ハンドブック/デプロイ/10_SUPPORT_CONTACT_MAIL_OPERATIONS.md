@@ -37,7 +37,7 @@ Googleの条件は[制限付きscopeの審査・例外](https://developers.googl
 | 3 | 承認済み請求先と費用管理を設定し、Run、Firestore、Secret Manager、Gmail、Artifact Registry、必要なビルドAPIを有効化する。 | projectとAPI一覧、請求状態を再取得する。使わないビルドAPIは追加しない。 |
 | 4 | Cloud Run専用実行サービスアカウント、Firestore database、Secret、image保存先を作成する。 | 実行アカウントにはFirestore操作と対象Secretの読取りに必要な権限だけを付ける。ブラウザや一般利用者へFirestore/Secretを直接共有しない。 |
 | 5 | [index定義](../../../99_backend-docs/10_support-contact/mail-service/runtime/firestore.indexes.json)を対象databaseへ反映する。 | 必要indexが利用可能になるまで待つ。index作成中の一覧失敗を0件と扱わない。 |
-| 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)を使い、code/tokenを端末ファイル・ログへ出さない。登録先Secretとversionを確認する。 |
+| 6 | 手順2で確定したclientを使い、窓口本人の同意でscopeが正確に`gmail.readonly`だけの資格情報をSecret Managerへ登録する。 | [データ管理・削除の案内](../運用/09_SUPPORT_CONTACT_MAIL_DATA_CONTROL.md)に従い、案件終了後3年間の保存方針を実施する手段と削除申請先を先に確認する。[認可補助ツール](../../../99_backend-docs/10_support-contact/mail-service/README.md#公開前に必要な設定と判断)へ実施説明と申請先メールを渡し、本人が説明へ対話的に同意する。code/tokenを端末ファイル・ログへ出さず、登録先Secretとversionを確認する。 |
 | 7 | 下記の検証・imageビルドを行い、承認済みimage保存先へpushする。 | Git SHAとimage digestを対応付ける。ビルド未実施をテスト合格で代用しない。 |
 | 8 | Cloud RunをIAM認証必須で配備する。 | `allUsers`を付けない。GAS配備者だけにinvokerを付け、GASの実ID tokenのaudienceをcustom audienceへ登録する。[Cloud Runの認証](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)を参照する。 |
 | 9 | GASへメール連携コードと`openid` scopeを反映し、固定`MAIL_SERVICE_URL`を設定して必要な再認可を行う。 | 配備ID・version・コード・scope・設定を読戻す。既存Sheet/Drive参照先と利用者認証を維持する。 |

@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { createInterface } from 'node:readline/promises';
 import { authorizeMailbox, MAILBOX, OnboardingError } from './mailboxOnboarding.mjs';
 
 export function parseArguments(args) {
@@ -32,23 +33,41 @@ export async function openSystemBrowser(url, { platform = process.platform, spaw
   });
 }
 
+function requireInteractiveTerminal(input, output) {
+  if (input.isTTY !== true || output.isTTY !== true) throw new OnboardingError('DISCLOSURE_INTERACTIVE_REQUIRED');
+}
+
+export async function confirmMailboxDisclosure(disclosure, { input = process.stdin, output = process.stdout, createInterfaceImpl = createInterface } = {}) {
+  requireInteractiveTerminal(input, output);
+  output.write(`\n${disclosure}\n\n`);
+  const prompt = createInterfaceImpl({ input, output });
+  try {
+    const answer = await prompt.question('上記のデータ利用・共有と保存期間・削除窓口を確認し、同意する場合だけ「同意します」と入力してください（その他は中止）: ');
+    return answer.trim() === '同意します';
+  } finally { prompt.close(); }
+}
+
 export async function main(args = process.argv.slice(2), env = process.env) {
   const options = parseArguments(args);
   if (options.help) {
     process.stdout.write(`node tools/authorizeMailbox.mjs --execute --desktop-client --confirm-mailbox ${MAILBOX} --secret projects/PROJECT/secrets/EXISTING_SECRET\n`);
     process.stdout.write('Requires MAIL_OAUTH_CLIENT_ID and MAIL_OAUTH_CLIENT_SECRET in the process environment, an approved Desktop OAuth client, owner consent, and Secret Manager ADC permission.\n');
+    process.stdout.write('Also requires MAIL_DATA_RETENTION_NOTICE and MAIL_DATA_DELETION_CONTACT (an actionable email address), followed by interactive disclosure acceptance. See README: データの管理・削除.\n');
     return;
   }
-  const config = { ...options, clientId: env.MAIL_OAUTH_CLIENT_ID, clientSecret: env.MAIL_OAUTH_CLIENT_SECRET };
+  const config = { ...options, clientId: env.MAIL_OAUTH_CLIENT_ID, clientSecret: env.MAIL_OAUTH_CLIENT_SECRET,
+    retentionNotice: env.MAIL_DATA_RETENTION_NOTICE, deletionContact: env.MAIL_DATA_DELETION_CONTACT };
   // Validate explicit intent before importing Google clients or opening any browser/listener.
   const { validateOnboardingOptions } = await import('./mailboxOnboarding.mjs');
   validateOnboardingOptions(config);
+  requireInteractiveTerminal(process.stdin, process.stdout);
   const [{ OAuth2Client }, { SecretManagerServiceClient }] = await Promise.all([
     import('google-auth-library'), import('@google-cloud/secret-manager')
   ]);
   const result = await authorizeMailbox(config, {
     createOAuthClient: (clientId, clientSecret, redirectUri) => new OAuth2Client(clientId, clientSecret, redirectUri),
-    secretManager: new SecretManagerServiceClient(), openAuthorization: openSystemBrowser
+    secretManager: new SecretManagerServiceClient(), openAuthorization: openSystemBrowser,
+    confirmDisclosure: confirmMailboxDisclosure
   });
   process.stdout.write(`Stored mailbox authorization: ${result.secretVersion}\n`);
 }

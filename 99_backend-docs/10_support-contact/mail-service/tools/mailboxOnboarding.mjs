@@ -21,7 +21,24 @@ export function validateOnboardingOptions(options) {
   requireValue(/^projects\/[A-Za-z0-9._:-]+\/secrets\/[A-Za-z0-9_-]+$/.test(options.secretName || ''), 'INVALID_SECRET_NAME');
   requireValue(typeof options.clientId === 'string' && options.clientId.length <= 512 && /^[^\s]+\.apps\.googleusercontent\.com$/.test(options.clientId), 'OAUTH_CLIENT_REQUIRED');
   requireValue(typeof options.clientSecret === 'string' && options.clientSecret.trim() && options.clientSecret.length <= 4096 && !/[\r\n]/.test(options.clientSecret), 'OAUTH_CLIENT_REQUIRED');
+  requireValue(typeof options.retentionNotice === 'string' && options.retentionNotice.trim() && options.retentionNotice.length <= 500 &&
+    !/[\u0000-\u001f\u007f-\u009f]/.test(options.retentionNotice), 'DATA_HANDLING_NOTICE_REQUIRED');
+  requireValue(typeof options.deletionContact === 'string' && options.deletionContact.length <= 254 &&
+    /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}$/.test(options.deletionContact), 'DATA_DELETION_CONTACT_REQUIRED');
   return options;
+}
+
+export function mailboxDisclosure(options) {
+  return `SPEED AD お問い合わせ確認アプリ：Gmailデータの利用について
+対象アカウント: ${MAILBOX}
+要求権限: ${GMAIL_READONLY_SCOPE}（メールと添付の読取り。送信・変更・削除の権限は要求しません。）
+目的: 対象期間の送受信メールを問い合わせ案件と照合し、本文・添付と確認記録をアプリで確認するためです。判断できないメールは照合待ちとして表示します。
+共有: アプリの認証を通った abroad-o.com の社員と公式窓口の利用者が、対象メール・照合待ち・確認記録を閲覧します。Google Cloud上で処理・保存します。
+保存: 件名、差出人・宛先、日時、メール/スレッドID、添付情報、案件との照合、確認者・日時、同期位置と監査記録をFirestoreへ保存します。本文・添付本体は取得して一時メモリと画面で処理し、Firestoreへ保存しません。継続読取りの資格情報はSecret Managerへ保存します。
+保存方針: Gmail由来の照合・確認記録は案件終了後3年間保存します。実施方法: ${options.retentionNotice.trim()}
+停止・削除: Googleアカウントの接続管理から本アプリのアクセスを取り消せます。取消し後も保存済みデータは残るため、削除申請は ${options.deletionContact} へ対象の案件ID/メールIDを連絡してください。取消しやアプリ側データ削除でGmailの元メールは削除しません。
+詳細: mail-service READMEの「データの管理・削除」を確認してください。
+Google Workspaceから得た情報はGoogle User Data PolicyのLimited Use要件に従って扱います。`;
 }
 
 export function createProof(random = randomBytes) {
@@ -99,8 +116,10 @@ export async function listenForOAuthCallback(state, { timeoutMs = 300000 } = {})
 }
 
 /** Adapters are injected so tests never consent to Google or write a cloud secret. */
-export async function authorizeMailbox(options, { createOAuthClient, secretManager, openAuthorization, listen = listenForOAuthCallback, fetchImpl = fetch, random = randomBytes }) {
+export async function authorizeMailbox(options, { createOAuthClient, secretManager, openAuthorization, confirmDisclosure, listen = listenForOAuthCallback, fetchImpl = fetch, random = randomBytes }) {
   validateOnboardingOptions(options);
+  requireValue(typeof confirmDisclosure === 'function', 'DISCLOSURE_CONFIRMATION_REQUIRED');
+  requireValue(await confirmDisclosure(mailboxDisclosure(options)) === true, 'DISCLOSURE_DECLINED');
   const proof = createProof(random);
   const listener = await listen(proof.state);
   try {

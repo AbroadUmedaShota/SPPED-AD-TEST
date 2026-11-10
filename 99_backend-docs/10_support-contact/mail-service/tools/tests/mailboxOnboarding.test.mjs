@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { EventEmitter } from 'node:events';
 import { authorizeMailbox, createProof, GMAIL_READONLY_SCOPE, listenForOAuthCallback, MAILBOX } from '../mailboxOnboarding.mjs';
-import { openSystemBrowser, parseArguments } from '../authorizeMailbox.mjs';
+import { confirmMailboxDisclosure, main, openSystemBrowser, parseArguments } from '../authorizeMailbox.mjs';
 
 const options = { execute: true, desktopClient: true, confirmMailbox: MAILBOX,
   secretName: 'projects/test-project/secrets/existing-mailbox',
-  clientId: '1-test.apps.googleusercontent.com', clientSecret: 'synthetic-client-secret' };
+  clientId: '1-test.apps.googleusercontent.com', clientSecret: 'synthetic-client-secret',
+  retentionNotice: '合成試験の保存期間', deletionContact: 'synthetic-operator@example.com' };
 
 function fixture(overrides = {}) {
   const calls = { writes: [], token: [], opened: [], auth: [] };
@@ -23,6 +24,7 @@ function fixture(overrides = {}) {
       return { redirectUri: 'http://127.0.0.1:12345/oauth/callback', result: Promise.resolve('synthetic-code'), close() { calls.closed = true; } };
     },
     openAuthorization: async (url) => { calls.opened.push(url); },
+    confirmDisclosure: async (disclosure) => { calls.disclosure = disclosure; return true; },
     fetchImpl: async (url, request) => {
       calls.profile = { url, request };
       return { ok: true, async json() { return { emailAddress: MAILBOX }; } };
@@ -37,7 +39,8 @@ function fixture(overrides = {}) {
 }
 
 test('explicit execution, desktop type, mailbox and existing secret target are required before any adapter runs', async () => {
-  for (const change of [{ execute: false }, { desktopClient: false }, { confirmMailbox: 'other@example.com' }, { secretName: 'projects/p/secrets/s/versions/latest' }]) {
+  for (const change of [{ execute: false }, { desktopClient: false }, { confirmMailbox: 'other@example.com' }, { secretName: 'projects/p/secrets/s/versions/latest' },
+    { retentionNotice: '' }, { retentionNotice: 'unsafe\u001b[2J' }, { deletionContact: '' }, { deletionContact: 'ask the administrator' }]) {
     const { adapters, calls } = fixture();
     await assert.rejects(authorizeMailbox({ ...options, ...change }, adapters));
     assert.deepEqual(calls.opened, []);
@@ -65,7 +68,62 @@ test('PKCE offline consent verifies the exact mailbox and writes only the runtim
   assert.deepEqual(calls.writes, [{ parent: options.secretName,
     payload: { clientId: options.clientId, clientSecret: options.clientSecret, refreshToken: 'synthetic-refresh' }, callOptions: { retry: null } }]);
   assert.equal(calls.closed, true);
+  assert.match(calls.disclosure, /SPEED AD お問い合わせ確認アプリ/);
+  assert.ok(calls.disclosure.includes(GMAIL_READONLY_SCOPE));
+  assert.ok(calls.disclosure.includes(options.retentionNotice));
+  assert.match(calls.disclosure, /案件終了後3年間/);
+  assert.ok(calls.disclosure.includes(options.deletionContact));
+  assert.equal(calls.disclosure.includes(options.clientSecret), false);
   assert.deepEqual(Object.keys(result).sort(), ['mailbox', 'secretVersion']);
+});
+
+test('disclosure requires affirmative acknowledgement immediately before browser consent', async () => {
+  const sequence = [];
+  const { adapters, calls } = fixture({ adapters: {
+    confirmDisclosure: async () => { sequence.push('acknowledge'); return true; },
+    openAuthorization: async () => { sequence.push('open'); }
+  } });
+  await authorizeMailbox(options, adapters);
+  assert.deepEqual(sequence, ['acknowledge', 'open']);
+  assert.equal(calls.writes.length, 1);
+  for (const confirmDisclosure of [undefined, async () => false]) {
+    const declined = fixture({ adapters: { confirmDisclosure } });
+    await assert.rejects(authorizeMailbox(options, declined.adapters), /DISCLOSURE_(CONFIRMATION_REQUIRED|DECLINED)/);
+    assert.deepEqual(declined.calls.opened, []);
+    assert.deepEqual(declined.calls.token, []);
+    assert.deepEqual(declined.calls.writes, []);
+    assert.equal(declined.calls.profile, undefined);
+    assert.equal(declined.calls.state, undefined);
+  }
+});
+
+test('interactive disclosure rejects pipes and accepts only the explicit answer', async () => {
+  let interfaces = 0;
+  let written = '';
+  let closed = 0;
+  const io = { input: { isTTY: true }, output: { isTTY: true, write(value) { written += value; } },
+    createInterfaceImpl() { interfaces += 1; return { question: async () => '同意します', close() { closed += 1; } }; } };
+  for (const input of [{}, { isTTY: false }]) {
+    await assert.rejects(confirmMailboxDisclosure('synthetic disclosure', { ...io, input }), /DISCLOSURE_INTERACTIVE_REQUIRED/);
+  }
+  await assert.rejects(confirmMailboxDisclosure('synthetic disclosure', { ...io, output: { isTTY: false } }), /DISCLOSURE_INTERACTIVE_REQUIRED/);
+  assert.equal(interfaces, 0);
+  assert.equal(written, '');
+  assert.equal(await confirmMailboxDisclosure('synthetic disclosure', io), true);
+  assert.match(written, /synthetic disclosure/);
+  assert.equal(closed, 1);
+  for (const answer of ['', 'yes', '同意しません']) {
+    assert.equal(await confirmMailboxDisclosure('synthetic disclosure', { ...io,
+      createInterfaceImpl: () => ({ question: async () => answer, close() {} }) }), false);
+  }
+});
+
+test('noninteractive CLI stops before importing cloud clients or opening consent', async () => {
+  if (process.stdin.isTTY === true && process.stdout.isTTY === true) return;
+  await assert.rejects(main(['--execute', '--desktop-client', '--confirm-mailbox', MAILBOX, '--secret', options.secretName], {
+    MAIL_OAUTH_CLIENT_ID: options.clientId, MAIL_OAUTH_CLIENT_SECRET: options.clientSecret,
+    MAIL_DATA_RETENTION_NOTICE: options.retentionNotice, MAIL_DATA_DELETION_CONTACT: options.deletionContact
+  }), /DISCLOSURE_INTERACTIVE_REQUIRED/);
 });
 
 test('missing refresh token, broader scope, mailbox mismatch and profile failure never write a secret', async () => {
