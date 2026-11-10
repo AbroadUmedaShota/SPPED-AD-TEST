@@ -503,7 +503,7 @@ test('history stops at pre-period mail before body retrieval and requires a wide
   await f.execute(f.envelope('advanceSync', { executionId: run }));
   const file = { name: 'private.txt', bytes: Buffer.from('private attachment') };
   const old = gmailMessage('old-label-change', 'private old body', [], file);
-  old.internalDate = String(Date.parse(START) - 1); old.labelIds = ['STARRED'];
+  old.internalDate = String(Date.parse('2020-01-01T00:00:00.000Z')); old.labelIds = ['STARRED'];
   const draft = gmailMessage('draft-edit', 'private unsent body', [], file); draft.labelIds = ['DRAFT'];
   const eligible = gmailMessage('eligible', `受付ID: ${A}`);
   f.messages.set(old.id, old); f.messages.set(draft.id, draft); f.messages.set(eligible.id, eligible);
@@ -511,7 +511,8 @@ test('history stops at pre-period mail before body retrieval and requires a wide
   f.gmail.getAttachment = async () => { attachmentCalls++; throw new Error('unexpected attachment fetch'); };
   f.gmail.listHistory = async () => ({ messageIds: [draft.id, old.id, eligible.id], historyId: '200' });
   const executionId = randomUUID();
-  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, mode: 'history' })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  const historyRequest = f.envelope('advanceSync', { executionId, mode: 'history' });
+  await assert.rejects(() => f.execute(historyRequest), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
   assert.deepEqual(f.metadataCalls, [draft.id, old.id]);
   assert.deepEqual(f.calls, []);
   assert.equal(attachmentCalls, 0);
@@ -528,19 +529,78 @@ test('history stops at pre-period mail before body retrieval and requires a wide
   assert.equal(failed.processedCount, 1);
   assert.equal(failed.inFlightPage.index, 1);
   assert.deepEqual(failed.failedMessageIds, [old.id]);
+  assert.deepEqual(failed.prePeriodObservation, { messageId: old.id, internalDate: '2020-01-01T00:00:00.000Z', detectedAt: NOW });
+  const unknown = await f.execute(f.envelope('getSyncRequestResult', { requestId: historyRequest.requestId, requestPayload: historyRequest.payload }));
+  assert.equal(unknown.found, false);
+  assert.equal(unknown.sync.acceptanceReady, false);
+  assert.equal(unknown.sync.failedCount, 1);
   await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId, resume: true })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
-  for (const payload of [{ mode: 'full', startAt: START }, { mode: 'history', startAt: '2025-01-01T00:00:00.000Z' }]) {
+  for (const payload of [{ mode: 'full', startAt: START }, { mode: 'full', startAt: '2025-01-01T00:00:00.000Z' },
+    { mode: 'history', startAt: '2019-01-01T00:00:00.000Z' }]) {
     await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), ...payload })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
   }
   assert.deepEqual(await f.store.getSyncState(), failed);
   const recoveryId = randomUUID();
-  let recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId, mode: 'full', startAt: '2025-01-01T00:00:00.000Z' }));
-  while (recovered.sync.state === 'running') recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId }));
+  let recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId, mode: 'full', startAt: '2019-01-01T00:00:00.000Z' }));
+  for (let step = 0; step < 5 && recovered.sync.state === 'running'; step++) recovered = await f.execute(f.envelope('advanceSync', { executionId: recoveryId }));
   assert.equal(recovered.sync.state, 'complete');
-  assert.equal(recovered.sync.startAt, '2025-01-01T00:00:00.000Z');
+  assert.equal(recovered.sync.startAt, '2019-01-01T00:00:00.000Z');
+  assert.equal((await f.store.getSyncState()).prePeriodObservation, null);
   assert.equal((await f.store.getMessage(old.id)).bodyAvailability, 'verified');
   assert.equal((await f.store.getMessage(eligible.id)).bodyAvailability, 'verified');
   assert.equal(f.calls.includes(draft.id), false);
+});
+
+test('a vanished pre-period original remains an unavailable residual across full sync and receipt readback', async () => {
+  const f = fixture([A]);
+  const initial = randomUUID();
+  await f.execute(f.envelope('advanceSync', { executionId: initial, mode: 'full' }));
+  await f.execute(f.envelope('advanceSync', { executionId: initial }));
+  const old = gmailMessage('vanished-old'); old.internalDate = String(Date.parse('2020-01-01T00:00:00.000Z'));
+  f.messages.set(old.id, old);
+  f.gmail.listHistory = async () => ({ messageIds: [old.id], historyId: '200' });
+  await assert.rejects(() => f.execute(f.envelope('advanceSync', { executionId: randomUUID(), mode: 'history' })), { code: 'MAIL_PERIOD_EXPANSION_REQUIRED' });
+  f.messages.delete(old.id);
+  const executionId = randomUUID();
+  await f.execute(f.envelope('advanceSync', { executionId, mode: 'full', startAt: '2020-01-01T00:00:00.000Z' }));
+  const finalRequest = f.envelope('advanceSync', { executionId });
+  const result = await f.execute(finalRequest);
+  assert.equal(result.sync.state, 'complete');
+  assert.equal(result.sync.acceptanceReady, false);
+  assert.equal(result.sync.failedCount, 1);
+  assert.equal(result.sync.unobservedDeletedCount, 1);
+  const state = await f.store.getSyncState();
+  assert.equal(state.prePeriodObservation.messageId, old.id);
+  assert.equal(state.prePeriodObservation.internalDate, '2020-01-01T00:00:00.000Z');
+  const issues = await f.execute(f.envelope('listMailIssues', { kind: 'failed' }));
+  assert.deepEqual(issues.targets.map((item) => item.messageId), [old.id]);
+  const confirmation = await f.execute(f.envelope('getSyncRequestResult', { requestId: finalRequest.requestId, requestPayload: finalRequest.payload }));
+  assert.equal(confirmation.found, true);
+  assert.equal(confirmation.receipt.sync.failedCount, 1);
+  assert.equal(confirmation.receipt.sync.acceptanceReady, false);
+  assert.equal(confirmation.sync.acceptanceReady, false);
+  const next = randomUUID();
+  let repeated = await f.execute(f.envelope('advanceSync', { executionId: next, mode: 'full', startAt: '2019-01-01T00:00:00.000Z' }));
+  for (let step = 0; step < 5 && repeated.sync.state === 'running'; step++) repeated = await f.execute(f.envelope('advanceSync', { executionId: next }));
+  assert.equal(repeated.sync.state, 'complete');
+  assert.equal(repeated.sync.acceptanceReady, false);
+  assert.equal(repeated.sync.failedCount, 1);
+  assert.equal(repeated.sync.unobservedDeletedCount, 1);
+});
+
+test('Firestore sync state preserves unresolved pre-period evidence under the sync lease', async () => {
+  const db = memoryFirestore();
+  const store = createFirestoreStore(db);
+  const state = { state: 'failed', startAt: START, failedCount: 1, failedMessageIds: ['old'],
+    prePeriodObservation: { messageId: 'old', internalDate: '2020-01-01T00:00:00.000Z', detectedAt: NOW } };
+  await store.withAccess(async () => {
+    const lease = await store.acquireSyncLease('request', NOW);
+    await store.setSyncState(state, lease);
+    assert.deepEqual(await store.getSyncState(), state);
+    await assert.rejects(() => store.setSyncState({ ...state, prePeriodObservation: null }, 'wrong-lease'), { code: 'MAIL_SYNC_BUSY' });
+    assert.deepEqual(await store.getSyncState(), state);
+    await store.releaseSyncLease(lease);
+  });
 });
 
 test('full sync filters period boundaries and rejects invalid metadata before full-message retrieval', async () => {

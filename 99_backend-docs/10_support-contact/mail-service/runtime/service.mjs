@@ -486,7 +486,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       }
       internalDate = new Date(Number(metadata.internalDate)).toISOString();
       if (scope.rejectPrePeriod && scope.startAt && internalDate < scope.startAt) {
-        throw new MailError('MAIL_PERIOD_EXPANSION_REQUIRED', 409);
+        const error = new MailError('MAIL_PERIOD_EXPANSION_REQUIRED', 409);
+        error.prePeriodObservation = { messageId: id, internalDate, detectedAt: now().toISOString() };
+        throw error;
       }
       if ((scope.startAt && internalDate < scope.startAt) || (scope.cutoffAt && internalDate > scope.cutoffAt)) return;
       message = await gmail.getMessage(id);
@@ -602,8 +604,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         if (payload.mode === 'history') assertMail(state?.historyId, 'MAIL_FULL_SYNC_REQUIRED', 409);
         const startAt = periodStart(payload.startAt);
         assertMail(startAt, 'MAIL_PERIOD_REQUIRED', 409);
-        if (state?.errorCode === 'MAIL_PERIOD_EXPANSION_REQUIRED') {
-          assertMail(payload.mode === 'full' && startAt < periodStart(state.startAt), 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
+        const prePeriodObservation = state?.prePeriodObservation || null;
+        if (state?.errorCode === 'MAIL_PERIOD_EXPANSION_REQUIRED' || prePeriodObservation) {
+          assertMail(prePeriodObservation && payload.mode === 'full' && startAt <= prePeriodObservation.internalDate, 'MAIL_PERIOD_EXPANSION_REQUIRED', 409);
         }
         assertMail(!state?.executionId || !periodStart(state.startAt) || startAt <= periodStart(state.startAt), 'MAIL_PERIOD_NARROWING', 409);
         const mode = payload.mode === 'history' && startAt !== periodStart(state?.startAt) ? 'full' : payload.mode;
@@ -615,7 +618,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         const at = mode === 'history' ? startedAt : now().toISOString();
         state = { executionId: payload.executionId, mode, state: 'running', pageToken: null,
           startAt, cutoffAt: at, historyId: state?.historyId || null,
-          initialHistoryId: String(profile.historyId || ''), failedCount: 0, processedCount: 0,
+          initialHistoryId: String(profile.historyId || ''), failedCount: prePeriodObservation ? 1 : 0, processedCount: 0,
+          prePeriodObservation, failedMessageIds: prePeriodObservation ? [prePeriodObservation.messageId] : [],
           catalogSnapshotId: catalog.snapshotId || null,
           lastSuccessAt: state?.lastSuccessAt || null, errorCode: null };
         assertMail(/^\d+$/.test(state.initialHistoryId), 'MAIL_INVALID_UPSTREAM', 502);
@@ -624,6 +628,13 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       assertMail(periodStart(state?.startAt), 'MAIL_PERIOD_REQUIRED', 409);
       assertMail(state.state === 'running', state.state === 'complete' ? 'MAIL_SYNC_COMPLETE' : 'MAIL_FULL_SYNC_REQUIRED', 409);
       if (state.phase === 'finalize') {
+        if (state.prePeriodObservation && state.prePeriodObservation.probedExecutionId !== state.executionId) {
+          const observation = state.prePeriodObservation;
+          await indexMessage(observation.messageId, catalog, { startAt: state.startAt, cutoffAt: state.cutoffAt, generation: state.executionId });
+          const observed = await store.getMessage(observation.messageId);
+          state.prePeriodObservation = observed?.indexedGeneration === state.executionId && observed.sourceKind === 'mail' ? null :
+            { ...observation, probedExecutionId: state.executionId };
+        }
         const records = await store.listIndexedScope({ startAt: state.startAt, cutoffAt: state.cutoffAt, cursor: state.finalizeCursor, limit: PAGE_SIZE + 1 });
         const batch = records.slice(0, PAGE_SIZE);
         for (const record of batch) {
@@ -632,7 +643,9 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         }
         const more = records.length > PAGE_SIZE;
         state = { ...state, finalizeCursor: more ? { at: batch.at(-1).internalDate, id: batch.at(-1).messageId } : null,
-          state: more ? 'running' : 'complete' };
+          state: more ? 'running' : 'complete', failedCount: state.prePeriodObservation ? 1 : 0,
+          failedMessageIds: state.prePeriodObservation ? [state.prePeriodObservation.messageId] : [],
+          errorCode: state.prePeriodObservation ? 'MAIL_PERIOD_EXPANSION_REQUIRED' : null };
         if (!more) { state.historyId = state.initialHistoryId; state.lastSuccessAt = now().toISOString(); }
         const result = { sync: await syncStatus(state) };
         await store.setSyncState(state, lease, { requestId, fingerprint, result });
@@ -676,7 +689,15 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
         try { await indexMessage(messageId(id), catalog, { ...(state.mode === 'full' ? {
           startAt: state.startAt, cutoffAt: state.cutoffAt, generation: state.executionId
         } : { startAt: state.startAt, rejectPrePeriod: true }), draftEvidence: page.draftIds?.includes(id) === true }); }
-        catch (error) { state.failedMessageIds = [id]; throw error; }
+        catch (error) {
+          if (error.prePeriodObservation) state.prePeriodObservation = error.prePeriodObservation;
+          state.failedMessageIds = [...new Set([...(state.prePeriodObservation ? [state.prePeriodObservation.messageId] : []), id])];
+          throw error;
+        }
+        if (state.prePeriodObservation?.messageId === id) {
+          const observed = await store.getMessage(id);
+          if (observed?.indexedGeneration === state.executionId && observed.sourceKind === 'mail') state.prePeriodObservation = null;
+        }
         state.inFlightPage.index += 1;
         state.processedCount += 1;
       }
@@ -693,7 +714,8 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       const complete = !page.nextPageToken && state.mode === 'history';
       state = { ...state, pageToken: page.nextPageToken || null,
         inFlightPage: null,
-        state: complete ? 'complete' : 'running', errorCode: null, failedCount: 0, failedMessageIds: [],
+        state: complete ? 'complete' : 'running', errorCode: state.prePeriodObservation ? 'MAIL_PERIOD_EXPANSION_REQUIRED' : null,
+        failedCount: state.prePeriodObservation ? 1 : 0, failedMessageIds: state.prePeriodObservation ? [state.prePeriodObservation.messageId] : [],
         ...(!page.nextPageToken && state.mode === 'full' ? { phase: 'finalize', finalizeCursor: null } : {}) };
       if (complete) {
         const historyId = state.mode === 'history' ? String(page.historyId || '') : state.initialHistoryId;
@@ -706,7 +728,7 @@ export function createMailService({ store, gmail, core, now = () => new Date(), 
       return result;
     } catch (error) {
       if (state?.executionId === payload.executionId && state.state === 'running') {
-        await store.setSyncState({ ...state, state: 'failed', errorCode: error instanceof MailError ? error.code : 'MAIL_SYNC_FAILED', failedCount: 1 }, lease);
+        await store.setSyncState({ ...state, state: 'failed', errorCode: error instanceof MailError ? error.code : 'MAIL_SYNC_FAILED', failedCount: Math.max(1, state.failedMessageIds?.length || 0) }, lease);
       }
       throw error;
     } finally {
