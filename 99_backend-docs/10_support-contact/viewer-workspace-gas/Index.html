@@ -1338,6 +1338,7 @@
       queue: { scope: 'unreviewed', serial: 0, detailSerial: 0, attachmentSerial: 0, urls: [] },
       issues: { serial: 0, kind: 'pending', pageToken: '', history: [], result: null, active: false },
       syncSerial: 0,
+      syncObservationSerial: 0,
       sync: null,
       periodObserved: false,
       periodStartAt: null,
@@ -1476,6 +1477,9 @@
       contactMailState.periodObserved = true;
       contactMailState.periodStartAt = startAt;
       contactMailState.sync = sync;
+      ++contactMailState.syncObservationSerial;
+      document.getElementById('mailSyncSummary').textContent = renderContactMailSync(sync);
+      renderContactMailSyncButton();
       if (!changed) return false;
       const notice = 'メールの同期対象期間が変わりました。更新して現在の期間を確認してください。';
       const previous = Object.fromEntries(['case', 'queue'].map((view) => [view, {
@@ -1522,11 +1526,12 @@
     async function loadContactMailSyncStatus() {
       if (contactMailState.syncBusy) return;
       const serial = ++contactMailState.syncSerial;
+      const observationSerial = contactMailState.syncObservationSerial;
       const element = document.getElementById('mailSyncSummary');
       element.textContent = 'メール連携を確認中...';
       try {
         const result = contactMailResult(await callServer('getContactMailSyncStatus'));
-        if (serial !== contactMailState.syncSerial) return;
+        if (serial !== contactMailState.syncSerial || observationSerial !== contactMailState.syncObservationSerial) return;
         validateContactMailSync(result.sync);
         observeContactMailSync(result.sync);
         const progress = contactMailState.syncProgress;
@@ -1541,7 +1546,7 @@
         element.textContent = renderContactMailSync(result.sync);
         renderContactMailSyncButton();
       } catch (error) {
-        if (serial !== contactMailState.syncSerial) return;
+        if (serial !== contactMailState.syncSerial || observationSerial !== contactMailState.syncObservationSerial) return;
         element.textContent = contactMailErrorText(error.message);
       }
     }
@@ -2056,6 +2061,7 @@
 
     function showDenied(message) {
       ++contactMailState.syncSerial;
+      ++contactMailState.syncObservationSerial;
       contactMailState.sync = null;
       contactMailState.periodObserved = false;
       contactMailState.periodStartAt = null;

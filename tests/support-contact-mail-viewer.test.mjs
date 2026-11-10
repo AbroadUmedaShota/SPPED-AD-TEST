@@ -427,6 +427,33 @@ test('sync advance with a new period invalidates old list and detail responses b
   assert.match(app.element('mailQueueContent').innerHTML, /同期対象期間が変わりました/);
 });
 
+test('an older sync-status success or failure cannot overwrite a newer list period and counts', async () => {
+  for (const outcome of ['success', 'failure']) {
+    const broad = { ...sync, startAt: '2026-01-01T00:00:00.000Z', pendingCount: 99 };
+    const narrow = { ...sync, startAt: '2026-11-01T00:00:00.000Z', pendingCount: 2 };
+    let resolveStatus;
+    let rejectStatus;
+    const app = uiRuntime({
+      getContactMailSyncStatus: () => new Promise((resolve, reject) => { resolveStatus = resolve; rejectStatus = reject; }),
+      listContactMail: () => ({ ...list([]), sync: narrow }),
+    });
+    app.ui.observeContactMailSync(broad);
+    const oldStatus = app.ui.loadContactMailSyncStatus();
+    await Promise.resolve();
+    await app.ui.loadContactMailList('case', { caseId });
+    const latestHeader = app.element('mailSyncSummary').textContent;
+    assert.equal(app.mail.sync.startAt, narrow.startAt);
+    assert.match(latestHeader, /照合待ち 2件/);
+    if (outcome === 'success') resolveStatus({ ok: true, sync: broad });
+    else rejectStatus(new Error('MAIL_SERVICE_UNAVAILABLE'));
+    await oldStatus;
+    assert.equal(app.mail.sync.startAt, narrow.startAt);
+    assert.equal(app.mail.sync.pendingCount, 2);
+    assert.equal(app.element('mailSyncSummary').textContent, latestHeader);
+    assert.equal(app.element('pendingMailButton').textContent, '照合待ち 2件');
+  }
+});
+
 test('explicit review retries preserve request ID and never mutate case status', async () => {
   let attempts = 0;
   const app = uiRuntime({
