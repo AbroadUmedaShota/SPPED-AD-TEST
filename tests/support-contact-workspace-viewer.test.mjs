@@ -271,6 +271,20 @@ test('viewer rejects reordered columns before the public form can overwrite head
   assert.equal(env.isLocked(), false);
 });
 
+test('duplicate required headers beyond the canonical schema fail closed for list detail and save', () => {
+  const headers = runtime().headers;
+  for (const duplicate of ['closed_at', 'handled_status', 'submission_id']) {
+    const env = runtime('reader@abroad-o.com', { headerOrder: [...headers, 'extra', duplicate] });
+    for (const operation of [
+      () => env.api.listContactSubmissions({ status: 'all' }),
+      () => env.api.getContactSubmission('case-a'),
+      () => env.api.updateContactSubmissionStatus('case-a', '対応済み', 'memo'),
+    ]) assert.throws(operation, /必須列が重複/);
+    assert.deepEqual(env.writes, []);
+    assert.equal(env.isLocked(), false);
+  }
+});
+
 test('public form receipt append preserves existing closure and memo under the exact 18-column schema', () => {
   const env = runtime();
   const closed = env.api.updateContactSubmissionStatus('case-a', '対応済み', 'existing memo').submission;
