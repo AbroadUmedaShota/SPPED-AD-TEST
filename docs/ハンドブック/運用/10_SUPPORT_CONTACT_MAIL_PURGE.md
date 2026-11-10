@@ -62,15 +62,17 @@ node tools/purgeMailMetadata.mjs --project '<approved-project>' --confirm-projec
 
 現在の期間に見つからないだけでは、将来の期間拡大で再取込する恐れがあります。この実装は期間・ラベルで絞らず、下書き・Spam・Trashを含むGmail全体のIDを全ページ列挙し、原本が不在のときだけ候補にします。**「原本が同期対象にある間」より保守的に、Gmailに原本がある間は最小hashを保持する条件です。この保持範囲の本人判断は未確定で、実データ実行前に確定します。** 原本の本文・件名・アドレスは取得しません。[Gmail一覧API](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list)
 
-計画は最大250マーカーを文書ID順に読み、同期完了状態と期間・保存世代を固定します。出力は件数・計画hash・次のhash cursorだけです。
+計画は最大250マーカーを文書ID順に読み、同期完了状態と期間・処理済み履歴ID・保存世代を固定します。Gmail profileの履歴IDが処理済み位置と一致しない場合は、マーカーを保持して停止します。cancelで保守を解除し、通常同期で削除履歴まで処理してから新しい計画を作ります。出力は件数・計画hash・次のhash cursor・走査上限だけです。
 
 ```powershell
 node tools/cleanupMailMarkers.mjs --project '<approved-project>' --confirm-project '<same-project>' --database '(default)' --request-reference '<verified-operation>' --operation plan
 ```
 
-返された計画hashを確認後、同じ指定に `--operation advance --plan-hash '<returned-hash>' --secret-version '<approved-canonical-numeric-version>'` を指定します。1回につきGmail IDを50件まで読み、IDは直ちにhash比較して破棄します。元IDは一時計画にも保存しません。`enumerating` の間は同じ操作を明示して進めます。全ページ完了まで削除候補を確定せず、Gmail profileの履歴IDが開始時と一致した場合だけ `ready` と `deletionHash` を返します。最大5,000ページで止まり、結果件数の推定値は完全性の証拠にしません。
+返された計画hashを確認後、同じ指定に `--operation advance --plan-hash '<returned-hash>' --secret-version '<approved-canonical-numeric-version>'` を指定します。1回につきGmail IDを50件まで読み、IDは直ちにhash比較して破棄します。元IDは一時計画にも保存せず、全IDの重複検査に必要なhash集合だけを一時保存します。`enumerating` の間は同じ操作を明示して進めます。全ページ完了、ID重複なし、unique件数とprofileの `messagesTotal` の完全一致、開始・完了profileの履歴IDと件数の一致を確認した場合だけ `ready` と `deletionHash` を返します。欠落・不正な応答は空一覧に変換しません。profileが0件と示す空メールボックスでは、明示的な空配列または `resultSizeEstimate:0` の応答が必要です。推定件数だけを完全性の証拠にしません。[Gmail profile](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users/getProfile)
 
-`ready` の件数を確認後、`--operation apply --plan-hash '<same-plan-hash>' --deletion-hash '<returned-deletion-hash>' --secret-version '<same-version>'` を指定します。1回25マーカーまで、現在のGmail履歴ID・同期状態・保存世代・計画を再照合して削除します。`deleting` は同じ操作で再開し、`complete` で一時計画を消して保守を解除します。次のhash cursorがある場合は、別の依頼番号で `--after-marker '<nextMarker>'` を付けたplanから次の250個を処理します。advanceの初回にも同じcursorを付けます。
+再開用一時計画をFirestore文書上限内に保つため、Gmail全体で **10,000 ID・1,000ページ** が上限です。上限超過は `MAIL_MARKER_SCAN_LIMIT` で停止し、全件不在の証明や整理成功とは扱いません。未削除マーカーは保持します。この上限を超える本番メールボックスでは、別の一時hash保管と清掃工程を実装・検証してから整理します。
+
+`ready` の件数を確認後、`--operation apply --plan-hash '<same-plan-hash>' --deletion-hash '<returned-deletion-hash>' --secret-version '<same-version>'` を指定します。1回25マーカーまで、現在のGmail履歴ID・全件数・同期処理済み位置・保存世代・計画を再照合して削除します。`deleting` は同じ操作で再開し、`complete` で一時計画を消して保守を解除します。次のhash cursorがある場合は、別の依頼番号で `--after-marker '<nextMarker>'` を付けたplanから次の250個を処理します。advanceの初回にも同じcursorを付けます。
 
 処理中は既存の保守gateでメール閲覧・確認・同期・別の削除を止め、古い世代の要求を無効にします。API失敗・ページ不正・履歴ID変更・同期状態変更では未削除マーカーを保持して停止します。`--operation status --plan-hash '<same-plan-hash>'` はGmailを取得せず進捗を読みます。処理を取りやめる場合は `--operation cancel --plan-hash '<same-plan-hash>'` で残りを保持して保守を解除し、新しいdry-runから再列挙します。最終応答不明でstatusがidleでも完了の証明にはせず、記録と新しいdry-runを照合します。自動再送・自動scheduleはありません。
 
