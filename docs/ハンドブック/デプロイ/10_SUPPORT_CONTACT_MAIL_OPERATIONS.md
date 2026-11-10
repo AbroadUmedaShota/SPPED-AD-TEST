@@ -14,10 +14,14 @@ last_reviewed: 2026-11-10
 
 | 用途 | 準備済みのprojectと設定 | 残る確認 |
 | --- | --- | --- |
-| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、Internal audience、宣言scopeは `gmail.readonly` のみ。請求先は紐付けていない。 | Desktop client、本人のGmail同意、適用される審査・評価または除外根拠、初回読取後のquotaと費用。 |
+| 窓口Gmail用OAuth | `speed-ad.com` 組織の `spd-contact-mail-oauth-261110`（番号 `47432854912`）。Gmail API有効、Internal audience、宣言scopeは `gmail.readonly` のみ。Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` を作成済み。請求先は紐付けていない。 | 本人のGmail同意、資格情報のSecret version登録、セキュリティ評価の適用または除外根拠、初回読取後のquotaと費用。 |
 | Cloud Run・Firestore・Secret Manager | `abroad-o.com` 組織の `spd-contact-viewer-20261110`。承認済み請求先、同project限定の月額3,000円予算通知、必要API、東京の保存先と専用サービスアカウントを準備済み。 | imageとCloud Run配備、数値固定のSecret version、GAS連携と実環境受入。 |
 
 OAuth clientの所属projectとSecret保存先のprojectは別に照合します。実行基盤側の予算通知はOAuth側projectを含みません。この準備状況は本番受入の完了を示さず、以後の変更と読戻しは切替記録を正本にします。
+
+同日のGoogle Auth Platform検証センターは、Internal構成のため検証不要と表示しました。`speed-ad.com` のWorkspace管理コンソールでは「内部アプリを信頼する」と、GmailのAPIアクセス「制限なし」を読戻しています。これは設定の確認であり、窓口本人のGmail同意、Secret version、実メール読取、Cloud Run・GAS第2段階の配備と受入は未実施です。
+
+Googleの[内部アプリのOAuth設定](https://developers.google.com/workspace/guides/configure-oauth-consent)は内部用途のscopeについてGoogleの追加審査不要としています。一方、[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)にはサーバー経由のデータアクセスに対する年次セキュリティ評価（CASA）の規定があります。検証センターの表示だけで今回の構成のCASA適用除外を確定せず、内部用途と別組織のCloud Runで処理する構成への適用を確認してから実メール接続へ進みます。
 
 ## 1. 接続前に確定すること
 

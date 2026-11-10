@@ -26,7 +26,11 @@
 4. Cloud Runは`allUsers`を許可せず、GAS配備者だけにinvokerを付ける。Apps ScriptのOAuth client IDをcustom audienceに設定し、サービス内でもaudienceと配備者subject/emailを固定値で検証する。設定値は`MAIL_SCRIPT_AUDIENCE`、`MAIL_DEPLOYER_EMAIL`、`MAIL_DEPLOYER_SUBJECT`、`MAILBOX_OAUTH_SECRET_VERSION`、必要なら`FIRESTORE_DATABASE_ID`。GAS側は新しい`openid`認可とScript Property `MAIL_SERVICE_URL` が必要。実値をrepoへ保存しない。
 5. 画面とAPIの認証、Firestore複合index、初回全件同期、後続履歴同期、照合待ち、添付の到達、別利用者の確認者・日時読戻しを実環境で検証する。対象期間・同期基準日時を記録し、正本Sheet全受付IDと窓口の対象送受信メールを照合する。
 
-2026-11-10時点の準備では、Gmail読取用OAuthを `speed-ad.com` 組織内の `spd-contact-mail-oauth-261110`（番号 `47432854912`）へ分け、Gmail APIの有効化、Internal audience、`gmail.readonly`だけの宣言を設定した。Desktop clientの作成・資格情報の登録・窓口本人のGmail同意は未確認である。Cloud Run・Firestore・Secret Managerは `abroad-o.com` 組織内の `spd-contact-viewer-20261110` に置き、同projectの請求先と月額3,000円の予算通知は設定済み。OAuth clientのprojectと資格情報を保存するSecretのprojectをそれぞれ照合し、初回Gmail読取後にOAuth側のquotaと費用を確認する。既存の予算通知はOAuth側projectを含まない。実行時の状態と受入結果は切替記録で再確認する。
+2026-11-10時点の読戻しでは、Gmail読取用OAuthを `speed-ad.com` 組織内の `spd-contact-mail-oauth-261110`（番号 `47432854912`）へ分け、Gmail API有効、Internal audience、`gmail.readonly`だけの宣言、Desktop client `SPEED AD Contact Mailbox - Gmail Readonly` の作成を確認した。検証センターは内部アプリのため検証不要と表示し、WorkspaceのAPI制御は内部アプリを信頼、Gmailは制限なしだった。窓口本人のGmail同意、資格情報のSecret version登録、実メール読取は未実施である。
+
+内部用途は[Googleの追加審査が不要](https://developers.google.com/workspace/guides/configure-oauth-consent)とされる一方、[制限付きscopeの要件](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)にはサーバー経由アクセスの年次セキュリティ評価（CASA）が規定されている。検証センターの表示と、今回の内部用途・別組織Cloud Run構成への評価適用または除外判断を分け、実メール接続前に確認する。
+
+Cloud Run・Firestore・Secret Managerは `abroad-o.com` 組織内の `spd-contact-viewer-20261110` に置き、同projectの請求先と月額3,000円の予算通知は設定済み。OAuth clientのprojectと資格情報を保存するSecretのprojectをそれぞれ照合し、初回Gmail読取後にOAuth側のquotaと費用を確認する。既存の予算通知はOAuth側projectを含まない。Cloud Run・GAS第2段階の配備と実環境受入は未完了であり、実行時の状態と受入結果は切替記録で再確認する。
 
 GASの第1段階version 7は単独で受入済み。第2段階が未配備または未設定の場合、メール欄は明示的な利用不可状態とする。第2段階の合成試験や同期の技術残件0だけで「シートやメールボックスを探さず全件確認できる」と判定しない。実環境での第2段階受入まで、現行メールボックス確認は必要。
 
