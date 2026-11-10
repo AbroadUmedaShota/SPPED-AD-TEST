@@ -1358,6 +1358,7 @@
         MAIL_NOT_CONFIGURED: 'メール連携は未設定です。受付データのみ確認できます。',
         MAIL_SERVICE_AUTH: 'メール連携の認証を確認できません。',
         MAIL_INVALID_RESPONSE: 'メールの応答を確認できません。更新して再確認してください。',
+        MAIL_OBSERVATION_CHANGED: 'メール連携の状態を新しく確認したため、前の応答を破棄しました。更新して現在の条件で読み直してください。',
         CONFLICT: '別の操作でメールの状態が変わりました。更新して確認してください。',
         NOT_FOUND: '対象のメールが見つかりません。更新して確認してください。',
         MAIL_UNAVAILABLE: 'このメールを取得できません。',
@@ -1447,7 +1448,10 @@
       const iso = (item) => typeof item === 'string' && Number.isFinite(Date.parse(item)) && new Date(item).toISOString() === item;
       if (!exact(value, ['eligible', 'contextToken', 'confirmation', 'stale']) || typeof value.eligible !== 'boolean' ||
         typeof value.stale !== 'boolean' || !(value.contextToken === null || typeof value.contextToken === 'string' && /^[a-f0-9]{64}$/.test(value.contextToken)) ||
-        (value.eligible && value.contextToken === null)) throw new Error('MAIL_INVALID_RESPONSE');
+        !sync || value.contextToken !== sync.noMailContextToken ||
+        ((value.eligible || value.confirmation !== null) && (value.contextToken === null || sync.state !== 'complete' ||
+          sync.enumerationComplete !== true || sync.remainingPages !== false || sync.pendingCount !== 0 || sync.failedCount !== 0 ||
+          sync.unobservedDeletedCount !== 0))) throw new Error('MAIL_INVALID_RESPONSE');
       const confirmation = value.confirmation;
       if (confirmation !== null && (!exact(confirmation, ['email', 'at', 'startAt', 'cutoffAt']) ||
         typeof confirmation.email !== 'string' || !/^(?:[^\s@]+@abroad-o\.com|customer@speed-ad\.com)$/.test(confirmation.email) ||
@@ -1500,10 +1504,25 @@
       if (view === 'case') root.hidden = true;
     }
 
+    function sameContactMailSyncObservation(left, right) {
+      if (!left || !right) return false;
+      const keys = Object.keys(left).sort();
+      return keys.join(',') === Object.keys(right).sort().join(',') && keys.every((key) => JSON.stringify(left[key]) === JSON.stringify(right[key]));
+    }
+
+    function observeContactMailResponse(sync, observationSerial) {
+      validateContactMailSync(sync);
+      if (observationSerial !== contactMailState.syncObservationSerial) {
+        if (!sameContactMailSyncObservation(sync, contactMailState.sync)) throw new Error('MAIL_OBSERVATION_CHANGED');
+        return false;
+      }
+      return observeContactMailSync(sync);
+    }
+
     function observeContactMailSync(sync) {
       validateContactMailSync(sync);
       const previousSync = contactMailState.sync;
-      const noMailContextChanged = previousSync && ['state', 'executionId', 'startAt', 'cutoffAt'].some((key) => previousSync[key] !== sync[key]);
+      const noMailContextChanged = previousSync && ['state', 'executionId', 'startAt', 'cutoffAt', 'noMailContextToken'].some((key) => previousSync[key] !== sync[key]);
       const startAt = typeof sync.startAt === 'string' && Number.isFinite(Date.parse(sync.startAt)) ? new Date(sync.startAt).toISOString() : null;
       const changed = contactMailState.periodObserved && contactMailState.periodStartAt !== startAt;
       contactMailState.periodObserved = true;
@@ -1512,6 +1531,7 @@
       if (noMailContextChanged && contactMailState.case.noMail) {
         const previousNoMail = contactMailState.case.noMail;
         contactMailState.case.noMail = { eligible: false, contextToken: null, confirmation: null, stale: Boolean(previousNoMail.confirmation || previousNoMail.stale) };
+        contactMailState.case.sync = sync;
         contactMailState.case.noMailError = 'メール同期の状態が変わりました。更新して現在の確認状態を読み直してください。';
         if (contactMailState.case.status === 'loaded') renderContactMailView('case');
       }
@@ -1635,12 +1655,14 @@
           (executionId && sync.executionId !== executionId) ||
           sync.remainingPages !== (sync.state === 'running') || sync.enumerationComplete !== (sync.state === 'complete') ||
           typeof sync.historyAvailable !== 'boolean' || typeof sync.acceptanceReady !== 'boolean' ||
+          !(sync.noMailContextToken === null || typeof sync.noMailContextToken === 'string' && /^[a-f0-9]{64}$/.test(sync.noMailContextToken)) ||
           !['enumerate', 'finalize'].includes(sync.phase)) invalid();
       const counts = ['processedCount', 'pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount'];
       const unscoped = sync.startAt === null;
       if (counts.some((key) => unscoped && key !== 'processedCount' ? sync[key] !== null : !Number.isSafeInteger(sync[key]) || sync[key] < 0) ||
           (sync.coverageUnverifiedCaseCount !== null && (!Number.isSafeInteger(sync.coverageUnverifiedCaseCount) || sync.coverageUnverifiedCaseCount < 0))) invalid();
       if (unscoped && (!['not_started', 'needs_full_sync'].includes(sync.state) || sync.historyAvailable || sync.acceptanceReady || sync.coverageUnverifiedCaseCount !== null)) invalid();
+      if ((unscoped || sync.state !== 'complete') && sync.noMailContextToken !== null) invalid();
       const validDate = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 19) === value.slice(0, 19);
       if (sync.lastSuccessAt !== null && !validDate(sync.lastSuccessAt)) invalid();
       if (sync.state === 'not_started') {
@@ -1795,13 +1817,15 @@
       const current = contactMailState.issues;
       current.active = true;
       const serial = ++current.serial;
+      const observationSerial = contactMailState.syncObservationSerial;
       current.result = null;
       renderContactMailIssues('対象を確認中...');
       try {
         const result = contactMailResult(await callServer('listContactMailIssues', { kind: current.kind, pageToken: current.pageToken }));
         if (serial !== current.serial) return;
-        if (observeContactMailSync(result.sync)) return;
-        current.result = validateContactMailIssues(result, current.kind);
+        validateContactMailIssues(result, current.kind);
+        if (observeContactMailResponse(result.sync, observationSerial)) return;
+        current.result = result;
         renderContactMailIssues();
       } catch (error) {
         if (serial !== current.serial) return;
@@ -1867,6 +1891,7 @@
       if (current.scope === 'case') current.pendingNoMail = contactMailState.noMailRequests[current.caseId] || null;
       if (current.pendingNoMail) current.writing = false;
       const serial = ++current.serial;
+      const observationSerial = contactMailState.syncObservationSerial;
       ++current.detailSerial;
       current.urls.forEach((url) => URL.revokeObjectURL(url));
       Object.assign(current, { urls: [], messages: [], message: null, selectedIndex: -1, status: 'loading', error: '', pendingWrite: null, noMail: null, page: null, pageToken: options.pageToken || '' });
@@ -1875,10 +1900,11 @@
         const result = contactMailResult(await callServer('listContactMail', contactMailOptions(current, { pageToken: current.pageToken })));
         if (serial !== current.serial) return;
         validateContactMailList(result, current.scope, current.caseId);
-        if (observeContactMailSync(result.sync)) return;
+        const newerObservation = observationSerial !== contactMailState.syncObservationSerial;
+        if (observeContactMailResponse(result.sync, observationSerial)) return;
         current.messages = result.messages;
         current.page = result.page;
-        current.sync = result.sync;
+        current.sync = newerObservation ? contactMailState.sync : result.sync;
         current.noMail = current.scope === 'case' ? result.noMail : null;
         if (current.noMail && (current.noMail.confirmation || current.messages.length)) { delete contactMailState.noMailRequests[current.caseId]; current.pendingNoMail = null; current.noMailError = ''; }
         if (current.noMail && !current.pendingNoMail) current.noMailError = '';
@@ -2004,6 +2030,7 @@
       const current = contactMailState.queue;
       if (current.scope !== 'pending' || current.writing || viewerContext.authMode !== 'domain') return;
       const serial = current.serial;
+      const observationSerial = contactMailState.syncObservationSerial;
       current.writing = true;
       current.reconcileRequestId = current.reconcileRequestId || window.crypto.randomUUID();
       current.reconcileMessage = '照合待ちを再照合中...';
@@ -2012,7 +2039,7 @@
         const result = contactMailResult(await callServer('reconcileContactMailPending', { pageToken: current.reconcilePageToken || '', requestId: current.reconcileRequestId }));
         if (serial !== current.serial) return;
         if (!Number.isInteger(result.processedCount) || !result.page || typeof result.page.nextPageToken !== 'string') throw new Error('MAIL_INVALID_RESPONSE');
-        if (observeContactMailSync(result.sync)) return;
+        if (observeContactMailResponse(result.sync, observationSerial)) return;
         current.reconcilePageToken = result.page.nextPageToken;
         current.reconcileRequestId = '';
         current.reconcileMessage = `${result.processedCount}件を再照合しました。${current.reconcilePageToken ? '続行ボタンで次へ進めます。' : 'この回の再照合は完了です。'}`;
@@ -2054,7 +2081,7 @@
         const noMail = validateContactCaseNoMail(result.noMail, result.sync);
         if (!noMail.confirmation || noMail.stale) throw new Error('MAIL_INVALID_RESPONSE');
         if (observationSerial !== contactMailState.syncObservationSerial &&
-          ['state', 'executionId', 'startAt', 'cutoffAt'].some((key) => result.sync[key] !== contactMailState.sync?.[key])) {
+          !sameContactMailSyncObservation(result.sync, contactMailState.sync)) {
           current.writing = false;
           current.noMailError = 'メール同期の状態が変わりました。更新して現在の確認状態を読み直してください。';
           renderContactMailView(view);

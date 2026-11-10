@@ -287,7 +287,8 @@ test('GAS advance pre-dispatch config and identity failures carry exact not-sent
 const summary = (messageId = 'mail1', extra = {}) => ({ messageId, threadId: 'thread1', caseId, matchState: 'matched', version: 1, internalDate: '2026-11-10T00:00:00Z', subject: '件名', from: 'sender@example.com', to: 'customer@speed-ad.com', direction: 'received', attachmentCount: 0, firstReview: null, unavailable: false, ...extra });
 const detail = (messageId = 'mail1', extra = {}) => ({ ...summary(messageId), bodyText: '本文', bodyAvailability: 'verified', reviewReady: true, attachments: [], ...extra });
 const sync = { unknownClosureCaseCount: 0, expiredCaseCount: 0, executionId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', state: 'complete', lastSuccessAt: '2026-11-10T00:00:00Z', pendingCount: 0, unreviewedCount: 0, failedCount: 0, unavailableCount: 0, remainingPages: false, bodyUnverifiedCount: 1, bodyUnavailableCount: 0, attachmentUnverifiedCount: 0, attachmentUnavailableCount: 0, acceptanceReady: false, processedCount: 0, phase: 'enumerate', mode: 'full', cutoffAt: '2026-11-10T00:00:00Z', startAt: '2026-11-01T00:00:00.000Z', historyAvailable: true, enumerationComplete: true, coverageUnverifiedCaseCount: 0, unobservedDeletedCount: 0 };
-const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', ...extra } });
+sync.noMailContextToken = 'a'.repeat(64);
+const syncResponse = (executionId, state = 'running', extra = {}) => ({ ok: true, sync: { ...sync, executionId, state, remainingPages: state === 'running', enumerationComplete: state === 'complete', noMailContextToken: state === 'complete' ? sync.noMailContextToken : null, ...extra } });
 const syncCallResponse = (options, state = 'running', extra = {}) => {
   const result = syncResponse(options.executionId, state, extra);
   return options.confirmOnly ? { ...result, found: true, receipt: { sync: result.sync } } : result;
@@ -298,7 +299,7 @@ const catalogResponse = (options, total = 1) => {
   catalog.complete = !options.prepareCatalog && catalog.nextPageIndex === catalog.pageCount;
   return { ok: true, catalog };
 };
-const noMail = (extra = {}) => ({ eligible: false, contextToken: null, confirmation: null, stale: false, ...extra });
+const noMail = (extra = {}) => ({ eligible: false, contextToken: sync.noMailContextToken, confirmation: null, stale: false, ...extra });
 const noMailConfirmation = { email: 'reader@abroad-o.com', at: '2026-11-10T01:00:00.000Z', startAt: '2026-11-01T00:00:00.000Z', cutoffAt: '2026-11-10T00:00:00.000Z' };
 const list = (messages, page = {}) => ({ ok: true, messages, page: { nextPageToken: '', previousPageToken: '', pageSize: 50, ...page }, sync, noMail: noMail() });
 
@@ -612,10 +613,10 @@ test('case no-mail confirmation is explicit and reads back the server actor and 
 });
 
 test('no-mail UI rejects malformed eligibility and shows stale confirmation as requiring review', async () => {
-  const stale = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ stale: true, eligible: true, contextToken: 'b'.repeat(64) }) }) });
+  const stale = uiRuntime({ listContactMail: () => ({ ...list([]), sync: { ...sync, noMailContextToken: 'b'.repeat(64) }, noMail: noMail({ stale: true, eligible: true, contextToken: 'b'.repeat(64) }) }) });
   await stale.ui.loadContactMailList('case', { caseId });
   assert.match(stale.element('caseMailSection').innerHTML, /失効しています。再確認が必要/);
-  for (const value of [undefined, noMail({ eligible: true }), noMail({ confirmation: { ...noMailConfirmation, email: 'other@example.com' } }),
+  for (const value of [undefined, noMail({ eligible: true, contextToken: null }), noMail({ confirmation: { ...noMailConfirmation, email: 'other@example.com' } }),
     noMail({ confirmation: { ...noMailConfirmation, cutoffAt: '2026-11-09T00:00:00.000Z' } }), noMail({ unexpected: true })]) {
     const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: value }) });
     await app.ui.loadContactMailList('case', { caseId });
@@ -681,6 +682,79 @@ test('new sync observation and auth loss prevent a late no-mail confirmation fro
     if (authLoss) { assert.equal(app.element('caseMailSection').innerHTML, ''); assert.equal(app.mail.case.pendingNoMail, null); assert.equal(Object.keys(app.mail.noMailRequests).length, 0); }
     else { assert.equal(app.mail.case.noMail.confirmation, null); assert.ok(app.mail.case.pendingNoMail); assert.match(app.element('caseMailSection').innerHTML, /同期の状態が変わりました/); }
   }
+});
+
+test('late case list cannot restore an old no-mail confirmation after a newer sync observation', async () => {
+  let completeOld; let first = true;
+  const latest = { ...sync, noMailContextToken: 'b'.repeat(64) };
+  const app = uiRuntime({ listContactMail: () => first ? (first = false, new Promise((resolve) => { completeOld = resolve; })) :
+    { ...list([]), sync: latest, noMail: noMail({ eligible: true, contextToken: latest.noMailContextToken, stale: true }) },
+  getContactMailSyncStatus: () => ({ ok: true, sync: latest }) });
+  const waiting = app.ui.loadContactMailList('case', { caseId });
+  await new Promise((resolve) => setImmediate(resolve));
+  await app.ui.loadContactMailSyncStatus();
+  completeOld({ ...list([]), noMail: noMail({ confirmation: noMailConfirmation }) }); await waiting;
+  assert.equal(app.mail.sync, latest);
+  assert.equal(app.mail.case.status, 'failed');
+  assert.equal(app.mail.case.noMail, null);
+  assert.doesNotMatch(app.element('caseMailSection').innerHTML, /関連メールなし確認済み|reader@abroad-o\.com/);
+  assert.match(app.element('caseMailSection').innerHTML, /前の応答を破棄.*更新して現在の条件/s);
+  assert.equal(app.calls.filter((call) => call.name === 'listContactMail').length, 1);
+  await app.ui.loadContactMailList('case');
+  assert.equal(app.mail.case.status, 'loaded');
+  assert.equal(app.mail.case.noMail.contextToken, latest.noMailContextToken);
+  assert.equal(app.mail.case.noMail.confirmation, null);
+});
+
+test('mapping or purge context changes invalidate displayed no-mail confirmation within the same sync', async () => {
+  for (const token of ['b'.repeat(64), null]) {
+    const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ confirmation: noMailConfirmation }) }) });
+    await app.ui.loadContactMailList('case', { caseId });
+    assert.match(app.element('caseMailSection').innerHTML, /関連メールなし確認済み/);
+    const latest = { ...sync, noMailContextToken: token };
+    app.ui.observeContactMailSync(latest);
+    assert.equal(app.mail.case.noMail.confirmation, null);
+    assert.equal(app.mail.case.noMail.eligible, false);
+    assert.equal(app.mail.case.sync, latest);
+    assert.match(app.element('caseMailSection').innerHTML, /失効しています。再確認が必要/);
+    assert.doesNotMatch(app.element('caseMailSection').innerHTML, /確認者: reader@abroad-o\.com|data-mail-no-mail-confirm/);
+  }
+});
+
+test('late residual and reconciliation responses cannot regress the observed no-mail context', async () => {
+  for (const operation of ['issues', 'reconcile']) {
+    let complete;
+    const latest = { ...sync, noMailContextToken: 'b'.repeat(64) };
+    const app = uiRuntime({ listContactMail: () => list([]),
+      listContactMailIssues: () => new Promise((resolve) => { complete = resolve; }),
+      reconcileContactMailPending: () => new Promise((resolve) => { complete = resolve; }) });
+    await app.ui.loadContactMailList('case', { caseId });
+    let waiting;
+    if (operation === 'issues') waiting = app.ui.loadContactMailIssues();
+    else { app.mail.queue.scope = 'pending'; app.mail.queue.status = 'loaded'; app.mail.queue.messages = []; app.mail.queue.page = list([]).page; app.mail.queue.sync = sync; waiting = app.ui.reconcileContactMailPendingFromUi(); }
+    await new Promise((resolve) => setImmediate(resolve));
+    app.ui.observeContactMailSync(latest);
+    complete(operation === 'issues' ? { ok: true, kind: 'pending', targets: [], scannedCount: 0, page: { pageSize: 50, nextPageToken: '' }, sync } :
+      { ok: true, processedCount: 0, page: { nextPageToken: '' }, sync });
+    await waiting;
+    assert.equal(app.mail.sync, latest);
+    if (operation === 'issues') assert.equal(app.mail.issues.result, null);
+    else { assert.ok(app.mail.queue.reconcileRequestId); assert.equal(app.mail.queue.writing, false); }
+    assert.match(app.element('mailQueueContent').innerHTML, /前の応答を破棄/);
+  }
+});
+
+test('no-mail context tokens are mandatory scalar values and must agree across case and sync observations', async () => {
+  for (const token of [undefined, ['a'.repeat(64)], 'A'.repeat(64)]) {
+    const app = uiRuntime();
+    assert.throws(() => app.ui.validateContactMailSync({ ...sync, noMailContextToken: token }), /MAIL_INVALID_RESPONSE/);
+  }
+  const app = uiRuntime({ listContactMail: () => ({ ...list([]), noMail: noMail({ contextToken: 'b'.repeat(64) }) }) });
+  await app.ui.loadContactMailList('case', { caseId });
+  assert.equal(app.mail.case.status, 'failed');
+  const blocked = uiRuntime({ listContactMail: () => ({ ...list([]), sync: { ...sync, pendingCount: 1 }, noMail: noMail({ eligible: true }) }) });
+  await blocked.ui.loadContactMailList('case', { caseId });
+  assert.equal(blocked.mail.case.status, 'failed');
 });
 
 test('foreground sync continues successful batches and retains unknown-result request ID for manual retry', async () => {
@@ -1060,7 +1134,7 @@ test('post-dispatch auth failure or timeout remains unknown and uses only receip
 });
 
 test('well-formed initial not-started sync status remains observable', async () => {
-  const initial = { ...sync, ...Object.fromEntries(['pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount', 'coverageUnverifiedCaseCount'].map((key) => [key, null])), state: 'not_started', executionId: null, mode: null, cutoffAt: null, startAt: null, lastSuccessAt: null, historyAvailable: false, enumerationComplete: false };
+  const initial = { ...sync, ...Object.fromEntries(['pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount', 'coverageUnverifiedCaseCount'].map((key) => [key, null])), state: 'not_started', executionId: null, mode: null, cutoffAt: null, startAt: null, lastSuccessAt: null, historyAvailable: false, enumerationComplete: false, noMailContextToken: null };
   const app = uiRuntime({ getContactMailSyncStatus: () => ({ ok: true, sync: initial }) });
   await app.ui.loadContactMailSyncStatus();
   assert.equal(app.mail.sync, initial);
@@ -1173,7 +1247,7 @@ test('review action stays unavailable until server confirms body and complete at
 test('unscoped initial and legacy sync status keeps unknown counts and permits an explicit full start', async () => {
   const unknownCounts = Object.fromEntries(['pendingCount', 'unreviewedCount', 'failedCount', 'unavailableCount', 'bodyUnverifiedCount', 'bodyUnavailableCount', 'attachmentUnverifiedCount', 'attachmentUnavailableCount', 'unobservedDeletedCount', 'coverageUnverifiedCaseCount'].map((key) => [key, null]));
   for (const state of ['not_started', 'needs_full_sync']) {
-    const stopped = { ...sync, ...unknownCounts, state, startAt: null, historyAvailable: false, enumerationComplete: false, acceptanceReady: false,
+    const stopped = { ...sync, ...unknownCounts, state, startAt: null, historyAvailable: false, enumerationComplete: false, acceptanceReady: false, noMailContextToken: null,
       ...(state === 'not_started' ? { executionId: null, mode: null, cutoffAt: null, lastSuccessAt: null } : {}) };
     const app = uiRuntime({ getContactMailSyncStatus: () => ({ ok: true, sync: stopped }),
       advanceContactMailSync: (options) => !options.executionId ? catalogResponse(options) : syncCallResponse(options, 'complete') });
@@ -1326,7 +1400,7 @@ test('newer observed counts cannot hide definite non-dispatch while post-dispatc
     let release;
     let first = true;
     const app = uiRuntime({
-      listContactMail: () => ({ ...list([]), sync: newer }),
+      listContactMail: () => ({ ...list([]), sync: newer, noMail: noMail({ contextToken: newer.noMailContextToken }) }),
       advanceContactMailSync: (options) => {
         const result = bridgeApp.api.advanceContactMailSync(options);
         if (!first) return result;
