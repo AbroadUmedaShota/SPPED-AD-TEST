@@ -212,12 +212,12 @@ function mailHistoryStartAt_(derivedStartAt) {
 function mailCurrentPeriodResult_(result) {
   if (!result.sync || result.sync.state === 'not_started') return result;
   var startAt = null;
-  try { startAt = mailHistoryStartAt_(); } catch (_error) { /* An unset period cannot verify old results. */ }
+  try { startAt = mailCatalogSource_().startAt; } catch (_error) { /* An invalid source cannot verify old results. */ }
   if (startAt && result.sync.startAt === startAt) return result;
-  result.sync.state = 'needs_full_sync';
+  if (result.sync.state !== 'running') result.sync.state = 'needs_full_sync';
   result.sync.acceptanceReady = false;
   result.sync.enumerationComplete = false;
-  result.sync.remainingPages = false;
+  result.sync.remainingPages = result.sync.state === 'running';
   result.sync.noMailContextToken = null;
   result.sync.errorCode = 'MAIL_PERIOD_REQUIRED';
   if (result.noMail) result.noMail = { eligible: false, contextToken: null, confirmation: null,

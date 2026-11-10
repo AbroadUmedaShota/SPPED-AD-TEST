@@ -403,6 +403,76 @@ test('a changed configured period projects old status as unverified without rewr
   assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, false);
 });
 
+test('an earlier corrected Sheet receipt invalidates old readiness and no-mail confirmation', () => {
+  const startAt = '2026-11-08T15:00:00.000Z';
+  const dates = ['2026-11-10T00:00:00.000Z'];
+  const app = bridgeRuntime({ dates, historyStartAt: startAt });
+  app.respond(() => ({ ok: true, sync: { ...sync, startAt, bodyUnverifiedCount: 0, acceptanceReady: true },
+    noMail: { eligible: true, contextToken: sync.noMailContextToken,
+      confirmation: { ...noMailConfirmation, startAt }, stale: false } }));
+  assert.equal(app.api.getContactMailSyncStatus().sync.acceptanceReady, true);
+  dates[0] = '2026-10-01T00:00:00.000Z';
+  const result = app.api.getContactMailSyncStatus();
+  assert.equal(result.sync.startAt, startAt);
+  assert.equal(result.sync.state, 'needs_full_sync');
+  assert.equal(result.sync.acceptanceReady, false);
+  assert.equal(result.noMail.eligible, false);
+  assert.equal(result.noMail.confirmation, null);
+  assert.equal(result.noMail.stale, true);
+  const ui = uiRuntime();
+  ui.ui.validateContactMailSync(result.sync);
+  ui.ui.validateContactCaseNoMail(result.noMail, result.sync);
+});
+
+test('changed period preserves old running batches across reload and permits a new full sync after completion', async () => {
+  for (const reload of [false, true]) {
+    const oldStartAt = '2026-11-08T15:00:00.000Z';
+    const newStartAt = '2026-10-01T15:00:00.000Z';
+    const executionId = randomUUID();
+    const bridgeApp = bridgeRuntime({ historyStartAt: oldStartAt });
+    let batches = 0;
+    const status = () => syncResponse(executionId, batches < 3 ? 'running' : 'complete', {
+      startAt: oldStartAt, processedCount: batches * 5, bodyUnverifiedCount: 0, acceptanceReady: batches === 3
+    });
+    bridgeApp.respond((envelope) => {
+      if (envelope.operation === 'getSyncStatus') return status();
+      if (envelope.operation === 'uploadCaseCatalog') return { ok: true, catalog: { complete: true } };
+      assert.equal(envelope.operation, 'advanceSync');
+      if (envelope.payload.executionId === executionId) {
+        assert.equal(envelope.payload.mode, undefined);
+        batches++;
+        return status();
+      }
+      assert.equal(batches, 3);
+      assert.equal(envelope.payload.mode, 'full');
+      assert.equal(envelope.payload.startAt, newStartAt);
+      return syncResponse(envelope.payload.executionId, 'complete', {
+        startAt: newStartAt, processedCount: 15, bodyUnverifiedCount: 0, acceptanceReady: true
+      });
+    });
+    bridgeApp.setHistoryStartAt(newStartAt);
+    const app = uiRuntime({
+      getContactMailSyncStatus: () => bridgeApp.api.getContactMailSyncStatus(),
+      advanceContactMailSync: (options) => bridgeApp.api.advanceContactMailSync(options)
+    });
+    if (!reload) app.mail.syncProgress = { executionId, started: true };
+    await app.ui.loadContactMailSyncStatus();
+    assert.equal(app.mail.sync.state, 'running');
+    assert.equal(app.mail.sync.acceptanceReady, false);
+    if (!reload) assert.equal(app.mail.syncProgress.executionId, executionId);
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(batches, 3);
+    assert.equal(app.mail.sync.state, 'needs_full_sync');
+    assert.equal(app.mail.sync.acceptanceReady, false);
+    assert.equal(app.mail.syncProgress, null);
+    assert.equal(bridgeApp.calls.filter((call) => call.envelope.operation === 'uploadCaseCatalog').length, 0);
+    await app.ui.advanceContactMailSyncFromUi();
+    assert.equal(app.mail.sync.state, 'complete');
+    assert.equal(app.mail.sync.startAt, newStartAt);
+    assert.equal(app.mail.sync.acceptanceReady, true);
+  }
+});
+
 test('mail UI navigates individual messages across page boundaries and renders text safely', async () => {
   const app = uiRuntime({
     listContactMail: (options) => options.pageToken === 'next' ? list([summary('mail3')], { previousPageToken: 'previous' }) : list([summary('mail1'), summary('mail2')], { nextPageToken: 'next' }),
