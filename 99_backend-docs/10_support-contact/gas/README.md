@@ -37,7 +37,7 @@
 2026-06-22 時点の追加運用値:
 
 ```text
-CONTACT_NOTIFY_EMAIL=customer@speed-ad.com,s-umeda@abroad-o.com,t-hayashi@abroad-o.com
+CONTACT_NOTIFY_EMAIL=customer@speed-ad.com,speed-ad-support@abroad-o.com
 CONTACT_VIEWER_BASE_URL=https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec
 CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 CONTACT_TEST_MODE_TOKEN=<Script Properties only>
@@ -150,8 +150,8 @@ Apps Script エディタ上で、Web App 公開前に以下の関数を手動実
 - `testMode:true` かつ不正な `testModeToken` では保存・メール送信前に `ok:false` になること。
 - honeypot が埋まっている、またはフォーム表示からの経過時間が短すぎる投稿は `ok:false` で拒否されること。
 - Turnstile トークンが欠落・不正・失効・再利用・hostname/action 不一致、または検証API障害のときは保存前に `ok:false` で拒否されること。
-- 社内通知メールの件名に問い合わせ種別が含まれること。
-- 社内通知メールに `submission_id`、問い合わせ種別、投稿者メールアドレス、確認アプリ詳細URLが含まれること。
+- 社内通知メールの件名は固定の「新規お問い合わせ」とし、本文に `submission_id`、受付日時、問い合わせ種別、確認アプリ詳細URLだけが含まれること。投稿者情報、問い合わせ本文、Sheet・Driveの直接リンクは含めない。
+- 社内通知の返信先は `CONTACT_REPLY_TO_EMAIL` とし、投稿者メールアドレスへ直接返信しないこと。
 
 2026-06-21 検証:
 

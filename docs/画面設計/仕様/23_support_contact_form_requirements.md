@@ -55,7 +55,7 @@ last_reviewed: 2026-07-11
 7. 添付画像がある場合は Drive フォルダへ保存する。
 8. 投稿内容を `contact_submissions` シートへ記録する。
 9. `CONTACT_FROM_EMAIL` を From にできるか確認し、使えない場合はGAS実行ユーザーから送信して Reply-To を `CONTACT_REPLY_TO_EMAIL` にする。
-10. `SUPPORT_CONTACT_NOTIFY_EMAIL` へ社内通知メールを送信する。早期検知を優先し、社内通知は投稿者向け受付メールより先に送る。通知の主導線は確認アプリの詳細URLとする。
+10. GAS Script Property `CONTACT_NOTIFY_EMAIL` の公式窓口と通知グループへ社内通知メールを送信する。早期検知を優先し、社内通知は投稿者向け受付メールより先に送る。通知の主導線は確認アプリの詳細URLとする。
 11. 投稿者へ受付メールを送信する。
 12. 保存、社内通知、投稿者向けメール送信が成功した場合に、完了画面を表示する。
 
@@ -137,10 +137,10 @@ Content-Type: text/plain;charset=utf-8
 ### 4.2 社内通知メール
 
 - From: `CONTACT_FROM_EMAIL`。GAS実行ユーザーまたはGmail aliasとして利用できない場合はGAS実行ユーザー。
-- To: `SUPPORT_CONTACT_NOTIFY_EMAIL`。カンマ、セミコロン、改行区切りで複数宛先を指定可能。
-- Reply-To: 投稿者が入力したメールアドレス
-- 件名: `【SPEED AD】お問い合わせ: [{問い合わせ種別}] {件名}`
-- 本文: 確認アプリ詳細URL、投稿内容、投稿日時、投稿者メールアドレス、保存先行 ID を含める。確認アプリ詳細URLには `id` と確認用 `#token` を付与する。確認用トークンはURLフラグメントに置き、Apps Script の初回リクエストやサーバー側アクセスログへ載せない。Spreadsheet URL と該当行リンクは予備情報とし、通常確認は確認アプリ上で完結させる。
+- To: `CONTACT_NOTIFY_EMAIL`。本番値は公式窓口 `customer@speed-ad.com` と通知グループ `speed-ad-support@abroad-o.com`。グループの会話閲覧はメンバー限定、参加は招待制とする。
+- Reply-To: `CONTACT_REPLY_TO_EMAIL`。標準値は公式窓口 `customer@speed-ad.com` とし、投稿者へ直接返信しない。
+- 件名: `【SPEED AD】新規お問い合わせ`。
+- 本文: 受付ID、受付日時、問い合わせ種別、認証付き確認アプリへの `?id=` リンクのみを案内する。投稿者の氏名・メール・件名・本文、Sheet・Driveの直接リンク、共有トークンは含めない。
 - テストモード時は社内通知メールと投稿者向け受付メールの To を `s-umeda@abroad-o.com` のみにし、件名へ `【TEST】`、本文へテスト投稿である旨を含める。
 
 ### 4.3 確認アプリ UX
@@ -148,7 +148,7 @@ Content-Type: text/plain;charset=utf-8
 - 初期一覧は `未対応` と `対応中` を優先表示し、`すべて` と個別ステータスへ切り替えできる。
 - 一覧の上部に `未対応` / `対応中` / `保留` / `対応済み` の件数と全体件数を表示する。
 - 行には受付日時、経過時間、問い合わせ種別、添付数、現在状態を並べる。
-- 詳細には `対応中にする` / `対応済みにする` / `保留にする` のクイック操作、保存成功メッセージ、返信メール作成リンクを置く。
+- 詳細には `対応中にする` / `対応済みにする` / `保留にする` のクイック操作、保存成功メッセージ、公式窓口から返信する案内を置く。個人のメールソフトを開く顧客宛てリンクは置かない。
 - 未保存のステータスや内部メモがあるまま別の問い合わせへ移動する場合は確認を出す。
 - 添付はインライン表示に加えて、クリックで大きいビューアを開き、前後移動できる。
 - 添付ビューアは開いた時に閉じるボタンへフォーカスし、閉じた時に元の添付サムネイルへフォーカスを戻す。
@@ -220,7 +220,7 @@ GAS側 Script Properties:
 - `CONTACT_SHEET_NAME`
 - `CONTACT_MAX_ATTACHMENT_MB`
 - `CONTACT_VIEWER_BASE_URL`
-- `CONTACT_VIEWER_ACCESS_TOKEN`
+- `CONTACT_VIEWER_ACCESS_TOKEN`（旧確認アプリ用。現行の認証付き確認アプリでは設定しない）
 - `CONTACT_TEST_MODE_TOKEN`
 - `CONTACT_TURNSTILE_SECRET`
 
