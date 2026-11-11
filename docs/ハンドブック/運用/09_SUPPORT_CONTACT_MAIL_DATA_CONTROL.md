@@ -74,7 +74,7 @@ DesktopクライアントのIDとsecretは続けて非表示入力します。�
 
 `closed_at`を更新しない旧版へ巻戻す場合は期限削除を停止し、期間中の状態更新を全件監査します。現行版へ戻した後、影響した終了日時を根拠で再確認するか空にするまで再開しません。監査範囲が不明なら全案件を終了日未確認として扱います。詳細は[巻戻し手順](../デプロイ/10_SUPPORT_CONTACT_MAIL_OPERATIONS.md#7-巻戻し)に従います。
 
-確認済みの個別案件削除と、除外確定後3年を過ぎたメールの削除には[管理者用のdry-run・適用手順](10_SUPPORT_CONTACT_MAIL_PURGE.md)を使います。再取込・再処理防止のため、同じGmailメールID、削除済み案件ID、削除対象となった操作要求IDのhashを保持し、件名・宛先・確認者は削除します。新しい返信は新しい照合待ちになり得ます。Gmail原本が存在しないことを完全な列挙で証明してから、最小メールIDマーカーを整理する運用が必要です。案件ID・操作要求IDマーカーの保持条件は本番前に確定します。
+確認済みの個別案件削除と、除外確定後3年を過ぎたメールの削除には[管理者用のdry-run・適用手順](10_SUPPORT_CONTACT_MAIL_PURGE.md)を使います。再取込・再処理防止のため、同じGmailメールID、削除済み案件ID、削除対象となった操作要求IDのhashを保持し、件名・宛先・確認者は削除します。新しい返信は新しい照合待ちになり得ます。Gmail原本が存在しないことを完全な列挙で証明してから、最小メールIDマーカーを整理します。案件ID由来hashは正本Sheetに案件が残る間保持し、正本全件で不在を確認した後に管理者が手動で削除します。操作要求ID由来hashは操作IDの発行から7日の期限後に手動で整理します。
 
 
 通知と同意の要件は[Google Workspace user data policy](https://developers.google.com/workspace/workspace-api-user-data-developer-policy#transparent-and-accurate-notice-and-control)、Google側の接続解除は[Googleアカウントの接続管理](https://myaccount.google.com/connections)を参照してください。
