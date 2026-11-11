@@ -929,7 +929,6 @@
       state.detail = submission;
       state.dirty = false;
       const attachments = submission.attachments || [];
-      const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
       const sourceUrl = safeHttpUrl(submission.source_url);
       const currentStatus = submission.handled_status || '未対応';
       detailView.innerHTML = `
@@ -969,7 +968,7 @@
             <div class="save-row">
               <div class="status-note">
                 <p class="muted" id="statusSaveMessage"></p>
-                <a href="${escapeHtml(replyMailHref)}" target="_blank" rel="noopener noreferrer" id="replyMailLink">返信メールを作成</a>
+                <span id="replyMailLink">お客様への返信は公式窓口 customer@speed-ad.com のメールで行ってください。</span>
               </div>
               <span class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</span>
             </div>

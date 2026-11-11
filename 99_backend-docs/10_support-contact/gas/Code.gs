@@ -168,7 +168,7 @@ function submitContact_(payload) {
 
   var fromState = getFromState_();
   try {
-    sendInternalNotification_(normalized, attachmentRefs, sheetLink, fromState);
+    sendInternalNotification_(normalized, receivedAt, fromState);
     sendUserReceipt_(normalized, fromState);
     updateSubmission_(normalized.submissionId, {
       mail_status: 'sent'
@@ -585,12 +585,12 @@ function sendUserReceipt_(payload, fromState) {
   sendEmail_(getUserReceiptEmail_(payload), subject, body, fromEmail, replyTo, fromState);
 }
 
-function sendInternalNotification_(payload, attachmentRefs, sheetLink, fromState) {
+function sendInternalNotification_(payload, receivedAt, fromState) {
   var fromEmail = getProperty_('CONTACT_FROM_EMAIL', DEFAULT_FROM_EMAIL);
   var notifyEmails = getInternalNotifyEmails_(payload);
   var viewerDetailUrl = buildViewerDetailUrl_(payload.submissionId);
   var subjectPrefix = payload.testMode ? '【TEST】【SPEED AD】' : '【SPEED AD】';
-  var subject = subjectPrefix + 'お問い合わせ: [' + payload.contactTypeLabel + '] ' + payload.subject;
+  var subject = subjectPrefix + '新規お問い合わせ';
   var body = [
     payload.testMode
       ? 'SPEED AD サポート問い合わせのテスト投稿を受け付けました。メール通知は梅田さんのみに送信しています。'
@@ -599,23 +599,13 @@ function sendInternalNotification_(payload, attachmentRefs, sheetLink, fromState
     '確認アプリ: ' + (viewerDetailUrl || 'CONTACT_VIEWER_BASE_URL 未設定'),
     '',
     '受付ID: ' + payload.submissionId,
-    '問い合わせ種別: ' + payload.contactTypeLabel + ' (' + payload.contactType + ')',
-    'お名前: ' + (payload.name || '-'),
-    'メールアドレス: ' + payload.email,
-    '件名: ' + payload.subject,
-    '投稿元URL: ' + (payload.sourceUrl || '-'),
+    '受付日時: ' + receivedAt,
+    '問い合わせ種別: ' + payload.contactTypeLabel,
     '',
-    '--- 本文 ---',
-    payload.message,
-    '',
-    '--- 予備情報 ---',
-    'Spreadsheet: ' + sheetLink.spreadsheetUrl,
-    '該当行: ' + sheetLink.rowUrl,
-    'シート: ' + sheetLink.sheetName + ' / ' + sheetLink.rowNumber + '行目',
-    '添付: ' + (attachmentRefs.length ? attachmentRefs.join('\n') : '-')
+    '内容と添付は確認アプリで確認してください。この通知には返信しないでください。'
   ].join('\n');
 
-  sendEmail_(notifyEmails, subject, body, fromEmail, payload.testMode ? TEST_NOTIFY_EMAIL : payload.email, fromState);
+  sendEmail_(notifyEmails, subject, body, fromEmail, payload.testMode ? TEST_NOTIFY_EMAIL : getProperty_('CONTACT_REPLY_TO_EMAIL', fromEmail), fromState);
 }
 
 function getInternalNotifyEmails_(payload) {
