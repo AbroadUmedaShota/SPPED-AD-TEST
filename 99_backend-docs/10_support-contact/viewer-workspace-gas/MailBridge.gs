@@ -1,0 +1,355 @@
+/** Authenticated, fixed-operation bridge to the separately deployed mail service. */
+// A 2 MiB decoded body can grow when JSON escapes quotes, backslashes and controls.
+// Keep this getMail-only ceiling aligned with MAX_MAIL_DETAIL_JSON_CHARS in service.mjs.
+var MAIL_DETAIL_RESPONSE_CHARS = 16 * 1024 * 1024;
+var MAIL_SAFE_ERROR_CODES = [
+  'MAIL_NOT_CONFIGURED', 'MAIL_SERVICE_AUTH', 'MAIL_SERVICE_UNAVAILABLE',
+  'MAIL_INVALID_RESPONSE', 'INVALID_REQUEST', 'NOT_FOUND', 'CONFLICT',
+  'MAIL_UNAVAILABLE', 'ATTACHMENT_UNAVAILABLE', 'SYNC_INCOMPLETE',
+  'AUTH_REQUIRED', 'FORBIDDEN', 'HISTORY_EXPIRED', 'MAIL_AUTH_REQUIRED', 'MAIL_FORBIDDEN',
+  'MAIL_INVALID_REQUEST', 'MAIL_ATTACHMENT_NOT_FOUND', 'MAIL_CATALOG_INVALID', 'MAIL_REQUEST_CONFLICT', 'MAIL_REQUEST_EXPIRED',
+  'MAIL_SYNC_BUSY', 'MAIL_CONTENT_UNAVAILABLE', 'MAIL_HISTORY_EXPIRED', 'MAIL_INVALID_UPSTREAM',
+  'MAIL_MAILBOX_MISMATCH', 'MAIL_UPSTREAM_FAILED', 'MAIL_UPSTREAM_TIMEOUT', 'MAIL_NOT_FOUND',
+  'MAIL_REQUEST_TOO_LARGE', 'MAIL_ATTACHMENT_UNAVAILABLE', 'MAIL_ATTACHMENT_BUSY', 'MAIL_CASE_NOT_FOUND',
+  'MAIL_CATALOG_INCOMPLETE', 'MAIL_CATALOG_CHANGED', 'MAIL_CATALOG_UNVERIFIED', 'MAIL_REQUEST_RECORDED_CATALOG_CHANGED', 'MAIL_FULL_SYNC_REQUIRED', 'MAIL_MAPPING_CHANGED', 'MAIL_SYNC_COMPLETE', 'MAIL_SYNC_FAILED',
+  'MAIL_SCOPE_MISMATCH', 'MAIL_PERIOD_REQUIRED', 'MAIL_PERIOD_NARROWING', 'MAIL_PERIOD_EXPANSION_REQUIRED', 'MAIL_RETENTION_EXPIRED', 'MAIL_RECORDS_DELETED', 'MAIL_MAINTENANCE'
+];
+
+function listContactMail(options, authProof) {
+  var context = requireViewer_(authProof);
+  var payload = mailScopePayload_(options);
+  payload.pageToken = mailString_(options && options.pageToken, 4096, true);
+  var operation = payload.scope === 'case' ? 'listCaseMail' : (payload.scope === 'pending' ? 'listPendingMail' : 'listUnreviewedMail');
+  return callMailService_(operation, payload, context);
+}
+
+function getContactMailMessage(options, authProof) {
+  var context = requireViewer_(authProof);
+  var payload = mailScopePayload_(options);
+  payload.messageId = mailMessageId_(options && options.messageId);
+  return callMailService_('getMail', payload, context);
+}
+
+function getContactMailAttachmentChunk(options, authProof) {
+  var context = requireViewer_(authProof);
+  var payload = mailScopePayload_(options);
+  payload.messageId = mailMessageId_(options && options.messageId);
+  payload.partId = String(options && options.partId || '');
+  if (!/^0(?:\.\d+)*$/.test(payload.partId) || payload.partId.length > 64) throw new Error('メール添付の指定が不正です。');
+  payload.offset = options && options.offset;
+  if (typeof payload.offset !== 'number' || !isFinite(payload.offset) || payload.offset < 0 || Math.floor(payload.offset) !== payload.offset || payload.offset > 67108864) throw new Error('メール添付の取得位置が不正です。');
+  return callMailService_('getAttachmentChunk', payload, context);
+}
+
+function markContactMailReviewed(options, authProof) {
+  var context = requireViewer_(authProof);
+  var payload = mailScopePayload_(options);
+  if (payload.scope === 'pending') throw new Error('照合待ちメールは案件を確定してから確認してください。');
+  payload.messageId = mailMessageId_(options && options.messageId);
+  payload.expectedVersion = mailVersion_(options && options.expectedVersion);
+  return callMailService_('markReviewed', payload, context, mailRequestId_(options && options.requestId));
+}
+
+function confirmContactCaseNoMail(options, authProof) {
+  var context = requireViewer_(authProof);
+  var caseId = mailCaseId_(options && options.caseId);
+  var contextToken = options && options.contextToken;
+  if (typeof contextToken !== 'string' || !/^[a-f0-9]{64}$/.test(contextToken)) throw new Error('関連メールなし確認の対象条件が不正です。');
+  if (!options || typeof options.requestId !== 'string' || !options.requestId) throw new Error('メール操作の識別子が必要です。');
+  var requestId = mailRequestId_(options.requestId);
+  var status = callMailService_('getSyncStatus', {}, context);
+  if (!status.ok) return status;
+  var source;
+  try { source = mailCatalogSource_(); } catch (_error) { return mailError_('MAIL_CATALOG_CHANGED'); }
+  if (!status.sync || status.sync.state !== 'complete' || status.sync.catalogDigest !== source.digest ||
+      status.sync.startAt !== source.startAt || status.sync.noMailContextToken !== contextToken) return mailError_('MAIL_CATALOG_CHANGED');
+  return callMailService_('confirmCaseNoMail', { caseId: caseId, contextToken: contextToken }, context, requestId);
+}
+
+function resolveContactMailPending(options, authProof) {
+  var context = requireViewer_(authProof);
+  var action = String(options && options.action || '');
+  if (['match', 'exclude'].indexOf(action) === -1) throw new Error('照合操作が不正です。');
+  var payload = {
+    messageId: mailMessageId_(options && options.messageId),
+    action: action,
+    reason: mailString_(options && options.reason, 1000, false).trim(),
+    expectedVersion: mailVersion_(options && options.expectedVersion)
+  };
+  if (action === 'match') payload.caseId = mailCaseId_(options && options.caseId);
+  return callMailService_('resolvePending', payload, context, mailRequestId_(options && options.requestId));
+}
+
+function getContactMailSyncStatus(authProof) {
+  return callMailService_('getSyncStatus', {}, requireViewer_(authProof));
+}
+
+function listContactMailIssues(options, authProof) {
+  var context = requireViewer_(authProof);
+  var kind = String(options && options.kind || '');
+  if (['pending', 'unreviewed', 'unavailable', 'bodyUnverified', 'bodyUnavailable', 'attachmentUnverified', 'attachmentUnavailable', 'failed', 'coverage', 'deleted', 'unknownClosure', 'expiredRetention'].indexOf(kind) === -1) throw new Error('残件の表示対象が不正です。');
+  return callMailService_('listMailIssues', { kind: kind, pageToken: mailString_(options && options.pageToken, 2048, true) }, context);
+}
+
+function reconcileContactMailPending(options, authProof) {
+  var context = requireViewer_(authProof);
+  if (context.authMode !== 'domain') throw new Error('メール再照合を実行する権限がありません。');
+  return callMailService_('reconcilePending', { pageToken: mailString_(options && options.pageToken, 4096, true) }, context, mailRequestId_(options && options.requestId));
+}
+
+function advanceContactMailSync(options, authProof) {
+  var context = requireViewer_(authProof);
+  if (context.authMode !== 'domain') throw new Error('メール同期を実行する権限がありません。');
+  options = options || {};
+  if (options.executionId) {
+    var executionId = mailUuid_(options.executionId);
+    var requestId = mailRequestId_(options.requestId);
+    var payload = { executionId: executionId };
+    if (options.mode != null) {
+      if (['full', 'history'].indexOf(options.mode) === -1) throw new Error('メール同期の指定が不正です。');
+      payload.mode = options.mode;
+      if (!/^[a-f0-9]{64}$/.test(String(options.catalogDigest || ''))) throw new Error('受付ID照合のダイジェストが不正です。');
+      payload.catalogSnapshotId = mailUuid_(options.catalogSnapshotId);
+      payload.catalogDigest = options.catalogDigest;
+      var plannedStartAt = options.catalogStartAt;
+      if (typeof plannedStartAt !== 'string' || !isFinite(mailSubmittedAtMillis_(plannedStartAt)) || new Date(plannedStartAt).toISOString() !== plannedStartAt) throw new Error('同期対象期間が不正です。');
+      if (options.confirmOnly !== true) {
+        var source;
+        try { source = mailCatalogSource_(); } catch (error) {
+          return mailPreDispatchError_('advanceSync', payload, requestId, error.message === 'MAIL_PERIOD_REQUIRED' ? 'MAIL_PERIOD_REQUIRED' : 'MAIL_CATALOG_INVALID');
+        }
+        if (options.catalogDigest !== source.digest || plannedStartAt !== source.startAt) return mailPreDispatchError_('advanceSync', payload, requestId, 'MAIL_CATALOG_CHANGED');
+      }
+      payload.startAt = plannedStartAt;
+    }
+    if (options.resume === true) payload.resume = true;
+    if (options.confirmOnly === true) {
+      if (!options.requestId) throw new Error('確認する同期要求の識別子が必要です。');
+      return callMailService_('getSyncRequestResult', { requestId: requestId, requestPayload: payload }, context);
+    }
+    return callMailService_('advanceSync', payload, context, requestId);
+  }
+  var source = mailCatalogSource_();
+  var ids = source.ids;
+  var digest = source.digest;
+  var pageCount = Math.max(1, Math.ceil(ids.length / 200));
+  var previous = options.catalog || {};
+  var snapshotId = mailUuid_(previous.snapshotId);
+  var catalogRequestId = previous.requestId || (options.prepareCatalog === true ? mailRequestId_() : '');
+  mailCatalogRequestId_(catalogRequestId, snapshotId, 0);
+  if (options.prepareCatalog === true) return { ok: true, catalog: { snapshotId: snapshotId, requestId: catalogRequestId, digest: digest, nextPageIndex: 0, pageCount: pageCount, total: ids.length, complete: false, startAt: source.startAt } };
+  var pageIndex = previous.nextPageIndex;
+  if (previous.digest !== digest || previous.pageCount !== pageCount || previous.total !== ids.length || previous.startAt !== source.startAt) return mailError_('CONFLICT');
+  if (!Number.isInteger(pageIndex) || pageIndex < 0 || pageIndex >= pageCount) throw new Error('受付ID照合のページが不正です。');
+  var lastResult;
+  var end = Math.min(pageCount, pageIndex + 5);
+  for (; pageIndex < end; pageIndex++) {
+    lastResult = callMailService_('uploadCaseCatalog', {
+      snapshotId: snapshotId, pageIndex: pageIndex, pageCount: pageCount, total: ids.length,
+      digest: digest, cases: source.cases.slice(pageIndex * 200, (pageIndex + 1) * 200)
+    }, context, mailCatalogRequestId_(catalogRequestId, snapshotId, pageIndex));
+    if (!lastResult.ok) return lastResult;
+  }
+  return { ok: true, catalog: { snapshotId: snapshotId, requestId: catalogRequestId, digest: digest, nextPageIndex: pageIndex, pageCount: pageCount, total: ids.length, complete: pageIndex === pageCount && !!(lastResult.catalog && lastResult.catalog.complete), startAt: source.startAt } };
+}
+
+function mailCatalogRequestId_(requestId, snapshotId, pageIndex) {
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(String(requestId || ''))) throw new Error('受付ID照合の操作識別子が不正です。');
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, requestId + '\n' + snapshotId + '\n' + pageIndex, Utilities.Charset.UTF_8);
+  var hex = bytes.map(function (byte) { return ('0' + ((byte + 256) % 256).toString(16)).slice(-2); }).join('');
+  return requestId.slice(0, 14) + '7' + hex.slice(0, 3) + '-' + ((parseInt(hex.charAt(3), 16) & 3) | 8).toString(16) + hex.slice(4, 7) + '-' + hex.slice(7, 19);
+}
+
+function mailCatalogSource_() {
+  var sheet = getSheet_();
+  var headers = ensureHeaders_(sheet);
+  var idColumn = headers.indexOf('submission_id');
+  var dateColumn = headers.indexOf('submitted_at');
+  var ids = [];
+  var cases = [];
+  var statusColumn = headers.indexOf('handled_status');
+  var closedColumn = headers.indexOf('closed_at');
+  if (statusColumn < 0 || closedColumn < 0) throw new Error('MAIL_CATALOG_INVALID');
+  var seen = {};
+  var earliest = Infinity;
+  var invalidDate = dateColumn < 0;
+  sheet.getDataRange().getValues().slice(1).forEach(function (row) {
+    var raw = String(row[idColumn] || '').trim();
+    if (!raw) return;
+    var id = mailUuid_(raw.toLowerCase());
+    if (seen[id]) throw new Error('受付IDが重複しているためメール同期を開始できません。');
+    seen[id] = true;
+    ids.push(id);
+    var status = String(row[statusColumn] || '').trim() || '未対応';
+    if (['未対応', '対応中', '対応済み', '保留'].indexOf(status) === -1) throw new Error('MAIL_CATALOG_INVALID');
+    var submittedMillis = dateColumn < 0 ? NaN : mailSubmittedAtMillis_(row[dateColumn]);
+    var rawClosed = row[closedColumn];
+    var closedAt = null;
+    if (rawClosed !== '' && rawClosed != null) {
+      var closedMillis = mailSubmittedAtMillis_(rawClosed);
+      if (status !== '対応済み' || !isFinite(closedMillis) || !isFinite(submittedMillis) || closedMillis < submittedMillis || closedMillis > Date.now()) throw new Error('MAIL_CATALOG_INVALID');
+      closedAt = new Date(closedMillis).toISOString();
+    }
+    cases.push({ caseId: id, handledStatus: status, closedAt: closedAt });
+    var value = dateColumn < 0 ? null : row[dateColumn];
+    var time = mailSubmittedAtMillis_(value);
+    if (!isFinite(time)) invalidDate = true;
+    else earliest = Math.min(earliest, time);
+  });
+  ids.sort();
+  cases.sort(function (a, b) { return a.caseId < b.caseId ? -1 : a.caseId > b.caseId ? 1 : 0; });
+  if (invalidDate || !isFinite(earliest)) throw new Error('MAIL_PERIOD_REQUIRED');
+  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, cases.map(function (item) { return JSON.stringify([item.caseId, item.handledStatus, item.closedAt]); }).join('\n'), Utilities.Charset.UTF_8).map(function (byte) {
+    return ('0' + ((byte + 256) % 256).toString(16)).slice(-2);
+  }).join('');
+  var day = 86400000;
+  var derivedStartAt = new Date(Math.floor((earliest + 32400000) / day) * day - 32400000 - day).toISOString();
+  var startAt = mailHistoryStartAt_(derivedStartAt);
+  return { ids: ids, cases: cases, digest: digest, startAt: startAt };
+}
+
+function mailHistoryStartAt_(derivedStartAt) {
+  var startAt = getProperty_('MAIL_HISTORY_START_AT', '');
+  var millis = mailSubmittedAtMillis_(startAt);
+  if (typeof startAt !== 'string' || !isFinite(millis) || new Date(millis).toISOString() !== startAt ||
+      (millis + 32400000) % 86400000 !== 0 || (derivedStartAt && startAt > derivedStartAt)) throw new Error('MAIL_PERIOD_REQUIRED');
+  return startAt;
+}
+
+function mailCurrentPeriodResult_(result) {
+  if (!result.sync || result.sync.state === 'not_started') return result;
+  var source = null;
+  try { source = mailCatalogSource_(); } catch (_error) { /* An invalid source cannot verify old results. */ }
+  if (source && result.sync.startAt === source.startAt && result.sync.catalogDigest === source.digest) return result;
+  if (result.sync.state !== 'running') result.sync.state = 'needs_full_sync';
+  result.sync.acceptanceReady = false;
+  result.sync.enumerationComplete = false;
+  result.sync.remainingPages = result.sync.state === 'running';
+  result.sync.noMailContextToken = null;
+  result.sync.errorCode = 'MAIL_PERIOD_REQUIRED';
+  if (result.noMail) result.noMail = { eligible: false, contextToken: null, confirmation: null,
+    stale: Boolean(result.noMail.confirmation || result.noMail.stale) };
+  return result;
+}
+
+function mailSubmittedAtMillis_(value) {
+  if (Object.prototype.toString.call(value) === '[object Date]') return value.getTime();
+  if (typeof value !== 'string') return NaN;
+  var match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(Z|[+-](\d{2}):?(\d{2}))$/.exec(value);
+  if (!match) return NaN;
+  var year = Number(match[1]), month = Number(match[2]), date = Number(match[3]);
+  var monthEnd = new Date(0);
+  monthEnd.setUTCFullYear(year, month, 0);
+  if (month < 1 || month > 12 || date < 1 || date > monthEnd.getUTCDate() || Number(match[4]) > 23 || Number(match[5]) > 59 || Number(match[6]) > 59 || Number(match[8] || 0) > 23 || Number(match[9] || 0) > 59) return NaN;
+  return Date.parse(value);
+}
+
+function mailUuid_(value) {
+  var id = String(value || '');
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(id)) throw new Error('受付IDまたは同期IDが不正です。');
+  return id;
+}
+
+function mailScopePayload_(options) {
+  var scope = String(options && options.scope || '');
+  if (['case', 'unreviewed', 'pending', 'issues'].indexOf(scope) === -1) throw new Error('メール表示対象が不正です。');
+  var payload = { scope: scope };
+  if (scope === 'case') payload.caseId = mailCaseId_(options && options.caseId);
+  return payload;
+}
+
+function mailCaseId_(value) {
+  var id = mailString_(value, 256, false).trim();
+  if (!findSubmission_(id)) throw new Error('問い合わせが見つかりません。');
+  return id;
+}
+
+function mailMessageId_(value) {
+  var id = String(value || '');
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(id)) throw new Error('メールの指定が不正です。');
+  return id;
+}
+
+function mailVersion_(value) {
+  if (typeof value !== 'number' || !isFinite(value) || value < 1 || Math.floor(value) !== value) throw new Error('メールの版が不正です。');
+  return value;
+}
+
+function mailRequestId_(value) {
+  if (!value) {
+    var stamp = new Date().getTime().toString(16);
+    while (stamp.length < 12) stamp = '0' + stamp;
+    return stamp.slice(0, 8) + '-' + stamp.slice(8) + '-7' + Utilities.getUuid().slice(15);
+  }
+  var id = String(value);
+  if (!/^[a-zA-Z0-9-]{16,80}$/.test(id)) throw new Error('メール操作の識別子が不正です。');
+  return id;
+}
+
+function mailString_(value, limit, optional) {
+  if (value == null && optional) return '';
+  if (typeof value !== 'string' || value.length > limit || (!optional && !value.trim())) throw new Error('メール操作の入力が不正です。');
+  return value;
+}
+
+function callMailService_(operation, payload, context, requestId) {
+  var serviceUrl = getProperty_('MAIL_SERVICE_URL', '');
+  if (!serviceUrl) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
+  // Only the configured Cloud Run origin is callable; redirects and arbitrary proxy URLs are forbidden.
+  if (!/^https:\/\/[a-z0-9][a-z0-9.-]*\.run\.app$/.test(serviceUrl)) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_NOT_CONFIGURED');
+  var guardedCatalog = ['listCaseMail', 'listUnreviewedMail', 'listPendingMail', 'listMailIssues', 'getMail',
+    'getAttachmentChunk', 'markReviewed', 'resolvePending', 'confirmCaseNoMail', 'reconcilePending'].indexOf(operation) !== -1;
+  var source = null;
+  if (guardedCatalog) {
+    try { source = mailCatalogSource_(); } catch (error) {
+      return mailError_(error.message === 'MAIL_PERIOD_REQUIRED' ? 'MAIL_PERIOD_REQUIRED' : 'MAIL_CATALOG_INVALID');
+    }
+  }
+  var identityToken;
+  try { identityToken = ScriptApp.getIdentityToken(); } catch (_error) { return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH'); }
+  if (!identityToken) return mailPreDispatchError_(operation, payload, requestId, 'MAIL_SERVICE_AUTH');
+  var envelope = {
+    contractVersion: 1,
+    operation: operation,
+    requestId: requestId || mailRequestId_(),
+    issuedAt: new Date().toISOString(),
+    actor: { email: context.email, authMode: context.authMode === 'google-oauth' ? 'customer-oauth' : 'domain' },
+    payload: payload
+  };
+  if (source) envelope.sourceCatalogDigest = source.digest;
+  try {
+    var response = UrlFetchApp.fetch(serviceUrl + '/rpc', {
+      method: 'post', contentType: 'application/json', payload: JSON.stringify(envelope),
+      headers: { Authorization: 'Bearer ' + identityToken },
+      muteHttpExceptions: true, followRedirects: false, validateHttpsCertificates: true
+    });
+    var status = response.getResponseCode();
+    var body = response.getContentText();
+    var responseLimit = operation === 'getMail' ? MAIL_DETAIL_RESPONSE_CHARS : 2097152;
+    if (body.length > responseLimit) return mailError_('MAIL_INVALID_RESPONSE');
+    var result;
+    try { result = JSON.parse(body); } catch (_parseError) { return mailError_(status === 401 || status === 403 ? 'MAIL_SERVICE_AUTH' : 'MAIL_SERVICE_UNAVAILABLE'); }
+    if (!result || typeof result !== 'object' || typeof result.ok !== 'boolean') return mailError_('MAIL_INVALID_RESPONSE');
+    if (!result.ok) return mailError_(result.error && result.error.code);
+    if (status !== 200) return mailError_('MAIL_INVALID_RESPONSE');
+    if (source) {
+      var latest;
+      try { latest = mailCatalogSource_(); } catch (_sourceError) { return mailError_('MAIL_CATALOG_UNVERIFIED'); }
+      if (latest.digest !== source.digest || latest.startAt !== source.startAt) return mailError_('MAIL_CATALOG_UNVERIFIED');
+    }
+    return mailCurrentPeriodResult_(result);
+  } catch (_error) {
+    // Do not expose or log service responses, tokens, message bodies, or exception details.
+    return mailError_('MAIL_SERVICE_UNAVAILABLE');
+  }
+}
+
+function mailPreDispatchError_(operation, payload, requestId, code) {
+  if (operation !== 'advanceSync') return mailError_(code);
+  return { ok: false, error: { code: 'MAIL_SYNC_NOT_DISPATCHED', cause: code },
+    dispatch: { sent: false, operation: operation, requestId: requestId, executionId: payload.executionId } };
+}
+
+function mailError_(code) {
+  return { ok: false, error: { code: MAIL_SAFE_ERROR_CODES.indexOf(code) !== -1 ? code : 'MAIL_SERVICE_UNAVAILABLE' } };
+}
