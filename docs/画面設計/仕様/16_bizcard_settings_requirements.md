@@ -119,7 +119,7 @@ last_reviewed: 2026-04-24
         ├── <h1 id="pageTitle">                         … 「アンケート『[名]』の名刺データ化設定」
         └── <div class="flex xl:flex-row gap-8 ...">    … 2 カラムコンテナ
             ├── 左カラム (xl:w-[65%])
-            │   ├── アンケート基本情報カード              … 名前 / ID / 会期（renderSurveyInfo）
+            │   ├── アンケート基本情報カード              … アンケート名 / アンケートID / 会期（renderSurveyInfo）
             │   └── <section id="bizcardSettingsFields">
             │       ├── #skipBizcardToggleContainer     … 有効/無効切替 (#skipBizcardToggle)
             │       └── #bizcardFormActiveArea          … 以下スキップ時に .opacity-40 .pointer-events-none .grayscale
@@ -127,11 +127,12 @@ last_reviewed: 2026-04-24
             │           │   ├── #dataConversionPlanSelection (role="radiogroup")
             │           │   ├── ステッパー群 (±1/±10/±100)
             │           │   ├── #bizcardRequest (number, min=0 max=9999, value=100)
-            │           │   └── #minChargeNotice (hidden→flex)
+            │           │   ├── #minChargeNotice (hidden→flex)
+            │           │   └── 対応言語テキスト (静的文言)
             │           ├── STEP2 プレミアムオプション
             │           │   └── #premiumOptionsContainer
-            │           │       ├── Service Upgrade: premiumMultilingual (toggle)
-            │           │       └── Extraction Details: premiumAdditionalItems (multi x3)
+            │           │       ├── 対応言語の追加: premiumMultilingual (toggle)
+            │           │       └── データ化項目の追加: premiumAdditionalItems (multi x3)
             │           └── STEP3 社内管理用メモ
             │               ├── #toggleMemoSection (折り畳みボタン)
             │               └── #memoSection (default .hidden)
@@ -146,7 +147,6 @@ last_reviewed: 2026-04-24
                     ├── #couponSectionWrapper
                     │   ├── #couponInputContainer (#couponCode / #applyCouponBtn / #couponLoadingIndicator / #couponCodeErrorMessage)
                     │   └── #couponAppliedContainer (#appliedCouponCodeDisplay / #appliedCouponSourceDisplay / #removeCouponBtn)
-                    ├── 対応言語テキスト (静的文言)
                     ├── #saveBizcardSettingsBtn         … 主アクション
                     └── #cancelBizcardSettings          … 戻る
 └── #footer-placeholder
@@ -172,13 +172,15 @@ last_reviewed: 2026-04-24
 - 見出し「1. データ化プランと見込み枚数」＋ `data-help-key="bizcardPlanAndSpeed"` のヘルプトリガ、右端に「詳細仕様を見る」ボタン `#openBizcardDetailsModalBtn`。
 - `#dataConversionPlanSelection` は `role="radiogroup"`、`grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
 - 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー群 + `<input id="bizcardRequest" type="number" min="0" max="9999" value="100">` + `.input-error-message`（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
-- 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「実際の件数が N 枚に満たない場合でも…」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
-- 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。…」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
+- 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「最低ご請求は見込み枚数の50％分（今回は N 枚・¥金額）です。」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
+- 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
+- 対応言語: 注記文言の直後に「対応言語：日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語」を 1 行で表示（HTML 直書き、「対応言語：」のみ太字）。
 
 **STEP2 プレミアムオプション**:
 - `#premiumOptionsContainer` は初期 `grid gap-4 sm:grid-cols-2` だが、`renderPremiumOptions()` 内で `space-y-8` に上書きされ、2 グループのセクションに再構成される（[bizcardSettingsRenderer.js:395](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L395)）。
-- グループ 1 `Service Upgrade`: `premiumMultilingual`（toggle、単一チェックボックス、`unitPriceLabel` があれば価格バッジ描画だが `bizcardPlans.js` には未定義）。
-- グループ 2 `Extraction Details`: `premiumAdditionalItems`（multi、3 オプション `secondPhone` / `secondAddress` / `handwrittenMemo`、チェック複数可）。
+- グループ 1「対応言語の追加」: `premiumMultilingual`（toggle、単一チェックボックス、`unitPriceLabel` があれば価格バッジ描画だが `bizcardPlans.js` には未定義）。
+- グループ 2「データ化項目の追加」: `premiumAdditionalItems`（multi、3 オプション `secondPhone` / `secondAddress` / `handwrittenMemo`、チェック複数可）。
+- グループ見出しは `document.documentElement.lang` が `ja` のとき上記の日本語で表示し、それ以外では `Service Upgrade` / `Extraction Details` を表示する。
 
 **STEP3 社内管理用メモ**:
 - `#toggleMemoSection` 押下で `#memoSection` の `.hidden` をトグル、矢印アイコンを `rotate-180`（[bizcardSettings.js:187-193](../../../02_dashboard/src/bizcardSettings.js#L187)）。
@@ -189,13 +191,12 @@ last_reviewed: 2026-04-24
 - カード全体を覆う `#rightColumnDisabledOverlay` は `absolute inset-0 bg-surface/50 backdrop-blur-[1px] z-10 hidden`。スキップ時のみ `hidden` を外して全面を覆う。内部要素は `z-20` に上げてあるが、`pointer-events-none` 付きで操作不可にする。
 - `#estimatedAmount` は `text-4xl font-black`、`renderEstimate()` で 400ms の `requestAnimationFrame` カウントアップ描画（[bizcardSettingsRenderer.js:103-138](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L103)）。スキップ時は `state.isSkipped` 分岐で金額 0 を強制。
 - `#estimatedCompletionDate` は `innerHTML` で 2 行（完了日 + 「起算日 XX + 納期 N 日」小字）を書き換える（同:145-152）。スキップ時は `data化を実施しない`。
-- `#estimateBreakdown` は想定件数・内訳・選択オプション・合計・最低請求の複合 HTML を `innerHTML` に一括代入（同:181-197）。
+- `#estimateBreakdown` は見込み枚数・内訳・選択オプション・合計・最低請求の複合 HTML を `innerHTML` に一括代入（同:181-197）。
 - `#openBillingNotesModalBtn` 押下で `billingNotesModal.showModal()`。
 - クーポンセクション `#couponSectionWrapper`:
   - 未適用時: `#couponInputContainer`（`#couponCode` 入力 + `#applyCouponBtn` + ローディング `#couponLoadingIndicator` + エラー `#couponCodeErrorMessage` / `#couponCodeErrorText`）を表示。
   - 適用中: `#couponAppliedContainer`（コード表示 `#appliedCouponCodeDisplay` + 共有ソース `#appliedCouponSourceDisplay` + 解除 `#removeCouponBtn`）を表示。`#appliedCouponCodeDisplay` は HTML 直書きの `SUMMER2026` で初期表示され（[bizcardSettings.html:274](../../../02_dashboard/bizcardSettings.html#L274)）、初期化完了時に JS が上書きする（§11-13 チラつきリスク）。
   - スキップ時は `#couponSectionWrapper` に `opacity-50 pointer-events-none grayscale bg-surface` を追加してグレーアウト（[bizcardSettings.js:578-584](../../../02_dashboard/src/bizcardSettings.js#L578)）。
-- 対応言語: 静的テキスト「日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語」を HTML 直書き。
 - 保存ボタン `#saveBizcardSettingsBtn`（`#saveBizcardSettingsBtnText` + `#saveBizcardSettingsBtnLoading`）と戻るボタン `#cancelBizcardSettings`。
 
 ### 4.5 モーダル
@@ -204,8 +205,8 @@ last_reviewed: 2026-04-24
 
 | モーダル | 起動ボタン | 閉じるボタン | 用途 |
 |----------|------------|--------------|------|
-| `#bizcardDetailsModal` | `#openBizcardDetailsModalBtn`（「詳細仕様を見る」） | `#closeBizcardDetailsModalBtn` / `#closeBizcardDetailsModalActionBtn` | 「無料 2 項目」「スタンダード 10 項目」「共通の入力規則」の静的解説（[bizcardSettings.html:315-370](../../../02_dashboard/bizcardSettings.html#L315)） |
-| `#billingNotesModal` | `#openBillingNotesModalBtn` | `#closeBillingNotesModalBtn` / `#closeBillingNotesModalActionBtn` | 「見込み × 単価」「会期開始後は変更不可」「クーポンはアンケート全体に適用」「最低請求 50%」等の静的注記（同:373-395） |
+| `#bizcardDetailsModal` | `#openBizcardDetailsModalBtn`（「詳細仕様を見る」） | `#closeBizcardDetailsModalBtn` / `#closeBizcardDetailsModalActionBtn` | 「お試しプラン 2 項目」「通常・特急・超特急・オンデマンド 10 項目」「共通の入力規則」の静的解説（[bizcardSettings.html:315-370](../../../02_dashboard/bizcardSettings.html#L315)） |
+| `#billingNotesModal` | `#openBillingNotesModalBtn` | `#closeBillingNotesModalBtn` / `#closeBillingNotesModalActionBtn` | 「見込み枚数 × データ化単価」「会期開始後は変更不可」「クーポンはアンケート全体に適用」「最低請求 50%」等の静的注記（同:373-395） |
 
 両モーダルとも `aria-labelledby` は未設定（§11-17）。
 
@@ -247,11 +248,11 @@ last_reviewed: 2026-04-24
 
 2 グループを `renderPremiumOptions(PREMIUM_OPTION_GROUPS, state.settings.premiumOptions)` が描画。
 
-- **Service Upgrade（グループ `multilingual`、type=toggle）**:
+- **対応言語の追加（グループ `multilingual`、type=toggle）**:
   - `input[name="premiumMultilingual"]` 単一チェックボックス。
   - 選択中は `state.settings.premiumOptions.multilingual = true`。
   - 料金加算: `premiumUnitAddOn = multilingualGroup.unitPrice ?? 0`。`bizcardPlans.js` に `unitPrice` が **未定義**のため常に 0 を加算する休眠ロジック（§11-3）。
-- **Extraction Details（グループ `additionalItems`、type=multi）**:
+- **データ化項目の追加（グループ `additionalItems`、type=multi）**:
   - `input[name="premiumAdditionalItems"]` 複数チェック。`value` は `secondPhone` / `secondAddress` / `handwrittenMemo` の 3 種。
   - 選択中アイテムは `state.settings.premiumOptions.additionalItems: string[]` に保持。`normalizePremiumOptions()` が許可リストで絞り込み（[bizcardPlans.js:163-190](../../../02_dashboard/src/services/bizcardPlans.js#L163)）。
   - 料金加算ロジック **なし**。選択中アイテムは見積内訳の「選択オプション: …」に **タイトル表示のみ**（§11-4）。
@@ -464,7 +465,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 |---------|--------|-------------|----------|------|
 | `multilingual` | `toggle` | 多言語対応 | `multilingualGroup.unitPrice ?? 0` = **0**（未定義） | §11-3 |
 | `additionalItems.secondPhone` | `multi` 内 | 電話番号2つ目 | なし | §11-4 |
-| `additionalItems.secondAddress` | `multi` 内 | 住所2つめ | なし | §11-4 |
+| `additionalItems.secondAddress` | `multi` 内 | 住所2つ目 | なし | §11-4 |
 | `additionalItems.handwrittenMemo` | `multi` 内 | 手書きメモ | なし | §11-4 |
 
 ### 6.4 クーポン定義（モック）
