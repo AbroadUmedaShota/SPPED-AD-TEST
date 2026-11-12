@@ -8,6 +8,9 @@ import { DEFAULT_PLAN } from '../services/bizcardPlans.js';
 
 const dom = {};
 
+// 横長レイアウトで先頭に表示するプラン（お試し）
+const TRIAL_PLAN_VALUE = 'trial';
+
 function getLocalizedText(content, lang) {
     if (!content) return '';
     if (typeof content === 'string') return content;
@@ -225,6 +228,7 @@ export function renderEstimate(estimate) {
 
 /**
  * データ化項目プランを描画します。
+ * お試しプランは先頭に横長の1枚、有料プランはその下に2列（768px未満は1列）で並べます。
  * @param {Array<object>} plans - 表示するプラン一覧。
  * @param {string} selectedPlan - 選択中のプラン値。
  */
@@ -238,14 +242,20 @@ export function renderDataConversionPlans(plans, selectedPlan) {
   const normalizedPlan = selectedPlan || DEFAULT_PLAN;
   container.innerHTML = '';
 
-  plans.forEach(plan => {
+  /**
+   * プランカード（ラジオ1件）を生成します。
+   * @param {object} plan - プラン定義。
+   * @param {boolean} isWide - 横長レイアウト（お試し）で描画するかどうか。
+   * @returns {HTMLLabelElement} プランカード。
+   */
+  const createPlanCard = (plan, isWide) => {
     const isSelected = plan.value === normalizedPlan;
-    
+
     const label = document.createElement('label');
     label.className = [
       'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface text-left select-none',
-      isSelected 
-        ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
+      isSelected
+        ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10'
         : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
     ].join(' ');
 
@@ -259,119 +269,162 @@ export function renderDataConversionPlans(plans, selectedPlan) {
 
     const header = document.createElement('div');
     header.className = 'flex items-start justify-between border-b border-outline-variant/50 pb-3 mb-3 shrink-0';
-    
+
     const titleFlex = document.createElement('div');
     titleFlex.className = 'flex items-center gap-2.5';
-    
+
     if (plan.icon) {
-       const iconDiv = document.createElement('div');
-       iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${plan.accentGradient} text-white shadow-sm shrink-0`;
-       const iconSpan = document.createElement('span');
-       iconSpan.className = 'material-icons text-[18px]';
-       iconSpan.textContent = plan.icon;
-       iconDiv.appendChild(iconSpan);
-       titleFlex.appendChild(iconDiv);
+      const iconDiv = document.createElement('div');
+      iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${plan.accentGradient} text-white shadow-sm shrink-0`;
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'material-icons text-[18px]';
+      iconSpan.textContent = plan.icon;
+      iconDiv.appendChild(iconSpan);
+      titleFlex.appendChild(iconDiv);
     }
-    
+
     const titleInfo = document.createElement('div');
     titleInfo.className = 'flex flex-col';
-    
+
     const titleWrapper = document.createElement('div');
     titleWrapper.className = 'flex items-center gap-1.5 flex-wrap';
-    
+
     const titleText = document.createElement('span');
     titleText.className = [
-        'font-bold text-base leading-tight',
-        isSelected ? 'text-primary' : 'text-on-surface'
+      'font-bold text-base leading-tight',
+      isSelected ? 'text-primary' : 'text-on-surface'
     ].join(' ');
     titleText.textContent = getLocalizedText(plan.title, lang);
     titleWrapper.appendChild(titleText);
-    
+
     if (plan.badge) {
-        const badge = document.createElement('span');
-        badge.className = 'rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 shrink-0';
-        badge.textContent = getLocalizedText(plan.badge, lang);
-        titleWrapper.appendChild(badge);
+      const badge = document.createElement('span');
+      badge.className = 'rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 shrink-0';
+      badge.textContent = getLocalizedText(plan.badge, lang);
+      titleWrapper.appendChild(badge);
     }
-    
+
     titleInfo.appendChild(titleWrapper);
+
+    // 横長レイアウトではタグラインをプラン名の下に置く
+    if (isWide && plan.tagline) {
+      const headerTagline = document.createElement('span');
+      headerTagline.className = 'mt-0.5 text-[11px] font-bold text-on-surface-variant text-balance';
+      headerTagline.textContent = getLocalizedText(plan.tagline, lang);
+      titleInfo.appendChild(headerTagline);
+    }
+
     titleFlex.appendChild(titleInfo);
-    
+
     const radioUiContainer = document.createElement('div');
     radioUiContainer.className = 'flex h-6 w-6 items-center justify-center shrink-0 mt-0.5 ml-2';
-    
+
     const radioUi = document.createElement('div');
     radioUi.className = [
-        'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all',
-        isSelected ? 'border-primary bg-primary shadow-sm shadow-primary/30' : 'border-outline-variant bg-surface'
+      'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all',
+      isSelected ? 'border-primary bg-primary shadow-sm shadow-primary/30' : 'border-outline-variant bg-surface'
     ].join(' ');
     const radioInner = document.createElement('div');
     radioInner.className = [
-        'h-2 w-2 rounded-full bg-surface transition-transform duration-200',
-        isSelected ? 'scale-100' : 'scale-0'
+      'h-2 w-2 rounded-full bg-surface transition-transform duration-200',
+      isSelected ? 'scale-100' : 'scale-0'
     ].join(' ');
     radioUi.appendChild(radioInner);
     radioUiContainer.appendChild(radioUi);
-    
+
     header.append(titleFlex, radioUiContainer);
-    
-    const body = document.createElement('div');
-    body.className = 'flex-1 flex flex-col justify-between';
-    
+
     const features = [
-       { icon: 'sell', label: lang === 'ja' ? '単価' : 'Price', value: getLocalizedText(plan.unitPriceLabel || plan.price, lang) },
-       { icon: 'data_object', label: lang === 'ja' ? '項目数' : 'Fields', value: getLocalizedText(plan.itemCountLabel, lang) },
-       { icon: 'schedule', label: lang === 'ja' ? '納期' : 'Speed', value: getLocalizedText(plan.turnaroundLabel, lang) }
+      { icon: 'sell', label: lang === 'ja' ? '単価' : 'Price', value: getLocalizedText(plan.unitPriceLabel || plan.price, lang) },
+      { icon: 'data_object', label: lang === 'ja' ? '項目数' : 'Fields', value: getLocalizedText(plan.itemCountLabel, lang) },
+      { icon: 'schedule', label: lang === 'ja' ? '納期' : 'Speed', value: getLocalizedText(plan.turnaroundLabel, lang) }
     ];
-    
-    const ul = document.createElement('ul');
-    ul.className = 'space-y-2 text-sm text-on-surface mb-3';
-    features.forEach(f => {
-       const li = document.createElement('li');
-       li.className = 'flex items-center justify-between border-b border-outline-variant/30 pb-1.5 last:border-0 last:pb-0';
-       
-       const liLeft = document.createElement('div');
-       liLeft.className = 'flex items-center gap-1.5 text-on-surface-variant';
-       const listIcon = document.createElement('span');
-       listIcon.className = 'material-icons text-[14px] opacity-70';
-       listIcon.textContent = f.icon;
-       const listLabel = document.createElement('span');
-       listLabel.className = 'font-semibold text-[13px]';
-       listLabel.textContent = f.label;
-       liLeft.append(listIcon, listLabel);
-       
-       const liRight = document.createElement('span');
-       liRight.className = 'font-bold text-[14px]';
-       liRight.textContent = f.value;
-       
-       li.append(liLeft, liRight);
-       ul.appendChild(li);
-    });
-    
-    const bottomSection = document.createElement('div');
-    bottomSection.className = 'mt-auto pt-2';
-    
-    if (plan.tagline) {
+
+    let body;
+    if (isWide) {
+      // 単価・項目数・納期を横3列（各列はラベルと値の縦積み）で並べる
+      body = document.createElement('div');
+      body.className = 'grid grid-cols-3 gap-2 md:gap-4';
+      features.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'flex min-w-0 flex-col gap-0.5 md:gap-1';
+        const itemLabel = document.createElement('span');
+        itemLabel.className = 'font-semibold text-xs md:text-[13px] text-on-surface-variant';
+        itemLabel.textContent = f.label;
+        const itemValue = document.createElement('span');
+        itemValue.className = 'font-bold text-sm md:text-base text-on-surface';
+        itemValue.textContent = f.value;
+        item.append(itemLabel, itemValue);
+        body.appendChild(item);
+      });
+    } else {
+      body = document.createElement('div');
+      body.className = 'flex-1 flex flex-col justify-between';
+
+      const ul = document.createElement('ul');
+      ul.className = 'space-y-2 text-sm text-on-surface mb-3';
+      features.forEach(f => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between border-b border-outline-variant/30 pb-1.5 last:border-0 last:pb-0';
+
+        const liLeft = document.createElement('div');
+        liLeft.className = 'flex items-center gap-1.5 text-on-surface-variant';
+        const listIcon = document.createElement('span');
+        listIcon.className = 'material-icons text-[14px] opacity-70';
+        listIcon.textContent = f.icon;
+        const listLabel = document.createElement('span');
+        listLabel.className = 'font-semibold text-[13px]';
+        listLabel.textContent = f.label;
+        liLeft.append(listIcon, listLabel);
+
+        const liRight = document.createElement('span');
+        liRight.className = 'font-bold text-[14px]';
+        liRight.textContent = f.value;
+
+        li.append(liLeft, liRight);
+        ul.appendChild(li);
+      });
+
+      const bottomSection = document.createElement('div');
+      bottomSection.className = 'mt-auto pt-2';
+
+      if (plan.tagline) {
         const tagline = document.createElement('p');
         tagline.className = [
-            'text-[11px] font-bold p-1.5 rounded text-center transition-colors',
-            isSelected ? 'text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-highest'
+          'text-[11px] font-bold p-1.5 rounded text-center transition-colors',
+          isSelected ? 'text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-highest'
         ].join(' ');
         tagline.textContent = getLocalizedText(plan.tagline, lang);
         bottomSection.appendChild(tagline);
+      }
+
+      body.append(ul, bottomSection);
     }
-    
-    body.append(ul, bottomSection);
-    
+
     label.addEventListener('click', event => {
       if (event.target === input) return;
       input.checked = true;
       input.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    
+
     label.append(input, header, body);
-    container.appendChild(label);
-  });
+    return label;
+  };
+
+  // お試しを先頭に全幅で1枚、残り（有料プラン）を2列のグリッドに描画する
+  const trialPlan = plans.find(plan => plan.value === TRIAL_PLAN_VALUE);
+  const paidPlans = plans.filter(plan => plan.value !== TRIAL_PLAN_VALUE);
+
+  if (trialPlan) {
+    container.appendChild(createPlanCard(trialPlan, true));
+  }
+
+  if (paidPlans.length > 0) {
+    const paidGrid = document.createElement('div');
+    paidGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+    paidPlans.forEach(plan => paidGrid.appendChild(createPlanCard(plan, false)));
+    container.appendChild(paidGrid);
+  }
 }
 
 /**
