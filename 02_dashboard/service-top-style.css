@@ -3184,3 +3184,218 @@ body.dark-mode .outline-highlight {
     content: '参照: ';
     font-weight: 700;
 }
+
+/* --- 名刺データ化設定: 見込み枚数ステッパー --- */
+/* 640px未満は2段（1段目: −・入力欄・＋ / 2段目: -100・-10・+10・+100）、640px以上は1行に並べる。 */
+/* DOM は1行表示の順（-100, -10, −, 入力欄, ＋, +10, +100）で、2段のときだけ order で1段目を先頭に出す。 */
+/* 枠の #6B7280 とフォーカスの #2563EB は、変更前の入力欄に実際に出ていた色（Tailwind forms の既定色）に合わせている。 */
+.bizcard-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.bizcard-stepper .bizcard-stepper__main {
+    order: -1;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 56px;
+    gap: 0.5rem;
+}
+
+.bizcard-stepper .bizcard-stepper__btn {
+    height: 44px;
+    min-width: 0;
+    padding: 0;
+}
+
+.bizcard-stepper .bizcard-stepper__btn--step {
+    order: 1;
+}
+
+.bizcard-stepper .bizcard-stepper__btn--one {
+    height: 56px;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.bizcard-stepper .bizcard-stepper__field {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    height: 56px;
+    min-width: 0;
+    padding: 0 6px;
+    border: 2px solid #6B7280;
+    border-radius: 12px;
+    background-color: var(--color-base-card);
+}
+
+.bizcard-stepper .bizcard-stepper__input {
+    width: 4ch;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    font-size: 36px;
+    line-height: 52px;
+}
+
+.bizcard-stepper .bizcard-stepper__unit {
+    font-size: 16px;
+}
+
+.bizcard-stepper .bizcard-stepper__field.is-invalid {
+    border-color: var(--color-state-error);
+}
+
+.bizcard-stepper .bizcard-stepper__error {
+    order: 0;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--color-state-error);
+}
+
+.bizcard-stepper .bizcard-stepper__error.hidden {
+    display: none;
+}
+
+.bizcard-stepper .bizcard-stepper__error .material-icons {
+    font-size: 16px;
+}
+
+@media (max-width: 639.98px) {
+    /* 2段表示では枠（__field）が入力欄の外枠を兼ねるため、フォーカス表示も枠側に出す */
+    .bizcard-stepper .bizcard-stepper__field:focus-within {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 2px #2563EB;
+        /* ハイコントラスト表示では box-shadow が描かれないため、輪郭線でフォーカスを示す */
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__field.is-invalid:focus-within {
+        border-color: var(--color-state-error);
+    }
+
+    .bizcard-stepper .bizcard-stepper__field .bizcard-stepper__input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* 専用の増減ボタンがあるため、幅の狭い入力欄ではブラウザ標準のスピンボタンを出さない */
+    .bizcard-stepper .bizcard-stepper__input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .bizcard-stepper .bizcard-stepper__input::-webkit-outer-spin-button,
+    .bizcard-stepper .bizcard-stepper__input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
+@media (max-width: 359.98px) {
+    .bizcard-stepper .bizcard-stepper__main {
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__field {
+        gap: 4px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__input {
+        font-size: 30px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__unit {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 640px) {
+    .bizcard-stepper {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 1行表示では −・入力欄・＋ を他のボタンと同じ並びに戻す */
+    .bizcard-stepper .bizcard-stepper__main {
+        display: contents;
+    }
+
+    .bizcard-stepper .bizcard-stepper__btn {
+        flex: 0 0 auto;
+    }
+
+    .bizcard-stepper .bizcard-stepper__btn--step {
+        order: 0;
+    }
+
+    .bizcard-stepper .bizcard-stepper__btn--hundred {
+        width: 64px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__btn--ten {
+        width: 48px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__btn--one {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__field {
+        flex: 0 0 auto;
+        gap: 8px;
+        height: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background-color: transparent;
+    }
+
+    .bizcard-stepper .bizcard-stepper__input {
+        width: 8rem;
+        /* 左右は 8px。4桁（9999）が内側に収まる幅を確保する */
+        padding: 8px;
+        border: 2px solid #6B7280;
+        border-radius: 12px;
+        background-color: var(--color-base-card);
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        line-height: 40px;
+    }
+
+    /* フォーカスの輪は変更前と同じ 2px */
+    .bizcard-stepper .bizcard-stepper__input:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 2px #2563EB, inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .bizcard-stepper .bizcard-stepper__field.is-invalid .bizcard-stepper__input {
+        border-color: var(--color-state-error);
+    }
+
+    .bizcard-stepper .bizcard-stepper__unit {
+        font-size: 20px;
+    }
+
+    .bizcard-stepper .bizcard-stepper__error {
+        order: 1;
+        flex: 0 0 100%;
+    }
+}

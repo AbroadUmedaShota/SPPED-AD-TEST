@@ -276,9 +276,6 @@ export function initBizcardSettings() {
             // クーポン入力も無効化
             if (couponCodeInput) couponCodeInput.disabled = true;
             if (applyCouponBtn) applyCouponBtn.disabled = true;
-
-            // Re-validate to remove error borders if they existed
-            if (bizcardRequestInput) bizcardRequestInput.classList.remove('border-error');
         } else {
             bizcardFormActiveArea.classList.remove('opacity-40', 'pointer-events-none', 'grayscale');
             rightColumnDisabledOverlay.classList.add('hidden');

@@ -86,7 +86,7 @@
                         </div>
 
                         <!-- 設定フォーム群 -->
-                        <section class="w-full bg-surface p-8 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-8" id="bizcardSettingsFields">
+                        <section class="w-full bg-surface p-4 md:p-8 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-8" id="bizcardSettingsFields">
 
                             <!-- スキップトグル -->
                             <div class="flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-container-low p-5 transition-colors duration-300" id="skipBizcardToggleContainer" data-help-target="bizcard-disable-note">
@@ -120,7 +120,7 @@
                                     <div id="dataConversionPlanSelection" role="radiogroup" aria-labelledby="dataConversionPlanHeading" class="flex flex-col gap-4"></div>
 
                                     <!-- 見込み枚数（スライダー＋ステッパー） -->
-                                    <div class="rounded-2xl bg-gradient-to-br from-surface-container-lowest to-primary/5 p-6 border border-outline-variant/80 border-l-4 border-l-primary/40 mt-4 flex flex-col gap-5 relative" data-help-target="bizcard-request">
+                                    <div class="rounded-2xl bg-gradient-to-br from-surface-container-lowest to-primary/5 p-4 md:p-6 border border-outline-variant/80 border-l-4 border-l-primary/40 mt-4 flex flex-col gap-4 md:gap-5 relative" data-help-target="bizcard-request">
                                         <!-- ヘッダー -->
                                         <div class="flex items-center gap-1.5">
                                             <span class="material-icons text-primary text-[20px]">style</span>
@@ -130,37 +130,44 @@
                                             <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors text-[18px]" data-help-key="expectedBizcardCount" aria-label="見込み枚数の説明を表示">help_outline</button>
                                         </div>
 
-                                        <!-- ステッパー（数値表示中央） -->
-                                        <div class="flex items-center justify-center gap-2">
+                                        <!-- ステッパー（640px未満は2段、640px以上は1行。並びの切り替えは service-top-style.css の .bizcard-stepper） -->
+                                        <div class="bizcard-stepper">
                                             <button type="button" id="bizcardRequestDec100Btn"
-                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--hundred flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="100枚減らす">-100</button>
                                             <button type="button" id="bizcardRequestDec10Btn"
-                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--ten flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="10枚減らす">-10</button>
-                                            <button type="button" id="bizcardRequestDecBtn"
-                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚減らす">−</button>
 
-                                            <div class="flex items-baseline gap-2">
-                                                <div class="relative group">
-                                                    <input type="number" id="bizcardRequest" min="0" max="9999" placeholder="100"
-                                                        class="w-32 rounded-xl border-2 border-outline-variant bg-surface px-3 py-2 text-center font-black text-4xl text-on-surface shadow-inner transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                            <div class="bizcard-stepper__main">
+                                                <button type="button" id="bizcardRequestDecBtn"
+                                                    class="bizcard-stepper__btn bizcard-stepper__btn--one flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚減らす">−</button>
+
+                                                <div class="bizcard-stepper__field transition-colors">
+                                                    <input type="number" inputmode="numeric" id="bizcardRequest" min="0" max="9999" placeholder="100"
+                                                        class="bizcard-stepper__input text-center font-black text-on-surface transition-colors"
                                                         value="100">
-                                                    <div class="input-error-message text-center text-[10px] text-error font-bold leading-tight mt-1 h-3"></div>
+                                                    <span class="bizcard-stepper__unit font-bold text-on-surface-variant select-none">枚</span>
                                                 </div>
-                                                <span class="font-bold text-xl text-on-surface-variant select-none">枚</span>
+
+                                                <button type="button" id="bizcardRequestIncBtn"
+                                                    class="bizcard-stepper__btn bizcard-stepper__btn--one flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚増やす">＋</button>
                                             </div>
 
-                                            <button type="button" id="bizcardRequestIncBtn"
-                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚増やす">＋</button>
                                             <button type="button" id="bizcardRequestInc10Btn"
-                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--ten flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="10枚増やす">+10</button>
                                             <button type="button" id="bizcardRequestInc100Btn"
-                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--hundred flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="100枚増やす">+100</button>
+
+                                            <!-- 入力エラー（エラーがないときは非表示） -->
+                                            <p id="bizcardRequestError" class="bizcard-stepper__error hidden">
+                                                <span class="material-icons" aria-hidden="true">error_outline</span>
+                                                <span id="bizcardRequestErrorText" class="input-error-message"></span>
+                                            </p>
                                         </div>
 
                                         <!-- 最低請求バッジ（インライン） -->

@@ -31,6 +31,8 @@ function cacheDOMElements() {
     dom.bizcardSettingsFields = document.getElementById('bizcardSettingsFields');
     dom.dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
     dom.bizcardRequestInput = document.getElementById('bizcardRequest');
+    dom.bizcardRequestError = document.getElementById('bizcardRequestError');
+    dom.bizcardRequestErrorText = document.getElementById('bizcardRequestErrorText');
     dom.couponCodeInput = document.getElementById('couponCode');
     dom.couponMessage = document.getElementById('couponMessage');
     dom.premiumOptionsContainer = document.getElementById('premiumOptionsContainer');
@@ -595,6 +597,31 @@ export function displayCouponResult(couponResult) {
 }
 
 /**
+ * 見込み枚数の入力エラー表示を切り替えます。
+ * エラー時は入力欄の直下にアイコンと文言を出し、入力欄の枠を赤にして aria 属性を付けます。
+ * @param {string} message - エラー文言。空文字ならエラーなし。
+ */
+function setRequestCountError(message) {
+    const input = dom.bizcardRequestInput;
+    const errorEl = dom.bizcardRequestError;
+    const hasError = Boolean(message);
+
+    if (dom.bizcardRequestErrorText) dom.bizcardRequestErrorText.textContent = message || '';
+    if (errorEl) errorEl.classList.toggle('hidden', !hasError);
+
+    const field = input.closest('.bizcard-stepper__field');
+    if (field) field.classList.toggle('is-invalid', hasError);
+
+    if (hasError) {
+        input.setAttribute('aria-invalid', 'true');
+        if (errorEl) input.setAttribute('aria-describedby', errorEl.id);
+    } else {
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('aria-describedby');
+    }
+}
+
+/**
  * 入力検証を行い、エラーメッセージを表示・非表示します。
  * @param {boolean} isSkipped - スキップ状態かどうか。
  * @returns {boolean} 検証が成功したかどうか。
@@ -602,26 +629,21 @@ export function displayCouponResult(couponResult) {
 export function validateForm(isSkipped = false) {
     if (!dom.bizcardRequestInput || !dom.saveButton) cacheDOMElements();
     let isValid = true;
-    
+
     // スキップされている場合は常に有効とする
     if (isSkipped) {
-        const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
-        if (errorEl) errorEl.textContent = '';
-        dom.bizcardRequestInput.classList.remove('border-error');
+        setRequestCountError('');
         dom.saveButton.disabled = false;
         return true;
     }
 
     const value = parseInt(dom.bizcardRequestInput.value || 0, 10);
-    const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
-    
+
     if (isNaN(value) || value <= 0) {
-        if (errorEl) errorEl.textContent = '1枚以上必要です';
-        dom.bizcardRequestInput.classList.add('border-error');
+        setRequestCountError('1枚以上必要です');
         isValid = false;
     } else {
-        if (errorEl) errorEl.textContent = '';
-        dom.bizcardRequestInput.classList.remove('border-error');
+        setRequestCountError('');
     }
 
     dom.saveButton.disabled = !isValid;
