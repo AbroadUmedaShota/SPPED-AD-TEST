@@ -170,7 +170,8 @@ last_reviewed: 2026-04-24
 
 **STEP1 データ化プランと見込み枚数**:
 - 見出し「1. データ化プランと見込み枚数」＋ `data-help-key="bizcardPlanAndSpeed"` のヘルプトリガ、右端に「詳細仕様を見る」ボタン `#openBizcardDetailsModalBtn`。
-- `#dataConversionPlanSelection` は `role="radiogroup"`、`grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
+- `#dataConversionPlanSelection` は `role="radiogroup"`、`flex flex-col gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成し、お試し（`trial`）を先頭に全幅 1 枚、有料 4 プラン（`normal` / `express` / `superExpress` / `onDemand`）をその下の `grid grid-cols-1 md:grid-cols-2 gap-4`（768px 以上で 2 列 × 2 段、768px 未満で 1 列）に並べる（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
+- お試しカードは 2 段構成。上段はアイコン・プラン名・バッジ「無料」・その下にタグライン（11px 太字）、右端にラジオ表示、上段の下に罫線。下段は単価・項目数・納期の横 3 列（各列はラベルと値の縦積み。768px 以上はラベル 13px・値 16px 太字、768px 未満はラベル 12px・値 14px 太字）。有料 4 プランのカードは単価・項目数・納期の 3 行と下部のタグラインで構成する。選択時のスタイル（`border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md`）は全カード共通。
 - 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー群 + `<input id="bizcardRequest" type="number" min="0" max="9999" value="100">` + `.input-error-message`（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
 - 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「最低ご請求は見込み枚数の50％分（今回は N 枚・¥金額）です。」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
 - 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
