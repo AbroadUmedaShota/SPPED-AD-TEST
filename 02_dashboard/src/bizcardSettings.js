@@ -25,7 +25,7 @@ import {
     normalizePlanValue,
     normalizePremiumOptions
 } from './services/bizcardPlans.js';
-import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
+import { initEstimateBottomSheet } from './ui/estimateBottomSheet.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
@@ -160,7 +160,7 @@ export function initBizcardSettings() {
             }
 
             setupEventListeners();
-            initEstimateSidebarDrawer();
+            initEstimateBottomSheet();
             updateFullUI();
             initEstimateCardFit();
 

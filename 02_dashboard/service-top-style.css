@@ -3401,7 +3401,7 @@ body.dark-mode .outline-highlight {
 }
 
 /* --- 名刺データ化設定: 料金見積もりカード（本体スクロール＋フッター固定） --- */
-/* 共有の .estimate-drawer-card はそのまま残し、この画面のカードにだけ付ける追加クラスで上書きする。 */
+/* 共有の .estimate-drawer* はお礼メール設定が使うため変更せず、この画面は専用クラスで組む。 */
 .bizcard-estimate-card {
     display: flex;
     flex-direction: column;
@@ -3446,8 +3446,8 @@ body.dark-mode .outline-highlight {
 }
 
 @media (min-width: 1280px) {
-    /* 共有定義（#estimateSidebar > .estimate-drawer-card の max-height: none / overflow: visible）をこの画面だけ上書きする */
-    #estimateSidebar > .estimate-drawer-card.bizcard-estimate-card {
+    /* この画面のカードは共有の .estimate-drawer-card を使わず、専用クラスで高さ上限を決める */
+    #estimateSidebar > .bizcard-estimate-card {
         /* 画面の高さ − カードの上端の位置 − 下の余白 2rem。上端の位置は bizcardSettings.js が --estimate-card-top に入れる。
            追従中（top-24）は 6rem になり、ページ最上部ではカードが下にある分だけ低くして、フッターを画面内に収める。 */
         max-height: calc(100vh - var(--estimate-card-top, 6rem) - 2rem);
@@ -3480,4 +3480,287 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled,
 body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
     background-color: var(--color-button-disabled-bg);
     color: var(--color-button-disabled-text);
+}
+
+/* --- 名刺データ化設定: 料金見積もりフッター1行目（税込請求見込み） --- */
+/* 1280px 以上はカード下部の1行、1280px 未満は下部固定バーの1行目として使う。 */
+.estimate-bar__summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.estimate-bar__label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.estimate-bar__label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.estimate-bar__amount-group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.estimate-bar__amount {
+    font-size: 30px;
+    line-height: 36px;
+}
+
+/* 1280px 未満でだけ使う要素は、既定では出さない */
+.estimate-bar__date,
+.estimate-bar__toggle,
+.estimate-sheet__close,
+.estimate-sheet-scrim {
+    display: none;
+}
+
+/* --- 名刺データ化設定: 1280px 未満の料金見積もり（下部固定バー＋下からのシート） --- */
+/* 重なり順: モバイルサイドバー(39/40)・ヘッダー(50) < 背景(52) < シート(54) < バー(56) < モーダル(60)。
+   シートを閉じている間のバーは 38 にして、モバイルサイドバーを開いたときに下へ回るようにする。 */
+@media (max-width: 1279.98px) {
+    /* バーに最後の項目が隠れないよう、ページ下端にバーの高さ分の余白を足す（高さは estimateBottomSheet.js が渡す） */
+    body.bizcard-settings-page {
+        padding-bottom: var(--estimate-bar-height, calc(133px + env(safe-area-inset-bottom, 0px)));
+    }
+
+    body.estimate-sheet-open {
+        overflow: hidden;
+    }
+
+    /* 見積もりの DOM は1組だけ持ち、本体をシート、フッターをバーとして固定配置する。入れ物は場所を取らせない */
+    #estimateSidebar.estimate-sheet-host {
+        position: absolute;
+        z-index: auto;
+        width: 0;
+        height: 0;
+    }
+
+    .estimate-sheet-host > .bizcard-estimate-card {
+        display: contents;
+    }
+
+    .estimate-sheet-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 52;
+        background-color: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 240ms ease-out;
+    }
+
+    .estimate-sheet-scrim.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* シート: 閉じているときは画面の下へ送り、読み上げとフォーカスの対象からも外す */
+    .estimate-sheet {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 54;
+        max-height: calc(100vh - 5.75rem); /* 画面の高さ − ヘッダー（4rem）− 上の空き */
+        max-height: calc(100dvh - 5.75rem);
+        padding-bottom: var(--estimate-bar-height, 133px); /* 手前に重なるバーの分 */
+        border-radius: 24px 24px 0 0;
+        background-color: var(--color-base-card);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.16);
+        transform: translateY(100%);
+        visibility: hidden;
+        transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 320ms;
+    }
+
+    .estimate-sheet.is-open {
+        transform: translateY(0);
+        visibility: visible;
+        transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0s;
+    }
+
+    /* つまみ */
+    .estimate-sheet::before {
+        content: '';
+        flex-shrink: 0;
+        width: 40px;
+        height: 4px;
+        margin: 8px auto 4px;
+        border-radius: 9999px;
+        background-color: var(--color-base-border-divider);
+    }
+
+    .estimate-sheet .bizcard-estimate-card__body {
+        gap: 12px;
+        padding: 0 16px 16px;
+    }
+
+    .estimate-sheet .bizcard-estimate-card__overlay {
+        border-radius: 24px 24px 0 0;
+    }
+
+    /* 見出し行はシートの上端に留める（中身だけがスクロールする） */
+    .estimate-sheet .estimate-sheet__header {
+        position: sticky;
+        top: 0;
+        flex-shrink: 0;
+        z-index: 25; /* スクロールする中身（z-20）より手前、データ化OFFの覆い（30）より奥 */
+        min-height: 44px;
+        margin: 0 -16px;
+        padding: 0 8px 0 20px;
+        background-color: var(--color-base-card);
+    }
+
+    /* 自動計算チップは 1280px 以上のみ（Tailwind の inline-flex より優先させるため親から指定） */
+    .estimate-sheet .estimate-sheet__chip-auto {
+        display: none;
+    }
+
+    .estimate-sheet__close {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 9999px;
+        color: var(--color-text-main);
+    }
+
+    .estimate-sheet__close:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+
+    /* バー */
+    .estimate-bar {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 38;
+        gap: 10px;
+        padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+        border-radius: 0;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+        transition: transform 200ms ease, visibility 0s linear 0s;
+    }
+
+    body.estimate-sheet-open .estimate-bar {
+        z-index: 56;
+    }
+
+    /* テキスト入力中（ソフトキーボード表示中）は隠す */
+    .estimate-bar.is-hidden-for-input {
+        transform: translateY(100%);
+        visibility: hidden;
+        transition: transform 200ms ease, visibility 0s linear 200ms;
+    }
+
+    .estimate-bar__summary {
+        position: relative;
+        align-items: center;
+        gap: 12px;
+        min-height: 48px;
+    }
+
+    .estimate-bar__label {
+        font-size: 12px;
+        color: var(--color-text-sub);
+    }
+
+    .estimate-bar__date {
+        display: block;
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--color-text-sub);
+    }
+
+    .estimate-bar__amount {
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    .estimate-bar__toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        height: 32px;
+        padding: 0 8px 0 12px;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 9999px;
+        background-color: var(--color-base-background-sub);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+        color: var(--color-text-main);
+    }
+
+    /* 行全体を押せるようにする（見た目はチップのまま） */
+    .estimate-bar__toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+    }
+
+    .estimate-bar__toggle .material-icons {
+        font-size: 16px;
+    }
+
+    .estimate-bar__toggle:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .estimate-bar #cancelBizcardSettings {
+        font-size: 15px;
+    }
+}
+
+/* 1024px 以上では左端に常設のサイドバー（4rem）があるため、その右から始める */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+    .estimate-sheet,
+    .estimate-bar {
+        left: 4rem;
+    }
+}
+
+/* 本文の左右の余白をそろえる。共有定義は 1024px 未満で #main-content の左余白を 0 にしているため、この画面だけ戻す */
+@media (max-width: 1023.98px) {
+    .bizcard-settings-page #main-content {
+        padding-left: 1rem;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+    .bizcard-settings-page #main-content {
+        padding-left: 1.5rem;
+    }
+}
+
+/* 320px 幅では確定ボタンの文言が幅いっぱいになるため、360px 未満だけ文字を小さくする */
+@media (max-width: 359.98px) {
+    .estimate-bar .bizcard-confirm-button {
+        font-size: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .estimate-sheet,
+    .estimate-sheet.is-open,
+    .estimate-sheet-scrim,
+    .estimate-bar,
+    .estimate-bar.is-hidden-for-input {
+        transition: none;
+    }
 }

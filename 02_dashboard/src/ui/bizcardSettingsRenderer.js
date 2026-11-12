@@ -38,6 +38,7 @@ function cacheDOMElements() {
     dom.premiumOptionsContainer = document.getElementById('premiumOptionsContainer');
     dom.estimatedAmountSpan = document.getElementById('estimatedAmount');
     dom.estimatedCompletionDateSpan = document.getElementById('estimatedCompletionDate');
+    dom.estimatedCompletionDateCompact = document.getElementById('estimatedCompletionDateCompact');
     dom.estimateBreakdown = document.getElementById('estimateBreakdown');
     dom.minChargeNotice = document.getElementById('minChargeNotice');
     dom.minChargeNoticeText = document.getElementById('minChargeNoticeText');
@@ -156,6 +157,11 @@ export function renderEstimate(estimate) {
             </span>
         </div>
     `;
+    // 下部バー（1280px 未満）に出す完了予定日。料金見積もり内の完了予定日と同じ値を使う
+    if (dom.estimatedCompletionDateCompact) {
+        const compactLabel = lang === 'ja' ? '完了予定' : 'Est. completion';
+        dom.estimatedCompletionDateCompact.textContent = `${compactLabel} ${estimate.completionDate}`;
+    }
     if (dom.estimateBreakdown) {
         const lang = document.documentElement.lang || 'ja';
         const cards = estimate.requestedCards ?? 0;
