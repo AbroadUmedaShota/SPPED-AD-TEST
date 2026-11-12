@@ -131,12 +131,13 @@ export function renderEstimate(estimate) {
                 dom.amountAnimationId = requestAnimationFrame(animate);
             } else {
                 dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;
-                dom.estimatedAmountSpan.classList.remove('text-primary', 'scale-105');
+                dom.estimatedAmountSpan.classList.remove('text-primary');
                 dom.amountAnimationId = null;
             }
         };
         
-        dom.estimatedAmountSpan.classList.add('text-primary', 'scale-105', 'transition-transform');
+        // 更新中は金額をプライマリ色にして変化を示す（1行表示のため拡大はしない）
+        dom.estimatedAmountSpan.classList.add('text-primary');
         dom.amountAnimationId = requestAnimationFrame(animate);
     } else {
         dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;

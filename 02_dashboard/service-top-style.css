@@ -3399,3 +3399,85 @@ body.dark-mode .outline-highlight {
         flex: 0 0 100%;
     }
 }
+
+/* --- 名刺データ化設定: 料金見積もりカード（本体スクロール＋フッター固定） --- */
+/* 共有の .estimate-drawer-card はそのまま残し、この画面のカードにだけ付ける追加クラスで上書きする。 */
+.bizcard-estimate-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.bizcard-estimate-card__body-wrap {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.bizcard-estimate-card__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px 20px 16px;
+}
+
+/* データ化OFF時の覆い。本体だけを薄く見せる表示用で、クリックやスクロールは遮らない */
+.bizcard-estimate-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    border-radius: 1.5rem 1.5rem 0 0;
+    background-color: var(--color-base-card);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.bizcard-estimate-card__footer {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 10px;
+    padding: 14px 20px 20px;
+    border-top: 1px solid var(--color-base-border-divider);
+    border-radius: 0 0 1.5rem 1.5rem;
+    background-color: var(--color-base-card);
+}
+
+@media (min-width: 1280px) {
+    /* 共有定義（#estimateSidebar > .estimate-drawer-card の max-height: none / overflow: visible）をこの画面だけ上書きする */
+    #estimateSidebar > .estimate-drawer-card.bizcard-estimate-card {
+        /* 画面の高さ − カードの上端の位置 − 下の余白 2rem。上端の位置は bizcardSettings.js が --estimate-card-top に入れる。
+           追従中（top-24）は 6rem になり、ページ最上部ではカードが下にある分だけ低くして、フッターを画面内に収める。 */
+        max-height: calc(100vh - var(--estimate-card-top, 6rem) - 2rem);
+        overflow: hidden;
+    }
+}
+
+/* --- 名刺データ化設定: 確定ボタン（白文字とのコントラストを確保するため一段濃い青にする） --- */
+.button-primary.bizcard-confirm-button {
+    background-color: var(--color-button-primary-hover-bg);
+}
+
+.button-primary.bizcard-confirm-button:hover {
+    background-color: #2A56B8;
+}
+
+.button-primary.bizcard-confirm-button:disabled,
+.button-primary.bizcard-confirm-button:disabled:hover {
+    background-color: var(--color-button-disabled-bg);
+    color: #6B6B6B;
+    box-shadow: none;
+    opacity: 1;
+}
+
+body.dark-mode .button-primary.bizcard-confirm-button:hover {
+    background-color: var(--color-button-primary-hover-bg);
+}
+
+body.dark-mode .button-primary.bizcard-confirm-button:disabled,
+body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
+    background-color: var(--color-button-disabled-bg);
+    color: var(--color-button-disabled-text);
+}
