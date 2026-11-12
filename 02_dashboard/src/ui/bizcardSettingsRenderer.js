@@ -162,9 +162,9 @@ export function renderEstimate(estimate) {
         const minChargeLine = minCharge > 0
             ? `<div class="text-xs text-on-surface-variant">※ 最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
             : '';
-        const baseLine = `${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円`;
+        const baseLine = `${cards.toLocaleString()}枚 × データ化単価 ${unit.toLocaleString()}円`;
         const premiumLine = premiumTotal > 0
-            ? `＋ ${cards.toLocaleString()}件 × プレミアム加算 ${premiumUnit.toLocaleString()}円`
+            ? `＋ ${cards.toLocaleString()}枚 × プレミアム加算 ${premiumUnit.toLocaleString()}円`
             : '';
         // クーポン値引きは renderSurveyTotalBlock 側でのみ表示する
         const breakdownLines = [baseLine, premiumLine].filter(Boolean).join('<br>');
@@ -179,8 +179,8 @@ export function renderEstimate(estimate) {
         dom.estimateBreakdown.innerHTML = `
             <div class="space-y-3 text-on-surface-variant">
               <div class="flex items-center justify-between text-sm">
-                <span class="text-on-surface-variant">想定件数</span>
-                <span class="text-base font-semibold text-on-surface">${cards.toLocaleString()}件</span>
+                <span class="text-on-surface-variant">見込み枚数</span>
+                <span class="text-base font-semibold text-on-surface">${cards.toLocaleString()}枚</span>
               </div>
               <div class="space-y-2">
                 <div class="text-xs uppercase tracking-widest text-on-surface-variant">内訳</div>
@@ -203,7 +203,7 @@ export function renderEstimate(estimate) {
             const cardsText = minChargeCards.toLocaleString();
             const amountText = (estimate.minCharge ?? 0).toLocaleString();
             if (dom.minChargeNoticeText) {
-                dom.minChargeNoticeText.textContent = `実際の件数が${cardsText}枚に満たない場合でも${cardsText}枚分（¥${amountText}）をご請求します。`;
+                dom.minChargeNoticeText.textContent = `最低ご請求は見込み枚数の50％分（今回は${cardsText}枚・¥${amountText}）です。`;
             }
             dom.minChargeNotice.classList.remove('hidden');
             dom.minChargeNotice.classList.add('flex');
@@ -385,6 +385,11 @@ export function renderPremiumOptions(optionGroups, selections) {
   if (!container || !Array.isArray(optionGroups)) return;
 
   const lang = document.documentElement.lang || 'ja';
+  // グループ見出し: 日本語表示では日本語の見出し（英大文字化なし）、それ以外は従来の英語見出しを保つ
+  const isJa = lang === 'ja';
+  const groupHeadClass = isJa
+    ? 'text-xs font-bold text-primary tracking-wider flex items-center gap-2 px-1'
+    : 'text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 px-1';
   const normalizedSelections = selections || {};
   const additionalItems = new Set(normalizedSelections.additionalItems || []);
   container.innerHTML = '';
@@ -464,15 +469,15 @@ export function renderPremiumOptions(optionGroups, selections) {
     return card;
   };
 
-  // --- グループ1: サービス・アップグレード ---
+  // --- グループ1: 対応言語の追加 ---
   const upgradeGroup = optionGroups.find(g => g.value === 'multilingual');
   if (upgradeGroup) {
     const section = document.createElement('div');
     section.className = 'space-y-3';
     
     const head = document.createElement('h3');
-    head.className = 'text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 px-1';
-    head.innerHTML = '<span class="material-icons text-[14px]">upgrade</span> Service Upgrade';
+    head.className = groupHeadClass;
+    head.innerHTML = `<span class="material-icons text-[14px]">upgrade</span> ${isJa ? '対応言語の追加' : 'Service Upgrade'}`;
     section.appendChild(head);
 
     const grid = document.createElement('div');
@@ -494,15 +499,15 @@ export function renderPremiumOptions(optionGroups, selections) {
     container.appendChild(section);
   }
 
-  // --- グループ2: 抽出項目の追加 ---
+  // --- グループ2: データ化項目の追加 ---
   const additionalGroup = optionGroups.find(g => g.value === 'additionalItems');
   if (additionalGroup && Array.isArray(additionalGroup.options)) {
     const section = document.createElement('div');
     section.className = 'space-y-3';
     
     const head = document.createElement('h3');
-    head.className = 'text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 px-1';
-    head.innerHTML = '<span class="material-icons text-[14px]">add_task</span> Extraction Details';
+    head.className = groupHeadClass;
+    head.innerHTML = `<span class="material-icons text-[14px]">add_task</span> ${isJa ? 'データ化項目の追加' : 'Extraction Details'}`;
     section.appendChild(head);
 
     const grid = document.createElement('div');

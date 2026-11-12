@@ -121,7 +121,7 @@ const PREMIUM_OPTION_GROUPS = [
             },
             {
                 value: 'secondAddress',
-                title: { ja: '住所2つめ', en: 'Second address' },
+                title: { ja: '住所2つ目', en: 'Second address' },
                 description: {
                     ja: '本社と支社など複数住所の管理に対応します。',
                     en: 'Keep headquarters and branch addresses together.'

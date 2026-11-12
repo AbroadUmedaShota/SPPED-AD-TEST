@@ -55,8 +55,8 @@
                             <div class="relative z-10 grid grid-cols-1 md:grid-cols-[2fr_1fr_1.5fr] gap-6 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-outline-variant/30">
                                 <!-- アンケート名 -->
                                 <div class="flex flex-col gap-1.5 pb-4 md:pb-0" data-help-target="bizcard-survey-name">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">label</span> Survey Name
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">label</span> アンケート名
                                     </span>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-base font-bold text-on-surface leading-tight" id="surveyNameDisplay">業種別実用テンプレート (個人アカウント)</span>
@@ -66,16 +66,16 @@
 
                                 <!-- ID -->
                                 <div class="flex flex-col gap-1.5 py-4 md:py-0 md:pl-6">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">fingerprint</span> ID
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">fingerprint</span> アンケートID
                                     </span>
                                     <span class="text-sm font-mono font-bold text-on-surface-variant bg-surface-variant/50 px-2 py-0.5 rounded w-fit select-all" id="surveyIdDisplay">sv_0001_26008</span>
                                 </div>
 
                                 <!-- 会期 -->
                                 <div class="flex flex-col gap-1.5 pt-4 md:pt-0 md:pl-6" data-help-target="bizcard-survey-period">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">calendar_today</span> Event Period
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">calendar_today</span> 会期
                                     </span>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-sm font-bold text-on-surface" id="surveyPeriodDisplay">2026-01-04 - 2026-01-17</span>
@@ -170,7 +170,10 @@
                                         </div>
                                     </div>
                                     <p class="text-[13px] text-on-surface-variant leading-relaxed">
-                                        ※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を右カラムにて確認してください。
+                                        ※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。
+                                    </p>
+                                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                                        <span class="font-bold">対応言語：</span>日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語
                                     </p>
                                 </div>
 
@@ -374,14 +377,6 @@
                                 </div>
                             </details>
 
-                            <!-- 対応言語 -->
-                            <div class="px-2 z-20">
-                                <p class="text-xs font-bold text-on-surface-variant mb-1.5 flex items-center gap-1">
-                                    <span class="material-icons text-[14px]">translate</span> 対応言語
-                                </p>
-                                <p class="text-[11px] text-on-surface-variant/80 font-medium">日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語</p>
-                            </div>
-
                         </div>
                     </aside>
 
@@ -408,7 +403,7 @@
     <div class="p-6 space-y-8 text-sm overflow-y-auto max-h-[60vh] custom-scrollbar">
         <div class="space-y-3">
             <h3 class="font-bold border-b-2 border-primary/20 pb-2 text-base text-primary flex items-center gap-2">
-                <span class="material-icons text-lg">filter_1</span>無料項目プランでデータ化される2項目
+                <span class="material-icons text-lg">filter_1</span>お試しプランでデータ化される2項目
             </h3>
             <ol class="list-decimal pl-6 space-y-1.5 font-medium text-on-surface">
                 <li>メールアドレス</li>
@@ -417,7 +412,7 @@
         </div>
         <div class="space-y-3">
             <h3 class="font-bold border-b-2 border-primary/20 pb-2 text-base text-primary flex items-center gap-2">
-                <span class="material-icons text-lg">filter_2</span>スタンダード項目プランでデータ化される10項目
+                <span class="material-icons text-lg">filter_2</span>通常・特急・超特急・オンデマンドでデータ化される10項目
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-2 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
                 <ol class="list-decimal pl-5 space-y-2 font-medium text-on-surface">
@@ -466,12 +461,12 @@
     <div class="p-6 space-y-4 text-sm text-on-surface-variant overflow-y-auto max-h-[60vh] custom-scrollbar">
         <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/40">
             <ul class="space-y-3 font-medium text-on-surface">
-                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求見込み金額は「見込み件数×データ化単価」で算出した金額です。<br>実際のご請求は、データ化が完了した実数精算となります。</li>
+                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求見込み金額は「見込み枚数×データ化単価」で算出した金額です。<br>実際のご請求は、データ化が完了した実数精算となります。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>会期開始日以降のデータ化設定の変更はできません。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>クーポンをご利用の場合、アンケート全体のご請求金額に対してお値引きが適用されます。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求書はデータ化完了後にメールにてお送りします。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>お支払いは銀行振込（翌月末払い）となります。<br><span class="text-xs text-on-surface-variant font-normal">※振込手数料はお客様のご負担でお願いいたします。</span></li>
-                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-error">•</span>実際の件数が想定件数の50％に満たない場合でも、想定の50％分の数量が最低ご請求単位となります。</li>
+                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-error">•</span>実際の枚数が見込み枚数の50％に満たない場合でも、見込み枚数の50％分が最低ご請求単位となります。</li>
             </ul>
         </div>
     </div>
