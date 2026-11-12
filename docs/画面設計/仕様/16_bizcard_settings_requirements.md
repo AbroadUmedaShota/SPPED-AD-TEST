@@ -213,8 +213,8 @@ last_reviewed: 2026-04-24
 - 保存ボタンは `.bizcard-confirm-button` で通常色を `--color-button-primary-hover-bg`（#3367D6）、ホバー時を #2A56B8 にする。無効時は背景 `--color-button-disabled-bg`・文字 #6B6B6B。`--color-button-primary-bg` は変更しない。
 - 1280px 未満の下部固定バー（`#estimateBar`）: 白背景、上に 1px の罫線、上向きの影。余白は上 10px・左右 16px・下 16px + `env(safe-area-inset-bottom)`。1 行目は左にラベル「税込請求見込み」（12px 太字）と `#estimatedCompletionDateCompact`「完了予定 YYYY/M/D」（11px）、右に金額（24px・900）と内訳トグル `#estimateSheetToggleBtn`（高さ 32px のチップ。`::after` で行全体を押せる範囲にする。最小高さ 48px）。2 行目は確定 7 : キャンセル 3。360px 未満では確定ボタンの文字を 14px にする。
 - 1280px 未満の内訳シート（`#estimateSheet`）: トグルを押すとバーの後ろから `translateY(100%) → 0`（320ms、`cubic-bezier(0.2, 0.8, 0.2, 1)`）でせり上がり、背景 `#estimateSheetScrim`（黒 45%）が 240ms でフェードする。バーは動かず、トグルの文言が「閉じる」に変わる。上端の角丸 24px、つまみ（40×4px）、見出しと閉じるボタン `#estimateSheetCloseBtn`（44×44px）。高さは最大で画面高 − ヘッダー分で、中身が長いときはシート内でスクロールする。`prefers-reduced-motion: reduce` では動きを止める。
-- シートを閉じる手段は、トグルをもう一度押す・閉じるボタン・背景を押す・Esc キー。画面幅が 1280px 以上になったら自動で閉じる。注意事項モーダルや確認モーダルが前面にあるときの Esc は、モーダル側だけを閉じる。
-- シートは開いている間だけ `role="dialog" aria-modal="true" aria-label="料金見積もり"` を持つ。開いたら閉じるボタンへフォーカスを移し、閉じたらトグルへ戻す。開いている間は背面のスクロールを止め、設定フォーム（`#estimateSheetBackground`）に `inert` を付ける。トグルは `aria-expanded` と `aria-controls="estimateSheet"` を持つ。
+- シートを閉じる手段は、トグルをもう一度押す・閉じるボタン・背景を押す・Esc キー。画面幅が 1280px 以上になったら自動で閉じる。注意事項モーダル、確認モーダル、ヘルプのポップオーバーが前面にあるときの Esc は、前面のものだけを閉じる（Esc はキャプチャ段階で受けて判定する）。
+- シートは開いている間だけ `role="dialog" aria-modal="true" aria-label="料金見積もり"` を持つ。開いたら閉じるボタンへフォーカスを移し、閉じたらトグルへ戻す。開いている間は背面のスクロールを止め、設定フォーム（`#estimateSheetBackground`）・パンくず・ヘッダー・サイドバー・フッターに `inert` を付けて、フォーカスがシートとバーの外へ出ないようにする。トグルは `aria-expanded` と `aria-controls="estimateSheet"` を持つ。
 - テキスト入力（枚数、メモ、クーポンなど）にフォーカスがある間は、1280px 未満のバーを隠す（`.is-hidden-for-input`）。フォーカスが外れたら戻す。
 - 重なり順: モバイルサイドバー（39 / 40）・ヘッダー（50）< 背景（52）< シート（54）< バー（56）< モーダル（60）。シートを閉じている間のバーは 38 で、モバイルサイドバーを開くとその下に回る。
 
