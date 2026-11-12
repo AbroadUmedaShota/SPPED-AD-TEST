@@ -3764,3 +3764,26 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
         transition: none;
     }
 }
+
+/* --- 名刺データ化設定: ヘッダーのメールアドレスを末尾省略にする --- */
+/* 共通ヘッダー（common/header.html）は全画面で使うため変更せず、この画面（.bizcard-settings-page）でだけ効かせる。
+   幅が足りないときにロゴとメールアドレスが重なるのを防ぐ。ロゴの大きさは変えない。 */
+.bizcard-settings-page #header-placeholder header {
+    gap: 0.75rem;
+}
+
+.bizcard-settings-page #header-placeholder header > div:first-child {
+    flex-shrink: 0;
+}
+
+.bizcard-settings-page #header-placeholder header > div:last-child {
+    min-width: 0;
+}
+
+.bizcard-settings-page #header-placeholder header a[aria-label="現在のユーザー情報"] {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
