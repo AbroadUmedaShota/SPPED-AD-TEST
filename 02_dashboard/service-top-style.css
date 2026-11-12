@@ -3614,7 +3614,7 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
         position: sticky;
         top: 0;
         flex-shrink: 0;
-        z-index: 25; /* スクロールする中身（z-20）より手前、データ化OFFの覆い（30）より奥 */
+        z-index: 35; /* スクロールする中身（z-20）とデータ化OFFの覆い（30）より手前。閉じるボタンを薄く見せない */
         min-height: 44px;
         margin: 0 -16px;
         padding: 0 8px 0 20px;

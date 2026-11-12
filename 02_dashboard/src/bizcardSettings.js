@@ -160,8 +160,8 @@ export function initBizcardSettings() {
             }
 
             setupEventListeners();
-            initEstimateBottomSheet();
             updateFullUI();
+            initEstimateBottomSheet();
             initEstimateCardFit();
 
         } catch (error) {
@@ -180,14 +180,21 @@ export function initBizcardSettings() {
         if (!sidebar) return;
         const pcMedia = window.matchMedia('(min-width: 1280px)');
         let isUpdateQueued = false;
+        let lastTop = null;
 
         const update = () => {
             isUpdateQueued = false;
             if (!pcMedia.matches) {
                 sidebar.style.removeProperty('--estimate-card-top');
+                lastTop = null;
                 return;
             }
-            const top = Math.max(0, Math.round(sidebar.getBoundingClientRect().top));
+            // 追従位置（sticky の top）より上には詰めない。ページ末尾でカードが押し上げられたときに
+            // 高さ上限が増えてカードが伸びるのを防ぐ
+            const stickyTop = parseFloat(getComputedStyle(sidebar).top) || 96;
+            const top = Math.max(stickyTop, Math.round(sidebar.getBoundingClientRect().top));
+            if (top === lastTop) return;
+            lastTop = top;
             sidebar.style.setProperty('--estimate-card-top', `${top}px`);
         };
         const requestUpdate = () => {

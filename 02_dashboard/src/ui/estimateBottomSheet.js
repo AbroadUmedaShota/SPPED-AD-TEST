@@ -27,7 +27,7 @@ const TEXT_ENTRY_SELECTOR = [
  * @param {string} [options.closeId] - シートの閉じるボタンの ID。
  * @param {string} [options.scrimId] - 背景（半透明の黒）の要素 ID。
  * @param {string} [options.toggleLabelId] - トグルの文言（内訳／閉じる）を入れる要素の ID。
- * @param {string} [options.backgroundId] - シートを開いている間に操作不可にする背面要素の ID。
+ * @param {string[]} [options.backgroundIds] - シートを開いている間に操作不可にする背面要素の ID。
  * @returns {{open: Function, close: Function, isOpen: Function}|null} 制御用の関数。必要な要素が無ければ null。
  */
 export function initEstimateBottomSheet({
@@ -37,7 +37,7 @@ export function initEstimateBottomSheet({
   closeId = 'estimateSheetCloseBtn',
   scrimId = 'estimateSheetScrim',
   toggleLabelId = 'estimateSheetToggleLabel',
-  backgroundId = 'estimateSheetBackground'
+  backgroundIds = ['estimateSheetBackground', 'breadcrumb-container', 'header-placeholder', 'sidebar-placeholder', 'footer-placeholder']
 } = {}) {
   const sheet = document.getElementById(sheetId);
   const bar = document.getElementById(barId);
@@ -45,7 +45,6 @@ export function initEstimateBottomSheet({
   const closeBtn = document.getElementById(closeId);
   const scrim = document.getElementById(scrimId);
   const toggleLabel = document.getElementById(toggleLabelId);
-  const background = document.getElementById(backgroundId);
   const toggleIcon = toggleBtn?.querySelector('.material-icons');
 
   if (!sheet || !bar || !toggleBtn || !closeBtn || !scrim) return null;
@@ -56,9 +55,11 @@ export function initEstimateBottomSheet({
   const dialogLabel = sheet.dataset.sheetLabel || '料金見積もり';
   let isSheetOpen = false;
 
-  const isModalOpenOnTop = () => Boolean(
+  // 注意事項モーダル、確認モーダル、ヘルプのポップオーバーのいずれかが前面に出ているか
+  const isOverlayOpenOnTop = () => Boolean(
     document.querySelector('dialog[open]') ||
-    document.querySelector('.modal-overlay[data-state="open"]')
+    document.querySelector('.modal-overlay[data-state="open"]') ||
+    document.querySelector('#global-help-popover:not(.hidden)')
   );
 
   const applyState = (nextOpen) => {
@@ -82,11 +83,14 @@ export function initEstimateBottomSheet({
       sheet.removeAttribute('aria-label');
     }
 
-    // 背面（設定フォーム）はシートを開いている間は操作・読み上げの対象から外す
-    if (background) {
+    // 背面（設定フォーム、ヘッダー、サイドバーなど）はシートを開いている間は操作・読み上げの対象から外す。
+    // 共通部品は読み込みの後から差し込まれるため、要素は開閉のたびに取り直す
+    backgroundIds.forEach((id) => {
+      const background = document.getElementById(id);
+      if (!background) return;
       if (nextOpen) background.setAttribute('inert', '');
       else background.removeAttribute('inert');
-    }
+    });
   };
 
   const open = () => {
@@ -113,20 +117,26 @@ export function initEstimateBottomSheet({
   closeBtn.addEventListener('click', () => close());
   scrim.addEventListener('click', () => close());
 
+  // キャプチャ段階で受ける。ページ全体の Esc 処理が先にモーダルを閉じると、前面にあったかどうかを判定できないため
   document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape' || !isSheetOpen) return;
-    // 注意事項モーダルや確認モーダルが前面にあるときは、そちらの Esc を優先する
-    if (isModalOpenOnTop()) return;
+    if (event.key !== 'Escape' || event.isComposing || !isSheetOpen) return;
+    // モーダルやヘルプが前面にあるときは、そちらだけを閉じさせる
+    if (isOverlayOpenOnTop()) return;
     close();
-  });
+  }, true);
 
   // 1280px 以上になったら閉じて PC レイアウトへ戻す
-  sheetMedia.addEventListener('change', (event) => {
+  const handleMediaChange = (event) => {
     if (!event.matches) {
       close({ restoreFocus: false });
       bar.classList.remove('is-hidden-for-input');
     }
-  });
+  };
+  if (typeof sheetMedia.addEventListener === 'function') {
+    sheetMedia.addEventListener('change', handleMediaChange);
+  } else if (typeof sheetMedia.addListener === 'function') {
+    sheetMedia.addListener(handleMediaChange);
+  }
 
   // テキスト入力中（ソフトキーボード表示中）はバーを隠し、フォーカスが外れたら戻す
   const isTextEntry = (element) => element instanceof Element && element.matches(TEXT_ENTRY_SELECTOR);
