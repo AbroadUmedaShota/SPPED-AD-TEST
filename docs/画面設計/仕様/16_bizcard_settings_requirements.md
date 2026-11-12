@@ -172,7 +172,11 @@ last_reviewed: 2026-04-24
 - 見出し「1. データ化プランと見込み枚数」＋ `data-help-key="bizcardPlanAndSpeed"` のヘルプトリガ、右端に「詳細仕様を見る」ボタン `#openBizcardDetailsModalBtn`。
 - `#dataConversionPlanSelection` は `role="radiogroup"`、`flex flex-col gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成し、お試し（`trial`）を先頭に全幅 1 枚、有料 4 プラン（`normal` / `express` / `superExpress` / `onDemand`）をその下の `grid grid-cols-1 md:grid-cols-2 gap-4`（768px 以上で 2 列 × 2 段、768px 未満で 1 列）に並べる（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
 - お試しカードは 2 段構成。上段はアイコン・プラン名・バッジ「無料」・その下にタグライン（11px 太字）、右端にラジオ表示、上段の下に罫線。下段は単価・項目数・納期の横 3 列（各列はラベルと値の縦積み。768px 以上はラベル 13px・値 16px 太字、768px 未満はラベル 12px・値 14px 太字）。有料 4 プランのカードは単価・項目数・納期の 3 行と下部のタグラインで構成する。選択時のスタイル（`border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md`）は全カード共通。
-- 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー群 + `<input id="bizcardRequest" type="number" min="0" max="9999" value="100">` + `.input-error-message`（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
+- 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー `.bizcard-stepper`（6 ボタン + `<input id="bizcardRequest" type="number" inputmode="numeric" min="0" max="9999" value="100">` + 単位「枚」 + エラー表示 `#bizcardRequestError`）で構成する（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
+- ステッパーの並びは `service-top-style.css` の `.bizcard-stepper*` で切り替える。DOM は 1 行表示の順（-100 / -10 / − / 入力欄 / ＋ / +10 / +100）。
+  - 640px 以上: 1 行。ボタンは高さ 44px（幅は ±100 が 64px、±10 が 48px、±1 が 44px）。入力欄は幅 128px・枠 2px。
+  - 640px 未満: 2 段。1 段目は `56px minmax(0, 1fr) 56px`（間隔 8px・高さ 56px）で「−」・入力欄・「＋」。入力欄は枠（2px・角丸 12px）の中に数値（36px・900）と単位「枚」（16px 太字）を並べる。2 段目は 4 等分（間隔 8px・高さ 44px）で「-100」「-10」「+10」「+100」。360px 未満では 1 段目の両端を 44px、数値を 30px にする。
+  - フォーム枠 `#bizcardSettingsFields` の内側余白は 768px 未満で 16px、768px 以上で 32px。見込み枚数の囲みの余白は 768px 未満で 16px、768px 以上で 24px。
 - 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「最低ご請求は見込み枚数の50％分（今回は N 枚・¥金額）です。」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
 - 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
 - 対応言語: 注記文言の直後に「対応言語：日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語」を 1 行で表示（HTML 直書き、「対応言語：」のみ太字）。
@@ -223,7 +227,7 @@ last_reviewed: 2026-04-24
   - `#bizcardFormActiveArea` に `opacity-40 pointer-events-none grayscale` 付与。
   - `#rightColumnDisabledOverlay.hidden` を外して右カラム全面を覆う。
   - `#couponCode` / `#applyCouponBtn` を `disabled=true`。
-  - `#bizcardRequest.border-error` を除去（エラー表示を消す）。
+  - 見込み枚数の入力エラー表示を消す（`validateForm(true)` が `#bizcardRequestError` を非表示にし、`aria-invalid` / `aria-describedby` を外す）。
   - 見積計算時に `bizcardRequest: 0, dataConversionPlan: 'none', premiumOptions: 空` を強制して amount=0、`#estimatedCompletionDate` を「データ化を実施しない」に固定（[bizcardSettings.js:520-531](../../../02_dashboard/src/bizcardSettings.js#L520)）。
 - スキップ OFF（= 有効）時は上記をすべて解除。
 
@@ -532,7 +536,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 
 | 項目 | 条件 | 違反時 | 実装位置 |
 |------|------|--------|----------|
-| `bizcardRequest`（スキップ OFF 時） | `parseInt(value) > 0`、`NaN` 不可 | `.input-error-message` に「1枚以上必要です」、`.border-error` 付与、保存ボタン disabled | [bizcardSettingsRenderer.js:559-572](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) |
+| `bizcardRequest`（スキップ OFF 時） | `parseInt(value) > 0`、`NaN` 不可 | `#bizcardRequestError` に「1枚以上必要です」を表示、入力欄の枠を 2px の赤、`aria-invalid="true"` と `aria-describedby="bizcardRequestError"` を付与、保存ボタン disabled | [bizcardSettingsRenderer.js:559-572](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) |
 | `bizcardRequest`（スキップ ON 時） | チェックなし（常に valid） | エラー表示除去、保存ボタン enabled | 同:551-557 |
 | `bizcardRequest`（入力制約） | `min=0` `max=9999` | HTML5 標準の範囲外警告のみ | [bizcardSettings.html:147](../../../02_dashboard/bizcardSettings.html#L147) |
 | `bizcardRequest`（ステッパー） | 0〜9999 に clamp、非数は 0 | 自動補正、エラーなし | [bizcardSettings.js:210](../../../02_dashboard/src/bizcardSettings.js#L210) |
@@ -541,11 +545,11 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 | `couponCode` | 空文字時は「クーポンコードを入力してください。」、未知コードは「無効なクーポンコードです。」 | `#couponCodeErrorMessage` 表示 | [bizcardSettings.js:382-386, 407](../../../02_dashboard/src/bizcardSettings.js#L382) |
 | `internalMemo` | なし | — | — |
 
-`validateForm()` は `#input-error-message` を `bizcardRequestInput.parentElement` 内から 1 件だけ拾う実装で、複数箇所にはスケールしない（§11-15）。
+`validateForm()` は見込み枚数 1 項目だけを対象にし、エラー表示は `setRequestCountError()` が `#bizcardRequestError` に対して切り替える。複数箇所にはスケールしない（§11-15）。
 
 ### 7.2 エラー表示仕様
 
-- `bizcardRequest`: `.input-error-message`（高さ 3px 固定プレースホルダ、HTML 直書き）にテキスト挿入、`#bizcardRequest` に `.border-error` 付与。
+- `bizcardRequest`: 入力欄の直下（2 段表示では 1 段目と 2 段目の間）の `#bizcardRequestError` に、エラーアイコン（`error_outline`、`aria-hidden="true"`）と文言 `#bizcardRequestErrorText`（`.input-error-message`）を 13px 太字・`--color-state-error`・中央寄せで表示する。エラーがないときは `.hidden`。入力欄の枠は `.bizcard-stepper__field.is-invalid` で 2px の赤にし、`#bizcardRequest` に `aria-invalid="true"` と `aria-describedby="bizcardRequestError"` を付ける。エラーが解消したら属性を外す。
 - クーポン: `#couponCodeErrorMessage`（非表示時 `.hidden`）を外し、`#couponCodeErrorText` にメッセージ。
 - 保存失敗: `showToast(message, 'error')`。
 - `aria-live` は付与されていない（§11-16）。
@@ -682,7 +686,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 
 14. **`fetchSurveyData` / `fetchBizcardSettings` の二重 fetch**: 両関数とも同じ `data/core/surveys.json` を個別に fetch する（[bizcardSettingsService.js:22, 50](../../../02_dashboard/src/services/bizcardSettingsService.js#L22)）。`Promise.all` で並列化されているとはいえ HTTP リクエストは 2 本。共通ロード → 1 レスポンスから 2 値を取り出す形へ統合可能。
 
-15. **`validateForm` 単一箇所チェック**: [bizcardSettingsRenderer.js:559](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) の `dom.bizcardRequestInput.parentElement.querySelector('.input-error-message')` は `bizcardRequest` 直近親の 1 件しか見ない。将来バリデーション対象項目を増やす際はルール集約の作り替えが必要。
+15. **`validateForm` 単一箇所チェック**: [bizcardSettingsRenderer.js:559](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) の `validateForm()` と `setRequestCountError()` は `bizcardRequest` と `#bizcardRequestError` の 1 組しか扱わない。将来バリデーション対象項目を増やす際はルール集約の作り替えが必要。
 
 16. **`aria-live` 欠落**: `#estimatedAmount` / `#estimatedCompletionDate` / `#estimateBreakdown` / `.input-error-message` / `#couponCodeErrorMessage` いずれも `aria-live` 無し。見積金額のリアルタイム変動が支援技術に通知されない。
 
