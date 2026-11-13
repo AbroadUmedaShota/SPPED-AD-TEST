@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-background text-on-background bizcard-settings-page">
 
 <!-- 1. アプリケーション全体構造 -->
 <div class="relative flex min-h-screen flex-col">
@@ -45,7 +45,7 @@
                 <div class="flex flex-col xl:flex-row gap-8 items-start w-full relative">
                     
                     <!-- ====== 左カラム (メインエリア 65%) ====== -->
-                    <div class="w-full xl:w-[65%] flex flex-col gap-6">
+                    <div id="estimateSheetBackground" class="w-full xl:w-[65%] flex flex-col gap-6">
                         
                         <!-- アンケート基本情報：SPEED-AD Standard Style -->
                         <div class="rounded-2xl border border-outline-variant/60 bg-surface p-6 shadow-sm overflow-hidden relative group">
@@ -55,8 +55,8 @@
                             <div class="relative z-10 grid grid-cols-1 md:grid-cols-[2fr_1fr_1.5fr] gap-6 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-outline-variant/30">
                                 <!-- アンケート名 -->
                                 <div class="flex flex-col gap-1.5 pb-4 md:pb-0" data-help-target="bizcard-survey-name">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">label</span> Survey Name
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">label</span> アンケート名
                                     </span>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-base font-bold text-on-surface leading-tight" id="surveyNameDisplay">業種別実用テンプレート (個人アカウント)</span>
@@ -66,16 +66,16 @@
 
                                 <!-- ID -->
                                 <div class="flex flex-col gap-1.5 py-4 md:py-0 md:pl-6">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">fingerprint</span> ID
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">fingerprint</span> アンケートID
                                     </span>
                                     <span class="text-sm font-mono font-bold text-on-surface-variant bg-surface-variant/50 px-2 py-0.5 rounded w-fit select-all" id="surveyIdDisplay">sv_0001_26008</span>
                                 </div>
 
                                 <!-- 会期 -->
                                 <div class="flex flex-col gap-1.5 pt-4 md:pt-0 md:pl-6" data-help-target="bizcard-survey-period">
-                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
-                                        <span class="material-icons text-[14px]">calendar_today</span> Event Period
+                                    <span class="text-[11px] font-bold text-primary tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">calendar_today</span> 会期
                                     </span>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-sm font-bold text-on-surface" id="surveyPeriodDisplay">2026-01-04 - 2026-01-17</span>
@@ -86,7 +86,7 @@
                         </div>
 
                         <!-- 設定フォーム群 -->
-                        <section class="w-full bg-surface p-8 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-8" id="bizcardSettingsFields">
+                        <section class="w-full bg-surface p-4 md:p-8 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-8" id="bizcardSettingsFields">
 
                             <!-- スキップトグル -->
                             <div class="flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-container-low p-5 transition-colors duration-300" id="skipBizcardToggleContainer" data-help-target="bizcard-disable-note">
@@ -117,10 +117,10 @@
                                     </div>
                                     
                                     <!-- プラン選択 -->
-                                    <div id="dataConversionPlanSelection" role="radiogroup" aria-labelledby="dataConversionPlanHeading" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4"></div>
+                                    <div id="dataConversionPlanSelection" role="radiogroup" aria-labelledby="dataConversionPlanHeading" class="flex flex-col gap-4"></div>
 
                                     <!-- 見込み枚数（スライダー＋ステッパー） -->
-                                    <div class="rounded-2xl bg-gradient-to-br from-surface-container-lowest to-primary/5 p-6 border border-outline-variant/80 border-l-4 border-l-primary/40 mt-4 flex flex-col gap-5 relative" data-help-target="bizcard-request">
+                                    <div class="rounded-2xl bg-gradient-to-br from-surface-container-lowest to-primary/5 p-4 md:p-6 border border-outline-variant/80 border-l-4 border-l-primary/40 mt-4 flex flex-col gap-4 md:gap-5 relative" data-help-target="bizcard-request">
                                         <!-- ヘッダー -->
                                         <div class="flex items-center gap-1.5">
                                             <span class="material-icons text-primary text-[20px]">style</span>
@@ -130,37 +130,44 @@
                                             <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors text-[18px]" data-help-key="expectedBizcardCount" aria-label="見込み枚数の説明を表示">help_outline</button>
                                         </div>
 
-                                        <!-- ステッパー（数値表示中央） -->
-                                        <div class="flex items-center justify-center gap-2">
+                                        <!-- ステッパー（640px未満は2段、640px以上は1行。並びの切り替えは service-top-style.css の .bizcard-stepper） -->
+                                        <div class="bizcard-stepper">
                                             <button type="button" id="bizcardRequestDec100Btn"
-                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--hundred flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="100枚減らす">-100</button>
                                             <button type="button" id="bizcardRequestDec10Btn"
-                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--ten flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="10枚減らす">-10</button>
-                                            <button type="button" id="bizcardRequestDecBtn"
-                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚減らす">−</button>
 
-                                            <div class="flex items-baseline gap-2">
-                                                <div class="relative group">
-                                                    <input type="number" id="bizcardRequest" min="0" max="9999" placeholder="100"
-                                                        class="w-32 rounded-xl border-2 border-outline-variant bg-surface px-3 py-2 text-center font-black text-4xl text-on-surface shadow-inner transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                            <div class="bizcard-stepper__main">
+                                                <button type="button" id="bizcardRequestDecBtn"
+                                                    class="bizcard-stepper__btn bizcard-stepper__btn--one flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚減らす">−</button>
+
+                                                <div class="bizcard-stepper__field transition-colors">
+                                                    <input type="number" inputmode="numeric" id="bizcardRequest" min="0" max="9999" placeholder="100"
+                                                        class="bizcard-stepper__input text-center font-black text-on-surface transition-colors"
                                                         value="100">
-                                                    <div class="input-error-message text-center text-[10px] text-error font-bold leading-tight mt-1 h-3"></div>
+                                                    <span class="bizcard-stepper__unit font-bold text-on-surface-variant select-none">枚</span>
                                                 </div>
-                                                <span class="font-bold text-xl text-on-surface-variant select-none">枚</span>
+
+                                                <button type="button" id="bizcardRequestIncBtn"
+                                                    class="bizcard-stepper__btn bizcard-stepper__btn--one flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚増やす">＋</button>
                                             </div>
 
-                                            <button type="button" id="bizcardRequestIncBtn"
-                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚増やす">＋</button>
                                             <button type="button" id="bizcardRequestInc10Btn"
-                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--ten flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="10枚増やす">+10</button>
                                             <button type="button" id="bizcardRequestInc100Btn"
-                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                class="bizcard-stepper__btn bizcard-stepper__btn--step bizcard-stepper__btn--hundred flex items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                                                 aria-label="100枚増やす">+100</button>
+
+                                            <!-- 入力エラー（エラーがないときは非表示） -->
+                                            <p id="bizcardRequestError" class="bizcard-stepper__error hidden">
+                                                <span class="material-icons" aria-hidden="true">error_outline</span>
+                                                <span id="bizcardRequestErrorText" class="input-error-message"></span>
+                                            </p>
                                         </div>
 
                                         <!-- 最低請求バッジ（インライン） -->
@@ -170,7 +177,10 @@
                                         </div>
                                     </div>
                                     <p class="text-[13px] text-on-surface-variant leading-relaxed">
-                                        ※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を右カラムにて確認してください。
+                                        ※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。
+                                    </p>
+                                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                                        <span class="font-bold">対応言語：</span>日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語
                                     </p>
                                 </div>
 
@@ -198,190 +208,198 @@
                                 </div>
                             </div>
                         </section>
-                    <!-- アクション (旧サイドバー内) -->
-                    <div class="bg-white rounded-3xl border border-outline-variant shadow-sm p-6 sm:p-8 mt-8 xl:mt-10">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button id="saveBizcardSettingsBtn" class="flex-1 rounded-full button-primary px-6 py-3 text-base font-bold shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100 flex justify-center items-center group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                                <span id="saveBizcardSettingsBtnText">設定を保存して依頼を確定</span>
-                                <span id="saveBizcardSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
-                            </button>
-                            <button id="cancelBizcardSettings" class="flex-1 rounded-full border border-outline-variant px-6 py-3 text-base font-bold text-on-surface shadow-sm transition-colors hover:bg-surface-variant hover:border-outline focus:outline-none focus:ring-2 focus:ring-outline-variant focus:ring-offset-1 active:bg-outline-variant/20 flex justify-center items-center">キャンセル</button>
-                        </div>
-                    </div>
                     </div>
 
                     <!-- ====== 右カラム (サマリー・アクションエリア 35%) ====== -->
-                    <div id="estimateSidebarOverlay" class="estimate-sidebar-overlay"></div>
-                    <aside id="estimateSidebar" aria-label="料金見積もり" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
-                        <button id="estimateSidebarToggleBtn" type="button" class="estimate-drawer-toggle" aria-label="料金見積もりを開閉する" aria-expanded="false">
-                            <span class="material-icons transition-transform duration-300">chevron_left</span>
-                        </button>
-                        <div class="estimate-drawer-card rounded-3xl border border-outline-variant/60 bg-surface p-5 shadow-sm flex flex-col gap-4 relative">
-                            <!-- Overlay when skipped -->
-                            <div id="rightColumnDisabledOverlay" class="absolute inset-0 bg-surface/50 backdrop-blur-[1px] z-10 hidden rounded-3xl transition-opacity duration-300"></div>
+                    <!-- 1280px未満で内訳シートを開いている間の背景（押すと閉じる） -->
+                    <div id="estimateSheetScrim" class="estimate-sheet-scrim" aria-hidden="true"></div>
+                    <aside id="estimateSidebar" aria-label="料金見積もり" class="estimate-sheet-host w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
+                        <div class="bizcard-estimate-card rounded-3xl border border-outline-variant/60 bg-surface shadow-sm relative">
+                            <!-- 本体（内訳）。カードが画面の高さに収まらないときは、ここだけがスクロールする。
+                                 1280px未満では、下部バーの後ろからせり上がるシートになる -->
+                            <div id="estimateSheet" class="bizcard-estimate-card__body-wrap estimate-sheet" data-sheet-label="料金見積もり">
+                                <!-- データ化OFF時に本体だけを薄く見せる覆い（フッターは覆わない） -->
+                                <div id="rightColumnDisabledOverlay" class="bizcard-estimate-card__overlay hidden" aria-hidden="true"></div>
+                                <div class="bizcard-estimate-card__body flex flex-col gap-4">
 
-                            <div class="flex items-center justify-between border-b border-outline-variant pb-3 z-20">
-                                <div class="flex items-center gap-1.5">
-                                    <h2 class="text-lg font-bold text-on-surface">料金見積もり</h2>
-                                    <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="estimateBilling" aria-label="料金見積もりの説明を表示">help_outline</button>
-                                </div>
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface">
-                                    <span class="material-icons text-[14px] text-on-surface-variant animate-spin-slow">autorenew</span> 自動計算
-                                </span>
-                            </div>
-
-                            <!-- 金額と完了予定日 -->
-                            <div class="space-y-2 z-20">
-                                <div class="rounded-2xl bg-surface-bright p-4 shadow-inner border border-outline-variant relative overflow-hidden group">
-                                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                                    <p class="text-sm text-on-surface-variant font-semibold flex items-center justify-between relative z-10">
-                                        名刺データ化の小計（税抜）
-                                        <span class="text-[10px] bg-outline-variant/30 px-2 py-0.5 rounded text-on-surface-variant">名刺機能分のみ</span>
-                                    </p>
-                                    <div id="estimatedAmount" class="mt-1 text-right text-3xl font-black tracking-tight text-on-surface transition-all duration-300 relative z-10">¥0</div>
-                                </div>
-
-                                <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
-                                    <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-2">
-                                        <span class="material-icons text-base text-primary">event_available</span>完了予定日
-                                    </span>
-                                    <span id="estimatedCompletionDate" class="text-base font-bold text-on-surface">未定</span>
-                                </div>
-                            </div>
-
-                            <!-- 詳細内訳（折りたたみ） -->
-                            <details id="estimateBreakdownDetails" class="estimate-collapsible z-20 rounded-xl border border-outline-variant/60 bg-surface-container-lowest">
-                                <summary class="estimate-collapsible-summary cursor-pointer flex items-center justify-between px-3 py-2 text-xs font-semibold text-on-surface-variant select-none">
-                                    <span class="flex items-center gap-1.5">
-                                        <span class="material-icons text-[16px] text-primary">receipt</span>
-                                        詳細内訳
-                                    </span>
-                                    <span class="material-icons text-[18px] text-on-surface-variant estimate-collapsible-icon">expand_more</span>
-                                </summary>
-                                <div class="px-3 pb-3 pt-1">
-                                    <div id="estimateBreakdown" class="text-sm leading-relaxed text-on-surface-variant"></div>
-                                </div>
-                            </details>
-
-                            <!-- アンケート全体ブロック -->
-                            <div class="estimate-block-survey-total rounded-2xl border border-primary/30 bg-primary/5 p-4 z-20 space-y-2" data-block="surveyTotal">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-bold text-on-surface flex items-center gap-1.5">
-                                        <span class="material-icons text-base text-primary">receipt_long</span>
-                                        アンケート全体料金（このアンケートの請求見込み）
-                                    </h3>
-                                </div>
-
-                                <!-- 内訳: 名刺 / お礼メール (常時表示) -->
-                                <div class="space-y-1.5 text-xs">
-                                    <div class="flex justify-between" id="surveyTotalBizcardLine">
-                                        <span class="text-on-surface-variant">名刺データ化分</span>
-                                        <span class="font-semibold text-on-surface">¥<span id="surveyTotalBizcardAmount">0</span></span>
-                                        <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalBizcardMissing">未設定（後ほど反映されます）</span>
-                                    </div>
-                                    <div class="flex justify-between" id="surveyTotalThankYouLine">
-                                        <span class="text-on-surface-variant">お礼メール分</span>
-                                        <span class="font-semibold text-on-surface" id="surveyTotalThankYouAmount">¥0</span>
-                                        <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalThankYouMissing">未設定（後ほど反映されます）</span>
-                                    </div>
-                                </div>
-
-                                <hr class="border-outline-variant/40">
-
-                                <!-- 集計4〜5行: 税抜小計 / クーポン値引(条件) / 税抜割引後(条件) / 消費税 / 税込 -->
-                                <div class="space-y-1 text-sm">
-                                    <div class="flex justify-between">
-                                        <span class="text-on-surface-variant">税抜小計</span>
-                                        <span class="font-semibold text-on-surface">¥<span id="surveyTotalSubtotal">0</span></span>
-                                    </div>
-                                    <div class="flex justify-between estimate-coupon-line hidden" id="surveyTotalCouponLine">
-                                        <span class="text-on-surface-variant">クーポン値引き
-                                            <span class="text-[10px] text-primary" id="surveyTotalCouponPercent"></span>
+                                    <div class="estimate-sheet__header flex items-center justify-between border-b border-outline-variant pb-3 z-20">
+                                        <div class="flex items-center gap-1.5">
+                                            <h2 class="text-lg font-bold text-on-surface">料金見積もり</h2>
+                                            <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="estimateBilling" aria-label="料金見積もりの説明を表示">help_outline</button>
+                                        </div>
+                                        <span class="estimate-sheet__chip-auto inline-flex items-center gap-1.5 rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface">
+                                            <span class="material-icons text-[14px] text-on-surface-variant animate-spin-slow">autorenew</span> 自動計算
                                         </span>
-                                        <span class="font-semibold text-error">- ¥<span id="surveyTotalCouponAmount">0</span></span>
+                                        <button type="button" id="estimateSheetCloseBtn" class="estimate-sheet__close" aria-label="料金見積もりを閉じる">
+                                            <span class="material-icons" aria-hidden="true">close</span>
+                                        </button>
                                     </div>
-                                    <div class="flex justify-between hidden" id="surveyTotalAfterCouponLine">
-                                        <span class="text-on-surface-variant">税抜割引後</span>
-                                        <span class="font-semibold text-on-surface">¥<span id="surveyTotalAfterCoupon">0</span></span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-on-surface-variant">消費税（10%）</span>
-                                        <span class="font-medium text-on-surface">¥<span id="surveyTotalTax">0</span></span>
-                                    </div>
-                                    <div class="flex justify-between pt-1 border-t border-outline-variant/40">
-                                        <span class="font-bold text-on-surface">税込請求見込み</span>
-                                        <span class="font-black text-primary text-lg">¥<span id="surveyTotalWithTax">0</span></span>
-                                    </div>
-                                </div>
 
-                                <p class="text-[10px] text-on-surface-variant/80 italic">
-                                    ※クーポン値引きはアンケート全体の料金に対して1回適用されます
-                                </p>
-
-                                <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
-                                    <span class="material-icons text-[14px]">info</span>
-                                    ご請求・お支払いに関する注意事項
-                                </button>
-                            </div>
-
-                            <!-- クーポン適用エリア（折りたたみ） -->
-                            <details id="couponSectionWrapper" data-help-target="bizcard-coupon" class="estimate-collapsible rounded-2xl bg-surface-container-low border border-outline-variant z-20 transition-colors duration-300 relative">
-                                <summary class="estimate-collapsible-summary cursor-pointer flex items-center justify-between gap-2 p-4 select-none">
-                                    <span class="text-sm font-bold text-on-surface flex items-center gap-1.5">
-                                        割引クーポン
-                                    </span>
-                                    <span class="flex items-center gap-2">
-                                        <span id="couponSummaryStatus" class="text-xs text-on-surface-variant font-medium">未適用</span>
-                                        <span class="material-icons text-[18px] text-on-surface-variant estimate-collapsible-icon">expand_more</span>
-                                    </span>
-                                </summary>
-                                <div class="px-4 pb-4 pt-1 space-y-2">
-                                    <p class="text-[11px] text-on-surface-variant flex items-center gap-1">
-                                        <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="couponCode" aria-label="クーポンコードの説明を表示">help_outline</button>
-                                        <span>クーポンコードを入力して全体料金から値引きを受けられます。</span>
-                                    </p>
-
-                                <!-- 入力フォーム (未適用時) -->
-                                <div id="couponInputContainer" class="relative">
-                                    <div class="input-group">
-                                        <input type="text" id="couponCode" placeholder=" " class="input-field pr-20 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
-                                        <label for="couponCode" class="input-label text-sm">クーポンコード (任意)</label>
-                                        <button id="applyCouponBtn" type="button" class="coupon-action-button coupon-action-button--apply absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-3 py-1.5 text-xs font-bold shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all">適用</button>
-                                        <div id="couponLoadingIndicator" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-surface rounded-md">
-                                            <span class="material-icons animate-spin text-primary text-sm">sync</span>
-                                        </div>
-                                    </div>
-                                    <!-- エラーメッセージ -->
-                                    <div id="couponCodeErrorMessage" class="hidden mt-2 p-2 rounded-md bg-error/10 border border-error/20 flex items-start gap-1.5">
-                                        <span class="material-icons text-error text-[14px] mt-0.5">error_outline</span>
-                                        <p class="text-xs text-error font-medium leading-tight" id="couponCodeErrorText"></p>
-                                    </div>
-                                </div>
-
-                                <!-- 適用済み表示 (適用時) -->
-                                <div id="couponAppliedContainer" class="hidden p-3.5 bg-primary-container/30 border border-primary/40 rounded-xl shadow-sm transition-all duration-300">
-                                    <div class="flex justify-between items-start gap-2">
-                                        <div class="flex-1">
-                                            <span class="text-xs font-bold text-primary flex items-center gap-1 mb-1">
-                                                <span class="material-icons text-[14px]">check_circle</span> アンケート全体に適用中
+                                    <!-- 金額と完了予定日 -->
+                                    <div class="space-y-2 z-20">
+                                        <div class="flex items-center justify-between gap-2 rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
+                                            <span class="flex flex-col gap-0.5 text-sm font-semibold text-on-surface-variant">
+                                                名刺データ化の小計（税抜）
+                                                <span class="text-[10px] font-normal">名刺機能分のみ</span>
                                             </span>
-                                            <p id="appliedCouponCodeDisplay" class="text-base font-black text-on-surface tracking-wide">SUMMER2026</p>
-                                            <p id="appliedCouponSourceDisplay" class="text-[11px] text-on-primary-container font-medium mt-1 bg-primary/10 inline-block px-1.5 py-0.5 rounded hidden"></p>
+                                            <span id="estimatedAmount" class="text-base font-bold text-on-surface transition-colors duration-300">¥0</span>
                                         </div>
-                                        <button id="removeCouponBtn" type="button" class="text-xs font-semibold text-error/80 hover:text-error hover:bg-error/10 px-2 py-1.5 rounded transition-colors focus:outline-none flex-shrink-0 border border-transparent hover:border-error/30">解除</button>
-                                    </div>
-                                </div>
-                                </div>
-                            </details>
 
-                            <!-- 対応言語 -->
-                            <div class="px-2 z-20">
-                                <p class="text-xs font-bold text-on-surface-variant mb-1.5 flex items-center gap-1">
-                                    <span class="material-icons text-[14px]">translate</span> 対応言語
-                                </p>
-                                <p class="text-[11px] text-on-surface-variant/80 font-medium">日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語</p>
+                                        <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
+                                            <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-2">
+                                                <span class="material-icons text-base text-primary">event_available</span>完了予定日
+                                            </span>
+                                            <span id="estimatedCompletionDate" class="text-base font-bold text-on-surface">未定</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 詳細内訳（折りたたみ） -->
+                                    <details id="estimateBreakdownDetails" class="estimate-collapsible z-20 rounded-xl border border-outline-variant/60 bg-surface-container-lowest">
+                                        <summary class="estimate-collapsible-summary cursor-pointer flex items-center justify-between px-3 py-2 text-xs font-semibold text-on-surface-variant select-none">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="material-icons text-[16px] text-primary">receipt</span>
+                                                詳細内訳
+                                            </span>
+                                            <span class="material-icons text-[18px] text-on-surface-variant estimate-collapsible-icon">expand_more</span>
+                                        </summary>
+                                        <div class="px-3 pb-3 pt-1">
+                                            <div id="estimateBreakdown" class="text-sm leading-relaxed text-on-surface-variant"></div>
+                                        </div>
+                                    </details>
+
+                                    <!-- アンケート全体ブロック -->
+                                    <div class="estimate-block-survey-total rounded-2xl border border-primary/30 bg-primary/5 p-4 z-20 space-y-2" data-block="surveyTotal">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                                                <span class="material-icons text-base text-primary">receipt_long</span>
+                                                アンケート全体料金（このアンケートの請求見込み）
+                                            </h3>
+                                        </div>
+
+                                        <!-- 内訳: 名刺 / お礼メール (常時表示) -->
+                                        <div class="space-y-1.5 text-xs">
+                                            <div class="flex justify-between" id="surveyTotalBizcardLine">
+                                                <span class="text-on-surface-variant">名刺データ化分</span>
+                                                <span class="font-semibold text-on-surface">¥<span id="surveyTotalBizcardAmount">0</span></span>
+                                                <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalBizcardMissing">未設定（後ほど反映されます）</span>
+                                            </div>
+                                            <div class="flex justify-between" id="surveyTotalThankYouLine">
+                                                <span class="text-on-surface-variant">お礼メール分</span>
+                                                <span class="font-semibold text-on-surface" id="surveyTotalThankYouAmount">¥0</span>
+                                                <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalThankYouMissing">未設定（後ほど反映されます）</span>
+                                            </div>
+                                        </div>
+
+                                        <hr class="border-outline-variant/40">
+
+                                        <!-- 集計: 税抜小計 / クーポン値引(条件) / 税抜割引後(条件) / 消費税（税込請求見込みはカード下部のフッターに表示） -->
+                                        <div class="space-y-1 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-on-surface-variant">税抜小計</span>
+                                                <span class="font-semibold text-on-surface">¥<span id="surveyTotalSubtotal">0</span></span>
+                                            </div>
+                                            <div class="flex justify-between estimate-coupon-line hidden" id="surveyTotalCouponLine">
+                                                <span class="text-on-surface-variant">クーポン値引き
+                                                    <span class="text-[10px] text-primary" id="surveyTotalCouponPercent"></span>
+                                                </span>
+                                                <span class="font-semibold text-error">- ¥<span id="surveyTotalCouponAmount">0</span></span>
+                                            </div>
+                                            <div class="flex justify-between hidden" id="surveyTotalAfterCouponLine">
+                                                <span class="text-on-surface-variant">税抜割引後</span>
+                                                <span class="font-semibold text-on-surface">¥<span id="surveyTotalAfterCoupon">0</span></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-on-surface-variant">消費税（10%）</span>
+                                                <span class="font-medium text-on-surface">¥<span id="surveyTotalTax">0</span></span>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-[10px] text-on-surface-variant/80 italic">
+                                            ※クーポン値引きはアンケート全体の料金に対して1回適用されます
+                                        </p>
+
+                                        <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                                            <span class="material-icons text-[14px]">info</span>
+                                            ご請求・お支払いに関する注意事項
+                                        </button>
+                                    </div>
+
+                                    <!-- クーポン適用エリア（折りたたみ） -->
+                                    <details id="couponSectionWrapper" data-help-target="bizcard-coupon" class="estimate-collapsible rounded-2xl bg-surface-container-low border border-outline-variant z-20 transition-colors duration-300 relative">
+                                        <summary class="estimate-collapsible-summary cursor-pointer flex items-center justify-between gap-2 p-4 select-none">
+                                            <span class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                                                割引クーポン
+                                            </span>
+                                            <span class="flex items-center gap-2">
+                                                <span id="couponSummaryStatus" class="text-xs text-on-surface-variant font-medium">未適用</span>
+                                                <span class="material-icons text-[18px] text-on-surface-variant estimate-collapsible-icon">expand_more</span>
+                                            </span>
+                                        </summary>
+                                        <div class="px-4 pb-4 pt-1 space-y-2">
+                                            <p class="text-[11px] text-on-surface-variant flex items-center gap-1">
+                                                <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="couponCode" aria-label="クーポンコードの説明を表示">help_outline</button>
+                                                <span>クーポンコードを入力して全体料金から値引きを受けられます。</span>
+                                            </p>
+
+                                        <!-- 入力フォーム (未適用時) -->
+                                        <div id="couponInputContainer" class="relative">
+                                            <div class="input-group">
+                                                <input type="text" id="couponCode" placeholder=" " class="input-field pr-20 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                                                <label for="couponCode" class="input-label text-sm">クーポンコード (任意)</label>
+                                                <button id="applyCouponBtn" type="button" class="coupon-action-button coupon-action-button--apply absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-3 py-1.5 text-xs font-bold shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all">適用</button>
+                                                <div id="couponLoadingIndicator" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-surface rounded-md">
+                                                    <span class="material-icons animate-spin text-primary text-sm">sync</span>
+                                                </div>
+                                            </div>
+                                            <!-- エラーメッセージ -->
+                                            <div id="couponCodeErrorMessage" class="hidden mt-2 p-2 rounded-md bg-error/10 border border-error/20 flex items-start gap-1.5">
+                                                <span class="material-icons text-error text-[14px] mt-0.5">error_outline</span>
+                                                <p class="text-xs text-error font-medium leading-tight" id="couponCodeErrorText"></p>
+                                            </div>
+                                        </div>
+
+                                        <!-- 適用済み表示 (適用時) -->
+                                        <div id="couponAppliedContainer" class="hidden p-3.5 bg-primary-container/30 border border-primary/40 rounded-xl shadow-sm transition-all duration-300">
+                                            <div class="flex justify-between items-start gap-2">
+                                                <div class="flex-1">
+                                                    <span class="text-xs font-bold text-primary flex items-center gap-1 mb-1">
+                                                        <span class="material-icons text-[14px]">check_circle</span> アンケート全体に適用中
+                                                    </span>
+                                                    <p id="appliedCouponCodeDisplay" class="text-base font-black text-on-surface tracking-wide">SUMMER2026</p>
+                                                    <p id="appliedCouponSourceDisplay" class="text-[11px] text-on-primary-container font-medium mt-1 bg-primary/10 inline-block px-1.5 py-0.5 rounded hidden"></p>
+                                                </div>
+                                                <button id="removeCouponBtn" type="button" class="text-xs font-semibold text-error/80 hover:text-error hover:bg-error/10 px-2 py-1.5 rounded transition-colors focus:outline-none flex-shrink-0 border border-transparent hover:border-error/30">解除</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </details>
+                                </div>
                             </div>
 
+                            <!-- フッター（税込請求見込みと確定・キャンセル。常に見える） -->
+                            <div id="estimateBar" class="bizcard-estimate-card__footer estimate-bar">
+                                <div class="estimate-bar__summary">
+                                    <span class="estimate-bar__label-group">
+                                        <span class="estimate-bar__label">税込請求見込み</span>
+                                        <span id="estimatedCompletionDateCompact" class="estimate-bar__date">完了予定 未定</span>
+                                    </span>
+                                    <span class="estimate-bar__amount-group">
+                                        <span class="bizcard-estimate-card__total estimate-bar__amount font-black tracking-tight text-primary">¥<span id="surveyTotalWithTax">0</span></span>
+                                        <!-- 1280px未満のみ表示。行全体が押せる（::after で行いっぱいに広げている） -->
+                                        <button type="button" id="estimateSheetToggleBtn" class="estimate-bar__toggle" aria-expanded="false" aria-controls="estimateSheet" aria-label="料金見積もりの内訳を開く">
+                                            <span id="estimateSheetToggleLabel">内訳</span>
+                                            <span class="material-icons" aria-hidden="true">expand_less</span>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="saveBizcardSettingsBtn" class="bizcard-confirm-button button-primary flex-[7] min-w-0 h-12 rounded-full px-2 text-base font-bold whitespace-nowrap shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:active:scale-100 flex justify-center items-center group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                        <span id="saveBizcardSettingsBtnText">設定を保存して依頼を確定</span>
+                                        <span id="saveBizcardSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                                    </button>
+                                    <button id="cancelBizcardSettings" class="flex-[3] min-w-0 h-12 rounded-full border border-outline-variant px-1 text-base font-bold whitespace-nowrap text-on-surface shadow-sm transition-colors hover:bg-surface-variant hover:border-outline focus:outline-none focus:ring-2 focus:ring-outline-variant focus:ring-offset-1 active:bg-outline-variant/20 flex justify-center items-center">キャンセル</button>
+                                </div>
+                            </div>
                         </div>
                     </aside>
 
@@ -408,7 +426,7 @@
     <div class="p-6 space-y-8 text-sm overflow-y-auto max-h-[60vh] custom-scrollbar">
         <div class="space-y-3">
             <h3 class="font-bold border-b-2 border-primary/20 pb-2 text-base text-primary flex items-center gap-2">
-                <span class="material-icons text-lg">filter_1</span>無料項目プランでデータ化される2項目
+                <span class="material-icons text-lg">filter_1</span>お試しプランでデータ化される2項目
             </h3>
             <ol class="list-decimal pl-6 space-y-1.5 font-medium text-on-surface">
                 <li>メールアドレス</li>
@@ -417,7 +435,7 @@
         </div>
         <div class="space-y-3">
             <h3 class="font-bold border-b-2 border-primary/20 pb-2 text-base text-primary flex items-center gap-2">
-                <span class="material-icons text-lg">filter_2</span>スタンダード項目プランでデータ化される10項目
+                <span class="material-icons text-lg">filter_2</span>通常・特急・超特急・オンデマンドでデータ化される10項目
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-2 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
                 <ol class="list-decimal pl-5 space-y-2 font-medium text-on-surface">
@@ -466,12 +484,12 @@
     <div class="p-6 space-y-4 text-sm text-on-surface-variant overflow-y-auto max-h-[60vh] custom-scrollbar">
         <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/40">
             <ul class="space-y-3 font-medium text-on-surface">
-                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求見込み金額は「見込み件数×データ化単価」で算出した金額です。<br>実際のご請求は、データ化が完了した実数精算となります。</li>
+                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求見込み金額は「見込み枚数×データ化単価」で算出した金額です。<br>実際のご請求は、データ化が完了した実数精算となります。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>会期開始日以降のデータ化設定の変更はできません。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>クーポンをご利用の場合、アンケート全体のご請求金額に対してお値引きが適用されます。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>ご請求書はデータ化完了後にメールにてお送りします。</li>
                 <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-primary">•</span>お支払いは銀行振込（翌月末払い）となります。<br><span class="text-xs text-on-surface-variant font-normal">※振込手数料はお客様のご負担でお願いいたします。</span></li>
-                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-error">•</span>実際の件数が想定件数の50％に満たない場合でも、想定の50％分の数量が最低ご請求単位となります。</li>
+                <li class="flex gap-2.5 relative pl-5"><span class="absolute left-0 text-error">•</span>実際の枚数が見込み枚数の50％に満たない場合でも、見込み枚数の50％分が最低ご請求単位となります。</li>
             </ul>
         </div>
     </div>

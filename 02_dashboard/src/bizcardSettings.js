@@ -25,7 +25,7 @@ import {
     normalizePlanValue,
     normalizePremiumOptions
 } from './services/bizcardPlans.js';
-import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
+import { initEstimateBottomSheet } from './ui/estimateBottomSheet.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
@@ -45,6 +45,7 @@ export function initBizcardSettings() {
     const skipBizcardToggleContainer = document.getElementById('skipBizcardToggleContainer');
     const bizcardFormActiveArea = document.getElementById('bizcardFormActiveArea');
     const rightColumnDisabledOverlay = document.getElementById('rightColumnDisabledOverlay');
+    const surveyTotalDisplay = document.querySelector('#estimateSidebar .bizcard-estimate-card__total');
     // New UI controls: stepper / slider / presets
     const bizcardRequestDecBtn = document.getElementById('bizcardRequestDecBtn');
     const bizcardRequestIncBtn = document.getElementById('bizcardRequestIncBtn');
@@ -159,13 +160,57 @@ export function initBizcardSettings() {
             }
 
             setupEventListeners();
-            initEstimateSidebarDrawer();
             updateFullUI();
+            initEstimateBottomSheet();
+            initEstimateCardFit();
 
         } catch (error) {
             console.error('初期化エラー:', error);
             showToast('ページの読み込みに失敗しました。', 'error');
         }
+    }
+
+    /**
+     * 料金見積もりカードの上端の位置を CSS 変数へ渡します（1280px 以上）。
+     * カードの高さ上限をこの位置から計算することで、ページ最上部でも
+     * 税込請求見込みと確定・キャンセルが画面内に収まります。
+     */
+    function initEstimateCardFit() {
+        const sidebar = document.getElementById('estimateSidebar');
+        if (!sidebar) return;
+        const pcMedia = window.matchMedia('(min-width: 1280px)');
+        let isUpdateQueued = false;
+        let lastTop = null;
+
+        const update = () => {
+            isUpdateQueued = false;
+            if (!pcMedia.matches) {
+                sidebar.style.removeProperty('--estimate-card-top');
+                lastTop = null;
+                return;
+            }
+            // 追従位置（sticky の top）より上には詰めない。ページ末尾でカードが押し上げられたときに
+            // 高さ上限が増えてカードが伸びるのを防ぐ
+            const stickyTop = parseFloat(getComputedStyle(sidebar).top) || 96;
+            const top = Math.max(stickyTop, Math.round(sidebar.getBoundingClientRect().top));
+            if (top === lastTop) return;
+            lastTop = top;
+            sidebar.style.setProperty('--estimate-card-top', `${top}px`);
+        };
+        const requestUpdate = () => {
+            if (isUpdateQueued) return;
+            isUpdateQueued = true;
+            requestAnimationFrame(update);
+        };
+
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate);
+        // パンくずやタイトルの描画でカードの位置が変わったときにも追従する
+        const layoutRoot = sidebar.parentElement?.parentElement;
+        if (layoutRoot && 'ResizeObserver' in window) {
+            new ResizeObserver(requestUpdate).observe(layoutRoot);
+        }
+        update();
     }
 
     function setupEventListeners() {
@@ -276,9 +321,6 @@ export function initBizcardSettings() {
             // クーポン入力も無効化
             if (couponCodeInput) couponCodeInput.disabled = true;
             if (applyCouponBtn) applyCouponBtn.disabled = true;
-
-            // Re-validate to remove error borders if they existed
-            if (bizcardRequestInput) bizcardRequestInput.classList.remove('border-error');
         } else {
             bizcardFormActiveArea.classList.remove('opacity-40', 'pointer-events-none', 'grayscale');
             rightColumnDisabledOverlay.classList.add('hidden');
@@ -558,6 +600,12 @@ export function initBizcardSettings() {
         // ⑤ 描画
         renderEstimate(estimate);
         renderSurveyTotalBlock(surveyTotal, { otherScope: 'thankYou', isOtherMissing: surveyTotal.missing.includes('thankYou') });
+        // 税込請求見込みが 0 円のとき（データ化OFF・入力エラーなど）はグレーで表示する
+        if (surveyTotalDisplay) {
+            const isZeroTotal = !(surveyTotal.totalWithTax > 0);
+            surveyTotalDisplay.classList.toggle('text-primary', !isZeroTotal);
+            surveyTotalDisplay.classList.toggle('text-on-surface-variant', isZeroTotal);
+        }
         updateCouponSectionUI();
 
         // Handle validation logic

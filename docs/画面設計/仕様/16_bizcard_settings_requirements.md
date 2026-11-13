@@ -11,7 +11,7 @@ last_reviewed: 2026-04-24
 > - v1.x まで採用していた「本書が正・モックは参照実装」スタンスを破棄し、`15_help_center_requirements.md` と同方針で「画面が正（実装に書かれていないことは要件化しない）」へ刷新した。
 > - プランは `trial / normal / express / superExpress / onDemand` の 5 種で `bizcardPlans.js` にハードコードされており、`plan-capabilities.json` は **参照されていない**。プラン別の出し分け（allowedFields, speedPlans, maxAdditionalFields 等）は **完全に未実装**。§11 最重要項目として追跡する。
 > - 実サーバ保存（`saveBizcardSettings`）、クーポン検証（`validateCoupon`）、プレミアム多言語の料金加算（`multilingualGroup.unitPrice`）、追加項目の単価加算、いずれもモック・休眠状態。§11 に集約。
-> - 2 カラム（左 65% / 右 35% sticky）構成、スキップトグルで左カラム入力エリアと右カラムオーバーレイを同期。見積は入力変更の都度クライアント計算で再描画される。
+> - 1280px 以上は 2 カラム（左 65% / 右 35% sticky）構成で、確定・キャンセルと税込請求見込みは右カラムの料金見積もりカードの下部に固定する。1280px 未満は料金見積もりを下部固定バーと内訳シートで表示する。スキップトグルで左カラム入力エリアと料金見積もり本体の覆いを同期。見積は入力変更の都度クライアント計算で再描画される。
 
 ## 1. 概要
 
@@ -119,7 +119,7 @@ last_reviewed: 2026-04-24
         ├── <h1 id="pageTitle">                         … 「アンケート『[名]』の名刺データ化設定」
         └── <div class="flex xl:flex-row gap-8 ...">    … 2 カラムコンテナ
             ├── 左カラム (xl:w-[65%])
-            │   ├── アンケート基本情報カード              … 名前 / ID / 会期（renderSurveyInfo）
+            │   ├── アンケート基本情報カード              … アンケート名 / アンケートID / 会期（renderSurveyInfo）
             │   └── <section id="bizcardSettingsFields">
             │       ├── #skipBizcardToggleContainer     … 有効/無効切替 (#skipBizcardToggle)
             │       └── #bizcardFormActiveArea          … 以下スキップ時に .opacity-40 .pointer-events-none .grayscale
@@ -127,28 +127,33 @@ last_reviewed: 2026-04-24
             │           │   ├── #dataConversionPlanSelection (role="radiogroup")
             │           │   ├── ステッパー群 (±1/±10/±100)
             │           │   ├── #bizcardRequest (number, min=0 max=9999, value=100)
-            │           │   └── #minChargeNotice (hidden→flex)
+            │           │   ├── #minChargeNotice (hidden→flex)
+            │           │   └── 対応言語テキスト (静的文言)
             │           ├── STEP2 プレミアムオプション
             │           │   └── #premiumOptionsContainer
-            │           │       ├── Service Upgrade: premiumMultilingual (toggle)
-            │           │       └── Extraction Details: premiumAdditionalItems (multi x3)
+            │           │       ├── 対応言語の追加: premiumMultilingual (toggle)
+            │           │       └── データ化項目の追加: premiumAdditionalItems (multi x3)
             │           └── STEP3 社内管理用メモ
             │               ├── #toggleMemoSection (折り畳みボタン)
             │               └── #memoSection (default .hidden)
             │                   └── #internalMemo (textarea)
-            └── 右カラム (xl:w-[35%] xl:sticky xl:top-24)
-                └── 料金見積もりカード（見出しは「料金見積もり」に統一、狭幅時は右端タブで開閉）
-                    ├── #rightColumnDisabledOverlay     … スキップ時 .absolute で全面を覆う
-                    ├── #estimatedAmount                … ¥0 初期表示、400ms カウントアップ
-                    ├── #estimatedCompletionDate        … 起算日 + 納期で算出
-                    ├── #estimateBreakdown              … 内訳 HTML を innerHTML 更新
-                    ├── #openBillingNotesModalBtn       … 請求注意モーダル起動
-                    ├── #couponSectionWrapper
-                    │   ├── #couponInputContainer (#couponCode / #applyCouponBtn / #couponLoadingIndicator / #couponCodeErrorMessage)
-                    │   └── #couponAppliedContainer (#appliedCouponCodeDisplay / #appliedCouponSourceDisplay / #removeCouponBtn)
-                    ├── 対応言語テキスト (静的文言)
-                    ├── #saveBizcardSettingsBtn         … 主アクション
-                    └── #cancelBizcardSettings          … 戻る
+            ├── #estimateSheetScrim                     … 1280px 未満でシートを開いている間の背景
+            └── <aside id="estimateSidebar"> 右カラム (xl:w-[35%] xl:sticky xl:top-24)
+                └── 料金見積もりカード (.bizcard-estimate-card)
+                    ├── #estimateSheet 本体 (.bizcard-estimate-card__body-wrap)   … 1280px 未満では内訳シート
+                    │   ├── #rightColumnDisabledOverlay     … スキップ時に本体だけを薄く見せる覆い
+                    │   ├── 見出し「料金見積もり」/ #estimateSheetCloseBtn（1280px 未満のみ表示）
+                    │   ├── #estimatedAmount                … 名刺データ化の小計（1 行表示）、400ms カウントアップ
+                    │   ├── #estimatedCompletionDate        … 起算日 + 納期で算出
+                    │   ├── #estimateBreakdown              … 内訳 HTML を innerHTML 更新
+                    │   ├── アンケート全体料金ブロック / #openBillingNotesModalBtn
+                    │   └── #couponSectionWrapper
+                    │       ├── #couponInputContainer (#couponCode / #applyCouponBtn / #couponLoadingIndicator / #couponCodeErrorMessage)
+                    │       └── #couponAppliedContainer (#appliedCouponCodeDisplay / #appliedCouponSourceDisplay / #removeCouponBtn)
+                    └── #estimateBar フッター (.bizcard-estimate-card__footer)     … 1280px 未満では下部固定バー
+                        ├── 税込請求見込み (#surveyTotalWithTax) / #estimatedCompletionDateCompact / #estimateSheetToggleBtn
+                        ├── #saveBizcardSettingsBtn         … 主アクション
+                        └── #cancelBizcardSettings          … 戻る
 └── #footer-placeholder
 
 <dialog id="bizcardDetailsModal">                       … プラン詳細仕様モーダル
@@ -157,8 +162,8 @@ last_reviewed: 2026-04-24
 
 ### 4.2 2 カラム構成とレスポンシブ
 
-- `xl` 未満: 左カラムは全幅表示。`#estimateSidebar` を右端ドロワーとして扱い、`#estimateSidebarToggleBtn` と `#estimateSidebarOverlay` で料金見積もりを開閉できる。格納済みの見積もり領域分の余白は残さない。
-- `xl` 以上（1280px 以上）: 左 65% / 右 35%、右カラム `sticky top-24` で `max-h-[calc(100vh-8rem)]` の範囲内にとどまる。
+- `xl` 未満（1280px 未満）: 左カラムは全幅表示で、本文の左右の余白は同じ幅にする。料金見積もりは、フッター（`#estimateBar`）を画面下端の固定バー、本体（`#estimateSheet`）をバーの後ろからせり上がるシートとして表示する（§4.4）。見積もりの DOM は 1 組だけで、表示の切り替えは `service-top-style.css` の `.estimate-sheet*` / `.estimate-bar*`、開閉は `src/ui/estimateBottomSheet.js` が行う。ページ下端にはバーの高さ分の余白を足す。
+- `xl` 以上（1280px 以上）: 左 65% / 右 35%。右カラムは `sticky top-24` で追従し、カードは縦の flex で本体だけがスクロールする。カードの高さ上限は `calc(100vh - var(--estimate-card-top, 6rem) - 2rem)`。`--estimate-card-top` にはカードの上端の位置を `bizcardSettings.js` の `initEstimateCardFit()` が入れる（追従中は 6rem）。これにより、どのスクロール位置でもフッターが画面内に収まる。
 - カラム内カードは `rounded-2xl` / `rounded-3xl` + `border-outline-variant/60` + `shadow-sm` で統一。
 
 ### 4.3 左カラム（STEP1 / STEP2 / STEP3）
@@ -170,33 +175,48 @@ last_reviewed: 2026-04-24
 
 **STEP1 データ化プランと見込み枚数**:
 - 見出し「1. データ化プランと見込み枚数」＋ `data-help-key="bizcardPlanAndSpeed"` のヘルプトリガ、右端に「詳細仕様を見る」ボタン `#openBizcardDetailsModalBtn`。
-- `#dataConversionPlanSelection` は `role="radiogroup"`、`grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
-- 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー群 + `<input id="bizcardRequest" type="number" min="0" max="9999" value="100">` + `.input-error-message`（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
-- 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「実際の件数が N 枚に満たない場合でも…」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
-- 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。…」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
+- `#dataConversionPlanSelection` は `role="radiogroup"`、`flex flex-col gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成し、お試し（`trial`）を先頭に全幅 1 枚、有料 4 プラン（`normal` / `express` / `superExpress` / `onDemand`）をその下の `grid grid-cols-1 md:grid-cols-2 gap-4`（768px 以上で 2 列 × 2 段、768px 未満で 1 列）に並べる（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
+- お試しカードは 2 段構成。上段はアイコン・プラン名・バッジ「無料」・その下にタグライン（11px 太字）、右端にラジオ表示、上段の下に罫線。下段は単価・項目数・納期の横 3 列（各列はラベルと値の縦積み。768px 以上はラベル 13px・値 16px 太字、768px 未満はラベル 12px・値 14px 太字）。有料 4 プランのカードは単価・項目数・納期の 3 行と下部のタグラインで構成する。選択時のスタイル（`border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md`）は全カード共通。
+- 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー `.bizcard-stepper`（6 ボタン + `<input id="bizcardRequest" type="number" inputmode="numeric" min="0" max="9999" value="100">` + 単位「枚」 + エラー表示 `#bizcardRequestError`）で構成する（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
+- ステッパーの並びは `service-top-style.css` の `.bizcard-stepper*` で切り替える。DOM は 1 行表示の順（-100 / -10 / − / 入力欄 / ＋ / +10 / +100）。
+  - 640px 以上: 1 行。ボタンは高さ 44px（幅は ±100 が 64px、±10 が 48px、±1 が 44px）。入力欄は幅 128px・枠 2px。
+  - 640px 未満: 2 段。1 段目は `56px minmax(0, 1fr) 56px`（間隔 8px・高さ 56px）で「−」・入力欄・「＋」。入力欄は枠（2px・角丸 12px）の中に数値（36px・900）と単位「枚」（16px 太字）を並べる。2 段目は 4 等分（間隔 8px・高さ 44px）で「-100」「-10」「+10」「+100」。360px 未満では 1 段目の両端を 44px、数値を 30px にする。
+  - フォーム枠 `#bizcardSettingsFields` の内側余白は 768px 未満で 16px、768px 以上で 32px。見込み枚数の囲みの余白は 768px 未満で 16px、768px 以上で 24px。
+- 最低請求バッジ `#minChargeNotice` は `requestedCards > 0` かつ `minCharge > 0` の場合にテキスト「最低ご請求は見込み枚数の50％分（今回は N 枚・¥金額）です。」を表示。`requestedCards < minChargeCards` の場合は `text-error bg-error/10` の警告色に変化（[bizcardSettingsRenderer.js:213-219](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L213)）。
+- 注記文言: 「※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を料金見積もりにて確認してください。」（HTML 直書き、[bizcardSettings.html:172-174](../../../02_dashboard/bizcardSettings.html#L172)）。
+- 対応言語: 注記文言の直後に「対応言語：日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語」を 1 行で表示（HTML 直書き、「対応言語：」のみ太字）。
 
 **STEP2 プレミアムオプション**:
 - `#premiumOptionsContainer` は初期 `grid gap-4 sm:grid-cols-2` だが、`renderPremiumOptions()` 内で `space-y-8` に上書きされ、2 グループのセクションに再構成される（[bizcardSettingsRenderer.js:395](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L395)）。
-- グループ 1 `Service Upgrade`: `premiumMultilingual`（toggle、単一チェックボックス、`unitPriceLabel` があれば価格バッジ描画だが `bizcardPlans.js` には未定義）。
-- グループ 2 `Extraction Details`: `premiumAdditionalItems`（multi、3 オプション `secondPhone` / `secondAddress` / `handwrittenMemo`、チェック複数可）。
+- グループ 1「対応言語の追加」: `premiumMultilingual`（toggle、単一チェックボックス、`unitPriceLabel` があれば価格バッジ描画だが `bizcardPlans.js` には未定義）。
+- グループ 2「データ化項目の追加」: `premiumAdditionalItems`（multi、3 オプション `secondPhone` / `secondAddress` / `handwrittenMemo`、チェック複数可）。
+- グループ見出しは `document.documentElement.lang` が `ja` のとき上記の日本語で表示し、それ以外では `Service Upgrade` / `Extraction Details` を表示する。
 
 **STEP3 社内管理用メモ**:
 - `#toggleMemoSection` 押下で `#memoSection` の `.hidden` をトグル、矢印アイコンを `rotate-180`（[bizcardSettings.js:187-193](../../../02_dashboard/src/bizcardSettings.js#L187)）。
 - `<textarea id="internalMemo">` は `input-group` + `input-field` / `input-label` パターン、最低 100px。
 
-### 4.4 右カラム（見積・確定 sticky）
+### 4.4 料金見積もり（1280px 以上は右カラムのカード、1280px 未満は下部固定バーとシート）
 
-- カード全体を覆う `#rightColumnDisabledOverlay` は `absolute inset-0 bg-surface/50 backdrop-blur-[1px] z-10 hidden`。スキップ時のみ `hidden` を外して全面を覆う。内部要素は `z-20` に上げてあるが、`pointer-events-none` 付きで操作不可にする。
-- `#estimatedAmount` は `text-4xl font-black`、`renderEstimate()` で 400ms の `requestAnimationFrame` カウントアップ描画（[bizcardSettingsRenderer.js:103-138](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L103)）。スキップ時は `state.isSkipped` 分岐で金額 0 を強制。
+- カードは本体（`.bizcard-estimate-card__body-wrap`）とフッター（`.bizcard-estimate-card__footer`）で構成する。フッターは 1px の罫線で区切り、余白は上 14px・左右 20px・下 20px。
+- `#rightColumnDisabledOverlay`（`.bizcard-estimate-card__overlay`）はスキップ時のみ `hidden` を外し、本体だけを薄く見せる（カード色の 60% を重ねる）。フッターは覆わない。表示用の覆いで、クリックとスクロールは遮らない。
+- `#estimatedAmount` は完了予定日と同じ 1 行の形（左にラベル 14px と補足「名刺機能分のみ」10px、右に金額 16px 太字、角丸 12px・余白 12px）。`renderEstimate()` で 400ms の `requestAnimationFrame` カウントアップ描画（[bizcardSettingsRenderer.js:103-138](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L103)）。スキップ時は `state.isSkipped` 分岐で金額 0 を強制。
 - `#estimatedCompletionDate` は `innerHTML` で 2 行（完了日 + 「起算日 XX + 納期 N 日」小字）を書き換える（同:145-152）。スキップ時は `data化を実施しない`。
-- `#estimateBreakdown` は想定件数・内訳・選択オプション・合計・最低請求の複合 HTML を `innerHTML` に一括代入（同:181-197）。
+- `#estimateBreakdown` は見込み枚数・内訳・選択オプション・合計・最低請求の複合 HTML を `innerHTML` に一括代入（同:181-197）。
 - `#openBillingNotesModalBtn` 押下で `billingNotesModal.showModal()`。
 - クーポンセクション `#couponSectionWrapper`:
   - 未適用時: `#couponInputContainer`（`#couponCode` 入力 + `#applyCouponBtn` + ローディング `#couponLoadingIndicator` + エラー `#couponCodeErrorMessage` / `#couponCodeErrorText`）を表示。
   - 適用中: `#couponAppliedContainer`（コード表示 `#appliedCouponCodeDisplay` + 共有ソース `#appliedCouponSourceDisplay` + 解除 `#removeCouponBtn`）を表示。`#appliedCouponCodeDisplay` は HTML 直書きの `SUMMER2026` で初期表示され（[bizcardSettings.html:274](../../../02_dashboard/bizcardSettings.html#L274)）、初期化完了時に JS が上書きする（§11-13 チラつきリスク）。
   - スキップ時は `#couponSectionWrapper` に `opacity-50 pointer-events-none grayscale bg-surface` を追加してグレーアウト（[bizcardSettings.js:578-584](../../../02_dashboard/src/bizcardSettings.js#L578)）。
-- 対応言語: 静的テキスト「日本語 / 英語 / 中国語（繁体字・簡体字） / 韓国語」を HTML 直書き。
-- 保存ボタン `#saveBizcardSettingsBtn`（`#saveBizcardSettingsBtnText` + `#saveBizcardSettingsBtnLoading`）と戻るボタン `#cancelBizcardSettings`。
+- フッターの 1 行目は「税込請求見込み」（ラベル 15px 太字、金額 `#surveyTotalWithTax` は 30px・900・プライマリ色）。金額が 0 円のとき（スキップ時、入力エラー時など）はグレーで表示する。アンケート全体料金ブロックには内訳（名刺データ化分、お礼メール分、税抜小計、消費税、クーポン値引き、値引き後）と注記、注意事項リンクを置く。読み順は 内訳 → クーポン → 税込請求見込み → ボタン。
+- フッターの 2 行目は保存ボタン `#saveBizcardSettingsBtn`（`#saveBizcardSettingsBtnText` + `#saveBizcardSettingsBtnLoading`）と戻るボタン `#cancelBizcardSettings`。幅は 7 : 3（`flex: 7` / `flex: 3`）、間隔 8px、高さ 48px、ピル型。確定ボタンは 1 画面に 1 か所。
+- 保存ボタンは `.bizcard-confirm-button` で通常色を `--color-button-primary-hover-bg`（#3367D6）、ホバー時を #2A56B8 にする。無効時は背景 `--color-button-disabled-bg`・文字 #6B6B6B。`--color-button-primary-bg` は変更しない。
+- 1280px 未満の下部固定バー（`#estimateBar`）: 白背景、上に 1px の罫線、上向きの影。余白は上 10px・左右 16px・下 16px + `env(safe-area-inset-bottom)`。1 行目は左にラベル「税込請求見込み」（12px 太字）と `#estimatedCompletionDateCompact`「完了予定 YYYY/M/D」（11px）、右に金額（24px・900）と内訳トグル `#estimateSheetToggleBtn`（高さ 32px のチップ。`::after` で行全体を押せる範囲にする。最小高さ 48px）。2 行目は確定 7 : キャンセル 3。360px 未満では確定ボタンの文字を 14px にする。
+- 1280px 未満の内訳シート（`#estimateSheet`）: トグルを押すとバーの後ろから `translateY(100%) → 0`（320ms、`cubic-bezier(0.2, 0.8, 0.2, 1)`）でせり上がり、背景 `#estimateSheetScrim`（黒 45%）が 240ms でフェードする。バーは動かず、トグルの文言が「閉じる」に変わる。上端の角丸 24px、つまみ（40×4px）、見出しと閉じるボタン `#estimateSheetCloseBtn`（44×44px）。高さは最大で画面高 − ヘッダー分で、中身が長いときはシート内でスクロールする。`prefers-reduced-motion: reduce` では動きを止める。
+- シートを閉じる手段は、トグルをもう一度押す・閉じるボタン・背景を押す・Esc キー。画面幅が 1280px 以上になったら自動で閉じる。注意事項モーダル、確認モーダル、ヘルプのポップオーバーが前面にあるときの Esc は、前面のものだけを閉じる（Esc はキャプチャ段階で受けて判定する）。
+- シートは開いている間だけ `role="dialog" aria-modal="true" aria-label="料金見積もり"` を持つ。開いたら閉じるボタンへフォーカスを移し、閉じたらトグルへ戻す。開いている間は背面のスクロールを止め、設定フォーム（`#estimateSheetBackground`）・パンくず・ヘッダー・サイドバー・フッターに `inert` を付けて、フォーカスがシートとバーの外へ出ないようにする。トグルは `aria-expanded` と `aria-controls="estimateSheet"` を持つ。
+- テキスト入力（枚数、メモ、クーポンなど）にフォーカスがある間は、1280px 未満のバーを隠す（`.is-hidden-for-input`）。フォーカスが外れたら戻す。
+- 重なり順: モバイルサイドバー（39 / 40）・ヘッダー（50）< 背景（52）< シート（54）< バー（56）< モーダル（60）。シートを閉じている間のバーは 38 で、モバイルサイドバーを開くとその下に回る。
 
 ### 4.5 モーダル
 
@@ -204,8 +224,8 @@ last_reviewed: 2026-04-24
 
 | モーダル | 起動ボタン | 閉じるボタン | 用途 |
 |----------|------------|--------------|------|
-| `#bizcardDetailsModal` | `#openBizcardDetailsModalBtn`（「詳細仕様を見る」） | `#closeBizcardDetailsModalBtn` / `#closeBizcardDetailsModalActionBtn` | 「無料 2 項目」「スタンダード 10 項目」「共通の入力規則」の静的解説（[bizcardSettings.html:315-370](../../../02_dashboard/bizcardSettings.html#L315)） |
-| `#billingNotesModal` | `#openBillingNotesModalBtn` | `#closeBillingNotesModalBtn` / `#closeBillingNotesModalActionBtn` | 「見込み × 単価」「会期開始後は変更不可」「クーポンはアンケート全体に適用」「最低請求 50%」等の静的注記（同:373-395） |
+| `#bizcardDetailsModal` | `#openBizcardDetailsModalBtn`（「詳細仕様を見る」） | `#closeBizcardDetailsModalBtn` / `#closeBizcardDetailsModalActionBtn` | 「お試しプラン 2 項目」「通常・特急・超特急・オンデマンド 10 項目」「共通の入力規則」の静的解説（[bizcardSettings.html:315-370](../../../02_dashboard/bizcardSettings.html#L315)） |
+| `#billingNotesModal` | `#openBillingNotesModalBtn` | `#closeBillingNotesModalBtn` / `#closeBillingNotesModalActionBtn` | 「見込み枚数 × データ化単価」「会期開始後は変更不可」「クーポンはアンケート全体に適用」「最低請求 50%」等の静的注記（同:373-395） |
 
 両モーダルとも `aria-labelledby` は未設定（§11-17）。
 
@@ -219,9 +239,9 @@ last_reviewed: 2026-04-24
 - `change` イベントで `state.isSkipped = !checked`、`state.settings.bizcardEnabled = !state.isSkipped` を同期（[bizcardSettings.js:180-185](../../../02_dashboard/src/bizcardSettings.js#L180)）。
 - スキップ ON 時:
   - `#bizcardFormActiveArea` に `opacity-40 pointer-events-none grayscale` 付与。
-  - `#rightColumnDisabledOverlay.hidden` を外して右カラム全面を覆う。
+  - `#rightColumnDisabledOverlay.hidden` を外して料金見積もりの本体だけを薄く見せる（フッターは覆わない）。
   - `#couponCode` / `#applyCouponBtn` を `disabled=true`。
-  - `#bizcardRequest.border-error` を除去（エラー表示を消す）。
+  - 見込み枚数の入力エラー表示を消す（`validateForm(true)` が `#bizcardRequestError` を非表示にし、`aria-invalid` / `aria-describedby` を外す）。
   - 見積計算時に `bizcardRequest: 0, dataConversionPlan: 'none', premiumOptions: 空` を強制して amount=0、`#estimatedCompletionDate` を「データ化を実施しない」に固定（[bizcardSettings.js:520-531](../../../02_dashboard/src/bizcardSettings.js#L520)）。
 - スキップ OFF（= 有効）時は上記をすべて解除。
 
@@ -247,11 +267,11 @@ last_reviewed: 2026-04-24
 
 2 グループを `renderPremiumOptions(PREMIUM_OPTION_GROUPS, state.settings.premiumOptions)` が描画。
 
-- **Service Upgrade（グループ `multilingual`、type=toggle）**:
+- **対応言語の追加（グループ `multilingual`、type=toggle）**:
   - `input[name="premiumMultilingual"]` 単一チェックボックス。
   - 選択中は `state.settings.premiumOptions.multilingual = true`。
   - 料金加算: `premiumUnitAddOn = multilingualGroup.unitPrice ?? 0`。`bizcardPlans.js` に `unitPrice` が **未定義**のため常に 0 を加算する休眠ロジック（§11-3）。
-- **Extraction Details（グループ `additionalItems`、type=multi）**:
+- **データ化項目の追加（グループ `additionalItems`、type=multi）**:
   - `input[name="premiumAdditionalItems"]` 複数チェック。`value` は `secondPhone` / `secondAddress` / `handwrittenMemo` の 3 種。
   - 選択中アイテムは `state.settings.premiumOptions.additionalItems: string[]` に保持。`normalizePremiumOptions()` が許可リストで絞り込み（[bizcardPlans.js:163-190](../../../02_dashboard/src/services/bizcardPlans.js#L163)）。
   - 料金加算ロジック **なし**。選択中アイテムは見積内訳の「選択オプション: …」に **タイトル表示のみ**（§11-4）。
@@ -464,7 +484,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 |---------|--------|-------------|----------|------|
 | `multilingual` | `toggle` | 多言語対応 | `multilingualGroup.unitPrice ?? 0` = **0**（未定義） | §11-3 |
 | `additionalItems.secondPhone` | `multi` 内 | 電話番号2つ目 | なし | §11-4 |
-| `additionalItems.secondAddress` | `multi` 内 | 住所2つめ | なし | §11-4 |
+| `additionalItems.secondAddress` | `multi` 内 | 住所2つ目 | なし | §11-4 |
 | `additionalItems.handwrittenMemo` | `multi` 内 | 手書きメモ | なし | §11-4 |
 
 ### 6.4 クーポン定義（モック）
@@ -530,7 +550,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 
 | 項目 | 条件 | 違反時 | 実装位置 |
 |------|------|--------|----------|
-| `bizcardRequest`（スキップ OFF 時） | `parseInt(value) > 0`、`NaN` 不可 | `.input-error-message` に「1枚以上必要です」、`.border-error` 付与、保存ボタン disabled | [bizcardSettingsRenderer.js:559-572](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) |
+| `bizcardRequest`（スキップ OFF 時） | `parseInt(value) > 0`、`NaN` 不可 | `#bizcardRequestError` に「1枚以上必要です」を表示、入力欄の枠を 2px の赤、`aria-invalid="true"` と `aria-describedby="bizcardRequestError"` を付与、保存ボタン disabled | [bizcardSettingsRenderer.js:559-572](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) |
 | `bizcardRequest`（スキップ ON 時） | チェックなし（常に valid） | エラー表示除去、保存ボタン enabled | 同:551-557 |
 | `bizcardRequest`（入力制約） | `min=0` `max=9999` | HTML5 標準の範囲外警告のみ | [bizcardSettings.html:147](../../../02_dashboard/bizcardSettings.html#L147) |
 | `bizcardRequest`（ステッパー） | 0〜9999 に clamp、非数は 0 | 自動補正、エラーなし | [bizcardSettings.js:210](../../../02_dashboard/src/bizcardSettings.js#L210) |
@@ -539,11 +559,11 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 | `couponCode` | 空文字時は「クーポンコードを入力してください。」、未知コードは「無効なクーポンコードです。」 | `#couponCodeErrorMessage` 表示 | [bizcardSettings.js:382-386, 407](../../../02_dashboard/src/bizcardSettings.js#L382) |
 | `internalMemo` | なし | — | — |
 
-`validateForm()` は `#input-error-message` を `bizcardRequestInput.parentElement` 内から 1 件だけ拾う実装で、複数箇所にはスケールしない（§11-15）。
+`validateForm()` は見込み枚数 1 項目だけを対象にし、エラー表示は `setRequestCountError()` が `#bizcardRequestError` に対して切り替える。複数箇所にはスケールしない（§11-15）。
 
 ### 7.2 エラー表示仕様
 
-- `bizcardRequest`: `.input-error-message`（高さ 3px 固定プレースホルダ、HTML 直書き）にテキスト挿入、`#bizcardRequest` に `.border-error` 付与。
+- `bizcardRequest`: 入力欄の直下（2 段表示では 1 段目と 2 段目の間）の `#bizcardRequestError` に、エラーアイコン（`error_outline`、`aria-hidden="true"`）と文言 `#bizcardRequestErrorText`（`.input-error-message`）を 13px 太字・`--color-state-error`・中央寄せで表示する。エラーがないときは `.hidden`。入力欄の枠は `.bizcard-stepper__field.is-invalid` で 2px の赤にし、`#bizcardRequest` に `aria-invalid="true"` と `aria-describedby="bizcardRequestError"` を付ける。エラーが解消したら属性を外す。
 - クーポン: `#couponCodeErrorMessage`（非表示時 `.hidden`）を外し、`#couponCodeErrorText` にメッセージ。
 - 保存失敗: `showToast(message, 'error')`。
 - `aria-live` は付与されていない（§11-16）。
@@ -631,7 +651,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 
 **非機能要件**:
 - [ ] §9.2 プラン選択がキーボードのみで完結する
-- [ ] §9.2 スキップ時のオーバーレイが右カラム全体を覆う
+- [ ] §9.2 スキップ時の覆いが料金見積もりの本体だけを覆う（フッターは覆わない）
 - [ ] モバイル・タブレット・デスクトップで崩れなし
 
 **受入シナリオ**:
@@ -641,7 +661,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 | A1 | `?surveyId=sv_0001_26008` で遷移 | 基本情報 + 既存設定が表示、デフォルトは normal プラン |
 | A2 | `-100` ステッパーを枚数 50 で押す | 0 に clamp、エラー「1枚以上必要です」表示、保存ボタン disabled |
 | A3 | `SAVE10` を適用 | `¥1,000` 値引き、内訳に「ー クーポンお値引き 1,000円」表示 |
-| A4 | スキップトグル OFF | 左カラムグレーアウト、右カラム overlay 覆い、`¥0` + 「データ化を実施しない」 |
+| A4 | スキップトグル OFF | 左カラムグレーアウト、料金見積もりの本体を薄く表示、小計 `¥0`・完了予定日「未定」・税込請求見込み `¥0`（グレー）、確定ボタンは有効 |
 | A5 | プレミアム多言語 ON | 内訳の「選択オプション」に「多言語対応」表示、金額は変化せず |
 | A6 | 編集後キャンセル押下 | 確認モーダル表示、キャンセルで `fromPage` へ戻る |
 | A7 | `?surveyId=xx&from=v2` | キャンセル後 `surveyCreation-v2.html?surveyId=xx` へ戻る |
@@ -680,7 +700,7 @@ couponPercent       = preDiscount > 0 ? Math.round(couponAmount / preDiscount * 
 
 14. **`fetchSurveyData` / `fetchBizcardSettings` の二重 fetch**: 両関数とも同じ `data/core/surveys.json` を個別に fetch する（[bizcardSettingsService.js:22, 50](../../../02_dashboard/src/services/bizcardSettingsService.js#L22)）。`Promise.all` で並列化されているとはいえ HTTP リクエストは 2 本。共通ロード → 1 レスポンスから 2 値を取り出す形へ統合可能。
 
-15. **`validateForm` 単一箇所チェック**: [bizcardSettingsRenderer.js:559](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) の `dom.bizcardRequestInput.parentElement.querySelector('.input-error-message')` は `bizcardRequest` 直近親の 1 件しか見ない。将来バリデーション対象項目を増やす際はルール集約の作り替えが必要。
+15. **`validateForm` 単一箇所チェック**: [bizcardSettingsRenderer.js:559](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L559) の `validateForm()` と `setRequestCountError()` は `bizcardRequest` と `#bizcardRequestError` の 1 組しか扱わない。将来バリデーション対象項目を増やす際はルール集約の作り替えが必要。
 
 16. **`aria-live` 欠落**: `#estimatedAmount` / `#estimatedCompletionDate` / `#estimateBreakdown` / `.input-error-message` / `#couponCodeErrorMessage` いずれも `aria-live` 無し。見積金額のリアルタイム変動が支援技術に通知されない。
 
