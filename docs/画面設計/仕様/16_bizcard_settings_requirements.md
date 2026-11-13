@@ -86,6 +86,7 @@ last_reviewed: 2026-04-24
 - `02_dashboard/src/ui/bizcardSettingsRenderer.js`（プラン/オプション/見積の描画＋バリデーション）
 - 共通ルーティング: [main.js:435](../../../02_dashboard/src/main.js#L435) が `bizcardSettings.html` を検知し `initBizcardSettings()` を呼び出す。`#header-placeholder` / `#sidebar-placeholder` / `#footer-placeholder` / `#breadcrumb-container` は共通注入。
 - パンくず定義: [breadcrumb.js:20](../../../02_dashboard/src/breadcrumb.js#L20) 「アンケート一覧 > アンケート作成・編集 > 名刺データ化設定」（中央項目は動的リンクのプレースホルダー `#`）。
+- 640px 未満の表示: パンくずは 3 項目を 1 行に収める（文字は幅に合わせて 10〜13px、区切りの矢印は文字の 1.3 倍。収まらないときは途中の項目を末尾省略）。画面タイトルは幅に合わせて 15〜20px、アンケート名は 14px。どれもこの画面（`.bizcard-settings-page`）に限定した指定で、`breadcrumb.js` は変更しない。
 
 **依存 CDN**（`bizcardSettings.html` 冒頭）:
 - Tailwind CDN（`plugins=forms,container-queries`、[bizcardSettings.html:8](../../../02_dashboard/bizcardSettings.html#L8)）
@@ -175,6 +176,7 @@ last_reviewed: 2026-04-24
 
 **STEP1 データ化プランと見込み枚数**:
 - 見出し「1. データ化プランと見込み枚数」＋ `data-help-key="bizcardPlanAndSpeed"` のヘルプトリガ、右端に「詳細仕様を見る」ボタン `#openBizcardDetailsModalBtn`。
+  - 640px 未満: 「1.」「2.」の見出し（`.bizcard-step-heading`）は幅に合わせて 14〜18px。「詳細仕様を見る」は、見出しと横に並びきらない幅では見出しの下の段の右端へ回す（`.bizcard-section-head` を折り返す）。320〜359px では「名刺のデータ化を行う」を 14px にする。見出し類を 1 行に固定するのは 320px 以上で、320px 未満では折り返す。
 - `#dataConversionPlanSelection` は `role="radiogroup"`、`flex flex-col gap-4`。`renderDataConversionPlans()` が 5 プランのカードを動的生成し、お試し（`trial`）を先頭に全幅 1 枚、有料 4 プラン（`normal` / `express` / `superExpress` / `onDemand`）をその下の `grid grid-cols-1 md:grid-cols-2 gap-4`（768px 以上で 2 列 × 2 段、768px 未満で 1 列）に並べる（[bizcardSettingsRenderer.js:233](../../../02_dashboard/src/ui/bizcardSettingsRenderer.js#L233)）。
 - お試しカードは 2 段構成。上段はアイコン・プラン名・バッジ「無料」・その下にタグライン（11px 太字）、右端にラジオ表示、上段の下に罫線。下段は単価・項目数・納期の横 3 列（各列はラベルと値の縦積み。768px 以上はラベル 13px・値 16px 太字、768px 未満はラベル 12px・値 14px 太字）。有料 4 プランのカードは単価・項目数・納期の 3 行と下部のタグラインで構成する。選択時のスタイル（`border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md`）は全カード共通。
 - 見込み枚数エリアは `<label for="bizcardRequest">` + ステッパー `.bizcard-stepper`（6 ボタン + `<input id="bizcardRequest" type="number" inputmode="numeric" min="0" max="9999" value="100">` + 単位「枚」 + エラー表示 `#bizcardRequestError`）で構成する（[bizcardSettings.html:147-150](../../../02_dashboard/bizcardSettings.html#L147)）。
@@ -212,6 +214,7 @@ last_reviewed: 2026-04-24
 - フッターの 2 行目は保存ボタン `#saveBizcardSettingsBtn`（`#saveBizcardSettingsBtnText` + `#saveBizcardSettingsBtnLoading`）と戻るボタン `#cancelBizcardSettings`。幅は 7 : 3（`flex: 7` / `flex: 3`）、間隔 8px、高さ 48px、ピル型。確定ボタンは 1 画面に 1 か所。
 - 保存ボタンは `.bizcard-confirm-button` で通常色を `--color-button-primary-hover-bg`（#3367D6）、ホバー時を #2A56B8 にする。無効時は背景 `--color-button-disabled-bg`・文字 #6B6B6B。`--color-button-primary-bg` は変更しない。
 - 1280px 未満の下部固定バー（`#estimateBar`）: 白背景、上に 1px の罫線、上向きの影。余白は上 10px・左右 16px・下 16px + `env(safe-area-inset-bottom)`。1 行目は左にラベル「税込請求見込み」（12px 太字）と `#estimatedCompletionDateCompact`「完了予定 YYYY/M/D」（11px）、右に金額（24px・900）と内訳トグル `#estimateSheetToggleBtn`（高さ 32px のチップ。`::after` で行全体を押せる範囲にする。最小高さ 48px）。2 行目は確定 7 : キャンセル 3。360px 未満では確定ボタンの文字を 14px にする。
+- 640px 未満の文字: 320px 以上では、バーのラベルと完了予定、内訳シートの「名刺データ化の小計（税抜）」（`.estimate-subtotal-label`。幅に合わせて 11〜14px）を 1 行に固定する。320〜359px では金額 20px、行の間隔 8px、金額と内訳ボタンの間隔 6px、内訳ボタンの左右余白 10px・6px（金額 7 桁でもラベルと重ならない）。「アンケート全体料金」は括弧書きの補足（`.estimate-total-heading__sub`）を下の段に分け、11px・太さ 500 で表示する。
 - 1280px 未満の内訳シート（`#estimateSheet`）: トグルを押すとバーの後ろから `translateY(100%) → 0`（320ms、`cubic-bezier(0.2, 0.8, 0.2, 1)`）でせり上がり、背景 `#estimateSheetScrim`（黒 45%）が 240ms でフェードする。バーは動かず、トグルの文言が「閉じる」に変わる。上端の角丸 24px、つまみ（40×4px）、見出しと閉じるボタン `#estimateSheetCloseBtn`（44×44px）。高さは最大で画面高 − ヘッダー分で、中身が長いときはシート内でスクロールする。`prefers-reduced-motion: reduce` では動きを止める。
 - シートを閉じる手段は、トグルをもう一度押す・閉じるボタン・背景を押す・Esc キー。画面幅が 1280px 以上になったら自動で閉じる。注意事項モーダル、確認モーダル、ヘルプのポップオーバーが前面にあるときの Esc は、前面のものだけを閉じる（Esc はキャプチャ段階で受けて判定する）。
 - シートは開いている間だけ `role="dialog" aria-modal="true" aria-label="料金見積もり"` を持つ。開いたら閉じるボタンへフォーカスを移し、閉じたらトグルへ戻す。開いている間は背面のスクロールを止め、設定フォーム（`#estimateSheetBackground`）・パンくず・ヘッダー・サイドバー・フッターに `inert` を付けて、フォーカスがシートとバーの外へ出ないようにする。トグルは `aria-expanded` と `aria-controls="estimateSheet"` を持つ。
