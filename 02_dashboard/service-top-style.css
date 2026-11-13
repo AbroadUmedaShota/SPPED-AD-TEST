@@ -3787,3 +3787,128 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* --- 名刺データ化設定: スマホ幅で短い見出し・ラベルを折り返させない --- */
+/* 640px 未満だけに効かせる。パンくず（src/breadcrumb.js）は全画面で使うため変更せず、この画面（.bizcard-settings-page）でだけ見た目を変える。
+   文として読む説明文と、アンケート名などの可変データは対象にしない。 */
+@media (max-width: 639.98px) {
+    /* パンくず: 3 項目を 1 行に収める。文字は幅に合わせて 10〜13px。収まらないときは途中の項目を末尾省略にする */
+    .bizcard-settings-page #breadcrumb-container ol {
+        font-size: clamp(10px, 3.1vw, 13px);
+    }
+
+    .bizcard-settings-page #breadcrumb-container ol > li {
+        min-width: 0;
+        margin-left: 0;
+        white-space: nowrap;
+    }
+
+    .bizcard-settings-page #breadcrumb-container ol > li:last-child {
+        flex-shrink: 0;
+    }
+
+    .bizcard-settings-page #breadcrumb-container ol > li > a {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bizcard-settings-page #breadcrumb-container ol > li > .material-icons {
+        flex-shrink: 0;
+        margin: 0 1px;
+        font-size: 1.3em;
+    }
+
+    /* ページタイトル: 24px だと 3 行になるため、幅に合わせて 15〜20px にする */
+    .bizcard-settings-page #pageTitle {
+        font-size: clamp(15px, 4.7vw, 20px);
+        line-height: 1.4;
+    }
+
+    /* アンケート名（可変）: 折り返しを減らすため 1 段階小さくする */
+    .bizcard-settings-page #surveyNameDisplay {
+        font-size: 14px;
+    }
+
+    /* 「1.」「2.」の見出し: 幅に合わせて 14〜18px にする（ページタイトルより大きくしない） */
+    .bizcard-settings-page .bizcard-step-heading {
+        font-size: clamp(14px, 4.4vw, 18px);
+        line-height: 1.4;
+    }
+
+    /* 見出しと「詳細仕様を見る」が横に並びきらない幅では、ボタンを下の段の右端へ回す */
+    .bizcard-settings-page .bizcard-section-head {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .bizcard-settings-page #openBizcardDetailsModalBtn {
+        flex-shrink: 0;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    /* 内訳シートの「名刺データ化の小計（税抜）」: 金額が 7 桁でも 1 行に収まるよう、幅に合わせて 11〜14px にする */
+    .bizcard-settings-page .estimate-subtotal-label {
+        min-width: 0;
+        font-size: clamp(11px, 3.4vw, 14px);
+    }
+
+    .bizcard-settings-page #estimatedAmount {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* 内訳シートの「アンケート全体料金」: 括弧書きの補足を下の段に分ける */
+    .bizcard-settings-page .estimate-total-heading__text {
+        min-width: 0;
+    }
+
+    .bizcard-settings-page .estimate-total-heading__sub {
+        display: block;
+        margin-top: 1px;
+        /* 行頭の全角括弧の左側の空きを詰めて、上の段と左端をそろえる */
+        text-indent: -0.5em;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--color-text-sub);
+    }
+}
+
+/* 折り返し禁止は 320px 以上に限る。320px 未満では収まらず、重なりやはみ出しになるため、従来どおり折り返させる */
+@media (min-width: 320px) and (max-width: 639.98px) {
+    .bizcard-settings-page .bizcard-step-heading,
+    .bizcard-settings-page .estimate-subtotal-label,
+    .bizcard-settings-page .estimate-total-heading__text,
+    .bizcard-settings-page .estimate-bar__label,
+    .bizcard-settings-page .estimate-bar__date {
+        white-space: nowrap;
+    }
+}
+
+/* 320〜359px: さらに幅が足りない箇所だけ詰める */
+@media (min-width: 320px) and (max-width: 359.98px) {
+    /* 「名刺のデータ化を行う」とヘルプを 1 行に収める */
+    .bizcard-settings-page #skipBizcardToggleContainer h3 {
+        gap: 4px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    /* 下部バー: 金額が 7 桁でもラベルと重ならないよう、金額と内訳ボタンを少し詰める */
+    .bizcard-settings-page .estimate-bar .estimate-bar__summary {
+        gap: 8px;
+    }
+
+    .bizcard-settings-page .estimate-bar .estimate-bar__amount-group {
+        gap: 6px;
+    }
+
+    .bizcard-settings-page .estimate-bar .estimate-bar__amount {
+        font-size: 20px;
+    }
+
+    .bizcard-settings-page .estimate-bar .estimate-bar__toggle {
+        padding: 0 6px 0 10px;
+    }
+}

@@ -106,9 +106,9 @@
                             <div id="bizcardFormActiveArea" class="space-y-8 transition-opacity duration-300">
                                 <!-- STEP 1: データ化プランと見込み枚数 -->
                                 <div class="space-y-5">
-                                    <div class="flex items-center justify-between border-b border-outline-variant pb-2">
+                                    <div class="bizcard-section-head flex items-center justify-between border-b border-outline-variant pb-2">
                                         <div class="flex items-center gap-2" data-help-target="bizcard-plan">
-                                            <h2 id="dataConversionPlanHeading" class="text-on-surface text-xl font-bold">1. データ化プランと見込み枚数</h2>
+                                            <h2 id="dataConversionPlanHeading" class="bizcard-step-heading text-on-surface text-xl font-bold">1. データ化プランと見込み枚数</h2>
                                             <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="bizcardPlanAndSpeed" aria-label="データ化項目プランの説明を表示">help_outline</button>
                                         </div>
                                         <button type="button" id="openBizcardDetailsModalBtn" class="text-primary text-sm font-semibold hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-full transition-colors">
@@ -187,7 +187,7 @@
                                 <!-- STEP 2: プレミアムオプション -->
                                 <div class="space-y-5">
                                     <div class="border-b border-outline-variant pb-2">
-                                        <h2 class="text-on-surface text-xl font-bold">2. プレミアムオプション（任意）</h2>
+                                        <h2 class="bizcard-step-heading text-on-surface text-xl font-bold">2. プレミアムオプション（任意）</h2>
                                         <p class="text-sm text-on-surface-variant mt-1">標準プランに加えて、より高度なデータ化を行いたい項目を選択してください。</p>
                                     </div>
                                     <div id="premiumOptionsContainer" class="grid gap-4 sm:grid-cols-2"></div>
@@ -238,7 +238,7 @@
                                     <!-- 金額と完了予定日 -->
                                     <div class="space-y-2 z-20">
                                         <div class="flex items-center justify-between gap-2 rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
-                                            <span class="flex flex-col gap-0.5 text-sm font-semibold text-on-surface-variant">
+                                            <span class="estimate-subtotal-label flex flex-col gap-0.5 text-sm font-semibold text-on-surface-variant">
                                                 名刺データ化の小計（税抜）
                                                 <span class="text-[10px] font-normal">名刺機能分のみ</span>
                                             </span>
@@ -270,9 +270,10 @@
                                     <!-- アンケート全体ブロック -->
                                     <div class="estimate-block-survey-total rounded-2xl border border-primary/30 bg-primary/5 p-4 z-20 space-y-2" data-block="surveyTotal">
                                         <div class="flex items-center justify-between">
-                                            <h3 class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                                            <h3 class="estimate-total-heading text-sm font-bold text-on-surface flex items-center gap-1.5">
                                                 <span class="material-icons text-base text-primary">receipt_long</span>
-                                                アンケート全体料金（このアンケートの請求見込み）
+                                                <!-- 640px 未満では補足（括弧書き）を下の段に分ける。改行や空白を挟むと PC の表示が変わるため 1 行で書く -->
+                                                <span class="estimate-total-heading__text">アンケート全体料金<span class="estimate-total-heading__sub">（このアンケートの請求見込み）</span></span>
                                             </h3>
                                         </div>
 
