@@ -399,6 +399,46 @@ for (const vp of NARROW_VIEWPORTS) {
       expect(errors).toEqual([]);
     });
 
+    test('B1 一覧を下へ送ってから詳細を開いても、上端から表示され、閉じると同じ位置に戻る', async ({ page }) => {
+      await openList(page);
+      await press(page.locator('#close-test-overlay'));
+      await page.locator('#itemsPerPage').selectOption('50');
+      const rows = page.locator('#surveyTableBody tr[data-id]');
+      await expect(rows.first()).toBeVisible();
+      // 指でなぞって、ページを下へ送る
+      await swipeUp(page, 240);
+      const scrolledBefore = await page.evaluate(() => Math.round(window.scrollY));
+      expect(scrolledBefore, '一覧が下へ送られている').toBeGreaterThan(0);
+      // 画面の中に見えている行を選ぶ
+      let target = rows.first();
+      for (let index = 0; index < await rows.count(); index++) {
+        const box = await rows.nth(index).boundingBox();
+        if (box && box.y > 80 && box.y + box.height < vp.height - 20) {
+          target = rows.nth(index);
+          break;
+        }
+      }
+
+      await press(target.locator('td[data-label="アンケート名"]'));
+      const detail = page.locator('#surveyDetailsModal');
+      await expect(detail).toHaveAttribute('data-state', 'open');
+      await expectCoversViewport(page, detail);
+      // 開いている間は背面のページを動かせない。スクロール位置は変わらない
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflowY)).toBe('hidden');
+      expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(scrolledBefore);
+      // ×は画面の上端にあり、押せる
+      const closeButton = page.locator('#closeSurveyDetailsModalBtn');
+      await expect(closeButton).toBeInViewport();
+      const closeBox = await closeButton.boundingBox();
+      expect(closeBox ? Math.round(closeBox.y) : -1, '×が画面の上端にある').toBeGreaterThanOrEqual(0);
+      expect(closeBox ? Math.round(closeBox.y) : 999, '×が画面の上端にある').toBeLessThan(40);
+
+      await press(closeButton);
+      await expectClosedAndUnseen(page, detail);
+      await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).overflowY)).not.toBe('hidden');
+      expect(await page.evaluate(() => Math.round(window.scrollY)), '閉じたあとも一覧は同じ位置').toBe(scrolledBefore);
+    });
+
     test('B3 サンプルの詳細では「編集」が出ない', async ({ page }) => {
       await openList(page);
       await press(page.locator('#close-test-overlay'));

@@ -163,6 +163,23 @@ export function initSurveyListResponsive() {
     setOpenPanel(null);
   }, true);
 
+  // iPhone では、ページのスクロールが止まりきる前（慣性で動いている間や、端で跳ね返っている間）に
+  // 全画面のモーダルを開くと、画面に固定した要素の表示位置がずれたまま残り、上端の×が押せなくなることがある。
+  // 何かを押した時点で、スクロールを今の位置（動ける範囲の中）に確定させてから、それぞれの処理に進ませる。
+  // 止まっているときは同じ位置への移動なので、何も起きない。
+  const settlePageScroll = () => {
+    const root = document.scrollingElement || document.documentElement;
+    const maxTop = Math.max(0, root.scrollHeight - window.innerHeight);
+    const top = Math.min(Math.max(window.scrollY, 0), maxTop);
+    window.scrollTo(window.scrollX, top);
+  };
+
+  document.addEventListener('click', () => {
+    if (narrowQuery.matches) {
+      settlePageScroll();
+    }
+  }, true);
+
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !openPanel || !narrowQuery.matches) return;
     const button = openPanel === 'filter' ? filterButton : sortButton;
