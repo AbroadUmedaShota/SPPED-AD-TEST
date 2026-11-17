@@ -4,8 +4,9 @@ import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
 import { isReadOnlySurvey } from './services/surveyDefaults.js';
-import { closeModal } from './modalHandler.js';
-import { buildSurveyAnswerUrl } from './qrCodeModal.js';
+import { closeModal, handleOpenModal } from './modalHandler.js';
+import { buildSurveyAnswerUrl, populateQrCodeModal } from './qrCodeModal.js';
+import { resolveDashboardAssetPath } from './utils.js';
 import { initHelpPopovers } from './ui/helpPopover.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
@@ -38,8 +39,10 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     const goToBizcardSettingsBtn = modalElement.querySelector('#goToBizcardSettingsBtn');
     const goToThankYouEmailSettingsBtn = modalElement.querySelector('#goToThankYouEmailSettingsBtn');
     const goToSpeedReviewBtn = modalElement.querySelector('#goToSpeedReviewBtn');
+    const detailQrCodeBtn = modalElement.querySelector('#detailQrCodeBtn');
 
     // Remove existing listeners to prevent duplication
+    if (detailQrCodeBtn) detailQrCodeBtn.removeEventListener('click', handleOpenQrCode);
     if (detailDownloadBtn) detailDownloadBtn.removeEventListener('click', handleDetailDownload);
     if (deleteSurveyBtn) deleteSurveyBtn.removeEventListener('click', handleDeleteSurvey);
     if (duplicateSurveyBtn) duplicateSurveyBtn.removeEventListener('click', handleDuplicateSurvey);
@@ -90,6 +93,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.addEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.addEventListener('click', handleGoToThankYouEmailSettings);
     if (goToSpeedReviewBtn) goToSpeedReviewBtn.addEventListener('click', handleGoToSpeedReview);
+    if (detailQrCodeBtn) detailQrCodeBtn.addEventListener('click', handleOpenQrCode);
 
     const closeBtn = modalElement.querySelector('#closeSurveyDetailsModalBtn');
     if (closeBtn) {
@@ -120,6 +124,22 @@ function handleGoToThankYouEmailSettings() {
 function handleGoToSpeedReview() {
     if (currentEditingSurvey && currentEditingSurvey.id) {
         window.location.href = `speed-review.html?surveyId=${currentEditingSurvey.id}`;
+    } else {
+        showToast('アンケート情報がありません。', 'error');
+    }
+}
+
+/**
+ * 「QRコード」ボタン（1023px 以下でだけ表示）。一覧の行の「QRコードを表示」と同じ呼び出しを行う。
+ */
+function handleOpenQrCode() {
+    if (currentEditingSurvey && currentEditingSurvey.id) {
+        const surveyId = currentEditingSurvey.id;
+        handleOpenModal(
+            'qrCodeModal',
+            resolveDashboardAssetPath('modals/qrCodeModal.html'),
+            () => populateQrCodeModal({ surveyId })
+        );
     } else {
         showToast('アンケート情報がありません。', 'error');
     }
@@ -324,6 +344,9 @@ export function populateSurveyDetails(survey) {
         } else {
             editSurveyBtn.classList.add('hidden');
         }
+        // 1023px 以下では一覧の行のボタンを出さないため、行の「編集」と同じ条件（サンプル以外は会期を問わず表示）で出す。
+        // 出し分けは service-top-style.css がこの属性を見て行う。1024px 以上は上の条件のまま。
+        editSurveyBtn.dataset.rowEditable = String(!readOnlySurvey);
     }
     const deleteSurveyBtn = modal.querySelector('#deleteSurveyBtn');
     if (deleteSurveyBtn) {

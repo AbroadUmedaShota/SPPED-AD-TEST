@@ -12,6 +12,7 @@ let periodRangeInput;
 let confirmBtn;
 let cancelBtn;
 let closeBtn;
+let backBtn;
 let periodRangeInstance = null;
 let sourceSurvey = null;
 
@@ -46,6 +47,7 @@ const initElements = () => {
     confirmBtn = document.getElementById('confirmDuplicateSurveyBtn');
     cancelBtn = document.getElementById('cancelDuplicateSurveyModalBtn');
     closeBtn = document.getElementById('closeDuplicateSurveyModalBtn');
+    backBtn = document.getElementById('backDuplicateSurveyModalBtn');
 };
 
 /**
@@ -148,6 +150,12 @@ const setupEventListeners = () => {
 
     closeBtn.removeEventListener('click', closeDuplicateSurveyModal);
     closeBtn.addEventListener('click', closeDuplicateSurveyModal);
+
+    // 「←」はアンケート一覧の 1023px 以下でだけ表示される（アンケート詳細に戻る）。「キャンセル」と同じ処理。
+    if (backBtn) {
+        backBtn.removeEventListener('click', closeDuplicateSurveyModal);
+        backBtn.addEventListener('click', closeDuplicateSurveyModal);
+    }
 
     initHelpPopovers(modal);
 };

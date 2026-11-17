@@ -1,4 +1,5 @@
 import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
+import { initSurveyListResponsive } from './ui/surveyListResponsive.js';
 
 
 
@@ -23,6 +24,9 @@ export function initIndexPage() {
             endDatePicker.set('minDate', dateStr);
         }
     });
+
+    // 1023px 以下で使う、一覧の上のツールバー（表示件数・絞り込み・並べ替え）
+    initSurveyListResponsive();
 
     // フィルターとページネーションを適用
     applyFiltersAndPagination();
