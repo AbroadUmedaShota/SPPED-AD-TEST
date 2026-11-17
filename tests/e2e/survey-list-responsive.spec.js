@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect, webkit, devices } = require('@playwright/test');
 
 /**
  * アンケート一覧（02_dashboard/index.html）のレスポンシブ表示の確認。
@@ -71,6 +71,18 @@ async function swipeUp(page, distance) {
     remaining -= stroke;
   }
   await client.detach();
+}
+
+/**
+ * 一覧のステータスのバッジに色が付いていること。
+ * バッジの色は Tailwind の CDN 版が画面を開いたあとに作る CSS で付く。行の描画と同じタイミングで
+ * 別の class 名が増えると、色の指定が取りこぼされて付かなくなる（背景が透明のままになる）。
+ * @param {import('@playwright/test').Page} page
+ */
+async function expectStatusBadgeColored(page) {
+  const badge = page.locator('#surveyTableBody tr[data-id] td[data-label="ステータス"] span').first();
+  await expect(badge).toBeVisible();
+  await expect(badge).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
 }
 
 /** @param {import('@playwright/test').Page} page */
@@ -160,7 +172,7 @@ async function openDetailByKeyword(page, press, keyword) {
   const rows = page.locator('#surveyTableBody tr');
   await expect(rows).toHaveCount(1);
   await press(page.locator('#toggleSurveyFilterBtn'));
-  await expect(page.locator('#surveyFilterPanel')).not.toHaveClass(/is-open/);
+  await expect(page.locator('#surveyFilterPanel')).not.toHaveAttribute('data-open', 'true');
   await press(rows.first().locator('td[data-label="アンケート名"]'));
   await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
 }
@@ -181,6 +193,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await openList(page);
       await expectNoHorizontalScroll(page);
       await expectTitleRightBelowHeader(page);
+      await expectStatusBadgeColored(page);
 
       const firstRow = page.locator('#surveyTableBody tr').first();
       await expect(firstRow.locator('td[data-label="アンケート名"]')).toBeVisible();
@@ -234,7 +247,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(page.locator('#pageInfo')).not.toHaveText(pageInfoBefore);
       await expect(page.locator('#loading-indicator')).toBeHidden();
       await expect(rows.first()).toContainText('個人');
-      await expect(filterButton).toHaveClass(/is-active/);
+      await expect(filterButton).toHaveAttribute('data-active', 'true');
 
       // 外側（枠に隠れていない行）を押す → 閉じるだけで、詳細は開かない
       const lastRow = rows.last();
@@ -244,7 +257,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await page.waitForTimeout(500);
       await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
       // 条件が入っている間は、閉じていても青
-      await expect(filterButton).toHaveClass(/is-active/);
+      await expect(filterButton).toHaveAttribute('data-active', 'true');
 
       // フィルターをリセットで戻る
       await filterButton.scrollIntoViewIfNeeded();
@@ -254,7 +267,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(rows).toHaveCount(totalBefore);
       await press(filterButton);
       await expect(panel).toBeHidden();
-      await expect(filterButton).not.toHaveClass(/is-active/);
+      await expect(filterButton).not.toHaveAttribute('data-active', 'true');
     });
 
     test('A4 絞り込みは Esc でも閉じ、0 件の表示は横幅いっぱい', async ({ page }) => {
@@ -288,7 +301,7 @@ for (const vp of NARROW_VIEWPORTS) {
 
       // 初期の並びはアンケートIDの降順
       const idItem = items.nth(0);
-      await expect(idItem).toHaveClass(/is-sorted/);
+      await expect(idItem).toHaveAttribute('aria-pressed', 'true');
       await expect(idItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_downward');
 
       const nameItem = items.nth(1);
@@ -297,7 +310,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(nameItem).toHaveAttribute('aria-pressed', 'true');
       await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_downward');
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'descending');
-      await expect(idItem).not.toHaveClass(/is-sorted/);
+      await expect(idItem).toHaveAttribute('aria-pressed', 'false');
       const descending = await firstName();
 
       await press(nameItem);
@@ -305,7 +318,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'ascending');
       const ascending = await firstName();
       expect(descending).not.toBe(ascending);
-      await expect(menu).toHaveClass(/is-open/);
+      await expect(menu).toHaveAttribute('data-open', 'true');
 
       await press(sortButton);
       await expect(menu).toBeHidden();
@@ -595,7 +608,7 @@ test.describe('スマートフォンの実機に近い設定（390×844）', () 
       await startDate.fill('2026-03-01');
       await expect(page.locator('#pageInfo')).not.toHaveText(pageInfoBefore);
       await expect(page.locator('#filterStartDate')).toHaveValue('2026-03-01');
-      await expect(filterButton).toHaveClass(/is-active/);
+      await expect(filterButton).toHaveAttribute('data-active', 'true');
 
       await press(page.locator('#resetFiltersButton'));
       await expect(page.locator('#pageInfo')).toHaveText(pageInfoBefore);
@@ -603,7 +616,7 @@ test.describe('スマートフォンの実機に近い設定（390×844）', () 
       await expect(startDate).toHaveValue('');
       await press(filterButton);
       await expect(panel).toBeHidden();
-      await expect(filterButton).not.toHaveClass(/is-active/);
+      await expect(filterButton).not.toHaveAttribute('data-active', 'true');
     });
   });
 
@@ -702,6 +715,7 @@ for (const vp of WIDE_VIEWPORTS) {
       await openList(page);
       await expectNoHorizontalScroll(page);
       await expectTitleRightBelowHeader(page);
+      await expectStatusBadgeColored(page);
       await expect(page.locator('#surveyTable thead th')).toHaveCount(6);
       await expect(page.locator('#surveyTable thead')).toBeVisible();
       await expect(page.locator('#toggleSurveyFilterBtn')).toBeHidden();
@@ -836,6 +850,41 @@ test.describe('1024px 以上・タッチ操作の端末（タブレットの横�
     await expect(page.locator('#qrCodeModal')).toHaveAttribute('data-state', 'open');
     await expect(page.locator('#footerCloseQrCodeModalBtn')).toBeHidden();
     await expect(page.locator('#closeQrCodeModalBtn')).toBeVisible();
+  });
+});
+
+test.describe('Safari 系のブラウザー（iPhone の設定）', () => {
+  test('一覧と詳細のステータスのバッジに色が付く', async ({ baseURL }) => {
+    // local プロジェクトは Chrome 系だけなので、ここだけ WebKit を直接起動する。
+    // バッジの色の取りこぼしは WebKit で確実に再現するため（Chrome 系では端末の速さ次第）。
+    let browser;
+    try {
+      browser = await webkit.launch();
+    } catch (error) {
+      test.skip(true, 'WebKit が入っていない環境では確かめられない（npx playwright install webkit）');
+      return;
+    }
+    try {
+      // ファイル先頭のクリップボードの許可は Chrome 系専用の指定なので、ここでは外す
+      const context = await browser.newContext({ ...devices['iPhone 13'], baseURL, permissions: [] });
+      const page = await context.newPage();
+      await openList(page);
+      await expectStatusBadgeColored(page);
+      await expectNoHorizontalScroll(page);
+
+      // 並べ替え・絞り込みを使ったあとも、色が付いたまま
+      await page.locator('#toggleSurveySortBtn').tap();
+      await page.locator('.survey-sort-menu__item[data-sort-key="name"]').tap();
+      await page.locator('#toggleSurveySortBtn').tap();
+      await expectStatusBadgeColored(page);
+
+      await page.locator('#close-test-overlay').tap();
+      await page.locator('#surveyTableBody tr').first().locator('td[data-label="アンケート名"]').tap();
+      await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
+      await expect(page.locator('#surveyDetailStatusBadge')).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    } finally {
+      await browser.close();
+    }
   });
 });
 

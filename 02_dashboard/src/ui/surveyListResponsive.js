@@ -3,6 +3,11 @@
  * アンケート一覧の 1023px 以下の表示で使う、一覧の上のツールバー（表示件数・絞り込み・並べ替え）の開閉制御。
  * 見た目と幅ごとの出し分けは service-top-style.css の「アンケート一覧: レスポンシブ」が担う。
  * 絞り込み・並べ替え・ページ送りの処理は tableManager.js のものをそのまま使い、ここでは中身を持たない。
+ *
+ * 状態（開いている・条件あり・並べ替え中）は、class ではなく属性（data-open / data-active / aria-pressed）で持つ。
+ * この画面は Tailwind の CDN 版を使っており、画面に新しい class 名が現れるたびに CSS を作り足す。
+ * 作り足しが一覧の行の描画と重なると、行のバッジの色などが取りこぼされて付かなくなるため、
+ * ここでは class 名を増やさない。
  */
 
 import { sortSurveysByKey } from '../tableManager.js';
@@ -68,13 +73,13 @@ export function initSurveyListResponsive() {
   const render = () => {
     const filterOpen = openPanel === 'filter';
     const sortOpen = openPanel === 'sort';
-    filterPanel.classList.toggle('is-open', filterOpen);
-    sortMenu.classList.toggle('is-open', sortOpen);
+    filterPanel.dataset.open = String(filterOpen);
+    sortMenu.dataset.open = String(sortOpen);
     filterButton.setAttribute('aria-expanded', String(filterOpen));
     sortButton.setAttribute('aria-expanded', String(sortOpen));
     // 絞り込みボタンは、開いている間と、条件が入っている間は青にする。
-    filterButton.classList.toggle('is-active', filterOpen || hasFilterCondition());
-    sortButton.classList.toggle('is-active', sortOpen);
+    filterButton.dataset.active = String(filterOpen || hasFilterCondition());
+    sortButton.dataset.active = String(sortOpen);
   };
 
   const setOpenPanel = (next) => {
@@ -119,10 +124,13 @@ export function initSurveyListResponsive() {
       const isSorted = ariaSort === 'ascending' || ariaSort === 'descending';
       const headerIcon = header ? header.querySelector('.sort-icon') : null;
       const itemIcon = item.querySelector('.survey-sort-menu__icon');
-      item.classList.toggle('is-sorted', isSorted);
-      item.setAttribute('aria-pressed', String(isSorted));
-      if (itemIcon) {
-        itemIcon.textContent = isSorted && headerIcon ? headerIcon.textContent.trim() : 'unfold_more';
+      const iconName = isSorted && headerIcon ? headerIcon.textContent.trim() : 'unfold_more';
+      // 並べ替え中の見た目は aria-pressed を見て CSS が付ける。変わらないときは DOM に触れない。
+      if (item.getAttribute('aria-pressed') !== String(isSorted)) {
+        item.setAttribute('aria-pressed', String(isSorted));
+      }
+      if (itemIcon && itemIcon.textContent !== iconName) {
+        itemIcon.textContent = iconName;
       }
     });
   };
