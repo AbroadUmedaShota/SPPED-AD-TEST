@@ -51,7 +51,7 @@
 
                     <!-- タイトルエリア -->
                     <div
-                        class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                        class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant survey-list-title-row">
                         <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">
                             アンケート一覧</h1>
                         <button id="openNewSurveyModalBtn"
@@ -62,9 +62,51 @@
                         </button>
                     </div>
 
+                    <!-- 一覧の操作。1023px 以下はツールバー（表示件数・絞り込み・並べ替え）を出し、
+                         絞り込みの枠と並べ替えメニューはボタンの下に重ねて出す。1024px 以上は絞り込みの枠だけを常に出す。
+                         出し分けは service-top-style.css、開閉は src/ui/surveyListResponsive.js。 -->
+                    <div class="survey-list-controls" id="surveyListControls">
+                    <div class="survey-list-toolbar" id="surveyListToolbar">
+                        <!-- 1023px 以下では、表示件数（#itemsPerPageGroup）をここへ移す -->
+                        <div class="survey-list-toolbar__per-page" id="itemsPerPageSlotTop"></div>
+                        <div class="survey-list-toolbar__buttons">
+                            <button type="button" id="toggleSurveyFilterBtn" class="survey-list-toolbar__btn"
+                                aria-expanded="false" aria-controls="surveyFilterPanel">絞り込み</button>
+                            <button type="button" id="toggleSurveySortBtn" class="survey-list-toolbar__btn"
+                                aria-expanded="false" aria-controls="surveySortMenu">
+                                <span class="material-icons" aria-hidden="true">unfold_more</span>並べ替え
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 並べ替えメニュー（1023px 以下）。項目と順番は表の列見出しと同じ -->
+                    <div class="survey-sort-menu" id="surveySortMenu" role="group" aria-label="並べ替え">
+                        <button type="button" class="survey-sort-menu__item" data-sort-key="id" aria-pressed="false">
+                            <span>アンケートID</span>
+                            <span class="material-icons survey-sort-menu__icon" aria-hidden="true">unfold_more</span>
+                        </button>
+                        <button type="button" class="survey-sort-menu__item" data-sort-key="name" aria-pressed="false">
+                            <span>アンケート名</span>
+                            <span class="material-icons survey-sort-menu__icon" aria-hidden="true">unfold_more</span>
+                        </button>
+                        <button type="button" class="survey-sort-menu__item" data-sort-key="status" aria-pressed="false">
+                            <span>ステータス</span>
+                            <span class="material-icons survey-sort-menu__icon" aria-hidden="true">unfold_more</span>
+                        </button>
+                        <button type="button" class="survey-sort-menu__item" data-sort-key="answerCount" aria-pressed="false">
+                            <span>回答数</span>
+                            <span class="material-icons survey-sort-menu__icon" aria-hidden="true">unfold_more</span>
+                        </button>
+                        <button type="button" class="survey-sort-menu__item" data-sort-key="periodStart" aria-pressed="false">
+                            <span>展示会会期</span>
+                            <span class="material-icons survey-sort-menu__icon" aria-hidden="true">unfold_more</span>
+                        </button>
+                    </div>
+
                     <!-- フィルター・検索エリア -->
-                    <div class="bg-surface p-4 rounded-xl mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                    <div class="bg-surface p-4 rounded-xl mb-6 survey-filter-panel" id="surveyFilterPanel" role="group"
+                        aria-label="絞り込み">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-end survey-filter-panel__fields">
                             <!-- キーワード検索 -->
                             <div class="input-group lg:col-span-1 relative">
                                 <input type="text" id="searchKeyword" placeholder=" " class="input-field pl-10 pr-4">
@@ -88,7 +130,7 @@
                             </div>
 
                             <!-- 期間フィルター -->
-                            <div class="flex items-center gap-2 lg:col-span-1">
+                            <div class="flex items-center gap-2 lg:col-span-1 survey-filter-panel__dates">
                                 <div id="startDatePickerWrapper" class="input-group flex-1 relative">
                                     <input type="text" id="filterStartDate" class="input-field pr-10" placeholder=" "
                                         readonly data-input>
@@ -112,7 +154,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end mt-4">
+                        <div class="flex justify-end mt-4 survey-filter-panel__reset">
                             <button id="resetFiltersButton"
                                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-normal text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                                 aria-label="フィルターをリセット">
@@ -120,9 +162,10 @@
                             </button>
                         </div>
                     </div>
+                    </div>
 
                     <!-- アンケートテーブル -->
-                    <div
+                    <div id="surveyTableWrapper"
                         class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[200px]">
                         <div id="loading-indicator"
                             class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center z-10 hidden">
@@ -218,9 +261,9 @@
                     </div>
 
                     <!-- ページネーション -->
-                    <div
+                    <div id="surveyPagination"
                         class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2" id="itemsPerPageGroup">
                             <span>表示件数:</span>
                             <select id="itemsPerPage"
                                 class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none"

@@ -145,7 +145,8 @@
             </div>
 
             <!-- Access Info Section (Not editable) -->
-            <div class="space-y-4">
+            <!-- 1023px 以下では出さない（同じ内容は下の「QRコード」ボタンから見られる）。出し分けは service-top-style.css -->
+            <div class="space-y-4" id="detailAccessInfoSection">
                 <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">アンケートアクセス情報</h4>
                 <div class="input-group">
                     <input type="text" id="detail_surveyUrl" readonly class="input-field cursor-pointer"
@@ -185,6 +186,10 @@
                 <span class="material-icons text-sm">content_copy</span>
                 複製
             </button>
+            <!-- 1023px 以下でだけ出す。一覧の行の「QRコードを表示」と同じ処理を呼ぶ（行のボタンは 1023px 以下では出ないため） -->
+            <button id="detailQrCodeBtn"
+                class="hidden bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold"
+                type="button">QRコード</button>
             <button class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold"
                 id="footerCloseSurveyDetailsModalBtn" type="button">閉じる</button>
         </div>

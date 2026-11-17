@@ -35,6 +35,18 @@ export function setupQrCodeModalListeners(modalElement) {
     if (footerCloseBtn) {
         footerCloseBtn.addEventListener('click', () => closeModal('qrCodeModal'));
     }
+    // 「←」はアンケート一覧の 1023px 以下でだけ表示される（アンケート詳細に戻る）。閉じる処理は×と同じ。
+    const backBtn = modalElement.querySelector('#backQrCodeModalBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => closeModal('qrCodeModal'));
+    }
+
+    // URL欄を押すとコピーする（「URLをコピー」ボタンと同じ処理）。
+    // このモーダルはアンケート作成画面からも開くため、アンケート一覧から開いたときだけ有効にする。
+    const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
+    if (surveyUrlInput && document.body.dataset.pageId === 'survey-list') {
+        surveyUrlInput.addEventListener('click', handleCopyUrl);
+    }
 }
 
 export function populateQrCodeModal({ surveyId, surveyUrl, qrImageSrc } = {}) {
@@ -69,7 +81,7 @@ export function populateQrCodeModal({ surveyId, surveyUrl, qrImageSrc } = {}) {
     if (qrCodeHint) {
         qrCodeHint.textContent = hasQrImage
             ? 'このQRコードをスキャンしてアンケートに回答してください。'
-            : 'QRコード画像は未設定です。右側のURLは利用できます。';
+            : 'QRコード画像は未設定です。URLは利用できます。';
     }
 
     if (downloadQrCodeBtn) {

@@ -2,6 +2,11 @@
     data-state="closed">
     <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
         <div class="flex justify-between items-center mb-6">
+            <!-- アンケート一覧の 1023px 以下でだけ出す（アンケート詳細の中で切り替えて表示するため）。出し分けは service-top-style.css -->
+            <button type="button" class="hidden text-on-surface-variant hover:text-on-surface" id="backDuplicateSurveyModalBtn"
+                aria-label="アンケート詳細に戻る">
+                <span class="material-icons">arrow_back</span>
+            </button>
             <h3 class="text-on-surface text-xl font-semibold">アンケートを複製</h3>
             <button class="text-on-surface-variant hover:text-on-surface" id="closeDuplicateSurveyModalBtn"
                 aria-label="モーダルを閉じる">

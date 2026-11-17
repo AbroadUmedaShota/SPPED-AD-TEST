@@ -943,56 +943,7 @@ body.overflow-hidden {
 }
 
 /* --- Responsive Table --- */
-@media (max-width: 768px) {
-    .survey-table, .survey-table thead, .survey-table tbody, .survey-table th, .survey-table td, .survey-table tr {
-        display: block;
-    }
-
-    .survey-table thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    .survey-table tr {
-        margin-bottom: 1rem;
-        border: 1px solid var(--color-base-border-divider);
-        border-radius: 0.8rem;
-        overflow: hidden;
-        box-shadow: var(--color-base-shadow-soft);
-    }
-
-    .survey-table td {
-        border-bottom: 1px solid var(--color-base-border-divider);
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-    }
-
-    .survey-table td:last-child {
-        border-bottom: 0;
-    }
-
-    .survey-table td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-        color: var(--color-text-sub);
-        font-size: 0.9rem;
-    }
-
-    .actions-cell {
-        justify-content: flex-end;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-    }
-}
+/* アンケート一覧（.survey-table）の幅ごとの表示は、このファイル末尾の「アンケート一覧: レスポンシブ」にまとめている。 */
 
 /* --- Custom select appearance for removing default arrow --- */
 select.appearance-none {
@@ -3910,5 +3861,1146 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
 
     .bizcard-settings-page .estimate-bar .estimate-bar__toggle {
         padding: 0 6px 0 10px;
+    }
+}
+
+/* ==========================================================================
+   アンケート一覧: レスポンシブ（02_dashboard/index.html とそこから開くモーダル）
+   --------------------------------------------------------------------------
+   ・このファイルは他の多くの画面も読み込むため、ここの規則はすべて
+     body[data-page-id="survey-list"] で始め、アンケート一覧にだけ効かせる。
+     ヘッダー・サイドバー・モーダルは共通部品なので、HTML は変えずにここで見た目だけを変える。
+   ・幅の区切り: 767px 以下（スマートフォン）／768〜1023px（タブレット）／
+     1024〜1279px（小さめのパソコン）／1280px 以上（パソコン）。
+   ・「出さないボタン」（削除・データダウンロード・下部の閉じる）だけは、幅ではなく
+     タッチ操作の端末かどうか（hover: none かつ pointer: coarse）で切り替える。
+   ・開閉の制御は src/ui/surveyListResponsive.js。並べ替え・絞り込みの処理は tableManager.js のまま。
+   ========================================================================== */
+
+/* --- 全幅共通 --- */
+
+/* 一覧の上のツールバーと並べ替えメニューは、1023px 以下でだけ出す */
+body[data-page-id="survey-list"] .survey-list-toolbar,
+body[data-page-id="survey-list"] .survey-sort-menu {
+    display: none;
+}
+
+/* タイトルの上の余分な空き（80px）を詰める。
+   ・固定ヘッダーの分の空きが、#header-placeholder の min-height（64px）と、その下の枠の pt-16（64px）で二重に取られている。
+     ヘッダーは position: fixed で場所を取らないので、置き場の高さは 0 にしてよい。
+   ・パンくずの枠は、この画面では中身が空だが、下の余白（mb-4）だけが残る。空のときは枠ごと出さない。 */
+body[data-page-id="survey-list"] #header-placeholder {
+    min-height: 0;
+}
+
+body[data-page-id="survey-list"] #breadcrumb-container:empty,
+body[data-page-id="survey-list"] #breadcrumb-container:not(:has(*)) {
+    display: none;
+}
+
+/* モーダル下部ボタンの上の区切り線（QRコードは元からある。アカウント情報は全画面表示のときだけ） */
+body[data-page-id="survey-list"] #viewModeButtons {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-base-border-divider);
+}
+
+body[data-page-id="survey-list"] #newSurveyModal form > div:last-child,
+body[data-page-id="survey-list"] #duplicateSurveyModal form > div:last-child,
+body[data-page-id="survey-list"] #downloadOptionsModal form > div:last-child {
+    border-top: 1px solid var(--color-base-border-divider);
+}
+
+body[data-page-id="survey-list"] #newGroupModal #groupForm > div:last-child {
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-base-border-divider);
+}
+
+/* アンケート詳細: 切れ目のない長い英数字のアンケート名などで、欄が横にはみ出さないようにする */
+body[data-page-id="survey-list"] #surveyDetailsForm .view-mode {
+    overflow-wrap: anywhere;
+}
+
+/* 長い URL は 1 行で表示し、入りきらない分は末尾を「…」にする（横スクロールを出さない） */
+body[data-page-id="survey-list"] #detail_surveyUrl,
+body[data-page-id="survey-list"] #surveyUrlInput {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- 1024px 以上: 本文の左右の余白をそろえる／モーダルの高さを画面内に収める --- */
+@media (min-width: 1024px) {
+    /* 共通の指定では左だけ 4rem になり、サイドバーの右の領域の中央から本文がずれる */
+    body[data-page-id="survey-list"] #main-content {
+        padding-left: 2rem;
+    }
+
+    body[data-page-id="survey-list"] #newSurveyModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #duplicateSurveyModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #newGroupModal > .modal-content-transition {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* ダウンロードオプション: 収まらない分は中をスクロールし、ボタンは下に残す */
+    body[data-page-id="survey-list"] #downloadOptionsModal > .modal-content-transition {
+        max-height: calc(100vh - 2rem);
+        padding-bottom: 0;
+        overflow-y: auto;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal form > div:last-child {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        padding: 1rem 0 1.5rem;
+        background-color: var(--color-base-card);
+    }
+}
+
+/* --- 1024〜1279px: 表は 6 列のまま、横スクロールを出さない --- */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    body[data-page-id="survey-list"] #main-content {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-table {
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] .survey-table th,
+    body[data-page-id="survey-list"] .survey-table td {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-table th {
+        white-space: nowrap;
+    }
+
+    /* 回答数と会期の列を詰めて、アンケート名の幅を確保する。会期は開始日と終了日の間で 2 行になる */
+    body[data-page-id="survey-list"] .survey-table th:nth-child(5) {
+        width: 5rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-table th:nth-child(6) {
+        width: 8.75rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-table td[data-label="アンケート名"] {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* --- 1023px 以下: 一覧 --- */
+@media (max-width: 1023px) {
+    /* 共通の指定では 1023px 以下の左余白が 0 になり、本文が画面の左端に付く。右と同じ余白にそろえる */
+    body[data-page-id="survey-list"] #main-content {
+        padding-left: 1rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-controls {
+        position: relative;
+    }
+
+    /* 一覧の上の 1 行: 左に表示件数、右に「絞り込み」「並べ替え」 */
+    body[data-page-id="survey-list"] .survey-list-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-bottom: 12px;
+        color: var(--color-text-sub);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__per-page {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__per-page #itemsPerPage {
+        height: 44px;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__buttons {
+        display: inline-flex;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 44px;
+        padding: 0 12px;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 6px;
+        background-color: var(--color-base-card);
+        color: var(--color-text-sub);
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__btn .material-icons {
+        font-size: 16px;
+    }
+
+    /* 開いている間と、絞り込みの条件が入っている間は青にする */
+    body[data-page-id="survey-list"] .survey-list-toolbar__btn.is-active {
+        border-color: var(--color-primary);
+        background-color: var(--color-button-secondary-bg);
+        color: var(--color-text-main);
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__btn:focus-visible,
+    body[data-page-id="survey-list"] .survey-sort-menu__item:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+
+    /* 絞り込みの枠: 既存の枠をそのまま使い、ボタンのすぐ下に、一覧に重ねて出す（一覧を押し下げない） */
+    body[data-page-id="survey-list"] .survey-filter-panel {
+        position: absolute;
+        top: calc(100% - 6px);
+        left: 0;
+        right: 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 18px 12px;
+        margin: 0;
+        padding: 16px 12px 12px;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-6px);
+        transition: opacity 0.14s ease-in, transform 0.14s ease-in, visibility 0s 0.14s;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel.is-open,
+    body[data-page-id="survey-list"] .survey-sort-menu.is-open {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition: opacity 0.18s ease-out, transform 0.18s ease-out, visibility 0s;
+    }
+
+    /* 中の入力欄は足さず、既存の 4 つを並べ替えるだけにする（包みを外して、枠そのものを格子にする） */
+    body[data-page-id="survey-list"] .survey-filter-panel__fields,
+    body[data-page-id="survey-list"] .survey-filter-panel__reset {
+        display: contents;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel .input-group {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    /* スマートフォン: 1 段目 キーワード／2 段目 ステータスと「フィルターをリセット」／3 段目 開始日 ～ 終了日 */
+    body[data-page-id="survey-list"] .survey-filter-panel__fields > .input-group:nth-child(1) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__fields > .input-group:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__dates {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] #resetFiltersButton {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: end;
+        justify-content: flex-end;
+        width: calc(6em + 8px);
+        min-height: 44px;
+        padding: 4px;
+        line-height: 16px;
+        text-align: right;
+    }
+
+    /* スマートフォン・タブレットの実機では、flatpickr が日付欄を端末標準の日付入力（.flatpickr-mobile）に切り替える。
+       標準の日付入力は幅を縮めないため、そのままだと終了日が枠の右にはみ出す。縮められるようにして枠に収め、
+       標準のカレンダー印は既存のアイコンと二重になるので出さない（欄を押せば端末の日付選択が開く） */
+    body[data-page-id="survey-list"] .survey-filter-panel__dates > .input-group {
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel .flatpickr-mobile {
+        min-width: 0;
+        min-height: 2.875rem;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel .flatpickr-mobile::-webkit-calendar-picker-indicator {
+        display: none;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel .flatpickr-mobile::-webkit-date-and-time-value {
+        text-align: left;
+    }
+
+    /* カレンダーのアイコン: 見た目は変えずに、押せる範囲だけ 44px に広げる */
+    body[data-page-id="survey-list"] .survey-filter-panel button[data-toggle]::after {
+        content: "";
+        position: absolute;
+        inset: -12px;
+    }
+
+    /* 並べ替えメニュー: 「並べ替え」ボタンの下に、右寄せで重ねて出す */
+    body[data-page-id="survey-list"] .survey-sort-menu {
+        display: block;
+        position: absolute;
+        top: calc(100% - 6px);
+        right: 0;
+        z-index: 20;
+        width: 264px;
+        max-width: 100%;
+        padding: 6px 0;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 8px;
+        background-color: var(--color-base-card);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        color: var(--color-text-main);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-6px);
+        transition: opacity 0.14s ease-in, transform 0.14s ease-in, visibility 0s 0.14s;
+    }
+
+    body[data-page-id="survey-list"] .survey-sort-menu__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2px;
+        width: 100%;
+        min-height: 44px;
+        padding: 0 16px;
+        border-top: 1px solid var(--color-base-border-divider);
+        background-color: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    body[data-page-id="survey-list"] .survey-sort-menu__item:first-child {
+        border-top: 0;
+    }
+
+    body[data-page-id="survey-list"] .survey-sort-menu__icon {
+        font-size: 14px;
+        color: #5f6368;
+        opacity: 0.7;
+    }
+
+    /* 並べ替え中の項目は、表の列見出し（.sortable-header[aria-sort]）と同じ見た目にする */
+    body[data-page-id="survey-list"] .survey-sort-menu__item.is-sorted {
+        color: var(--color-primary);
+        font-weight: 700;
+        box-shadow: inset 0 -2px 0 var(--color-primary);
+    }
+
+    body[data-page-id="survey-list"] .survey-sort-menu__item.is-sorted .survey-sort-menu__icon {
+        color: var(--color-primary);
+        opacity: 1;
+    }
+
+    /* 一覧: 1 件＝1 行。出すのはアンケート名とステータスだけ（ほかの項目と行のボタンはアンケート詳細の中にある） */
+    body[data-page-id="survey-list"] #surveyTableWrapper {
+        overflow: hidden;
+    }
+
+    body[data-page-id="survey-list"] .survey-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] .survey-table thead {
+        display: none;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody {
+        display: block;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody tr {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 14px 16px;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody tr + tr {
+        border-top: 1px solid var(--color-base-border-divider);
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody td {
+        display: none;
+        padding: 0;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody td[data-label="アンケート名"],
+    body[data-page-id="survey-list"] .survey-table tbody td[data-label="ステータス"] {
+        display: block;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody td[data-label="アンケート名"] {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    /* 0 件の表示は横幅いっぱいに出す */
+    body[data-page-id="survey-list"] .survey-table tbody td[colspan] {
+        display: block;
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+
+    /* タイトルの行: ボタンの高さを 44px にする */
+    body[data-page-id="survey-list"] #openNewSurveyModalBtn {
+        height: 44px;
+    }
+
+    /* ダークテーマでは、共通の指定がこのボタンを最前面（z-index 99999）にしている。そのままだと
+       画面全体を覆うモーダルの手前にボタンが出てしまうので、1023px 以下では重なり順を元に戻す */
+    body[data-page-id="survey-list"].dark-mode #openNewSurveyModalBtn {
+        z-index: auto;
+    }
+
+    /* ヘッダー左のメニューボタン: 見た目は変えずに、押せる範囲だけ 44px に広げる。共通ヘッダーの HTML は変えない */
+    body[data-page-id="survey-list"] #sidebarToggleMobile {
+        position: relative;
+    }
+
+    body[data-page-id="survey-list"] #sidebarToggleMobile::after {
+        content: "";
+        position: absolute;
+        inset: -4px -7px;
+    }
+
+    /* ページ番号と前後のボタン: 見た目は変えずに、押せる範囲だけ 44px に広げる */
+    body[data-page-id="survey-list"] #pagination-numbers {
+        gap: 12px;
+    }
+
+    body[data-page-id="survey-list"] #pagination-numbers > button,
+    body[data-page-id="survey-list"] #prevPageBtn,
+    body[data-page-id="survey-list"] #nextPageBtn {
+        position: relative;
+    }
+
+    body[data-page-id="survey-list"] #pagination-numbers > button::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+    }
+
+    body[data-page-id="survey-list"] #prevPageBtn {
+        margin-right: 8px;
+    }
+
+    body[data-page-id="survey-list"] #nextPageBtn {
+        margin-left: 8px;
+    }
+
+    body[data-page-id="survey-list"] #prevPageBtn::after,
+    body[data-page-id="survey-list"] #nextPageBtn::after {
+        content: "";
+        position: absolute;
+        inset: -9px;
+    }
+}
+
+/* 「視差効果を減らす」（prefers-reduced-motion: reduce）の端末では、共通の指定（.sidebar の transform を
+   translateX(0) に固定）のせいで、1023px 以下でも左から出るメニューが常に出たままになり、一覧を覆ってしまう。
+   この画面では、開いていないメニューを画面の外に戻す */
+@media (prefers-reduced-motion: reduce) and (max-width: 1023px) {
+    body[data-page-id="survey-list"] .sidebar:not(.is-open-mobile) {
+        transform: translateX(-100%) !important;
+    }
+}
+
+/* 640〜1023px: 右の余白（sm:px-6）と同じ値にする */
+@media (min-width: 640px) and (max-width: 1023px) {
+    body[data-page-id="survey-list"] #main-content {
+        padding-left: 1.5rem;
+    }
+}
+
+/* --- 768〜1023px: タブレットの並び --- */
+@media (min-width: 768px) and (max-width: 1023px) {
+    /* 絞り込み: 1 段目 キーワードとステータス／2 段目 開始日 ～ 終了日と「フィルターをリセット」 */
+    body[data-page-id="survey-list"] .survey-filter-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__fields > .input-group:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__fields > .input-group:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__dates {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    body[data-page-id="survey-list"] #resetFiltersButton {
+        grid-column: 2;
+        grid-row: 2;
+        width: auto;
+    }
+
+    /* 一覧の行: 左にアンケート名、右にステータス */
+    body[data-page-id="survey-list"] .survey-table tbody tr {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 20px;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody td[data-label="アンケート名"] {
+        flex: 1 1 auto;
+    }
+
+    body[data-page-id="survey-list"] .survey-table tbody td[data-label="ステータス"] {
+        flex: 0 0 auto;
+    }
+}
+
+/* --- 767px 以下: スマートフォンのタイトル行とヘッダー --- */
+@media (max-width: 767px) {
+    /* 「アンケート新規作成」をタイトルの右に並べるため、文字と余白を少し詰める（文言は同じ） */
+    body[data-page-id="survey-list"] .survey-list-title-row {
+        gap: 8px;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-title-row > h1 {
+        font-size: clamp(20px, 6vw, 24px);
+    }
+
+    body[data-page-id="survey-list"] #openNewSurveyModalBtn {
+        gap: 4px;
+        padding-left: 12px;
+        padding-right: 12px;
+        font-size: 13px;
+    }
+
+    /* ヘッダーのユーザー名: 入りきらない分だけ末尾を「…」にする。共通ヘッダーの HTML は変えない */
+    body[data-page-id="survey-list"] #header-placeholder header {
+        gap: 0.75rem;
+    }
+
+    body[data-page-id="survey-list"] #header-placeholder header > div:first-child {
+        flex-shrink: 0;
+    }
+
+    body[data-page-id="survey-list"] #header-placeholder header > div:last-child {
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] #header-placeholder header a[aria-label="現在のユーザー情報"] {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+/* 363px 未満: 絞り込みの開始日と終了日を縦に積む */
+@media (max-width: 362px) {
+    body[data-page-id="survey-list"] .survey-filter-panel__dates {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    body[data-page-id="survey-list"] .survey-filter-panel__dates > span {
+        text-align: center;
+    }
+}
+
+/* --- 1023px 以下: モーダルを全画面にする --- */
+@keyframes survey-list-sheet-up {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+}
+
+@keyframes survey-list-push-in {
+    from { transform: translateX(100%); }
+    to { transform: none; }
+}
+
+@media (max-width: 1023px) {
+    /* 動かすのはオーバーレイ要素そのもの。modalHandler.js の closeModal は、オーバーレイ自身の
+       transform の変化が終わった合図でモーダルを DOM から消すため、中の枠ではなくここを動かす。
+       灰色（オーバーレイの色）は残さず、画面全体を白い面で覆う。 */
+    body[data-page-id="survey-list"] #surveyDetailsModal,
+    body[data-page-id="survey-list"] #newSurveyModal,
+    body[data-page-id="survey-list"] #accountInfoModal,
+    body[data-page-id="survey-list"] #newGroupModal,
+    body[data-page-id="survey-list"] #qrCodeModal,
+    body[data-page-id="survey-list"] #duplicateSurveyModal {
+        align-items: stretch;
+        justify-content: stretch;
+        padding: 0;
+        background-color: var(--color-base-card);
+        opacity: 1;
+        transform: translateY(100%);
+        transition: transform 0.26s cubic-bezier(0.4, 0, 1, 1);
+    }
+
+    /* 影は開いている間だけ付ける。閉じたモーダルが DOM に残る場合があり（closeModal が先に届いた別の
+       transitionend で待ち受けを使い切ったとき。現行からの動き）、閉じた状態にも影があると、
+       画面の外へ送ったモーダルの影だけが画面の端に灰色の帯として残るため */
+    body[data-page-id="survey-list"] #surveyDetailsModal[data-state="open"],
+    body[data-page-id="survey-list"] #newSurveyModal[data-state="open"],
+    body[data-page-id="survey-list"] #accountInfoModal[data-state="open"],
+    body[data-page-id="survey-list"] #newGroupModal[data-state="open"] {
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+        transform: none;
+        animation: survey-list-sheet-up 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* QRコードとアンケートを複製は、アンケート詳細の中で右から切り替わる（モーダルを重ねて見せない） */
+    body[data-page-id="survey-list"] #qrCodeModal,
+    body[data-page-id="survey-list"] #duplicateSurveyModal {
+        transform: translateX(100%);
+        transition: transform 0.24s cubic-bezier(0.4, 0, 1, 1);
+    }
+
+    body[data-page-id="survey-list"] #qrCodeModal[data-state="open"],
+    body[data-page-id="survey-list"] #duplicateSurveyModal[data-state="open"] {
+        box-shadow: -8px 0 24px rgba(0, 0, 0, 0.14);
+        transform: none;
+        animation: survey-list-push-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: none;
+    }
+
+    /* モック用の案内パネル（src/testScenarioOverlay.js。左下に固定・z-index 9999）は、そのままだと全画面のモーダルの
+       手前に残って下のボタンに重なり、閉じたあと（透明）もタップを受け取ってしまう。
+       1023px 以下ではモーダルの下に回し、閉じたあとは操作を妨げないようにする。パネル自体は変えない */
+    body[data-page-id="survey-list"] #test-scenario-overlay {
+        z-index: 55;
+    }
+
+    body[data-page-id="survey-list"] #test-scenario-overlay.opacity-0 {
+        pointer-events: none;
+    }
+
+    /* 切り替えている間、下のアンケート詳細を少し左へ送る */
+    body[data-page-id="survey-list"]:has(#qrCodeModal[data-state="open"], #duplicateSurveyModal[data-state="open"]) #surveyDetailsModal[data-state="open"] {
+        transform: translateX(-18%);
+    }
+
+    /* 中の枠: 画面いっぱい・角丸と影なし。動きはオーバーレイ側に任せる */
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #newSurveyModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #accountInfoModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #newGroupModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition,
+    body[data-page-id="survey-list"] #duplicateSurveyModal > .modal-content-transition {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        max-height: none;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        opacity: 1;
+        overflow: hidden;
+        transform: none;
+        transition: none;
+    }
+
+    /* タイトルの行: 上に固定する（アンケート詳細だけは下で上書きして、中身と一緒に流す） */
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #newSurveyModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #accountInfoModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #newGroupModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #duplicateSurveyModal > .modal-content-transition > div:first-child {
+        flex: 0 0 auto;
+        gap: 8px;
+        margin: 0;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--color-base-border-divider);
+    }
+
+    /* ×と←: 押せる範囲を 44px にする。←は HTML では非表示（hidden）で、ここでだけ出す */
+    body[data-page-id="survey-list"] #closeSurveyDetailsModalBtn,
+    body[data-page-id="survey-list"] #closeNewSurveyModalBtn,
+    body[data-page-id="survey-list"] #closeAccountInfoModalBtn,
+    body[data-page-id="survey-list"] #closeNewGroupModalBtn,
+    body[data-page-id="survey-list"] #closeDownloadOptionsModalBtn,
+    body[data-page-id="survey-list"] #backQrCodeModalBtn,
+    body[data-page-id="survey-list"] #backDuplicateSurveyModalBtn {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin: -4px -8px -4px 0;
+        border-radius: 9999px;
+    }
+
+    body[data-page-id="survey-list"] #backQrCodeModalBtn,
+    body[data-page-id="survey-list"] #backDuplicateSurveyModalBtn {
+        margin: -4px 0 -4px -10px;
+    }
+
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #duplicateSurveyModal > .modal-content-transition > div:first-child {
+        justify-content: flex-start;
+        gap: 4px;
+    }
+
+    /* 切り替えた先では×を出さない（←で戻る） */
+    body[data-page-id="survey-list"] #closeQrCodeModalBtn,
+    body[data-page-id="survey-list"] #closeDuplicateSurveyModalBtn {
+        display: none;
+    }
+
+    /* ボタンは 44px。「？」とカレンダーは見た目を変えずに、押せる範囲だけ広げる */
+    body[data-page-id="survey-list"] .modal-overlay button.rounded-md {
+        min-height: 44px;
+    }
+
+    body[data-page-id="survey-list"] .modal-overlay .help-inline-button,
+    body[data-page-id="survey-list"] .modal-overlay .field-trailing-actions .help-icon-button,
+    body[data-page-id="survey-list"] .modal-overlay .field-trailing-actions .field-action-button {
+        position: relative;
+    }
+
+    /* .help-icon-button の top / right（入力欄の右上に置くための指定）は、position: relative にすると
+       ずらす量として効いてしまう。カレンダーの横に並ぶ「？」は元の位置のままにする */
+    body[data-page-id="survey-list"] .modal-overlay .field-trailing-actions .help-icon-button {
+        top: auto;
+        right: auto;
+    }
+
+    body[data-page-id="survey-list"] .modal-overlay .help-trigger::after,
+    body[data-page-id="survey-list"] .modal-overlay .field-action-button::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+    }
+
+    body[data-page-id="survey-list"] .modal-overlay .help-inline-button::after {
+        inset: -10px;
+    }
+
+    /* 幅が狭いと、入力欄や表示欄の文字が右上の「？」の下に入り込んで重なる。「？」の分だけ右をあける */
+    body[data-page-id="survey-list"] .modal-overlay .input-group:has(> .help-icon-button) > .input-field,
+    body[data-page-id="survey-list"] .modal-overlay .input-group:has(> .help-icon-button) > .view-mode {
+        padding-right: 2.5rem;
+    }
+
+    /* 入力欄の右に並ぶカレンダーと「？」は、押せる範囲が重ならないように内側だけ控える */
+    body[data-page-id="survey-list"] .modal-overlay .field-trailing-actions .field-action-button::after {
+        inset: -8px -2px -8px -8px;
+    }
+
+    body[data-page-id="survey-list"] .modal-overlay .field-trailing-actions .help-icon-button::after {
+        inset: -8px -8px -8px -2px;
+    }
+
+    /* ---- アンケート詳細: 上は固定しない。固定するのは下のボタンだけ ---- */
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child {
+        align-items: flex-start;
+    }
+
+    /* アンケート名は折り返す。スマートフォンではステータスを名前の下に置く */
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child > div:first-child {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    body[data-page-id="survey-list"] #surveyDetailName {
+        overflow-wrap: anywhere;
+    }
+
+    body[data-page-id="survey-list"] #sampleReadOnlyNotice {
+        flex: 0 0 auto;
+        margin: 14px 16px 0;
+    }
+
+    body[data-page-id="survey-list"] #surveyDetailsForm {
+        flex: 0 0 auto;
+        padding: 14px 16px 16px;
+        overflow: visible;
+    }
+
+    /* 「アンケートアクセス情報」は出さない（同じものは下の「QRコード」ボタンから見られる） */
+    body[data-page-id="survey-list"] #detailAccessInfoSection {
+        display: none;
+    }
+
+    body[data-page-id="survey-list"] #viewModeButtons {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        gap: 8px;
+        margin-top: auto;
+        padding: 16px;
+        background-color: var(--color-base-card);
+    }
+
+    body[data-page-id="survey-list"] #viewModeButtons > button:not(.hidden),
+    body[data-page-id="survey-list"] #detailQrCodeBtn,
+    body[data-page-id="survey-list"] #editSurveyBtn[data-row-editable="true"] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    /* 「アンケートを削除」は別の行にする（包みを外して、ボタンを直接並べる） */
+    body[data-page-id="survey-list"] #viewModeButtons > .mr-auto {
+        display: contents;
+    }
+
+    body[data-page-id="survey-list"] #deleteSurveyBtn {
+        order: -2;
+        flex: 0 0 auto;
+        margin-right: auto;
+    }
+
+    /* 「SPEEDレビュー」はほかの主なボタンと同じ濃い青にし、横幅いっぱいにする */
+    body[data-page-id="survey-list"] #goToSpeedReviewBtn {
+        order: -1;
+        flex: 1 1 100%;
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+    }
+
+    /* 「編集」「複製」「QRコード」は同じ幅で横に並べる */
+    body[data-page-id="survey-list"] #editSurveyBtn,
+    body[data-page-id="survey-list"] #duplicateSurveyBtn,
+    body[data-page-id="survey-list"] #detailQrCodeBtn {
+        flex: 1 1 0;
+        min-width: calc((100% - 16px) / 3);
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    /* タッチ操作でない端末（パソコンの狭いウィンドウ）で出る 2 つは、その下の行に並べる */
+    body[data-page-id="survey-list"] #detailDownloadBtn,
+    body[data-page-id="survey-list"] #footerCloseSurveyDetailsModalBtn {
+        order: 1;
+        flex: 1 1 40%;
+    }
+
+    /* ---- QRコード（アンケート詳細の「QRコード」から） ---- */
+    /* URL の項目名・欄・注記と、下の「閉じる」は出さない。URL は「URLをコピー」でコピーする */
+    body[data-page-id="survey-list"] #qrCodeUrlBlock,
+    body[data-page-id="survey-list"] #qrCodeModalFooter {
+        display: none;
+    }
+
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition > div:nth-child(2) {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 14px 16px 16px;
+        overscroll-behavior: contain;
+    }
+
+    body[data-page-id="survey-list"] #qrCodeModal .space-y-3 {
+        margin-top: 0;
+    }
+
+    /* ---- タイトルと下のボタンを固定し、間だけをスクロールする 4 つ ---- */
+    body[data-page-id="survey-list"] #newSurveyModal form,
+    body[data-page-id="survey-list"] #duplicateSurveyModal form,
+    body[data-page-id="survey-list"] #accountInfoModal form,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-height: 0;
+        padding: 0 16px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    body[data-page-id="survey-list"] #newSurveyModal form > *,
+    body[data-page-id="survey-list"] #duplicateSurveyModal form > *,
+    body[data-page-id="survey-list"] #accountInfoModal form > *,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm > * {
+        flex: 0 0 auto;
+    }
+
+    body[data-page-id="survey-list"] #accountInfoModal form,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm {
+        padding-top: 14px;
+    }
+
+    /* 下のボタン: 画面の下に固定し、上に区切り線を入れる */
+    body[data-page-id="survey-list"] #newSurveyModal form > div:last-child,
+    body[data-page-id="survey-list"] #duplicateSurveyModal form > div:last-child,
+    body[data-page-id="survey-list"] #accountInfoModal form > div:last-child,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm > div:last-child {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        margin: auto -16px 0;
+        padding: 16px;
+        border-top: 1px solid var(--color-base-border-divider);
+        background-color: var(--color-base-card);
+    }
+
+    /* 最後の項目と下のボタンの間をあける */
+    body[data-page-id="survey-list"] #newSurveyModal form > :nth-last-child(2),
+    body[data-page-id="survey-list"] #duplicateSurveyModal form > :nth-last-child(2),
+    body[data-page-id="survey-list"] #accountInfoModal form > :nth-last-child(2),
+    body[data-page-id="survey-list"] #newGroupModal #groupForm > :nth-last-child(2) {
+        margin-bottom: 16px;
+    }
+}
+
+/* --- 768〜1023px: タブレットのモーダルの余白と並び --- */
+@media (min-width: 768px) and (max-width: 1023px) {
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #newSurveyModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #accountInfoModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #newGroupModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition > div:first-child,
+    body[data-page-id="survey-list"] #duplicateSurveyModal > .modal-content-transition > div:first-child {
+        padding: 16px 24px;
+    }
+
+    /* アンケート詳細: ステータスは現行どおりアンケート名の横 */
+    body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child > div:first-child {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+    }
+
+    body[data-page-id="survey-list"] #sampleReadOnlyNotice {
+        margin: 16px 24px 0;
+    }
+
+    body[data-page-id="survey-list"] #surveyDetailsForm {
+        padding: 16px 24px 24px;
+    }
+
+    /* 下のボタンは 1 行で右寄せ。「編集」「複製」「QRコード」は同じ幅、その右に「SPEEDレビュー」 */
+    body[data-page-id="survey-list"] #viewModeButtons {
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px 12px;
+        padding: 16px 24px 24px;
+    }
+
+    body[data-page-id="survey-list"] #editSurveyBtn,
+    body[data-page-id="survey-list"] #duplicateSurveyBtn,
+    body[data-page-id="survey-list"] #detailQrCodeBtn {
+        flex: 0 0 104px;
+        min-width: 0;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    body[data-page-id="survey-list"] #goToSpeedReviewBtn {
+        order: 9;
+        flex: 0 0 240px;
+    }
+
+    body[data-page-id="survey-list"] #detailDownloadBtn {
+        order: 0;
+        flex: 0 0 auto;
+    }
+
+    body[data-page-id="survey-list"] #footerCloseSurveyDetailsModalBtn {
+        order: 10;
+        flex: 0 0 auto;
+    }
+
+    body[data-page-id="survey-list"] #qrCodeModal > .modal-content-transition > div:nth-child(2) {
+        padding: 16px 24px 24px;
+    }
+
+    body[data-page-id="survey-list"] #newSurveyModal form,
+    body[data-page-id="survey-list"] #duplicateSurveyModal form,
+    body[data-page-id="survey-list"] #accountInfoModal form,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    body[data-page-id="survey-list"] #accountInfoModal form,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm {
+        padding-top: 16px;
+    }
+
+    body[data-page-id="survey-list"] #newSurveyModal form > div:last-child,
+    body[data-page-id="survey-list"] #duplicateSurveyModal form > div:last-child,
+    body[data-page-id="survey-list"] #accountInfoModal form > div:last-child,
+    body[data-page-id="survey-list"] #newGroupModal #groupForm > div:last-child {
+        margin-left: -24px;
+        margin-right: -24px;
+        padding: 16px 24px 24px;
+    }
+
+    /* ダウンロードオプション: 並びは現行のまま。収まらないときはモーダル全体を縦に送る */
+    body[data-page-id="survey-list"] #downloadOptionsModal {
+        align-items: flex-start;
+        overflow-y: auto;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal > .modal-content-transition {
+        margin: auto;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal form > div:last-child {
+        padding-top: 1rem;
+    }
+}
+
+/* --- 767px 以下: スマートフォンのモーダルの並び --- */
+@media (max-width: 767px) {
+    /* QRコード: QRコード、案内文、ボタン 2 つを縦に並べる */
+    body[data-page-id="survey-list"] #qrCodeModal .grid {
+        gap: 14px;
+    }
+
+    /* グループ新規作成: メールアドレスを 1 行にし、役割と「追加」は次の行にする */
+    body[data-page-id="survey-list"] #newGroupModal #groupForm .flex.items-end {
+        flex-wrap: wrap;
+        gap: 16px 8px;
+    }
+
+    body[data-page-id="survey-list"] #newGroupModal #groupForm .flex.items-end > .w-3\/5 {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    body[data-page-id="survey-list"] #newGroupModal #groupForm .flex.items-end > .w-48 {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+    }
+
+    /* アカウント情報: 内側の余白を詰めて、入力欄の幅を確保する。氏名は幅が足りないときだけ縦に並べる */
+    body[data-page-id="survey-list"] #accountInfoModal .section-header,
+    body[data-page-id="survey-list"] #accountInfoModal .section-content {
+        padding: 12px;
+    }
+
+    body[data-page-id="survey-list"] #accountInfoModal .section-content .flex.gap-4 {
+        flex-wrap: wrap;
+        row-gap: 0;
+    }
+
+    body[data-page-id="survey-list"] #accountInfoModal .section-content .flex.gap-4 > .input-group {
+        flex: 1 1 120px;
+        width: auto;
+    }
+
+    /* ダウンロードオプション（タッチ操作でない端末だけで開く）: 画面いっぱいに広げ、画面ごと縦に送る。
+       ボタンは区切り線の下で、画面の下に貼り付ける */
+    body[data-page-id="survey-list"] #downloadOptionsModal {
+        align-items: stretch;
+        padding: 0;
+        background-color: var(--color-base-card);
+        overflow-y: auto;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal > .modal-content-transition {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: none;
+        min-height: 100%;
+        padding: 16px 16px 0;
+        border-radius: 0;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal > .modal-content-transition > * {
+        flex: 0 0 auto;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal > .modal-content-transition > form {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal form > div:last-child {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        margin: auto -16px 0;
+        padding: 16px;
+        background-color: var(--color-base-card);
+    }
+
+    body[data-page-id="survey-list"] #downloadOptionsModal form > :nth-last-child(2) {
+        margin-bottom: 32px;
+    }
+}
+
+/* 348px 未満: アンケート詳細の下のボタンを 1 列にする */
+@media (max-width: 347px) {
+    body[data-page-id="survey-list"] #viewModeButtons > button,
+    body[data-page-id="survey-list"] #deleteSurveyBtn {
+        flex: 1 1 100%;
+        min-width: 100%;
+        margin-right: 0;
+    }
+}
+
+/* --- タッチ操作の端末: 誤操作を防ぐため出さないボタン（権限の制限ではない） --- */
+/* 幅ではなく端末の種類で切り替える。パソコンでウィンドウを狭くした場合は、すべて出る */
+@media (hover: none) and (pointer: coarse) {
+    body[data-page-id="survey-list"] #deleteSurveyBtn,
+    body[data-page-id="survey-list"] #detailDownloadBtn,
+    body[data-page-id="survey-list"] #footerCloseSurveyDetailsModalBtn,
+    body[data-page-id="survey-list"] #qrCodeModalFooter,
+    body[data-page-id="survey-list"] #surveyTableBody button[title="データダウンロード"] {
+        display: none !important;
     }
 }

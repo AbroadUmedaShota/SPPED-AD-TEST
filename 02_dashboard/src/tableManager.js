@@ -207,6 +207,18 @@ function sortByHeader(header) {
 }
 
 /**
+ * 並べ替えキーを指定して、列見出しを押したときと同じ並べ替えを行います。
+ * 列見出しを出さない幅（1023px 以下）の「並べ替え」メニューから呼びます。
+ * 昇順・降順の切り替えや見出しの表示更新は、すべて sortByHeader に任せます。
+ * @param {string} sortKey 列見出しの data-sort-key と同じ値。
+ */
+export function sortSurveysByKey(sortKey) {
+    const header = Array.from(document.querySelectorAll('.sortable-header'))
+        .find((candidate) => candidate.dataset.sortKey === sortKey);
+    sortByHeader(header);
+}
+
+/**
  * Fetches survey data from JSON files with aggregated success/failure counts.
  * @returns {Promise<{surveys: Array, fetchStats: { successCount: number, failureCount: number, totalCount: number }}>} A promise that resolves with survey objects and fetch stats.
  */
@@ -406,7 +418,7 @@ function renderTableRows(surveysToRender) {
                 ${survey.answerCount} ${realtimeAnswersDisplay}
             </td>
             <td data-label="掲載期間" class="px-4 py-3 text-on-surface-variant text-sm" data-sort-value="${survey.periodStart}">
-                ${survey.periodStart} ~ ${survey.periodEnd}
+                <span class="whitespace-nowrap">${survey.periodStart} ~</span> <span class="whitespace-nowrap">${survey.periodEnd}</span>
             </td>
         `;
 
