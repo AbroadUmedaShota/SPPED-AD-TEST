@@ -4481,6 +4481,15 @@ body[data-page-id="survey-list"] #surveyUrlInput {
         transition: transform 0.26s cubic-bezier(0.4, 0, 1, 1);
     }
 
+    /* モーダルを開いている間は、背面のページを動かせないようにする。
+       共通の止め方（body の overflow: hidden だけ）では、iPhone で背面のページが動く余地が残る。
+       背面が動いている最中は、画面に固定した要素の表示位置と押せる位置が食い違い、上端の×が押せなくなることがある。
+       ページ全体（html）も止める。セレクタは html で始まるが、:has() でアンケート一覧の画面だけに限っている */
+    html:has(body[data-page-id="survey-list"] > .modal-overlay[data-state="open"]) {
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+
     /* 影は開いている間だけ付ける。閉じたモーダルが DOM に残る場合があり（closeModal が先に届いた別の
        transitionend で待ち受けを使い切ったとき。現行からの動き）、閉じた状態にも影があると、
        画面の外へ送ったモーダルの影だけが画面の端に灰色の帯として残るため */
