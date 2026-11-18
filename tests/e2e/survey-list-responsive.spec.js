@@ -831,11 +831,13 @@ test.describe('1023px 以下・タッチ操作でない端末（パソコンの�
   });
 
   test('A3 詳細の読み込みに時間がかかっている間に Enter を重ねても、二重に開かない', async ({ page }) => {
-    // アンケート詳細の HTML の読み込みを 2 秒遅らせて、回線が遅い状況を作る
+    // アンケート詳細の HTML の読み込みを 10 秒遅らせて、回線がとても遅い状況を作る
+    // （止める印を時間で外す作りだと、待ち時間がその時間を超えたときに重ねて開けてしまう）
+    test.setTimeout(90000);
     let detailRequests = 0;
     await page.route('**/modals/surveyDetailsModal.html*', async (route) => {
       detailRequests += 1;
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 10000));
       await route.continue();
     });
     await openList(page);
@@ -850,14 +852,18 @@ test.describe('1023px 以下・タッチ操作でない端末（パソコンの�
     }
     expect(focusedId, 'Tab で一覧の行に移れる').not.toBeNull();
 
-    // 1 回目の Enter のあと、読み込みが終わる前（1 秒後）にもう一度 Enter とスペースを押す
+    // 1 回目の Enter のあと、読み込みが終わる前（1 秒後と 9 秒後）に、Enter・スペース・行のクリックを重ねる
     await page.keyboard.press('Enter');
     await page.waitForTimeout(1000);
     await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
     await page.keyboard.press('Enter');
     await page.keyboard.press('Space');
+    await page.waitForTimeout(8000);
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+    await page.keyboard.press('Enter');
+    await press(page.locator('#surveyTableBody tr[data-id]').nth(1).locator('td[data-label="アンケート名"]'));
 
-    await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
+    await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open', { timeout: 15000 });
     await page.waitForTimeout(2500);
     await expect(page.locator('#surveyDetailsModal')).toHaveCount(1);
     expect(detailRequests, 'アンケート詳細の読み込みは 1 回だけ').toBe(1);
