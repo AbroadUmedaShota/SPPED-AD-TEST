@@ -267,7 +267,25 @@ export function initSurveyListResponsive() {
     if ('MutationObserver' in window) {
       new MutationObserver(syncRowFocusability).observe(tableBody, { childList: true });
     }
-    let lastRowOpenAt = 0;
+    // キーで詳細を開く処理が進行中かどうか。モーダルの HTML は初回に読み込むため、開くまでに時間がかかることがある。
+    let rowOpenPending = false;
+    const ROW_OPEN_TIMEOUT_MS = 8000;
+    const waitForRowOpenToSettle = () => {
+      rowOpenPending = true;
+      let timer = 0;
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('.modal-overlay[data-state="open"]')) settle();
+      });
+      const settle = () => {
+        rowOpenPending = false;
+        observer.disconnect();
+        window.clearTimeout(timer);
+      };
+      // 開いたら解除する。読み込みに失敗して開かなかった場合に備えて、時間でも解除する
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-state'] });
+      timer = window.setTimeout(settle, ROW_OPEN_TIMEOUT_MS);
+    };
+
     tableBody.addEventListener('keydown', (event) => {
       if (!narrowQuery.matches) return;
       if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -275,13 +293,12 @@ export function initSurveyListResponsive() {
       if (!row) return;
       event.preventDefault();
       // アンケート詳細を開いても、フォーカスは背面の行に残る（モーダル側がフォーカスを移さないため）。
-      // 押しっぱなし・続けての連打・モーダルを開いている間のキーでは、もう一度開かない。
+      // 押しっぱなし・読み込みを待っている間・モーダルを開いている間のキーでは、もう一度開かない。
       // 続けて開くと、モーダルが二重に読み込まれたり、背面のスクロールを止める回数の数え方がずれたりする。
       if (event.repeat) return;
+      if (rowOpenPending) return;
       if (document.querySelector('.modal-overlay[data-state="open"]')) return;
-      const now = Date.now();
-      if (now - lastRowOpenAt < 800) return;
-      lastRowOpenAt = now;
+      waitForRowOpenToSettle();
       // 行を押したときと同じ処理（tableManager.js が行に付けたもの）を呼ぶ
       row.click();
     });
