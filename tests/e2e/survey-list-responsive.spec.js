@@ -798,21 +798,25 @@ test.describe('1023px 以下・タッチ操作でない端末（パソコンの�
     await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
     await expect(page.locator('#detail_surveyId')).toHaveText(String(firstRowId));
 
-    // 開いている間にもう一度 Enter を押しても、二重に開かない（フォーカスは背面の行に残っている）
+    // 開いている間にもう一度 Enter を押しても、開き直さない（フォーカスは背面の行に残っている）。
+    // 開いてから十分に時間を置いて押す（押した間隔ではなく、開いていること自体で止まることを確かめる）
+    await page.waitForTimeout(1500);
     await page.keyboard.press('Enter');
     await page.waitForTimeout(600);
     await expect(page.locator('#surveyDetailsModal')).toHaveCount(1);
     await expect(page.locator('#detail_surveyId')).toHaveText(String(firstRowId));
     await press(page.locator('#closeSurveyDetailsModalBtn'));
     await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+    // 開き直していれば、背面のスクロールを止めた回数が 1 つ余り、閉じたあとも止まったまま残る
+    expect(await page.evaluate(() => document.body.style.overflow), '閉じたあと、背面のスクロール停止が残らない').not.toBe('hidden');
 
     // スペースでも開く（×をマウスで押すとフォーカスが行から外れるので、もう一度 Tab で行へ移る）
-    await page.waitForTimeout(900);
     const spaceRowId = await tabToRow();
     expect(spaceRowId, 'もう一度 Tab で一覧の行に移れる').not.toBeNull();
     await page.keyboard.press('Space');
     await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
     await expect(page.locator('#detail_surveyId')).toHaveText(String(spaceRowId));
+    expect(await page.evaluate(() => document.body.style.overflow), '開いている間は背面のスクロールが止まる').toBe('hidden');
     await press(page.locator('#closeSurveyDetailsModalBtn'));
     await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
 
@@ -824,6 +828,45 @@ test.describe('1023px 以下・タッチ操作でない端末（パソコンの�
     await expect(rowsWithTabindex).toHaveCount(0);
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(rowsWithTabindex).toHaveCount(rowCount);
+  });
+
+  test('A3 詳細の読み込みに時間がかかっている間に Enter を重ねても、二重に開かない', async ({ page }) => {
+    // アンケート詳細の HTML の読み込みを 2 秒遅らせて、回線が遅い状況を作る
+    let detailRequests = 0;
+    await page.route('**/modals/surveyDetailsModal.html*', async (route) => {
+      detailRequests += 1;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await route.continue();
+    });
+    await openList(page);
+    await press(page.locator('#close-test-overlay'));
+    let focusedId = null;
+    for (let i = 0; i < 60 && !focusedId; i += 1) {
+      await page.keyboard.press('Tab');
+      focusedId = await page.evaluate(() => {
+        const active = document.activeElement;
+        return active instanceof HTMLElement && active.matches('#surveyTableBody tr[data-id]') ? active.dataset.id : null;
+      });
+    }
+    expect(focusedId, 'Tab で一覧の行に移れる').not.toBeNull();
+
+    // 1 回目の Enter のあと、読み込みが終わる前（1 秒後）にもう一度 Enter とスペースを押す
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(1000);
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+
+    await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
+    await page.waitForTimeout(2500);
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(1);
+    expect(detailRequests, 'アンケート詳細の読み込みは 1 回だけ').toBe(1);
+    await expect(page.locator('#detail_surveyId')).toHaveText(String(focusedId));
+
+    // 閉じたあとは、背面のスクロール停止が残らない（開いた回数と閉じた回数が合っている）
+    await press(page.locator('#closeSurveyDetailsModalBtn'));
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden');
   });
 
   test('C2 削除・データダウンロード・閉じるは出る。D1 ダウンロードオプションは全画面', async ({ page }) => {
