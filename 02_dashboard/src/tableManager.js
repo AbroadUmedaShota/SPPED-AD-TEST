@@ -123,6 +123,7 @@ export function getSurveyStatus(survey, referenceDate) {
 
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
+let isSurveyDetailsOpening = false; // 行からアンケート詳細を開く処理が進行中かどうか（二重に開くのを防ぐ）
 
 function sortByHeader(header) {
     if (!header) return;
@@ -465,11 +466,21 @@ function renderTableRows(surveysToRender) {
             if (e.target.closest('button')) {
                 return;
             }
+            // アンケート詳細の HTML は開くたびに読み込む。読み込みを待っている間にもう一度押されても、重ねて開かない
+            // （重ねると、同じモーダルが二重に読み込まれ、背面のスクロールを止める回数の数え方もずれる）。
+            // 印は時間では外さず、開く処理が終わったとき（成功でも失敗でも）に外す。
+            if (isSurveyDetailsOpening) {
+                return;
+            }
+            isSurveyDetailsOpening = true;
             handleOpenModal('surveyDetailsModal', resolveDashboardAssetPath('modals/surveyDetailsModal.html'))
                 .then(() => {
                     populateSurveyDetails(survey);
                 })
-                .catch(error => console.error("Failed to open survey details modal:", error));
+                .catch(error => console.error("Failed to open survey details modal:", error))
+                .finally(() => {
+                    isSurveyDetailsOpening = false;
+                });
         });
     });
 
