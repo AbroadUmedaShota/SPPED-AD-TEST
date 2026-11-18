@@ -4649,26 +4649,62 @@ body[data-page-id="survey-list"] #surveyUrlInput {
         inset: -8px -8px -8px -2px;
     }
 
-    /* ---- アンケート詳細: 上は固定しない。固定するのは下のボタンだけ ---- */
+    /* ---- アンケート詳細: アンケート名の行は中身と一緒に流す。残すのは右上の×と、下のボタンだけ ---- */
     body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition {
         overflow-y: auto;
         overscroll-behavior: contain;
     }
 
+    /* ×を、スクロールしても右上に残す（下まで読んだあと、上へ戻らずに閉じられるようにする）。
+       position: sticky は親の箱の中でしか留まらないので、タイトルの行の包みを外し（display: contents）、
+       ×をスクロールする枠の直接の子として扱う。HTML の並びは変えない。
+       行の余白と下の線は、包みを外すと効かなくなるため、アンケート名の側へ移す */
     body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child {
-        align-items: flex-start;
+        display: contents;
     }
 
-    /* アンケート名は折り返す。スマートフォンではステータスを名前の下に置く */
+    /* アンケート名は折り返す。スマートフォンではステータスを名前の下に置く。
+       右の 60px は×の分（×の幅 36px＋間 8px＋右の余白 16px）。高さの下限は、名前が 1 行でも×の行と同じ高さにするため */
     body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child > div:first-child {
+        box-sizing: border-box;
+        flex: 0 0 auto;
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
         min-width: 0;
+        min-height: 61px;
+        padding: 12px 60px 12px 16px;
+        border-bottom: 1px solid var(--color-base-border-divider);
     }
 
     body[data-page-id="survey-list"] #surveyDetailName {
         overflow-wrap: anywhere;
+    }
+
+    /* ×: 先頭に置いて場所を取らせず（下の余白を負にして高さを打ち消す）、上から 8px の位置に留める。
+       位置は、留める前（アンケート名の行の右端）と同じ */
+    body[data-page-id="survey-list"] #closeSurveyDetailsModalBtn {
+        position: sticky;
+        top: 8px;
+        z-index: 4;
+        order: -1;
+        align-self: flex-end;
+        margin: 8px 8px -52px auto;
+    }
+
+    /* 中身の上に重なっても見分けられるよう、×の下に丸い下地を敷く（押せる範囲 44px の内側に 36px） */
+    body[data-page-id="survey-list"] #closeSurveyDetailsModalBtn::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border: 1px solid var(--color-base-border-divider);
+        border-radius: 9999px;
+        background-color: var(--color-base-card);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    body[data-page-id="survey-list"] #closeSurveyDetailsModalBtn > .material-icons {
+        position: relative;
     }
 
     body[data-page-id="survey-list"] #sampleReadOnlyNotice {
@@ -4822,12 +4858,20 @@ body[data-page-id="survey-list"] #surveyUrlInput {
         padding: 16px 24px;
     }
 
-    /* アンケート詳細: ステータスは現行どおりアンケート名の横 */
+    /* アンケート詳細: ステータスは現行どおりアンケート名の横。余白はほかのモーダルのタイトルの行（16px 24px）に合わせる */
     body[data-page-id="survey-list"] #surveyDetailsModal > .modal-content-transition > div:first-child > div:first-child {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
+        align-content: flex-start;
         gap: 8px 12px;
+        min-height: 69px;
+        padding: 16px 68px 16px 24px;
+    }
+
+    body[data-page-id="survey-list"] #closeSurveyDetailsModalBtn {
+        top: 12px;
+        margin: 12px 16px -56px auto;
     }
 
     body[data-page-id="survey-list"] #sampleReadOnlyNotice {

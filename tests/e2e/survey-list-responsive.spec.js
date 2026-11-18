@@ -355,7 +355,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expectNoHorizontalScroll(page);
     });
 
-    test('B1-B3 詳細は下から出て画面全体を覆い、下のボタンだけが残る', async ({ page }) => {
+    test('B1-B3 詳細は下から出て画面全体を覆い、右上の×と下のボタンが残る', async ({ page }) => {
       const errors = collectErrors(page);
       await openList(page);
       await press(page.locator('#close-test-overlay'));
@@ -379,7 +379,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(page.locator('#detailAccessInfoSection')).toBeHidden();
       await expect(page.locator('#goToSpeedReviewBtn')).toHaveCSS('background-color', 'rgb(66, 133, 244)');
 
-      // スクロールすると、アンケート名・ステータス・×は一緒に流れ、下のボタンだけが残る
+      // スクロールすると、アンケート名とステータスは流れ、右上の×と下のボタンは残る
       const closeButton = page.locator('#closeSurveyDetailsModalBtn');
       const speedButton = page.locator('#goToSpeedReviewBtn');
       const closeBefore = await closeButton.boundingBox();
@@ -390,9 +390,15 @@ for (const vp of NARROW_VIEWPORTS) {
       const nameAfter = await page.locator('#surveyDetailName').boundingBox();
       const speedAfter = await speedButton.boundingBox();
       if (!closeBefore || !closeAfter || !nameBefore || !nameAfter || !speedBefore || !speedAfter) throw new Error('詳細の要素が見つかりません');
-      const scrolled = closeBefore.y - closeAfter.y;
-      expect(scrolled, '×が中身と一緒に上へ流れる').toBeGreaterThan(40);
-      expect(Math.round(nameBefore.y - nameAfter.y), 'アンケート名も同じだけ流れる').toBe(Math.round(scrolled));
+      expect(nameBefore.y - nameAfter.y, 'アンケート名が中身と一緒に上へ流れる').toBeGreaterThan(40);
+      expect(Math.round(closeAfter.x), '×は横に動かない').toBe(Math.round(closeBefore.x));
+      expect(Math.round(closeAfter.y), '×は縦に動かない').toBe(Math.round(closeBefore.y));
+      // ×は画面の右上にあり、押せる範囲は 44px
+      expect(Math.round(closeAfter.width)).toBe(44);
+      expect(Math.round(closeAfter.height)).toBe(44);
+      expect(closeAfter.y, '×は画面の上端の近く').toBeLessThan(20);
+      expect(page.viewportSize().width - (closeAfter.x + closeAfter.width), '×は画面の右端の近く').toBeLessThan(20);
+      await expect(closeButton).toBeInViewport();
       expect(Math.round(speedAfter.y), '下のボタンは動かない').toBe(Math.round(speedBefore.y));
       await expect(speedButton).toBeInViewport();
       await expect(page.locator('#detailQrCodeBtn')).toBeInViewport();
@@ -402,8 +408,7 @@ for (const vp of NARROW_VIEWPORTS) {
       if (!lastButton) throw new Error('お礼メール設定のボタンが見つかりません');
       expect(lastButton.y + lastButton.height, '最後の項目が下のボタンに隠れない').toBeLessThanOrEqual(speedAfter.y);
 
-      // 一番上の×で閉じられる。閉じたモーダルは DOM から消える（現行と同じ）
-      await page.locator('#closeSurveyDetailsModalBtn').scrollIntoViewIfNeeded();
+      // 最後まで送ったまま、上へ戻らずに右上の×で閉じられる。閉じたモーダルは DOM から消える（現行と同じ）
       await press(page.locator('#closeSurveyDetailsModalBtn'));
       await expect(modal).toHaveCount(0);
       await expectNoHorizontalScroll(page);
