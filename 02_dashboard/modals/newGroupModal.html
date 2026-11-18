@@ -16,12 +16,12 @@
             <div class="mb-6">
                 <h3 class="text-on-surface text-lg font-semibold mb-4">グループ情報</h3>
                 <div class="input-group mb-4">
-                    <label for="groupName" class="input-label">グループ名</label>
                     <input type="text" id="groupName" class="input-field" placeholder=" " required>
+                    <label for="groupName" class="input-label">グループ名</label>
                 </div>
                 <div class="input-group mb-4">
-                    <label for="groupDescription" class="input-label">説明（任意）</label>
                     <textarea id="groupDescription" class="input-field" rows="3" placeholder=" "></textarea>
+                    <label for="groupDescription" class="input-label">説明（任意）</label>
                 </div>
             </div>
 
@@ -30,15 +30,15 @@
                 <h3 class="text-on-surface text-lg font-semibold mb-4">メンバー管理</h3>
                 <div class="flex gap-2 mb-4 items-end">
                     <div class="input-group w-3/5 mt-0 mb-0">
-                        <label for="memberEmail" class="input-label">メンバーメールアドレス</label>
                         <input type="email" id="memberEmail" class="input-field h-10" placeholder=" " autocomplete="off">
+                        <label for="memberEmail" class="input-label">メンバーメールアドレス</label>
                     </div>
                     <div class="input-group w-48 mt-0 mb-0">
-                        <label for="memberRole" class="input-label">役割</label>
                         <select id="memberRole" class="input-field appearance-none">
                             <option value="member">一般メンバー</option>
                             <option value="admin">管理者</option>
                         </select>
+                        <label for="memberRole" class="input-label">役割</label>
                     </div>
                     <button type="button" id="addMemberBtn" class="button-primary text-on-primary px-6 py-2 rounded-md shadow-sm font-semibold text-sm">
                         追加

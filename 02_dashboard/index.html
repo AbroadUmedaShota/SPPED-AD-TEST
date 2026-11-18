@@ -71,7 +71,8 @@
                         <div class="survey-list-toolbar__per-page" id="itemsPerPageSlotTop"></div>
                         <div class="survey-list-toolbar__buttons">
                             <button type="button" id="toggleSurveyFilterBtn" class="survey-list-toolbar__btn"
-                                aria-expanded="false" aria-controls="surveyFilterPanel">絞り込み</button>
+                                aria-expanded="false" aria-controls="surveyFilterPanel">絞り込み<span
+                                    class="survey-list-toolbar__count" id="surveyFilterCount" aria-hidden="true" hidden></span></button>
                             <button type="button" id="toggleSurveySortBtn" class="survey-list-toolbar__btn"
                                 aria-expanded="false" aria-controls="surveySortMenu">
                                 <span class="material-icons" aria-hidden="true">unfold_more</span>並べ替え
@@ -163,6 +164,15 @@
                         </div>
                     </div>
                     </div>
+
+                    <!-- いまの並び順（1023px 以下）。メニューを閉じたあとも、何で並べているかが分かるようにする。
+                         絞り込みの枠と並べ替えメニューがボタンのすぐ下から開くよう、上の包みの外に置く -->
+                    <p class="survey-list-sort-summary" id="surveySortSummary" hidden>
+                        <span>並び順:</span>
+                        <span id="surveySortSummaryLabel"></span>
+                        <span class="material-icons" id="surveySortSummaryIcon" aria-hidden="true"></span>
+                        <span class="sr-only" id="surveySortSummaryDirection"></span>
+                    </p>
 
                     <!-- アンケートテーブル -->
                     <div id="surveyTableWrapper"

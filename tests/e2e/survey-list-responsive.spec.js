@@ -188,7 +188,7 @@ for (const vp of NARROW_VIEWPORTS) {
     test.use({ viewport: { width: vp.width, height: vp.height }, hasTouch: true, isMobile: true });
     const press = makePress(true);
 
-    test('A1-A3 一覧は 1 件 1 行で、上はツールバー 1 行だけ', async ({ page }) => {
+    test('A1-A3 一覧は 1 件 1 行で、上はツールバーと並び順の表示だけ', async ({ page }) => {
       const errors = collectErrors(page);
       await openList(page);
       await expectNoHorizontalScroll(page);
@@ -228,10 +228,17 @@ for (const vp of NARROW_VIEWPORTS) {
       const panel = page.locator('#surveyFilterPanel');
       const rows = page.locator('#surveyTableBody tr');
       const tableBefore = await page.locator('#surveyTableWrapper').boundingBox();
+      const filterBoxBefore = await filterButton.boundingBox();
+      const toolbarBefore = await page.locator('#surveyListToolbar').boundingBox();
+      await expect(page.locator('#surveyFilterCount')).toBeHidden();
 
       await press(filterButton);
       await expect(panel).toBeVisible();
       await expect(filterButton).toHaveAttribute('aria-expanded', 'true');
+      // 枠は、ボタンのすぐ下から開く（並び順の表示の上に重なる）
+      const panelBox = await panel.boundingBox();
+      if (!panelBox || !filterBoxBefore) throw new Error('絞り込みの枠かボタンが見つかりません');
+      expect(panelBox.y - (filterBoxBefore.y + filterBoxBefore.height), '枠はボタンのすぐ下').toBeLessThan(12);
       const tableAfter = await page.locator('#surveyTableWrapper').boundingBox();
       expect(tableAfter && tableBefore && Math.round(tableAfter.y), '一覧を押し下げない').toBe(Math.round(tableBefore ? tableBefore.y : -1));
       for (const id of ['#searchKeyword', '#filterStatus', '#filterStartDate', '#filterEndDate', '#resetFiltersButton']) {
@@ -256,8 +263,25 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(panel).toBeHidden();
       await page.waitForTimeout(500);
       await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
-      // 条件が入っている間は、閉じていても青
+      // 条件が入っている間は、閉じていても青。条件の数がボタンの右上に出る（ボタンの幅は変わらない）
       await expect(filterButton).toHaveAttribute('data-active', 'true');
+      await expect(page.locator('#surveyFilterCount')).toBeVisible();
+      await expect(page.locator('#surveyFilterCount')).toHaveText('1');
+      await expect(filterButton).toHaveAttribute('aria-label', '絞り込み（条件 1 件）');
+      const filterBox = await filterButton.boundingBox();
+      const toolbarAfter = await page.locator('#surveyListToolbar').boundingBox();
+      if (!filterBox || !filterBoxBefore || !toolbarBefore || !toolbarAfter) throw new Error('ツールバーが見つかりません');
+      expect(Math.round(filterBox.width), '数を出しても絞り込みボタンの幅は変わらない').toBe(Math.round(filterBoxBefore.width));
+      expect(Math.round(toolbarAfter.height), '数を出してもツールバーは折り返さない').toBe(Math.round(toolbarBefore.height));
+      // 条件を足すと数が増える。「全てのステータス」は数えない
+      await filterButton.scrollIntoViewIfNeeded();
+      await press(filterButton);
+      await page.locator('#filterStatus').selectOption('会期前');
+      await expect(page.locator('#surveyFilterCount')).toHaveText('2');
+      await page.locator('#filterStatus').selectOption('all');
+      await expect(page.locator('#surveyFilterCount')).toHaveText('1');
+      await press(filterButton);
+      await expect(panel).toBeHidden();
 
       // フィルターをリセットで戻る
       await filterButton.scrollIntoViewIfNeeded();
@@ -268,6 +292,8 @@ for (const vp of NARROW_VIEWPORTS) {
       await press(filterButton);
       await expect(panel).toBeHidden();
       await expect(filterButton).not.toHaveAttribute('data-active', 'true');
+      await expect(page.locator('#surveyFilterCount')).toBeHidden();
+      await expect(filterButton).not.toHaveAttribute('aria-label', /条件/);
     });
 
     test('A4 絞り込みは Esc でも閉じ、0 件の表示は横幅いっぱい', async ({ page }) => {
@@ -291,6 +317,13 @@ for (const vp of NARROW_VIEWPORTS) {
       const menu = page.locator('#surveySortMenu');
       const items = menu.locator('.survey-sort-menu__item');
       const firstName = () => page.locator('#surveyTableBody tr td[data-label="アンケート名"]').first().innerText();
+      const summaryLabel = page.locator('#surveySortSummaryLabel');
+      const summaryIcon = page.locator('#surveySortSummaryIcon');
+
+      // メニューを開かなくても、いまの並び順（初期はアンケートIDの降順）がツールバーの下に出ている
+      await expect(page.locator('#surveySortSummary')).toBeVisible();
+      await expect(summaryLabel).toHaveText('アンケートID');
+      await expect(summaryIcon).toHaveText('arrow_downward');
 
       await press(sortButton);
       await expect(menu).toBeVisible();
@@ -311,6 +344,9 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(menu).toHaveAttribute('data-open', 'false');
       await expect(sortButton).toHaveAttribute('aria-expanded', 'false');
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'descending');
+      // 閉じたあとも、何で並べているかが分かる
+      await expect(summaryLabel).toHaveText('アンケート名');
+      await expect(summaryIcon).toHaveText('arrow_downward');
       const descending = await firstName();
 
       // 開き直すと、並べ替え中の項目と向きが出ている
@@ -326,6 +362,10 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'ascending');
       const ascending = await firstName();
       expect(descending).not.toBe(ascending);
+      await expect(summaryLabel).toHaveText('アンケート名');
+      await expect(summaryIcon).toHaveText('arrow_upward');
+      await expect(page.locator('#surveySortSummaryDirection')).toHaveText('昇順');
+      await expectNoHorizontalScroll(page);
 
       await press(sortButton);
       await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_upward');
@@ -499,6 +539,9 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(page.locator('#closeDuplicateSurveyModalBtn')).toBeHidden();
       await expect(page.locator('#duplicateSurveyName')).toHaveValue(/ のコピー$/);
       await expect(page.locator('#duplicateSurveyPeriodRange')).toHaveValue('');
+      // 元のアンケートに表示タイトル・メモが無いときは空欄で開く（「undefined」と出さない）
+      await expect(page.locator('#duplicateDisplayTitle')).toHaveValue('');
+      await expect(page.locator('#duplicateSurveyMemo')).toHaveValue('');
       // 回答期間の欄: カレンダーと「？」が欄の上下中央にそろって並ぶ（押せる範囲を広げても位置はずれない）
       const periodBox = await page.locator('#duplicateSurveyPeriodRange').boundingBox();
       const calendarBox = await duplicate.locator('.field-trailing-actions .field-action-button').boundingBox();
@@ -510,6 +553,11 @@ for (const vp of NARROW_VIEWPORTS) {
       expect(Math.round(helpBox.x - (calendarBox.x + calendarBox.width)), 'カレンダーと「？」の間隔').toBe(4);
       await expect(page.locator('#cancelDuplicateSurveyModalBtn')).toBeInViewport();
       await expect(page.locator('#confirmDuplicateSurveyBtn')).toBeInViewport();
+
+      // 表示タイトルが空のまま押すと、欄の下に入力チェックの文言が出る（ブラウザー標準の吹き出しで止まらない）
+      await press(page.locator('#confirmDuplicateSurveyBtn'));
+      await expect(page.locator('#duplicateDisplayTitle-error')).toHaveText('表示タイトルを入力してください。');
+      await expect(duplicate).toHaveAttribute('data-state', 'open');
 
       // 入力チェックの文言は現行のまま
       await page.locator('#duplicateDisplayTitle').fill('複製の表示タイトル');
@@ -622,6 +670,17 @@ for (const vp of NARROW_VIEWPORTS) {
         expect(Math.abs((roleBox.y + roleBox.height / 2) - (emailBox.y + emailBox.height / 2)), '現行と同じ横一列').toBeLessThan(12);
       }
       expect(addBox.x + addBox.width, '「追加」が画面内に収まる').toBeLessThanOrEqual(vp.width);
+      // 文字を入れると、ラベルは欄の枠の上へ移り、入力した文字と重ならない。「役割」は最初から枠の上にある
+      await page.locator('#groupName').fill('営業部');
+      await page.locator('#groupDescription').fill('展示会の担当チーム');
+      await page.locator('#memberEmail').fill('member@example.com');
+      await press(page.locator('#groupName'));
+      for (const id of ['groupName', 'groupDescription', 'memberEmail', 'memberRole']) {
+        const fieldBox = await page.locator(`#${id}`).boundingBox();
+        const labelBox = await page.locator(`label[for="${id}"]`).boundingBox();
+        if (!fieldBox || !labelBox) throw new Error(`${id} の欄かラベルが見つかりません`);
+        expect(labelBox.y + labelBox.height - fieldBox.y, `${id} のラベルが欄の中の文字に重ならない`).toBeLessThan(12);
+      }
       await press(page.locator('#closeNewGroupModalBtn'));
       await expectClosedAndUnseen(page, group);
       await expectNoHorizontalScroll(page);
@@ -713,6 +772,59 @@ test.describe('スマートフォンの実機に近い設定（390×844）', () 
 test.describe('1023px 以下・タッチ操作でない端末（パソコンの狭いウィンドウ 390×844）', () => {
   test.use({ viewport: { width: 390, height: 844 } });
   const press = makePress(false);
+
+  test('A3 行をキーボードで選び、Enter でアンケート詳細を開ける', async ({ page }) => {
+    await openList(page);
+    await press(page.locator('#close-test-overlay'));
+    // Tab を送っていき、一覧の行にフォーカスが当たるまで進む（行のボタンは 1023px 以下では出ない）
+    const tabToRow = async () => {
+      for (let i = 0; i < 60; i += 1) {
+        await page.keyboard.press('Tab');
+        const id = await page.evaluate(() => {
+          const active = document.activeElement;
+          return active instanceof HTMLElement && active.matches('#surveyTableBody tr[data-id]') ? active.dataset.id : null;
+        });
+        if (id) return id;
+      }
+      return null;
+    };
+    const focusedId = await tabToRow();
+    expect(focusedId, 'Tab で一覧の行に移れる').not.toBeNull();
+    const firstRowId = await page.locator('#surveyTableBody tr[data-id]').first().getAttribute('data-id');
+    expect(focusedId, '最初に移るのは先頭の行').toBe(firstRowId);
+    await expect(page.locator('#surveyTableBody tr[data-id]').first()).toHaveCSS('outline-style', 'solid');
+
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
+    await expect(page.locator('#detail_surveyId')).toHaveText(String(firstRowId));
+
+    // 開いている間にもう一度 Enter を押しても、二重に開かない（フォーカスは背面の行に残っている）
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(600);
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(1);
+    await expect(page.locator('#detail_surveyId')).toHaveText(String(firstRowId));
+    await press(page.locator('#closeSurveyDetailsModalBtn'));
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+
+    // スペースでも開く（×をマウスで押すとフォーカスが行から外れるので、もう一度 Tab で行へ移る）
+    await page.waitForTimeout(900);
+    const spaceRowId = await tabToRow();
+    expect(spaceRowId, 'もう一度 Tab で一覧の行に移れる').not.toBeNull();
+    await page.keyboard.press('Space');
+    await expect(page.locator('#surveyDetailsModal')).toHaveAttribute('data-state', 'open');
+    await expect(page.locator('#detail_surveyId')).toHaveText(String(spaceRowId));
+    await press(page.locator('#closeSurveyDetailsModalBtn'));
+    await expect(page.locator('#surveyDetailsModal')).toHaveCount(0);
+
+    // 幅を 1024px 以上にすると、行はフォーカスを受けなくなる（行のボタンがあるため）。戻すと、また受ける
+    const rowsWithTabindex = page.locator('#surveyTableBody tr[data-id][tabindex]');
+    const rowCount = await page.locator('#surveyTableBody tr[data-id]').count();
+    await expect(rowsWithTabindex).toHaveCount(rowCount);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(rowsWithTabindex).toHaveCount(0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(rowsWithTabindex).toHaveCount(rowCount);
+  });
 
   test('C2 削除・データダウンロード・閉じるは出る。D1 ダウンロードオプションは全画面', async ({ page }) => {
     const errors = collectErrors(page);

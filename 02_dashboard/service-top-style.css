@@ -3879,9 +3879,10 @@ body.dark-mode .button-primary.bizcard-confirm-button:disabled:hover {
 
 /* --- 全幅共通 --- */
 
-/* 一覧の上のツールバーと並べ替えメニューは、1023px 以下でだけ出す */
+/* 一覧の上のツールバー、並べ替えメニュー、いまの並び順の表示は、1023px 以下でだけ出す */
 body[data-page-id="survey-list"] .survey-list-toolbar,
-body[data-page-id="survey-list"] .survey-sort-menu {
+body[data-page-id="survey-list"] .survey-sort-menu,
+body[data-page-id="survey-list"] .survey-list-sort-summary {
     display: none;
 }
 
@@ -4036,6 +4037,7 @@ body[data-page-id="survey-list"] #surveyUrlInput {
     }
 
     body[data-page-id="survey-list"] .survey-list-toolbar__btn {
+        position: relative;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -4051,6 +4053,54 @@ body[data-page-id="survey-list"] #surveyUrlInput {
 
     body[data-page-id="survey-list"] .survey-list-toolbar__btn .material-icons {
         font-size: 16px;
+    }
+
+    /* 絞り込みの条件の数: ボタンの右上の角に重ねて出す。ボタンの幅は変えない
+       （375px ではツールバーの空きが 5px しかなく、ボタンの中に文字を足すと 2 行に折り返すため） */
+    body[data-page-id="survey-list"] .survey-list-toolbar__count {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        box-sizing: border-box;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        border-radius: 9999px;
+        background-color: var(--color-button-primary-bg);
+        color: var(--color-button-primary-text);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 20px;
+        text-align: center;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-toolbar__count[hidden],
+    body[data-page-id="survey-list"] .survey-list-sort-summary[hidden] {
+        display: none;
+    }
+
+    /* いまの並び順: ツールバーのすぐ下に、右寄せの小さな文字で出す（同じ理由で、ボタンの中には入れない）。
+       ツールバーの下の余白（12px）へ 8px 食い込ませて、ボタンに寄せる。
+       絞り込みの枠と並べ替えメニューは、これまでどおりボタンのすぐ下から、この行に重ねて開く */
+    body[data-page-id="survey-list"] .survey-list-sort-summary {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px;
+        margin: -8px 0 6px;
+        color: var(--color-text-sub);
+        font-size: 12px;
+        line-height: 16px;
+    }
+
+    body[data-page-id="survey-list"] .survey-list-sort-summary .material-icons {
+        font-size: 14px;
+    }
+
+    /* 行をキーボードで選んだときの枠（1023px 以下では、行そのものにフォーカスが当たる） */
+    body[data-page-id="survey-list"] #surveyTableBody tr[data-id]:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
     }
 
     /* 開いている間と、絞り込みの条件が入っている間は青にする。
