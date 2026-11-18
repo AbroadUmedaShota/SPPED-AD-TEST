@@ -17,17 +17,17 @@ const FILTER_INPUT_IDS = ['searchKeyword', 'filterStatus', 'filterStartDate', 'f
 const DATE_PICKER_WRAPPER_IDS = ['startDatePickerWrapper', 'endDatePickerWrapper'];
 
 /**
- * 絞り込みの入力欄に条件が入っているかを返します。
+ * 絞り込みの入力欄のうち、条件が入っているものの数を返します。
  * ステータスは「全てのステータス」（all）を条件なしとして扱います。
- * @returns {boolean} 条件が 1 つでも入っていれば true。
+ * @returns {number} 条件が入っている欄の数（0〜4）。
  */
-function hasFilterCondition() {
-  return FILTER_INPUT_IDS.some((id) => {
+function countFilterConditions() {
+  return FILTER_INPUT_IDS.filter((id) => {
     const input = document.getElementById(id);
     if (!input) return false;
     const value = input.value.trim();
     return id === 'filterStatus' ? value !== '' && value !== 'all' : value !== '';
-  });
+  }).length;
 }
 
 /**
@@ -61,6 +61,12 @@ export function initSurveyListResponsive() {
   const perPageSlot = document.getElementById('itemsPerPageSlotTop');
   const pagination = document.getElementById('surveyPagination');
   const resetButton = document.getElementById('resetFiltersButton');
+  const filterCount = document.getElementById('surveyFilterCount');
+  const sortSummary = document.getElementById('surveySortSummary');
+  const sortSummaryLabel = document.getElementById('surveySortSummaryLabel');
+  const sortSummaryIcon = document.getElementById('surveySortSummaryIcon');
+  const sortSummaryDirection = document.getElementById('surveySortSummaryDirection');
+  const tableBody = document.getElementById('surveyTableBody');
 
   if (!controls || !filterButton || !sortButton || !filterPanel || !sortMenu) {
     return;
@@ -78,7 +84,21 @@ export function initSurveyListResponsive() {
     filterButton.setAttribute('aria-expanded', String(filterOpen));
     sortButton.setAttribute('aria-expanded', String(sortOpen));
     // 絞り込みボタンは、開いている間と、条件が入っている間は青にする。
-    filterButton.dataset.active = String(filterOpen || hasFilterCondition());
+    // 条件が入っている間は、その数をボタンの右上に出す（色だけでは絞り込み中だと気づきにくいため）。
+    const conditionCount = countFilterConditions();
+    filterButton.dataset.active = String(filterOpen || conditionCount > 0);
+    if (filterCount) {
+      const countText = conditionCount > 0 ? String(conditionCount) : '';
+      if (filterCount.textContent !== countText) {
+        filterCount.textContent = countText;
+      }
+      filterCount.hidden = conditionCount === 0;
+    }
+    if (conditionCount > 0) {
+      filterButton.setAttribute('aria-label', `絞り込み（条件 ${conditionCount} 件）`);
+    } else {
+      filterButton.removeAttribute('aria-label');
+    }
     sortButton.dataset.active = String(sortOpen);
   };
 
@@ -124,6 +144,9 @@ export function initSurveyListResponsive() {
 
   // メニューの表示（並べ替え中の項目と矢印）は、列見出しの状態を写す。
   const syncSortMenu = () => {
+    let sortedLabel = '';
+    let sortedIcon = '';
+    let sortedDirection = '';
     sortItems.forEach((item) => {
       const header = Array.from(document.querySelectorAll('.sortable-header'))
         .find((candidate) => candidate.dataset.sortKey === item.dataset.sortKey);
@@ -139,7 +162,28 @@ export function initSurveyListResponsive() {
       if (itemIcon && itemIcon.textContent !== iconName) {
         itemIcon.textContent = iconName;
       }
+      if (isSorted) {
+        const itemLabel = item.querySelector('span');
+        sortedLabel = itemLabel ? itemLabel.textContent.trim() : '';
+        sortedIcon = iconName;
+        sortedDirection = ariaSort === 'ascending' ? '昇順' : '降順';
+      }
     });
+
+    // ツールバーの下に、いまの並び順（項目と向き）を出す。メニューを閉じたあとも分かるようにする。
+    if (sortSummary && sortSummaryLabel && sortSummaryIcon) {
+      if (sortSummaryLabel.textContent !== sortedLabel) {
+        sortSummaryLabel.textContent = sortedLabel;
+      }
+      if (sortSummaryIcon.textContent !== sortedIcon) {
+        sortSummaryIcon.textContent = sortedIcon;
+      }
+      // 矢印のアイコンは読み上げられないので、読み上げ用に向きを文字でも持つ（画面には出さない）
+      if (sortSummaryDirection && sortSummaryDirection.textContent !== sortedDirection) {
+        sortSummaryDirection.textContent = sortedDirection;
+      }
+      sortSummary.hidden = sortedLabel === '';
+    }
   };
 
   const tableHead = document.querySelector('#surveyTable thead');
@@ -206,8 +250,46 @@ export function initSurveyListResponsive() {
     }
   };
 
+  // 1023px 以下では行のボタンを出さないため、行そのものをキーボードで選べるようにする
+  // （Tab で行へ移り、Enter かスペースでアンケート詳細を開く）。1024px 以上は行のボタンがあるので、元のままにする。
+  const syncRowFocusability = () => {
+    if (!tableBody) return;
+    tableBody.querySelectorAll('tr[data-id]').forEach((row) => {
+      if (narrowQuery.matches) {
+        if (row.getAttribute('tabindex') !== '0') row.setAttribute('tabindex', '0');
+      } else if (row.hasAttribute('tabindex')) {
+        row.removeAttribute('tabindex');
+      }
+    });
+  };
+
+  if (tableBody) {
+    if ('MutationObserver' in window) {
+      new MutationObserver(syncRowFocusability).observe(tableBody, { childList: true });
+    }
+    let lastRowOpenAt = 0;
+    tableBody.addEventListener('keydown', (event) => {
+      if (!narrowQuery.matches) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const row = event.target instanceof Element && event.target.matches('tr[data-id]') ? event.target : null;
+      if (!row) return;
+      event.preventDefault();
+      // アンケート詳細を開いても、フォーカスは背面の行に残る（モーダル側がフォーカスを移さないため）。
+      // 押しっぱなし・続けての連打・モーダルを開いている間のキーでは、もう一度開かない。
+      // 続けて開くと、モーダルが二重に読み込まれたり、背面のスクロールを止める回数の数え方がずれたりする。
+      if (event.repeat) return;
+      if (document.querySelector('.modal-overlay[data-state="open"]')) return;
+      const now = Date.now();
+      if (now - lastRowOpenAt < 800) return;
+      lastRowOpenAt = now;
+      // 行を押したときと同じ処理（tableManager.js が行に付けたもの）を呼ぶ
+      row.click();
+    });
+  }
+
   const handleWidthChange = () => {
     placePerPageGroup();
+    syncRowFocusability();
     if (!narrowQuery.matches) {
       setOpenPanel(null);
     }
@@ -220,5 +302,6 @@ export function initSurveyListResponsive() {
   }
 
   placePerPageGroup();
+  syncRowFocusability();
   render();
 }

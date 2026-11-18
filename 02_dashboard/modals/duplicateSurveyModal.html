@@ -13,7 +13,9 @@
                 <span class="material-icons">close</span>
             </button>
         </div>
-        <form class="space-y-4">
+        <!-- 入力チェックは duplicateSurveyModal.js が行い、欄の下に文言を出す。ブラウザー標準の入力チェックは止める
+             （空の必須欄があると、標準の吹き出しが先に出て、送信の処理まで届かないため） -->
+        <form class="space-y-4" novalidate>
             <div class="input-group">
                 <input class="input-field" id="duplicateSurveyName" name="duplicateSurveyName" placeholder=" "
                     type="text" required />

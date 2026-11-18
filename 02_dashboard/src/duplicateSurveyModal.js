@@ -64,13 +64,14 @@ const populateForm = (survey) => {
     }
     if (displayTitleInput) {
         const displayTitle = (survey.displayTitle && typeof survey.displayTitle === 'object') ? survey.displayTitle[lang] || survey.displayTitle.ja : survey.displayTitle;
-        displayTitleInput.value = displayTitle;
+        // 元のアンケートに表示タイトルが無いときは空欄にする（そのまま代入すると「undefined」と表示される）
+        displayTitleInput.value = displayTitle ?? '';
     }
     if (surveyMemoInput) {
         const surveyMemo = (survey.memo && typeof survey.memo === 'object') ? survey.memo[lang] || survey.memo.ja : survey.memo;
         surveyMemoInput.value = isSampleSurvey
             ? 'サンプルアンケートを複製して作成した通常アンケートです。'
-            : surveyMemo;
+            : (surveyMemo ?? '');
     }
     // 回答期間は空にする仕様
     if (periodRangeInput) {
