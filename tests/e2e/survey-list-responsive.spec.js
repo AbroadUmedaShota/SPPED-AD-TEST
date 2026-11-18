@@ -285,7 +285,7 @@ for (const vp of NARROW_VIEWPORTS) {
       await expectNoHorizontalScroll(page);
     });
 
-    test('A5 並べ替えは 5 項目で、押すと並びが変わり、メニューは開いたまま', async ({ page }) => {
+    test('A5 並べ替えは 5 項目で、押すと並びが変わり、メニューが閉じる', async ({ page }) => {
       await openList(page);
       const sortButton = page.locator('#toggleSurveySortBtn');
       const menu = page.locator('#surveySortMenu');
@@ -305,21 +305,32 @@ for (const vp of NARROW_VIEWPORTS) {
       await expect(idItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_downward');
 
       const nameItem = items.nth(1);
-      // 列見出しと同じ動き: 1 回目は降順、もう一度押すと昇順
+      // 列見出しと同じ動き: 1 回目は降順。押すと並べ替えて、メニューは閉じる
       await press(nameItem);
-      await expect(nameItem).toHaveAttribute('aria-pressed', 'true');
-      await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_downward');
+      await expect(menu).toBeHidden();
+      await expect(menu).toHaveAttribute('data-open', 'false');
+      await expect(sortButton).toHaveAttribute('aria-expanded', 'false');
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'descending');
-      await expect(idItem).toHaveAttribute('aria-pressed', 'false');
       const descending = await firstName();
 
+      // 開き直すと、並べ替え中の項目と向きが出ている
+      await press(sortButton);
+      await expect(menu).toBeVisible();
+      await expect(nameItem).toHaveAttribute('aria-pressed', 'true');
+      await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_downward');
+      await expect(idItem).toHaveAttribute('aria-pressed', 'false');
+
+      // 同じ項目をもう一度押すと昇順になり、また閉じる
       await press(nameItem);
-      await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_upward');
+      await expect(menu).toBeHidden();
       await expect(page.locator('.sortable-header[data-sort-key="name"]')).toHaveAttribute('aria-sort', 'ascending');
       const ascending = await firstName();
       expect(descending).not.toBe(ascending);
-      await expect(menu).toHaveAttribute('data-open', 'true');
 
+      await press(sortButton);
+      await expect(nameItem.locator('.survey-sort-menu__icon')).toHaveText('arrow_upward');
+
+      // 項目を押さずに閉じるときは、これまでどおりボタンをもう一度押す
       await press(sortButton);
       await expect(menu).toBeHidden();
     });
@@ -915,7 +926,7 @@ test.describe('Safari 系のブラウザー（iPhone の設定）', () => {
       // 並べ替え・絞り込みを使ったあとも、色が付いたまま
       await page.locator('#toggleSurveySortBtn').tap();
       await page.locator('.survey-sort-menu__item[data-sort-key="name"]').tap();
-      await page.locator('#toggleSurveySortBtn').tap();
+      await expect(page.locator('#surveySortMenu')).toBeHidden();
       await expectStatusBadgeColored(page);
 
       await page.locator('#close-test-overlay').tap();

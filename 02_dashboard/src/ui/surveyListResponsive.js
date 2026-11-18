@@ -107,11 +107,18 @@ export function initSurveyListResponsive() {
     });
   }
 
-  // 並べ替えメニュー: 列見出しを押したときと同じ関数を呼ぶ。押してもメニューは閉じない。
+  // 並べ替えメニュー: 列見出しを押したときと同じ関数を呼び、並べ替えたらメニューを閉じる。
+  // 逆順にするときは、メニューを開き直して同じ項目をもう一度押す。
   const sortItems = Array.from(sortMenu.querySelectorAll('.survey-sort-menu__item'));
   sortItems.forEach((item) => {
     item.addEventListener('click', () => {
+      const hadFocus = document.activeElement === item;
       sortSurveysByKey(item.dataset.sortKey);
+      setOpenPanel(null);
+      // 押した項目はメニューごと見えなくなる。フォーカスを持っていた場合は「並べ替え」ボタンへ戻す。
+      if (hadFocus) {
+        sortButton.focus({ preventScroll: true });
+      }
     });
   });
 
