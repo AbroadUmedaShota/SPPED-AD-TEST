@@ -25,7 +25,9 @@ last_reviewed: 2026-11-10
 
 - 配備者は会社アカウント `s-umeda@abroad-o.com`。manifestは `USER_DEPLOYING` / `ANYONE`（Googleログイン必須）。匿名公開しない。
 - 社員は従来どおりサーバーの `Session.getActiveUser().getEmail()` を前後空白除去・小文字化し、ローカル部が空でなくドメインが厳密に `abroad-o.com` の場合に許可する。
-- 外部例外は `customer@speed-ad.com` の専用Google OAuth認可コードフローだけ。Sessionメール一致だけの例外は廃止する。通常GETは外部利用者にメール/問い合わせを含まないIndex画面枠だけを返し、証明付きgetViewerContextが成功するまで業務データを取得しない。認証失敗/期限切れ時は画面の既存データを消して専用ログインを案内し、`?login=google` でデータのない `Login.html` を表示する。画面・認可URLに許可メールを露出しない。
+- 外部例外は `customer@speed-ad.com` の専用Google OAuth認可コードフロー。通常GETは外部利用者にメールや問い合わせを含まない画面枠だけを返す。同じタブの認証を確認できない場合は業務データを消し、「公式窓口でGoogleログイン」を表示する。ボタンから同じタブでGoogleへ進む。画面で準備できない場合は従来の `?login=google` を案内する。
+- Googleから戻った後は、照合に成功した場合だけ「案件一覧を開く」または「対象の案件を開く」を表示する。対象案件はサーバーで照合済みのログイン開始情報から復元する。エラー時は「このタブでログインをやり直す」を表示し、通常URLで新しいログインを始められる。同じタブに通知リンクの受付IDが残っているときは再開先にも保持する。受付IDは表示対象の指定にのみ使用し、案件の閲覧権限はサーバーで確認する。
+- `AUTH_STATE` の調査では、形式不正、保存情報なし（期限切れ・使用済み等）、照合不一致、期限判定の分類だけをサーバーログに記録する。
 - 既知のSessionメールが外部例外と異なる場合、専用OAuth開始・grant発行・cached grant参照を拒否する。社員は自分のSession経路を維持する。Sessionメール空欄の場合は有効なOAuth grantがなければRPCを拒否する。`getEffectiveUser`、UIの本人指定、クライアントtokenを代替にしない。
 - OAuth画面入口は `doGet ?login=google` と同じ `/exec` の標準 `code/state/error` callback。予約クエリ `c` / `sid` は使用しない。callback GETはstate消費/コード交換/grant発行をせず、コードとstateを安全なJSONでLoginへ渡す。新規認証RPCは `beginCustomerOAuthLogin(proofHash, submissionId)` と `completeCustomerOAuthLogin(params, authProof)` の2本だけ。後者が同じタブのproofを確認してから認証を完了し、通常URLを返す。問い合わせデータやGoogle tokenは返さない。
 - state、nonce、PKCE verifierは秘密鍵付きHMAC-SHA256（UUID+時刻+用途）で生成。stateは600秒・単回。ScriptLock内でstateを取り出し、タブproofのhashと一時利用者キーの一致を検証してから削除・期限確認し、ネットワーク前に消費する。不正proofではstateを消費せず、コード交換/業務データアクセスもしない。認可を拒否した応答・交換失敗の試行も再利用しない。

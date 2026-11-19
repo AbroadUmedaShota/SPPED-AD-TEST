@@ -15,13 +15,17 @@
   <h1>SPEED AD ログイン</h1>
   <p id="loginMessage">許可されたGoogleアカウントでログインしてください。</p>
   <a id="loginLink" target="_top" rel="noreferrer" hidden>Googleでログイン</a>
+  <a id="loginRetry" target="_top" rel="noreferrer" hidden>このタブでログインをやり直す</a>
   <script>
     const callback = <?!= JSON.stringify(callback).replace(/</g, '\\u003c') ?>;
     const initialId = <?!= JSON.stringify(submissionId).replace(/</g, '\\u003c') ?>;
     const authuserHint = <?!= JSON.stringify(authuser).replace(/</g, '\\u003c') ?>;
+    const retryBaseUrl = <?!= JSON.stringify(retryBaseUrl).replace(/</g, '\\u003c') ?>;
     const proofStorageKey = 'speed-ad-contact-oauth-tab-proof-v2';
+    const requestedIdKey = 'speed-ad-contact-oauth-requested-id-v1';
     const message = document.getElementById('loginMessage');
     const link = document.getElementById('loginLink');
+    const retry = document.getElementById('loginRetry');
 
     function loginRpc(name, ...args) {
       return new Promise((resolve, reject) => {
@@ -64,19 +68,37 @@
         let result;
         if (callback) {
           result = await loginRpc('completeCustomerOAuthLogin', callback, proof);
-          message.textContent = 'ログインを確認しました。通常の確認画面を開いてください。';
-          link.textContent = '確認画面を開く';
+          message.textContent = 'ログインを確認しました。同じタブで確認画面を開いてください。';
+          link.textContent = new URL(result.returnUrl).searchParams.has('id') ? '対象の案件を開く' : '案件一覧を開く';
           link.href = result.returnUrl;
         } else {
           const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(proof));
           const proofHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+          window.sessionStorage.setItem(requestedIdKey, initialId);
           result = await loginRpc('beginCustomerOAuthLogin', proofHash, initialId, authuserHint);
           link.href = result.authorizationUrl;
         }
         link.hidden = false;
       } catch (_error) {
-        message.textContent = 'ログインを確認できません。同じタブで通常URLからやり直してください。 [' + loginFailureCode(_error) + ']';
+        const code = loginFailureCode(_error);
+        const guidance = code === 'AUTH_PERMISSION' || code === 'AUTH_IDENTITY'
+          ? '公式窓口のGoogleアカウントを選び、このタブでやり直してください。'
+          : code === 'AUTH_TAB_STORAGE'
+            ? 'ログインに必要な情報をこのタブで確認できません。対象のGoogleアカウントだけで開き直してください。'
+            : 'ログインを完了できませんでした。このタブでやり直してください。';
+        message.textContent = guidance + ' [' + code + ']';
         link.hidden = true;
+        if (retryBaseUrl) {
+          const url = new URL(retryBaseUrl);
+          let requestedId = initialId;
+          try {
+            if (callback) requestedId = window.sessionStorage.getItem(requestedIdKey) || '';
+          } catch (_storageError) { /* Retry the list when the original case is unavailable. */ }
+          if (requestedId) url.searchParams.set('id', requestedId.slice(0, 256));
+          if (authuserHint) url.searchParams.set('authuser', authuserHint);
+          retry.href = url.href;
+          retry.hidden = false;
+        }
       }
     }
     prepareLogin();
