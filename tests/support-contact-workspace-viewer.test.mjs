@@ -25,7 +25,9 @@ function runtime(email = 'reader@abroad-o.com', { sessionThrows = false, missing
     get(key) {
       cacheReads.push(key);
       const entry = cacheEntries.get(key);
-      return entry && entry.until > now ? entry.value : null;
+      if (!entry || entry.until > now) return entry?.value ?? null;
+      cacheEntries.delete(key);
+      return null;
     },
     put(key, value, ttl) { cacheEntries.set(key, { value, until: now + ttl * 1000, ttl }); },
     remove(key) { assert.equal(locked, true, 'one-time state consumed under lock'); cacheEntries.delete(key); },
@@ -325,7 +327,15 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
     },
   };
   const context = {
-    window: { CONTACT_VIEWER_INITIAL_ID: initialId, CONTACT_VIEWER_CONTEXT: { allowed: true, email: 'spoof@abroad-o.com' }, sessionStorage: { getItem: (key) => storage.get(key) || null } },
+    window: {
+      CONTACT_VIEWER_INITIAL_ID: initialId,
+      CONTACT_VIEWER_CONTEXT: { allowed: true, email: 'spoof@abroad-o.com' },
+      crypto: webcrypto,
+      sessionStorage: {
+        getItem: (key) => storage.get(key) || null,
+        setItem: (key, value) => storage.set(key, value),
+      },
+    },
     document: {
       getElementById: element,
       querySelectorAll: (selector) => selector === '.quick-status' ? ['対応中', '対応済み', '保留'].map((status) => {
@@ -336,7 +346,7 @@ function uiRuntime(env = runtime(), initialId = '', storage = new Map()) {
       addEventListener() {},
     },
     google: { script: { run } },
-    URL, URLSearchParams,
+    URL, URLSearchParams, Uint8Array, TextEncoder,
   };
   vm.createContext(context);
   const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][1][1];
@@ -1086,7 +1096,8 @@ for (const condition of ['expiry', 'key-rotation', 'missing-key', 'eviction', 's
 test('OAuth helper surface stays private and Login never exposes identity or provider tokens', () => {
   const login = readFileSync(new URL('Login.html', root), 'utf8');
   for (const match of oauthSource.matchAll(/^function ([^(]+)\(/gm)) assert.ok(match[1].endsWith('_') || ['beginCustomerOAuthLogin', 'completeCustomerOAuthLogin'].includes(match[1]));
-  assert.doesNotMatch(oauthSource, /getEffectiveUser|Math\.random|console\.|Logger\.|login_hint|setProperty/);
+  assert.doesNotMatch(oauthSource, /getEffectiveUser|Math\.random|Logger\.|login_hint|setProperty/);
+  assert.deepEqual(oauthSource.match(/console\.[^\n]*/g), ["console.warn('customer_oauth_state: ' + stateReason[_err.message]);"]);
   assert.doesNotMatch(login, /customer@|speed-ad\.com|id_token|access_token/);
   assert.match(login, /getRandomValues/);
   assert.match(login, /sessionStorage/);
@@ -1138,7 +1149,7 @@ test('dedicated HMAC key replaces client secret for state unpredictability', () 
 const tabProofKey = 'speed-ad-contact-oauth-tab-proof-v2';
 
 function loginClientRuntime(env, storage = new Map(), callback = null, authuser = '') {
-  const elements = new Map([['loginMessage', {}], ['loginLink', { hidden: true }]]);
+  const elements = new Map([['loginMessage', {}], ['loginLink', { hidden: true }], ['loginRetry', { hidden: true }]]);
   const run = { withSuccessHandler(success) { return { withFailureHandler(failure) {
     return new Proxy({}, { get(_target, method) { return (...args) => {
       try { success(env.api[method](...args)); } catch (error) { failure(error); }
@@ -1153,12 +1164,14 @@ function loginClientRuntime(env, storage = new Map(), callback = null, authuser 
       },
     },
     document: { getElementById: (id) => elements.get(id) },
-    google: { script: { run } }, Uint8Array, TextEncoder,
+    google: { script: { run } }, Uint8Array, TextEncoder, URL,
   };
   vm.createContext(context);
   const login = readFileSync(new URL('Login.html', root), 'utf8');
   const script = login.match(/<script>([\s\S]*?)<\/script>/)[1]
-    .replace(/<\?!= ([\s\S]*?) \?>/g, (_match, expression) => vm.runInNewContext(expression, { callback, submissionId: 'case-b', authuser }))
+    .replace(/<\?!= ([\s\S]*?) \?>/g, (_match, expression) => vm.runInNewContext(expression, {
+      callback, submissionId: 'case-b', authuser, retryBaseUrl: env.properties.OAUTH_REDIRECT_URI || '',
+    }))
     .replace('    prepareLogin();', '');
   vm.runInContext(script, context);
   return { ui: context, elements, storage };
@@ -1449,4 +1462,45 @@ test('Login catch shows only whitelisted fixed server codes and separates missin
   await callback.ui.prepareLogin();
   assert.match(callback.elements.get('loginMessage').textContent, /\[AUTH_STATE\]$/);
   assert.doesNotMatch(callback.elements.get('loginMessage').textContent, /private-code|bad-state/);
+});
+
+test('notification entry reaches Google directly and keeps its case through an expired-state retry', async () => {
+  const env = runtime('customer@speed-ad.com', { oauth: true });
+  const storage = new Map();
+  const caseId = 'case-b';
+  const initial = uiRuntime(env, caseId, storage);
+  env.api.doGet({ parameter: { id: caseId, authuser: '2' } });
+  const login = initial.ui.document.getElementById('customerLoginLink');
+  login.href = env.templates.at(-1).loginStartUrl;
+  await initial.ui.prepareCustomerLoginLink();
+  assert.equal(login.hidden, false);
+  const google = new URL(login.href);
+  assert.equal(google.origin, 'https://accounts.google.com');
+  assert.equal(google.searchParams.get('scope'), 'openid email');
+  assertNoContactAccess(env);
+
+  env.advance(601);
+  const expired = loginClientRuntime(env, storage, { code: 'unused-code', state: google.searchParams.get('state') }, '2');
+  await expired.ui.prepareLogin();
+  assert.match(expired.elements.get('loginMessage').textContent, /\[AUTH_STATE\]$/);
+  assert.equal(expired.elements.get('loginLink').hidden, true);
+  assert.equal(expired.elements.get('loginRetry').hidden, false);
+  assert.equal(env.network.length, 0);
+  const retry = new URL(expired.elements.get('loginRetry').href);
+  assert.equal(retry.href, env.properties.OAUTH_REDIRECT_URI + '?id=case-b&authuser=2');
+  const reopened = uiRuntime(env, caseId, storage);
+  env.api.doGet({ parameter: Object.fromEntries(retry.searchParams) });
+  const newLogin = reopened.ui.document.getElementById('customerLoginLink');
+  newLogin.href = env.templates.at(-1).loginStartUrl;
+  await reopened.ui.prepareCustomerLoginLink();
+  const next = new URL(newLogin.href);
+  assert.notEqual(next.searchParams.get('state'), google.searchParams.get('state'));
+  env.respond(() => tokenResponse(env, next));
+  const completed = loginClientRuntime(env, storage, { code: 'fresh-code', state: next.searchParams.get('state') });
+  await completed.ui.prepareLogin();
+  assert.equal(completed.elements.get('loginLink').textContent, '対象の案件を開く', completed.elements.get('loginMessage').textContent);
+  assert.equal(completed.elements.get('loginLink').href, retry.href);
+  const proof = storage.get(tabProofKey);
+  assert.equal(env.api.getViewerContext(proof).email, 'customer@speed-ad.com');
+  assert.equal(env.api.getContactSubmission(caseId, proof).submission.submission_id, caseId);
 });

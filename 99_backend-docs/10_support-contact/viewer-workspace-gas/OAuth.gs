@@ -79,7 +79,8 @@ function consumeCustomerOAuthState_(state, config, proofHash) {
   try {
     var raw = cache.get('oauth-state-v2:' + state);
     var pending = raw ? JSON.parse(raw) : null;
-    if (!pending || pending.version !== 2 || pending.proofHash !== proofHash || pending.binding !== binding) {
+    if (!pending) throw new Error('OAuth state unavailable');
+    if (pending.version !== 2 || pending.proofHash !== proofHash || pending.binding !== binding) {
       throw new Error('Invalid tab proof');
     }
     cache.remove('oauth-state-v2:' + state);
@@ -213,6 +214,15 @@ function completeCustomerOAuthLogin(params, authProof) {
     if (result.authuser) query += (query ? '&' : '') + 'authuser=' + result.authuser;
     return { ok: true, returnUrl: result.redirectUri + (query ? '?' + query : '') };
   } catch (_err) {
+    var stateReason = {
+      'Invalid state': 'invalid',
+      'OAuth state unavailable': 'missing_or_used',
+      'Invalid tab proof': 'context_mismatch',
+      'Expired or unbound state': 'expired'
+    };
+    if (Object.prototype.hasOwnProperty.call(stateReason, _err && _err.message)) {
+      console.warn('customer_oauth_state: ' + stateReason[_err.message]);
+    }
     throw new Error('ログインを確認できませんでした。 [' + oauthFailureCode_(_err) + ']');
   }
 }
@@ -232,6 +242,12 @@ function renderLogin_(submissionId, callback, authuser) {
   template.submissionId = submissionId;
   template.callback = callback;
   template.authuser = normalizeOAuthAuthuser_(authuser);
+  template.retryBaseUrl = '';
+  try {
+    template.retryBaseUrl = oauthConfig_().redirectUri;
+  } catch (_error) {
+    // A missing login configuration cannot provide a trusted return URL.
+  }
   return template.evaluate().setTitle('SPEED AD ログイン');
 }
 
@@ -244,7 +260,7 @@ function normalizeOAuthAuthuser_(value) {
 function oauthFailureCode_(error) {
   var groups = {
     AUTH_CONFIG: ['OAuth configuration unavailable'],
-    AUTH_STATE: ['Invalid state', 'Invalid tab proof', 'Expired or unbound state'],
+    AUTH_STATE: ['Invalid state', 'OAuth state unavailable', 'Invalid tab proof', 'Expired or unbound state'],
     AUTH_PROOF: ['Tab proof unavailable'],
     AUTH_IDENTITY: ['Temporary user identity unavailable', 'Temporary user changed', 'Invalid customer identity', 'OAuth identity expired'],
     AUTH_PERMISSION: ['Known principal mismatch'],
