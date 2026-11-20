@@ -1,0 +1,41 @@
+# メール全件照合用の正本Sheet取得
+
+第2段階の本番受入で、独立照合器へ渡すSheet manifestを取得するための読取り専用手順です。通常のGAS `/exec` URLへ `?operator=sheet-acceptance` を付けると専用画面を開きます。サーバーで既存の `abroad-o.com` domain認証を確認してから画面を返し、取得RPCでも同じ認証を再確認します。全社員に認められた既存の利用範囲を使い、新しい管理者役割は設けません。新しいOAuth scopeやApps Script Execution APIの公開設定は不要です。実行には `SheetAcceptance.gs` と `SheetAcceptance.html` を含むGAS版の配備が必要であり、現在の配備で開けると推定しないでください。
+
+## 入力と結果
+
+`options` は次の4項目だけを持ちます。
+
+| 項目 | 内容 |
+| --- | --- |
+| `runId` | 全取得で共通の1～80文字の英数字・`.`・`_`・`-`。 |
+| `startAt` | GAS Script Property `MAIL_HISTORY_START_AT` と同期に一致する開始日時。ミリ秒付き正規UTC ISOのJST 00:00で、最古受付JST日の前日以前。設定なし・不正では取得不可。 |
+| `cutoffAt` | 今回の同期・照合に固定した基準日時。現在以前の正規UTC ISO文字列。 |
+| `hashKeyBase64` | 今回だけ使うランダム32byteの共通キーを標準base64にした値。Gmail/App取得と同じキーを使い、manifestやログには保存しない。 |
+
+専用画面で「Sheet前」または「Sheet後」を選び、4欄へ入力して「JSONを取得」を押します。画面は既存の `getViewerContext` でdomain経路を確認し、`exportContactMailSheetAcceptance(options, '')` を呼びます。成功時は `{manifest,receipt}` だけを `speed-ad-sheet-before.json` または `speed-ad-sheet-after.json` としてBlobから端末へ保存し、行データを画面へ展開しません。順番の選択は固定の保存名を決めるだけで、GASへの入力には追加しません。Sheet前・後で取得したファイルはアクセス制限された一時フォルダへ分けて置き、照合後に削除します。関数は認証、入力検査の順に処理し、Cloud Run/Gmail/Driveを呼びません。
+
+入力値をURLへ付けず、一時キーをbrowser storage・console・ログへ保存しません。成功・入力不備・取得失敗のいずれでも一時キー欄を消すため、再取得時は同じ実行キーを再入力します。任意の例外文を表示せず、固定の失敗案内だけを示します。ブラウザの保存先設定によっては標準のダウンロードフォルダに置かれるため、実際の保存先を確認し、アクセス制限された一時フォルダへ移して元の不要コピーを削除します。
+
+結果は `{ok:true, manifest, receipt}` です。`manifest` はschemaVersion、source、runId、hashKeyId、startAt、cutoffAt、capturedAt、sourceComplete、errors、pages、rowsを持ちます。各行は `{caseHash, submittedAt, handledStatus, closedAt}` です。caseHashはHMAC-SHA256の `case + NUL + 受付ID`、hashKeyIdはキー自体のSHA-256です。`receipt` は既存カタログと同じ `catalogDigest`、件数 `total`、読取り回数 `readCount:2` を持ちます。
+
+受付ID、名前、メールアドレス、件名、受付本文、内部メモ、添付情報、キーは結果へ含めません。hashも照合可能な管理情報なので、共有リポジトリや公開ログへ置かないでください。
+
+## 採取順と変更検出
+
+1. 同期とhistory追随が完了した対象期間・基準日時、採用版、runId、共通キーを固定する。
+2. 専用画面でSheet-beforeを取得する。
+3. 独立したGmail manifestを取得する。
+4. 読取り専用のApp manifestを取得する。
+5. 専用画面へ同じ入力を再入力し、Sheet-afterを取得する。
+6. Sheet-beforeとSheet-afterの全行が一致し、Sheet-afterのcapturedAtがGmail/App取得後であることを照合器で確認する。照合CLIは両receiptの件数・二重読取り・catalogDigest一致も検査する。
+
+各呼出しでも正本と選択開始日の設定を2回読み、受付ID・受付日時・状態・終了日時・設定開始日が一致した場合だけ完了結果を返します。200件の上限は設けず、保存先の全データ行を確認します。空の保存先、受付IDを欠く非空行、不正・重複ID、不正日時、状態と終了日時の不整合、基準日時より後の受付、読取り間の変更は固定エラーで停止します。行の不備を黙って省略せず、基準日時より後の受付があれば新しい基準で同期と採取をやり直します。
+
+開始日より前の関連履歴がないことは、このSheet取得では検証できません。実メールの履歴調査で開始日の根拠をprivate運用記録へ残し、古い関連メールが見つかれば設定を前へ広げ、全同期後に同じ新期間で採取し直します。設定を後ろへ動かす通常同期は実行サービスが拒否します。
+
+これは固定した観測期間の照合です。Sheet、Gmail、Firestoreをまたぐ原子的なsnapshotではありません。採取中の変更・取得失敗・未完了があれば合格へ進めません。manifest同士の一致だけで本文・添付の実確認、別利用者による確認記録の読戻しが完了したとは判定しません。
+
+## 合成検証
+
+リポジトリ直下で `node --test tests/support-contact-sheet-acceptance.test.mjs tests/support-contact-sheet-operator.test.mjs`。401件、HMAC互換、全件数、カタログdigest、認証・入力検査、空・欠損・重複・不正行、header/受付日時/状態の変更、基準日時違反、秘密を含む例外の固定化、専用画面のdomain拒否・Blob取得・キー消去・不正応答拒否・配備source一式を合成データで確認します。実Sheetと配備画面での取得は別の受入です。

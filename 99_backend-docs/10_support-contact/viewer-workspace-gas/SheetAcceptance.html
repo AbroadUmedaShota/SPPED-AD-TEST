@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>SPEED AD 受入用Sheet取得</title>
+  <style>
+    body { margin: 0; background: #f5f7fb; color: #17233b; font: 16px/1.6 Arial, sans-serif; }
+    main { max-width: 680px; margin: 32px auto; padding: 24px; background: #fff; border: 1px solid #dbe1ed; border-radius: 12px; }
+    h1 { margin: 0 0 12px; font-size: 22px; }
+    p { margin: 0 0 20px; }
+    label { display: block; margin: 16px 0; font-weight: 600; }
+    input, select { display: block; box-sizing: border-box; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid #b4bfd2; border-radius: 6px; font: 14px/1.5 monospace; }
+    button { padding: 10px 20px; color: #fff; background: #163e80; border: 0; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { min-height: 26px; margin: 16px 0 0; }
+    @media (max-width: 720px) { main { margin: 12px; padding: 20px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>受入用Sheet取得</h1>
+  <p>正本の受付ID・受付日時・対応状態・終了日時を照合用JSONにします。Sheet前 → Gmail → App → Sheet後の順で取得してください。一時キーは取得のたびに入力してください。ダウンロード先を確認し、JSONをアクセス制限された一時フォルダで扱って照合後に削除してください。</p>
+  <form id="capture-form" method="post" autocomplete="off" novalidate>
+    <label>取得の順番<select id="capture-phase"><option value="before">Sheet前（Gmail/App取得の前）</option><option value="after">Sheet後（Gmail/App取得の後）</option></select></label>
+    <label>実行ID<input id="run-id" type="text" maxlength="80" autocomplete="off" spellcheck="false" required></label>
+    <label>開始日時（UTC ISO）<input id="start-at" type="text" placeholder="2026-11-08T15:00:00.000Z" autocomplete="off" spellcheck="false" required></label>
+    <label>基準日時（UTC ISO）<input id="cutoff-at" type="text" placeholder="2026-11-10T01:00:00.000Z" autocomplete="off" spellcheck="false" required></label>
+    <label>一時キー（32byte・base64）<input id="hash-key" type="password" autocomplete="off" spellcheck="false" minlength="44" maxlength="44" required></label>
+    <button id="capture" type="submit">JSONを取得</button>
+  </form>
+  <p id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+  'use strict';
+  const form = document.getElementById('capture-form');
+  const keyInput = document.getElementById('hash-key');
+  const button = document.getElementById('capture');
+  const status = document.getElementById('status');
+  const hashPattern = /^[a-f0-9]{64}$/;
+  const statuses = ['未対応', '対応中', '保留', '対応済み'];
+  let busy = false;
+
+  function exactKeys(value, expected) {
+    return value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).sort().join(',') === expected.slice().sort().join(',');
+  }
+  function iso(value) {
+    return typeof value === 'string' && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value;
+  }
+  function validInput(value) {
+    if (!/^[A-Za-z0-9._-]{1,80}$/.test(value.runId) || !iso(value.startAt) || !iso(value.cutoffAt) || value.startAt > value.cutoffAt ||
+        Date.parse(value.cutoffAt) > Date.now() || !/^[A-Za-z0-9+/]{43}=$/.test(value.hashKeyBase64)) return false;
+    try { const decoded = atob(value.hashKeyBase64); return decoded.length === 32 && btoa(decoded) === value.hashKeyBase64; }
+    catch (_) { return false; }
+  }
+  function validResult(value, expected) {
+    if (!exactKeys(value, ['ok', 'manifest', 'receipt']) || value.ok !== true) return false;
+    const m = value.manifest;
+    if (!exactKeys(m, ['schemaVersion', 'source', 'runId', 'hashKeyId', 'startAt', 'cutoffAt', 'capturedAt', 'sourceComplete', 'errors', 'pages', 'rows']) ||
+        m.schemaVersion !== 1 || m.source !== 'sheet' || m.runId !== expected.runId || m.startAt !== expected.startAt || m.cutoffAt !== expected.cutoffAt ||
+        !hashPattern.test(m.hashKeyId) || !iso(m.capturedAt) || m.capturedAt < m.cutoffAt || m.sourceComplete !== true ||
+        !Array.isArray(m.errors) || m.errors.length !== 0 || !Array.isArray(m.rows) || m.rows.length === 0 || m.rows.length > 100000 ||
+        !Array.isArray(m.pages) || m.pages.length !== 1) return false;
+    const page = m.pages[0];
+    if (!exactKeys(page, ['index', 'requestTokenHash', 'nextTokenHash', 'rowCount']) || page.index !== 0 || page.requestTokenHash !== null ||
+        page.nextTokenHash !== null || page.rowCount !== m.rows.length) return false;
+    const ids = new Set();
+    for (const row of m.rows) {
+      if (!exactKeys(row, ['caseHash', 'submittedAt', 'handledStatus', 'closedAt']) || !hashPattern.test(row.caseHash) || ids.has(row.caseHash) ||
+          !iso(row.submittedAt) || row.submittedAt > m.cutoffAt || !statuses.includes(row.handledStatus) ||
+          !(row.closedAt === null || iso(row.closedAt) && row.handledStatus === '対応済み' && row.closedAt >= row.submittedAt && row.closedAt <= m.capturedAt)) return false;
+      ids.add(row.caseHash);
+    }
+    return exactKeys(value.receipt, ['catalogDigest', 'total', 'readCount']) && hashPattern.test(value.receipt.catalogDigest) &&
+      value.receipt.total === m.rows.length && value.receipt.readCount === 2;
+  }
+  function rpc(name, ...args) {
+    return new Promise((resolve, reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args));
+  }
+  function download(value, phase) {
+    const blob = new Blob([JSON.stringify({ manifest: value.manifest, receipt: value.receipt }, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    try {
+      link.href = url;
+      link.download = phase === 'after' ? 'speed-ad-sheet-after.json' : 'speed-ad-sheet-before.json';
+      document.body.appendChild(link);
+      link.click();
+    } finally { setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000); }
+  }
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    busy = true;
+    button.disabled = true;
+    const options = { runId: document.getElementById('run-id').value.trim(), startAt: document.getElementById('start-at').value.trim(),
+      cutoffAt: document.getElementById('cutoff-at').value.trim(), hashKeyBase64: keyInput.value };
+    const phase = document.getElementById('capture-phase').value;
+    status.textContent = '取得中です。';
+    try {
+      if (!validInput(options) || !['before', 'after'].includes(phase)) throw new Error('MAIL_ACCEPTANCE_INPUT_INVALID');
+      const viewer = await rpc('getViewerContext', '');
+      if (!viewer || viewer.allowed !== true || viewer.authMode !== 'domain') throw new Error('FORBIDDEN');
+      const value = await rpc('exportContactMailSheetAcceptance', options, '');
+      if (!validResult(value, options)) throw new Error('MAIL_ACCEPTANCE_RESPONSE_INVALID');
+      download(value, phase);
+      status.textContent = 'JSONのダウンロードを開始しました。件数: ' + value.receipt.total + '件。';
+    } catch (error) {
+      const allowed = ['MAIL_ACCEPTANCE_INPUT_INVALID', 'MAIL_ACCEPTANCE_SOURCE_INVALID', 'MAIL_ACCEPTANCE_SOURCE_CHANGED', 'MAIL_ACCEPTANCE_CUTOFF_CHANGED', 'MAIL_ACCEPTANCE_RESPONSE_INVALID', 'FORBIDDEN'];
+      const message = error && typeof error.message === 'string' ? error.message : '';
+      const code = allowed.includes(message) ? message : allowed.find((item) => message === 'Error: ' + item);
+      status.textContent = '取得できませんでした。認証・入力・正本を確認してください。' + (code ? ' (' + code + ')' : '');
+    } finally {
+      keyInput.value = '';
+      options.hashKeyBase64 = '';
+      busy = false;
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Cloud Build receives only runtime source and its locked dependencies.
+*
+!/package.json
+!/package-lock.json
+!/*.mjs
+!/runtime/
+/runtime/*
+!/runtime/*.mjs
+!/runtime/Dockerfile
+!/runtime/cloudbuild.yaml
